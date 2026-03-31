@@ -13,11 +13,11 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         Path uploadDir = Paths.get("uploads/media");
-        String uploadPath = uploadDir.toFile().getAbsolutePath();
+        String uploadPath = uploadDir.toFile().getAbsolutePath().replace("\\", "/");
         // Maps http://localhost:8080/uploads/media/filename.jpg to the physical backend
-        // folder
+        // folder (use forward slashes for cross-platform file URI compatibility)
         registry.addResourceHandler("/uploads/media/**")
-                .addResourceLocations("file:/" + uploadPath + "/");
+                .addResourceLocations("file:///" + uploadPath + "/");
     }
 
     @Override

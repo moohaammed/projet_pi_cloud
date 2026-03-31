@@ -22,8 +22,10 @@ public class FileStorageService {
     public String storeFile(MultipartFile file) {
         if (file == null || file.isEmpty()) return null;
         try {
-            // Generate unique filename to prevent overwriting files with the same name
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            // Generate unique filename and sanitize spaces/special chars
+            String originalFileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+            String safeFileName = originalFileName.replaceAll("[^a-zA-Z0-9\\.\\-_]", "_");
+            String fileName = UUID.randomUUID().toString() + "_" + safeFileName;
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
             return "/uploads/media/" + fileName; // Return the relative URL path mapping
