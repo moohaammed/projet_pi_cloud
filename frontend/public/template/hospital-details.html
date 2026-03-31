@@ -1,0 +1,1433 @@
+<!doctype html>
+<html lang="en">
+
+
+<!-- Mirrored from theme.easital.com/html/docwala/v1.0/hospital-details.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 30 Mar 2026 13:08:46 GMT -->
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+	<!-- Bootstrap CSS -->
+	<link rel="shortcut icon" href="assets/img/favicon.png">
+	<link href="assets/plugins/aos/aos.min.css" rel="stylesheet">
+	<link href="assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="assets/plugins/smartmenus/jquery.smartmenus.bootstrap-4.css" rel="stylesheet">
+	<link href="assets/plugins/fontawesome/css/all.min.css" rel="stylesheet">
+	<link href="assets/css/flaticon-icon.css" rel="stylesheet">
+	<link href="assets/plugins/themify-icons/themify-icons.css" rel="stylesheet">
+	<link href="assets/plugins/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet">
+	<link href="assets/plugins/select2/select2.min.css" rel="stylesheet">
+	<link href="assets/plugins/select2-bootstrap-5/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+	<link href="assets/plugins/OwlCarousel2/css/owl.carousel.min.css" rel="stylesheet">
+	<link href="assets/plugins/OwlCarousel2/css/owl.theme.default.min.css" rel="stylesheet">
+	<link href="assets/plugins/ion.rangeSlider/css/ion.rangeSlider.min.css" rel="stylesheet">
+	<link href="assets/plugins/raty/raty.min.css" rel="stylesheet">
+	<link href="assets/plugins/slick/slick.min.css" rel="stylesheet">
+	<link href="assets/plugins/slick/slick-theme.min.css" rel="stylesheet">
+	<link href="assets/plugins/magnific-popup/magnific-popup.min.css" rel="stylesheet">
+	<link href="assets/css/style.css" rel="stylesheet">
+	<title>DocWala - Doctor Listing & Consultation HTML Template</title>
+</head>
+
+<body>
+	<!-- Page Loader -->
+	<div class="page-loader-wrapper flex-column align-items-center justify-content-center">
+		<div class="loader">
+			<div class="preloader">
+				<div class="spinner-layer pl-green">
+					<div class="circle-clipper left">
+						<div class="circle"></div>
+					</div>
+					<div class="circle-clipper right">
+						<div class="circle"></div>
+					</div>
+				</div>
+			</div>
+			<p class="fs-12 fw-semibold mb-0 mt-3 text-uppercase">Please wait...</p>
+		</div>
+	</div>
+	<!-- /.Page Loader -->
+	<!-- Start Navbar -->
+	<nav class="custom-navbar navbar navbar-expand-lg fixed-top navbar-transfarent">
+		<!-- <nav class="custom-navbar navbar navbar-expand-lg sticky-top no-logo"> -->
+		<!-- <nav class="custom-navbar navbar navbar-expand-lg navbar-light sticky-top"> -->
+		<div class="container">
+			<!-- Start Navbar Brand-->
+			<a class="border-end navbar-brand pe-3 pe-sm-4 py-0" href="index.html"> <img class="logo-dark" src="assets/img/logo.png" alt=""> <img class="logo-white" src="assets/img/logo-white.png" alt=""> </a>
+			<!-- End Navbar Brand-->
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<!-- Start Navbar Collapse Header -->
+				<div class="align-items-center border-bottom d-flex d-lg-none  justify-content-between mb-3 navbar-collapse__header pb-3">
+					<!-- Start Brand Logo For Mobile -->
+					<div class="collapse-brand flex-shrink-0">
+						<a href="index.html"><img src="assets/img/logo.png" alt=""></a>
+					</div>
+					<!-- End Brand Logo For Mobile -->
+					<!-- Start Collapse Close Button -->
+					<div class="flex-grow-1 ms-3 text-end">
+						<button type="button" class="bg-transparent border-0 collapse-close p-0 position-relative"><span></span> <span></span></button>
+					</div>
+					<!-- End Collapse Close Button -->
+				</div>
+				<!-- End Navbar Collapse Header -->
+				<ul class="navbar-nav">
+					<li class="nav-item dropdown"> <a class="nav-link dropdown-toggle" href="#">
+              Home
+            </a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="index.html">Home 01</a></li>
+							<li><a class="dropdown-item" href="index-2.html">Home 02 </a></li>
+							<li><a class="dropdown-item" href="index-3.html">Home 03</a></li>
+							<li><a class="dropdown-item" href="index-4.html">Home 04</a></li>
+							<li><a class="dropdown-item" href="index-5.html">Home 05</a></li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown"> <a class="nav-link dropdown-toggle" href="#">
+              Pharmacy
+            </a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="product.html">Product</a></li>
+							<li><a class="dropdown-item" href="product-details.html">Product Details</a></li>
+							<li><a class="dropdown-item" href="cart.html">Shop Cart</a></li>
+							<li><a class="dropdown-item" href="checkout.html">Checkout</a></li>
+							<li><a class="dropdown-item" href="checkout-complete.html">Checkout Complete</a></li>
+							<li><a class="dropdown-item" href="order-completed.html">Complete Order</a></li>
+							<li><a class="dropdown-item" href="empty-cart.html">Cart Empty</a></li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown"> <a class="nav-link dropdown-toggle active" href="#">
+              Pages
+            </a>
+						<ul class="dropdown-menu">
+							<li class="dropdown"> <a class="dropdown-item dropdown-toggle" href="#">Doctors List</a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" href="doctor-list-sidebar-filters-1.html">Sidebar Filters 01</a></li>
+									<li><a class="dropdown-item" href="doctor-list-sidebar-filters-2.html">Sidebar Filters 02</a></li>
+									<li><a class="dropdown-item" href="doctor-list-sidebar-filters-3.html">Sidebar Filters 03</a></li>
+									<li><a class="dropdown-item" href="doctor-list-topbar-filters.html">Top Filters</a> </li>
+								</ul>
+							</li>
+							<li class="dropdown"> <a class="dropdown-item dropdown-toggle" href="#">Doctors Grid</a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" href="doctor-grid-sidebar-filters-1.html">Sidebar Filters 01</a></li>
+									<li><a class="dropdown-item" href="doctor-grid-sidebar-filters-2.html">Sidebar Filters 02</a></li>
+									<li><a class="dropdown-item" href="doctor-grid-topbar-filters.html">Top Filters</a></li>
+								</ul>
+							</li>
+							<li><a class="dropdown-item" href="doctor-details.html">Doctor Details</a></li>
+							<li class="dropdown"> <a class="dropdown-item dropdown-toggle" href="#">Hospital</a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" href="hospital-list-1.html">Hospital List 01</a></li>
+									<li><a class="dropdown-item" href="hospital-list-2.html">Hospital List 02</a></li>
+									
+								</ul>
+							</li>
+							<li><a class="dropdown-item active" href="hospital-details.html">Hospital Details</a></li>
+							<li><a class="dropdown-item" href="donation.html">Donation</a></li>
+							<li><a class="dropdown-item" href="donation-list.html">Donation List</a></li>
+							<li><a class="dropdown-item" href="registration-agent.html">Agent Registration</a></li>
+							<li><a class="dropdown-item" href="registration-doctor.html">Doctor Registration</a></li>
+							<li><a class="dropdown-item" href="registration-hospital.html">Hospital Registration</a></li>
+							<!-- <li><a class="dropdown-item" href="consult-privately.html">Consult Privately</a></li> -->
+						</ul>
+					</li>
+					<li class="nav-item dropdown"> <a class="nav-link dropdown-toggle" href="#">Extra</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="about.html">About Us</a></li>
+							<li><a class="dropdown-item" href="blog-1.html">Blog 01</a></li>
+							<li><a class="dropdown-item" href="blog-2.html">Blog 02</a></li>
+							<li><a class="dropdown-item" href="blog-details.html">Blog Details</a></li>
+							<li><a class="dropdown-item" href="404.html">404 Page</a></li>
+							<li><a class="dropdown-item" href="505.html">505 Page</a></li>
+							<li><a class="dropdown-item" href="help.html">Help Page</a></li>
+							<li><a class="dropdown-item" href="privacy.html">Privacy</a></li>
+							<li><a class="dropdown-item" href="offline-payment.html">Offline Payment</a></li>
+							<li class="dropdown"> <a class="dropdown-item dropdown-toggle" href="#">Authentication</a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" href="login.html">Log In</a></li>
+									<li><a class="dropdown-item" href="signup.html">Sign Up</a></li>
+									<li><a class="dropdown-item" href="forgot-password.html">Forgot Password</a></li>
+									<li><a class="dropdown-item" href="two-factor-auth.html">Two factor authentication</a></li>
+								</ul>
+							</li>
+							<li><a class="dropdown-item" href="terms-conditions.html">Terms & conditions</a></li>
+						</ul>
+					</li>
+					<li class="nav-item"> <a class="nav-link" href="contact.html">Contact</a> </li>
+				</ul>
+			</div>
+			<div class="d-flex ms-lg-5">
+				<!-- Start Navbar Toggler Buton -->
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-text">Menu</span> </button>
+				<!-- End Navbar Toggler Buton -->
+				<!-- Start Cart Button -->
+				<a href="cart.html" class="align-items-center btn cart-button d-none d-xl-flex ms-2 ms-lg-0">
+					 <i class="fa-solid fa-cart-shopping"></i>
+					 <span class="ms-2">Cart</span>
+					 <span class="align-items-center cart-quantity d-flex fw-bold justify-content-center ms-2 rounded-circle">0</span>
+				</a>
+				<!-- For Mobile -->
+				<a href="cart.html" class="btn btn-primary d-none d-sm-inline-block d-xl-none ms-sm-2"><i class="fa-solid fa-cart-shopping"></i></a>
+				<!-- /End Cart Button -->
+				<!-- Start Login & Signup Button -->
+				<a href="login.html" class="btn btn-primary ms-2 ms-xl-0"><i class="fa-solid fa-arrow-right-to-bracket"></i><span class="ms-2 d-none d-sm-inline-block">Login / Signup</span> </a>
+				<!-- End Login & Signup Button -->
+				<!-- Start Color Change Button -->
+				<!-- <div class="d-none d-sm-inline-block ms-1">
+              <button type="button" class="btn btn-primary dark-btn"><i class="fa-solid fa-moon"></i></button>
+              <button type="button" class="btn btn-primary light-btn"><i class="fa-solid fa-lightbulb"></i></button>
+            </div> -->
+				<!-- End Color Change Button -->
+			</div>
+		</div>
+	</nav>
+	<!-- /.End of navbar -->
+	<!-- Start Page Header -->
+	<div class="bg-img-hero position-relative profile-header py-5 text-white background-no-repeat background-size-cover" data-image-src="assets/img/header/03.jpg">
+		<div class="container mt-5 mb-4 position-relative pt-5 z-index-1">
+			<div class="row justify-content-center">
+				<div class="col-lg-7">
+					<div class="doctor-info position-relative text-center text-white">
+						<!-- Start Speciality -->
+						<!-- <div class="fs-16 fw-semibold l-spacing-2 mb-3 text-uppercase">Ayurvedic Doctor</div> -->
+						<!-- /.End Speciality -->
+						<!-- Start Star Rating -->
+						<div class="align-items-center d-flex fs-13 justify-content-center mb-2 star-rating">
+							<!-- Start Star Rating Box -->
+							<div class="star-rating__box"> <i class="align-items-center d-inline-flex fa-star fas justify-content-center rounded-1 bg-warning text-dark"></i> <i class="align-items-center d-inline-flex fa-star fas justify-content-center rounded-1 bg-warning text-dark"></i> <i class="align-items-center d-inline-flex fa-star fas justify-content-center rounded-1 bg-warning text-dark "></i> <i class="align-items-center d-inline-flex fa-star fas justify-content-center rounded-1 bg-warning text-dark"></i> <i class="far fa-star align-items-center d-inline-flex justify-content-center rounded-1 bg-warning text-dark"></i> </div>
+							<!-- /.End Star Rating Box -->
+							<!-- Start Review Numbers -->
+							<div class="ms-2 review-numbers"> <span class="reviews-stats">4.5</span> <span class="reviews-count">(862)</span> </div>
+							<!-- /.End Review Numbers -->
+						</div>
+						<!-- /.End Star Rating -->
+						<!-- Start Doctor Degrees -->
+						<h1 class="display-5 fw-semibold mb-5 text-white">Ispahani Islamia Eye Institute and Hospital
+            </h1>
+						<!-- /.End Doctor Degrees -->
+						<div class="fs-25 fw-semibold">Phone: <span class="bg-warning fw-bold px-3 py-1 rounded text-danger">+88 02 814 1969</span></div>
+						<div class="h-email text-decoration-underline"><a href="https://theme.easital.com/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="85ecebe3eac5ecf6e9e4e8ece4abe2e8e4ece9abe6eae8">[email&#160;protected]</a></div>
+						<!-- Start Doctor Clinic Locations -->
+						<div class="fs-16 fw-medium l-spacing-1 mt-3 text-uppercase"><i class="fa-solid fa-location-dot me-2"></i>1355 Market St, Suite 900 San Francisco, CA 94103</div>
+						<!-- /.End Doctor Clinic Locations --><a href="#" class="h-web_address"><i class="fas fa-globe"></i> http://islamia.org.bd</a> </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /.End Page Header -->
+	<div class="h-details_content py-5">
+		<div class="container py-3">
+			<div class="row">
+				<div class="col-md-8 content pe-xxl-5">
+					<div class="cs-content">
+						<div class="mb-5">
+							<!-- Start Title -->
+							<h4 class="fw-semibold mb-4 text-capitalize"><span class="underline position-relative text-primary">About Us</span>
+              </h4>
+							<!-- End Title -->
+							<div class="card shadow border-0 text-inherit flex-fill w-100">
+								<div class="card-body p-4 p-sm-5">
+									<div class="readmore js-read-more" data-rm-words="80">
+										<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+										<p>It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. </p>
+										<p>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+										<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. </p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="mb-5">
+							<!-- Start Title -->
+							<h4 class="fw-semibold mb-4 text-capitalize"><span class="underline position-relative text-primary">Departments</span>
+              </h4>
+							<!-- End Title -->
+							<div class="g-4 justify-content-center row">
+								<div class="col-sm-6 col-md-4 col-lg-3 col-xl-4 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-list.html" class="card shadow border-0 text-inherit flex-fill w-100">
+										<div class="card-body text-center">
+											<!-- Start Title -->
+											<h6 class="speciality-title overflow-hidden mb-1 fw-bold fs-18 mb-3">
+                        Allergist and Clinical</h6>
+											<!-- /.End Title -->
+											<!-- Start Image --><img src="assets/img/icon/01.jpg" alt="..." height="80" width="80" class="mb-3">
+											<!-- /.End Image -->
+											<!-- Start Text -->
+											<div class="mb-2 small">Manage allergies and treat immunity</div>
+											<!-- /.End Text -->
+											<!-- Start Text --><small class="text-primary fw-medium d-block">Recurring infections,
+                        Immunity deficiency</small>
+											<!-- /.End Text -->
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-sm-6 col-md-4 col-lg-3 col-xl-4 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-list.html" class="card shadow border-0 text-inherit flex-fill w-100">
+										<div class="card-body text-center">
+											<!-- Start Title -->
+											<h6 class="speciality-title overflow-hidden mb-1 fw-bold fs-18 mb-3">
+                        Bariatrics</h6>
+											<!-- /.End Title -->
+											<!-- Start Image --><img src="assets/img/icon/02.png" alt="..." height="80" width="80" class="mb-3">
+											<!-- /.End Image -->
+											<!-- Start Text -->
+											<div class="mb-2 small">For obesity-related disorders</div>
+											<!-- /.End Text -->
+											<!-- Start Text --><small class="text-primary fw-medium d-block">Recurring infections,
+                        Immunity deficiency</small>
+											<!-- /.End Text -->
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-sm-6 col-md-4 col-lg-3 col-xl-4 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-list.html" class="card shadow border-0 text-inherit flex-fill w-100">
+										<div class="card-body text-center">
+											<!-- Start Title -->
+											<h6 class="speciality-title overflow-hidden mb-1 fw-bold fs-18 mb-3">
+                        Cardiology</h6>
+											<!-- /.End Title -->
+											<!-- Start Image --><img src="assets/img/icon/03.jpg" alt="..." height="80" width="80" class="mb-3">
+											<!-- /.End Image -->
+											<!-- Start Text -->
+											<div class="mb-2 small">For heart and blood pressure</div>
+											<!-- /.End Text -->
+											<!-- Start Text --><small class="text-primary fw-medium d-block">Recurring infections,
+                        Immunity deficiency</small>
+											<!-- /.End Text -->
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-sm-6 col-md-4 col-lg-3 col-xl-4 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-list.html" class="card shadow border-0 text-inherit flex-fill w-100">
+										<div class="card-body text-center">
+											<!-- Start Title -->
+											<h6 class="speciality-title overflow-hidden mb-1 fw-bold fs-18 mb-3">
+                        Cold, Cough and Fever</h6>
+											<!-- /.End Title -->
+											<!-- Start Image --><img src="assets/img/icon/04.jpg" alt="..." height="80" width="80" class="mb-3">
+											<!-- /.End Image -->
+											<!-- Start Text -->
+											<div class="mb-2 small">For common health concerns</div>
+											<!-- /.End Text -->
+											<!-- Start Text --><small class="text-primary fw-medium d-block">Fever, Eye Infection,
+                        Stomach Ache, Headache</small>
+											<!-- /.End Text -->
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-sm-6 col-md-4 col-lg-3 col-xl-4 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-list.html" class="card shadow border-0 text-inherit flex-fill w-100">
+										<div class="card-body text-center">
+											<!-- Start Title -->
+											<h6 class="speciality-title overflow-hidden mb-1 fw-bold fs-18 mb-3">
+                        Colorectal Surgery</h6>
+											<!-- /.End Title -->
+											<!-- Start Image --><img src="assets/img/icon/05.jpg" alt="..." height="80" width="80" class="mb-3">
+											<!-- /.End Image -->
+											<!-- Start Text -->
+											<div class="mb-2 small">For disorders of rectum, anus, and colon </div>
+											<!-- /.End Text -->
+											<!-- Start Text --><small class="text-primary fw-medium d-block">Inflammatory bowel
+                        disease, Fistula, Intestinal
+                        blockage</small>
+											<!-- /.End Text -->
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-sm-6 col-md-4 col-lg-3 col-xl-4 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-list.html" class="card shadow border-0 text-inherit flex-fill w-100">
+										<div class="card-body text-center">
+											<!-- Start Title -->
+											<h6 class="speciality-title overflow-hidden mb-1 fw-bold fs-18 mb-3">
+                        Counseling</h6>
+											<!-- /.End Title -->
+											<!-- Start Image --><img src="assets/img/icon/06.jpg" alt="..." height="80" width="80" class="mb-3">
+											<!-- /.End Image -->
+											<!-- Start Text -->
+											<div class="mb-2 small">Emotional or mental health difficulties </div>
+											<!-- /.End Text -->
+											<!-- Start Text --><small class="text-primary fw-medium d-block">Depression, Anxiety,
+                        Mental Stress, Trauma</small>
+											<!-- /.End Text -->
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+							</div>
+						</div>
+						<div class="mb-5">
+							<!-- Start Title -->
+							<h4 class="fw-semibold mb-4 text-capitalize"><span class="underline position-relative text-primary">Doctors</span>
+              </h4>
+							<!-- End Title -->
+							<div class="row g-4">
+								<div class="col-md-6 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-details.html" class="border-0 text-inherit card overflow-hidden shadow doctor-card bg-soft-primary w-100 flex-fill">
+										<div class="card-body p-0">
+											<div class="bg-white d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<!-- Start Avatar Wrap -->
+												<div class="d-block doctor-avatar flex-shrink-0 me-3 p-2 position-relative rounded-bottom rounded-circle shadow">
+													<!-- Start Online Dot -->
+													<div class="online position-absolute"> <span class="heartbit"></span> <span class="point"></span> </div>
+													<!-- End Online Dot -->
+													<!-- Start Avatar --><img src="assets/img/avatar/01.jpg" alt="" class="rounded-bottom rounded-circle">
+													<!-- End Avatar -->
+												</div>
+												<!-- End Avatar Wrap -->
+												<div class="flex-grow-1">
+													<!-- Start Name -->
+													<h6 class="fs-17 fw-semibold mb-2 mb-sm-1">Dr. Chaithanya Ravikumar</h6>
+													<!-- End Name -->
+													<!-- Start Designation -->
+													<div class="fw-semibold mb-0 mb-sm-2 small text-primary">MBBS, MD, FCCM, FCCP, EDIC </div>
+													<!-- Start Designation -->
+													<!-- Start Language Skills -->
+													<div class="d-none d-sm-block small">English, Punjabi, Hindi, English</div>
+													<!-- End Language Skills -->
+													<!-- Start Chamber  -->
+													<div class="d-none d-sm-block small">Apollo Hospitals Indraprastha, South Delhi </div>
+													<!-- End Chamber  -->
+												</div>
+											</div>
+											<!-- <hr> -->
+											<div class="bg-white p-3 p-lg-4 p-md-3 p-sm-4 pt-0 pt-lg-0 pt-sm-0">
+												<div class="row g-3">
+													<div class="col-auto col-md-12">
+														<h6 class="fs-13 mb-1 text-muted">Working in</h6>
+														<div class="fw-bold text-black fs-15">Apollo Hospitals Dhaka</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Rating (7668)</h6>
+														<div class="align-items-center d-flex fs-12">
+															<!-- Start Star Rating -->
+															<div class="d-flex star-rating text-warning"> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="far fa-star"></i> </div>
+															<!-- End Star Rating -->
+															<!-- Start Star Rating count -->
+															<div class="fw-semibold ms-1 review-numbers small text-dark"> <span class="reviews-stats">4.5</span> <span class="reviews-count">(862)</span> </div>
+															<!-- End Star Rating count -->
+														</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Experience</h6>
+														<div class="fw-bold text-black fs-15">27+ Years</div>
+													</div>
+												</div>
+											</div>
+											<div class="d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<div class="col-auto">
+													<div class="align-items-sm-center d-sm-flex d-xl-block">
+														<div class="align-items-center d-flex price-area">
+															<div class="fs-32 fw-bold purchase-price">
+																<div class="main-price text-primary">$1,199</div>
+															</div>
+															<div class="product-price ms-2 fs-13"> <del class="prev-price">$1,299</del>
+																<div class="legal text-danger">Save $100</div>
+															</div>
+														</div>
+														<div class="flex-grow-1 mt-2 ms-sm-3 ms-xl-0 mt-xl-2"> <strong class="small">(incl. VAT)</strong>
+															<div class="small">Per consultation</div>
+														</div>
+													</div>
+												</div>
+												<div class="align-self-center ms-auto"> <i class="fa-solid fa-arrow-right fs-19 text-primary"></i> </div>
+											</div>
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-md-6 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-details.html" class="border-0 text-inherit card overflow-hidden shadow doctor-card bg-soft-primary w-100 flex-fill">
+										<div class="card-body p-0">
+											<div class="bg-white d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<!-- Start Avatar Wrap -->
+												<div class="d-block doctor-avatar flex-shrink-0 me-3 p-2 position-relative rounded-bottom rounded-circle shadow">
+													<!-- Start Online Dot -->
+													<div class="online position-absolute"> <span class="heartbit"></span> <span class="point"></span> </div>
+													<!-- End Online Dot -->
+													<!-- Start Avatar --><img src="assets/img/avatar/02.jpg" alt="" class="rounded-bottom rounded-circle">
+													<!-- End Avatar -->
+												</div>
+												<!-- End Avatar Wrap -->
+												<div class="flex-grow-1">
+													<!-- Start Name -->
+													<h6 class="fs-17 fw-semibold mb-2 mb-sm-1">Dr. Pranoti Deshpande</h6>
+													<!-- End Name -->
+													<!-- Start Designation -->
+													<div class="fw-semibold mb-0 mb-sm-2 small text-primary">MBBS, MD (Dermatology, Venereology andLeprosy)</div>
+													<!-- Start Designation -->
+													<!-- Start Language Skills -->
+													<div class="d-none d-sm-block small">English, Punjabi, Hindi, English</div>
+													<!-- End Language Skills -->
+													<!-- Start Chamber  -->
+													<div class="d-none d-sm-block small">Apollo Hospitals Indraprastha, South Delhi </div>
+													<!-- End Chamber  -->
+												</div>
+											</div>
+											<!-- <hr> -->
+											<div class="bg-white p-3 p-lg-4 p-md-3 p-sm-4 pt-0 pt-lg-0 pt-sm-0">
+												<div class="row g-3">
+													<div class="col-auto col-md-12">
+														<h6 class="fs-13 mb-1 text-muted">Working in</h6>
+														<div class="fw-bold text-black fs-15">Al-Fateh Medical Sevices (Pvt) Ltd.</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Rating (7668)</h6>
+														<div class="align-items-center d-flex fs-12">
+															<!-- Start Star Rating -->
+															<div class="d-flex star-rating text-warning"> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="far fa-star"></i> </div>
+															<!-- End Star Rating -->
+															<!-- Start Star Rating count -->
+															<div class="fw-semibold ms-1 review-numbers small text-dark"> <span class="reviews-stats">4.5</span> <span class="reviews-count">(862)</span> </div>
+															<!-- End Star Rating count -->
+														</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Experience</h6>
+														<div class="fw-bold text-black fs-15">27+ Years</div>
+													</div>
+												</div>
+											</div>
+											<div class="d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<div class="col-auto">
+													<div class="align-items-sm-center d-sm-flex d-xl-block">
+														<div class="align-items-center d-flex price-area">
+															<div class="fs-32 fw-bold purchase-price">
+																<div class="main-price text-primary">$1,199</div>
+															</div>
+															<div class="product-price ms-2 fs-13"> <del class="prev-price">$1,299</del>
+																<div class="legal text-danger">Save $100</div>
+															</div>
+														</div>
+														<div class="flex-grow-1 mt-2 ms-sm-3 ms-xl-0 mt-xl-2"> <strong class="small">(incl. VAT)</strong>
+															<div class="small">Per consultation</div>
+														</div>
+													</div>
+												</div>
+												<div class="align-self-center ms-auto"> <i class="fa-solid fa-arrow-right fs-19 text-primary"></i> </div>
+											</div>
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-md-6 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-details.html" class="border-0 text-inherit card overflow-hidden shadow doctor-card bg-soft-primary w-100 flex-fill">
+										<div class="card-body p-0">
+											<div class="bg-white d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<!-- Start Avatar Wrap -->
+												<div class="d-block doctor-avatar flex-shrink-0 me-3 p-2 position-relative rounded-bottom rounded-circle shadow">
+													<!-- Start Online Dot -->
+													<div class="online position-absolute"> <span class="heartbit"></span> <span class="point"></span> </div>
+													<!-- End Online Dot -->
+													<!-- Start Avatar --><img src="assets/img/avatar/03.jpg" alt="" class="rounded-bottom rounded-circle">
+													<!-- End Avatar -->
+												</div>
+												<!-- End Avatar Wrap -->
+												<div class="flex-grow-1">
+													<!-- Start Name -->
+													<h6 class="fs-17 fw-semibold mb-2 mb-sm-1">Dr. S Madhuri</h6>
+													<!-- End Name -->
+													<!-- Start Designation -->
+													<div class="fw-semibold mb-0 mb-sm-2 small text-primary">MBBS, MD (DVL), DNB, Fellow (Dermatosurgery & Lasers)</div>
+													<!-- Start Designation -->
+													<!-- Start Language Skills -->
+													<div class="d-none d-sm-block small">English, Punjabi, Hindi, English</div>
+													<!-- End Language Skills -->
+													<!-- Start Chamber  -->
+													<div class="d-none d-sm-block small">Apollo Hospitals Indraprastha, South Delhi </div>
+													<!-- End Chamber  -->
+												</div>
+											</div>
+											<!-- <hr> -->
+											<div class="bg-white p-3 p-lg-4 p-md-3 p-sm-4 pt-0 pt-lg-0 pt-sm-0">
+												<div class="row g-3">
+													<div class="col-auto col-md-12">
+														<h6 class="fs-13 mb-1 text-muted">Working in</h6>
+														<div class="fw-bold text-black fs-15">Al-Madina General Hospital (Pvt.) Ltd.</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Rating (7668)</h6>
+														<div class="align-items-center d-flex fs-12">
+															<!-- Start Star Rating -->
+															<div class="d-flex star-rating text-warning"> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="far fa-star"></i> </div>
+															<!-- End Star Rating -->
+															<!-- Start Star Rating count -->
+															<div class="fw-semibold ms-1 review-numbers small text-dark"> <span class="reviews-stats">4.5</span> <span class="reviews-count">(862)</span> </div>
+															<!-- End Star Rating count -->
+														</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Experience</h6>
+														<div class="fw-bold text-black fs-15">27+ Years</div>
+													</div>
+												</div>
+											</div>
+											<div class="d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<div class="col-auto">
+													<div class="align-items-sm-center d-sm-flex d-xl-block">
+														<div class="align-items-center d-flex price-area">
+															<div class="fs-32 fw-bold purchase-price">
+																<div class="main-price text-primary">$1,599</div>
+															</div>
+															<div class="product-price ms-2 fs-13"> <del class="prev-price">$1,799</del>
+																<div class="legal text-danger">Save $200</div>
+															</div>
+														</div>
+														<div class="flex-grow-1 mt-2 ms-sm-3 ms-xl-0 mt-xl-2"> <strong class="small">(incl. VAT)</strong>
+															<div class="small">Per consultation</div>
+														</div>
+													</div>
+												</div>
+												<div class="align-self-center ms-auto"> <i class="fa-solid fa-arrow-right fs-19 text-primary"></i> </div>
+											</div>
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-md-6 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-details.html" class="border-0 text-inherit card overflow-hidden shadow doctor-card bg-soft-primary w-100 flex-fill">
+										<div class="card-body p-0">
+											<div class="bg-white d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<!-- Start Avatar Wrap -->
+												<div class="d-block doctor-avatar flex-shrink-0 me-3 p-2 position-relative rounded-bottom rounded-circle shadow">
+													<!-- Start Online Dot -->
+													<div class="online position-absolute"> <span class="heartbit"></span> <span class="point"></span> </div>
+													<!-- End Online Dot -->
+													<!-- Start Avatar --><img src="assets/img/avatar/04.jpg" alt="" class="rounded-bottom rounded-circle">
+													<!-- End Avatar -->
+												</div>
+												<!-- End Avatar Wrap -->
+												<div class="flex-grow-1">
+													<!-- Start Name -->
+													<h6 class="fs-17 fw-semibold mb-2 mb-sm-1">Dr. Soumen Devidutta</h6>
+													<!-- End Name -->
+													<!-- Start Designation -->
+													<div class="fw-semibold mb-0 mb-sm-2 small text-primary">MBBS, MD, DM</div>
+													<!-- Start Designation -->
+													<!-- Start Language Skills -->
+													<div class="d-none d-sm-block small">English, Punjabi, Hindi, English</div>
+													<!-- End Language Skills -->
+													<!-- Start Chamber  -->
+													<div class="d-none d-sm-block small">Apollo Hospitals Indraprastha, South Delhi </div>
+													<!-- End Chamber  -->
+												</div>
+											</div>
+											<!-- <hr> -->
+											<div class="bg-white p-3 p-lg-4 p-md-3 p-sm-4 pt-0 pt-lg-0 pt-sm-0">
+												<div class="row g-3">
+													<div class="col-auto col-md-12">
+														<h6 class="fs-13 mb-1 text-muted">Working in</h6>
+														<div class="fw-bold text-black fs-15">Al-Helal Specialized Hospital Ltd.</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Rating (7668)</h6>
+														<div class="align-items-center d-flex fs-12">
+															<!-- Start Star Rating -->
+															<div class="d-flex star-rating text-warning"> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="far fa-star"></i> </div>
+															<!-- End Star Rating -->
+															<!-- Start Star Rating count -->
+															<div class="fw-semibold ms-1 review-numbers small text-dark"> <span class="reviews-stats">4.5</span> <span class="reviews-count">(862)</span> </div>
+															<!-- End Star Rating count -->
+														</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Experience</h6>
+														<div class="fw-bold text-black fs-15">27+ Years</div>
+													</div>
+												</div>
+											</div>
+											<div class="d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<div class="col-auto">
+													<div class="align-items-sm-center d-sm-flex d-xl-block">
+														<div class="align-items-center d-flex price-area">
+															<div class="fs-32 fw-bold purchase-price">
+																<div class="main-price text-primary">$1,100</div>
+															</div>
+															<div class="product-price ms-2 fs-13"> <del class="prev-price">$1,299</del>
+																<div class="legal text-danger">Save $199</div>
+															</div>
+														</div>
+														<div class="flex-grow-1 mt-2 ms-sm-3 ms-xl-0 mt-xl-2"> <strong class="small">(incl. VAT)</strong>
+															<div class="small">Per consultation</div>
+														</div>
+													</div>
+												</div>
+												<div class="align-self-center ms-auto"> <i class="fa-solid fa-arrow-right fs-19 text-primary"></i> </div>
+											</div>
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-md-6 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-details.html" class="border-0 text-inherit card overflow-hidden shadow doctor-card bg-soft-primary w-100 flex-fill">
+										<div class="card-body p-0">
+											<div class="bg-white d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<!-- Start Avatar Wrap -->
+												<div class="d-block doctor-avatar flex-shrink-0 me-3 p-2 position-relative rounded-bottom rounded-circle shadow">
+													<!-- Start Online Dot -->
+													<div class="online position-absolute"> <span class="heartbit"></span> <span class="point"></span> </div>
+													<!-- End Online Dot -->
+													<!-- Start Avatar --><img src="assets/img/avatar/05.jpg" alt="" class="rounded-bottom rounded-circle">
+													<!-- End Avatar -->
+												</div>
+												<!-- End Avatar Wrap -->
+												<div class="flex-grow-1">
+													<!-- Start Name -->
+													<h6 class="fs-17 fw-semibold mb-2 mb-sm-1">Dr. Asha Mahilmaran</h6>
+													<!-- End Name -->
+													<!-- Start Designation -->
+													<div class="fw-semibold mb-0 mb-sm-2 small text-primary">MD, DNB, DM</div>
+													<!-- Start Designation -->
+													<!-- Start Language Skills -->
+													<div class="d-none d-sm-block small">English, Punjabi, Hindi, English</div>
+													<!-- End Language Skills -->
+													<!-- Start Chamber  -->
+													<div class="d-none d-sm-block small">Apollo Hospitals Indraprastha, South Delhi </div>
+													<!-- End Chamber  -->
+												</div>
+											</div>
+											<!-- <hr> -->
+											<div class="bg-white p-3 p-lg-4 p-md-3 p-sm-4 pt-0 pt-lg-0 pt-sm-0">
+												<div class="row g-3">
+													<div class="col-auto col-md-12">
+														<h6 class="fs-13 mb-1 text-muted">Working in</h6>
+														<div class="fw-bold text-black fs-15">Al-Raji Hospital Ltdr</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Rating (7668)</h6>
+														<div class="align-items-center d-flex fs-12">
+															<!-- Start Star Rating -->
+															<div class="d-flex star-rating text-warning"> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="far fa-star"></i> </div>
+															<!-- End Star Rating -->
+															<!-- Start Star Rating count -->
+															<div class="fw-semibold ms-1 review-numbers small text-dark"> <span class="reviews-stats">4.5</span> <span class="reviews-count">(862)</span> </div>
+															<!-- End Star Rating count -->
+														</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Experience</h6>
+														<div class="fw-bold text-black fs-15">27+ Years</div>
+													</div>
+												</div>
+											</div>
+											<div class="d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<div class="col-auto">
+													<div class="align-items-sm-center d-sm-flex d-xl-block">
+														<div class="align-items-center d-flex price-area">
+															<div class="fs-32 fw-bold purchase-price">
+																<div class="main-price text-primary">$999</div>
+															</div>
+															<div class="product-price ms-2 fs-13"> <del class="prev-price">$1,299</del>
+																<div class="legal text-danger">Save $300</div>
+															</div>
+														</div>
+														<div class="flex-grow-1 mt-2 ms-sm-3 ms-xl-0 mt-xl-2"> <strong class="small">(incl. VAT)</strong>
+															<div class="small">Per consultation</div>
+														</div>
+													</div>
+												</div>
+												<div class="align-self-center ms-auto"> <i class="fa-solid fa-arrow-right fs-19 text-primary"></i> </div>
+											</div>
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+								<div class="col-md-6 d-flex">
+									<!-- Start Card -->
+									<a href="doctor-details.html" class="border-0 text-inherit card overflow-hidden shadow doctor-card bg-soft-primary w-100 flex-fill">
+										<div class="card-body p-0">
+											<div class="bg-white d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<!-- Start Avatar Wrap -->
+												<div class="d-block doctor-avatar flex-shrink-0 me-3 p-2 position-relative rounded-bottom rounded-circle shadow">
+													<!-- Start Online Dot -->
+													<div class="online position-absolute"> <span class="heartbit"></span> <span class="point"></span> </div>
+													<!-- End Online Dot -->
+													<!-- Start Avatar --><img src="assets/img/avatar/06.jpg" alt="" class="rounded-bottom rounded-circle">
+													<!-- End Avatar -->
+												</div>
+												<!-- End Avatar Wrap -->
+												<div class="flex-grow-1">
+													<!-- Start Name -->
+													<h6 class="fs-17 fw-semibold mb-2 mb-sm-1">Dr. Chaithanya Ravikumar</h6>
+													<!-- End Name -->
+													<!-- Start Designation -->
+													<div class="fw-semibold mb-0 mb-sm-2 small text-primary">MBBS, MD, FCCM, FCCP, EDIC </div>
+													<!-- Start Designation -->
+													<!-- Start Language Skills -->
+													<div class="d-none d-sm-block small">English, Punjabi, Hindi, English</div>
+													<!-- End Language Skills -->
+													<!-- Start Chamber  -->
+													<div class="d-none d-sm-block small">Apollo Hospitals Indraprastha, South Delhi </div>
+													<!-- End Chamber  -->
+												</div>
+											</div>
+											<!-- <hr> -->
+											<div class="bg-white p-3 p-lg-4 p-md-3 p-sm-4 pt-0 pt-lg-0 pt-sm-0">
+												<div class="row g-3">
+													<div class="col-auto col-md-12">
+														<h6 class="fs-13 mb-1 text-muted">Working in</h6>
+														<div class="fw-bold text-black fs-15">Al Anaiet Adhunik Hospital</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Rating (7668)</h6>
+														<div class="align-items-center d-flex fs-12">
+															<!-- Start Star Rating -->
+															<div class="d-flex star-rating text-warning"> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="far fa-star"></i> </div>
+															<!-- End Star Rating -->
+															<!-- Start Star Rating count -->
+															<div class="fw-semibold ms-1 review-numbers small text-dark"> <span class="reviews-stats">4.5</span> <span class="reviews-count">(862)</span> </div>
+															<!-- End Star Rating count -->
+														</div>
+													</div>
+													<div class="col-auto">
+														<h6 class="fs-13 mb-1 text-muted">Total Experience</h6>
+														<div class="fw-bold text-black fs-15">27+ Years</div>
+													</div>
+												</div>
+											</div>
+											<div class="d-flex p-3 p-lg-4 p-md-3 p-sm-4">
+												<div class="col-auto">
+													<div class="align-items-sm-center d-sm-flex d-xl-block">
+														<div class="align-items-center d-flex price-area">
+															<div class="fs-32 fw-bold purchase-price">
+																<div class="main-price text-primary">$1,199</div>
+															</div>
+															<div class="product-price ms-2 fs-13"> <del class="prev-price">$1,299</del>
+																<div class="legal text-danger">Save $100</div>
+															</div>
+														</div>
+														<div class="flex-grow-1 mt-2 ms-sm-3 ms-xl-0 mt-xl-2"> <strong class="small">(incl. VAT)</strong>
+															<div class="small">Per consultation</div>
+														</div>
+													</div>
+												</div>
+												<div class="align-self-center ms-auto"> <i class="fa-solid fa-arrow-right fs-19 text-primary"></i> </div>
+											</div>
+										</div>
+									</a>
+									<!-- /.End Card -->
+								</div>
+							</div>
+						</div>
+						<div class="mb-5">
+							<!-- Start Title -->
+							<h4 class="fw-semibold mb-4 text-capitalize"><span class="underline position-relative text-primary">Location</span>
+              </h4>
+							<!-- End Title -->
+							<!-- Start Map -->
+							<div id="map" class="border rounded-4"></div>
+							<!-- /.End Map -->
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4 sidebar">
+					<div class="appointment-form">
+						<!-- Start Title -->
+						<h4 class="fw-semibold mb-4 text-capitalize">Book <span
+                class="underline position-relative text-primary">Appointment</span></h4>
+						<!-- End Title -->
+						<!-- Start Tabs Nav -->
+						<ul class="nav nav-tabs mb-5" role="tablist">
+							<li class="nav-item" role="presentation">
+								<button class="nav-link ms-0 active" id="tab-one" data-bs-toggle="tab" data-bs-target="#tab-one-pane" type="button" role="tab" aria-controls="tab-one-pane" aria-selected="true">Returning Patient</button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="tab-two" data-bs-toggle="tab" data-bs-target="#tab-two-pane" type="button" role="tab" aria-controls="tab-two-pane" aria-selected="false">New Registration</button>
+							</li>
+						</ul>
+						<!-- /.End Tabs Nav -->
+						<!-- Start Tab Content -->
+						<div class="tab-content">
+							<!-- Start Tab Pane -->
+							<div class="tab-pane fade show active" id="tab-one-pane" role="tabpanel" aria-labelledby="tab-one" tabindex="0">
+								<form>
+									<div class="row g-4">
+										<div class="col-sm-12">
+											<!-- Start Form Group -->
+											<div class="form-group">
+												<label class="required">Mobile Number</label>
+												<input type="number" class="form-control"> </div>
+											<!-- End Form Group -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group -->
+											<div class="form-group">
+												<label class="required">Appointment Date</label>
+												<input type="text" class="form-control datepicker" placeholder="mm-dd-yyyy"> </div>
+											<!-- End Form Group -->
+										</div>
+										<div class="col-sm-6">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Department</label>
+												<select name="state" class="form-select">
+													<option value="Rajshahi">Rajshahi</option>
+													<option value="Rangpur">Rangpur</option>
+													<option value="Mymensingh">Mymensingh</option>
+													<option value="Barisal">Barisal</option>
+													<option value="Chittagong">Chittagong</option>
+													<option value="Dhaka">Dhaka</option>
+													<option value="Khulna">Khulna</option>
+													<option value="Sylhet">Sylhet</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-6">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Doctor</label>
+												<select name="state" class="form-select">
+													<option value="Rajshahi">Begumganj</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Appointment Type</label>
+												<select name="state" class="form-select">
+													<option value="Live Video Call">Live Video Call</option>
+													<option value="Live Video Call">Docter Chamber</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Venue</label>
+												<select name="state" class="form-select">
+													<option value="Farmgate Eye hospital">Farmgate Eye hospital</option>
+													<option value="Framget">Framget</option>
+													<option value="Hitech Multi Care Hospital 03">Hitech Multi Care Hospital 03 </option>
+													<option value="Ispahani Islamia Eye Institute and Hospital">Ispahani Islamia Eye Institute and Hospital</option>
+													<option value="national institute of child health care">national institute of child health care </option>
+													<option value="Online Video Consultation Chamber">Online Video Consultation Chamber</option>
+													<option value="Popular Diagnostic Center ">Popular Diagnostic Center </option>
+													<option value="Uttara eye hospital">Uttara eye hospital</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Patient Type</label>
+												<select name="state" class="form-select">
+													<option value="New">New</option>
+													<option value="Old">Old</option>
+													<option value="Report">Report</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group -->
+											<div class="form-group">
+												<label class="required">Problem</label>
+												<textarea class="form-control" placeholder="Write Your problem..." rows="2"></textarea>
+											</div>
+											<!-- End Form Group -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Checkbox -->
+											<div class="form-check text-start">
+												<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultOne">
+												<label class="form-check-label" for="flexCheckDefaultOne"> I agree to the <a href="terms-conditions.html" class="text-decoration-underline">Terms &amp;
+                            Conditions</a> </label>
+											</div>
+											<!-- /.End Checkbox -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Button -->
+											<button class="btn btn-primary btn-lg w-100" type="submit">Get Appointment</button>
+											<!-- /.End Button -->
+										</div>
+									</div>
+									<hr>
+									<div class="text-center"> <span>Already have an account yet? <a href="#">Sign In</a></span> </div>
+								</form>
+							</div>
+							<!-- /.End Tab Pane -->
+							<!-- Start Tab Pane -->
+							<div class="tab-pane fade" id="tab-two-pane" role="tabpanel" aria-labelledby="tab-two" tabindex="0">
+								<form>
+									<div class="row g-4">
+										<div class="col-sm-12">
+											<!-- Start Form Group -->
+											<div class="form-group">
+												<label class="required">Patient Name</label>
+												<input type="text" class="form-control" placeholder="Mr./Ms."> </div>
+											<!-- End Form Group -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group -->
+											<div class="form-group">
+												<label class="required">Phone Number</label>
+												<input type="number" class="form-control" placeholder="+880"> </div>
+											<!-- End Form Group -->
+										</div>
+										<div class="col-sm-6">
+											<!-- Start Form Group -->
+											<div class="form-group">
+												<label>Date Of Birth (Optional)</label>
+												<input type="text" class="form-control datepicker" placeholder="mm-dd-yyyy"> </div>
+											<!-- End Form Group -->
+										</div>
+										<div class="col-sm-6">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Gender</label>
+												<select name="Gender" class="form-select">
+													<option value="Male">Male</option>
+													<option value="Female">Female</option>
+													<option value="Other">Other</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group -->
+											<div class="form-group">
+												<label class="required">Appointment Date</label>
+												<input type="text" class="form-control datepicker" placeholder="mm-dd-yyyy"> </div>
+											<!-- End Form Group -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Department</label>
+												<select name="Department" class="form-select">
+													<option value="1">Cardiology</option>
+													<option value="2">Allergy sex &amp; Immunology </option>
+													<option value="3">Laser</option>
+													<option value="4">Medicine</option>
+													<option value="5">Dentistry</option>
+													<option value="9">Orthopaedic </option>
+													<option value="10">Neuromedicine</option>
+													<option value="11">Cancer (Oncology) </option>
+													<option value="12">Gynecology</option>
+													<option value="13">Pediatrics (CHILD) </option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Doctor</label>
+												<select name="Department" class="form-select">
+													<option value="133">Prof.Dr.Sk.Abdul Fattah</option>
+													<option value="449">Dr. Md. Solaiman</option>
+													<option value="498">Dr. Mohammad Almas</option>
+													<option value="598">Tamim</option>
+													<option value="604">Uzzal Chandro Pull</option>
+													<option value="610">HIMEL GHOSH</option>
+													<option value="613">Ashik Elahi </option>
+													<option value="618">Arif Absar Rizvi</option>
+													<option value="633">S M Sharfuddin </option>
+													<option value="679">Dr. Debdash Paul</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Appointment Type</label>
+												<select name="Department" class="form-select">
+													<option value="Live Video Call">Live Video Call</option>
+													<option value="Docter Chamber">Docter Chamber</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Venue</label>
+												<select name="Department" class="form-select">
+													<option value="Farmgate Eye hospital">Farmgate Eye hospital</option>
+													<option value="Hitech Multi Care Hospital 03">Hitech Multi Care Hospital 03</option>
+													<option value="Ispahani Islamia Eye Institute and Hospital">Ispahani Islamia Eye Institute and Hospital</option>
+													<option value="national institute of child health care">national institute of child health care </option>
+													<option value="Online Video Consultation Chamber">Online Video Consultation Chamber</option>
+													<option value="Popular Diagnostic Center ">Popular Diagnostic Center </option>
+													<option value="Uttara eye hospital">Uttara eye hospital</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group (Select) -->
+											<div class="form-group">
+												<label class="required">Patient Type</label>
+												<select name="Department" class="form-select">
+													<option value="New">New</option>
+													<option value="Old">Old</option>
+													<option value="Report">Report</option>
+												</select>
+											</div>
+											<!-- /.End Form Group (Select) -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Form Group -->
+											<div class="form-group">
+												<label class="required">Problem</label>
+												<textarea class="form-control" placeholder="Write Your problem..." rows="2"></textarea>
+											</div>
+											<!-- End Form Group -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Checkbox -->
+											<div class="form-check text-start">
+												<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultTwo">
+												<label class="form-check-label" for="flexCheckDefaultTwo"> I agree to the <a href="terms-conditions.html" class="text-decoration-underline">Terms &amp;
+                            Conditions</a> </label>
+											</div>
+											<!-- /.End Checkbox -->
+										</div>
+										<div class="col-sm-12">
+											<!-- Start Button -->
+											<button class="btn btn-primary btn-lg w-100" type="submit">Get Appointment</button>
+											<!-- /.End Button -->
+										</div>
+									</div>
+									<hr>
+									<div class="text-center"> <span>Already have an account yet? <a href="#" data-toggle="modal" data-target="#loginModal">Sign
+                        In</a></span> </div>
+								</form>
+							</div>
+							<!-- /.End Tab Pane -->
+						</div>
+						<!-- /.End Tab Content -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Related Articles-->
+	<div class="pb-5">
+		<div class="container pb-3">
+			<div class="row">
+				<div class="col-md-10 offset-md-1">
+					<!-- Start Section Header Title -->
+					<div class="section-header text-center mb-5">
+						<!-- Start Section Header title -->
+						<h2 class="fw-semibold mb-2 section-header__title text-capitalize">Affordable full body <span
+                class="underline position-relative text-primary">health</span> checkups</h2>
+						<!-- /.End Section Header Title -->
+						<!-- Start Section Header Sub Title -->
+						<div class="sub-title fs-16"> Our guests always travel the world in style. Mention @Kempinski
+							<br class="d-none d-lg-block"> on Instagram for a chance to be featured! </div>
+						<!-- /.End Section Header Sub Title -->
+					</div>
+					<!--/. End Section Header -->
+				</div>
+			</div>
+			<div class="blog-carousel owl-carousel owl-theme">
+				<!-- Start Blog Article -->
+				<article class="thumb-post" data-aos="fade" data-aos-delay="300">
+					<!-- Start Entry Content -->
+					<div class="entry-content mb-3 overflow-hidden position-relative rounded">
+						<!-- Start Post Image -->
+						<a href="blog-details.html"><img src="assets/img/blog/01-md.jpg" class="entry-img overflow-hidden h-100 bg-light" alt=""></a>
+						<!-- /.End Post Image -->
+						<div class="entry-content-caption h-100 overflow-hidden p-4 position-absolute start-0 text-white top-0 w-100">
+							<!-- Start Description -->
+							<p>A collection of free iPhone 7 and iPhone 7 Plus mockups for Photoshop and Sketch to showcase your app or website in the new Apple device.</p>
+							<!-- /.End Description -->
+							<!-- Start Post Date --><span class="posted-on">
+                <time class="entry-date published" datetime="2016-09-09T10:06:40+00:00">September 9,
+                  2016</time>
+              </span>
+							<!-- /.End Post Date -->
+						</div>
+					</div>
+					<!-- /.End Entry Content -->
+					<!-- Start Entry Header -->
+					<header class="entry-header">
+						<!-- Start Category --><a href="blog-category.html" class="entry-cat mb-1 d-block fw-semibold">Dentist</a>
+						<!-- /.End Category -->
+						<!-- Start Title -->
+						<h3 class="entry-title fs-17 fw-semibold mb-0"><a class="d-block text-dark"
+                href="blog-details.html">Teething troubles? Schedule a dental
+                checkup</a></h3>
+						<!-- /.End Title -->
+					</header>
+					<!-- /.End Entry Header -->
+				</article>
+				<!-- /.End Blog Article -->
+				<!-- Start Blog Article -->
+				<article class="thumb-post" data-aos="fade" data-aos-delay="400">
+					<!-- Start Entry Content -->
+					<div class="entry-content mb-3 overflow-hidden position-relative rounded">
+						<!-- Start Post Image -->
+						<a href="blog-details.html"><img src="assets/img/blog/02-md.jpg" class="entry-img overflow-hidden h-100 bg-light" alt=""></a>
+						<!-- /.End Post Image -->
+						<div class="entry-content-caption h-100 overflow-hidden p-4 position-absolute start-0 text-white top-0 w-100">
+							<!-- Start Description -->
+							<p>A collection of free iPhone 7 and iPhone 7 Plus mockups for Photoshop and Sketch to showcase your app or website in the new Apple device.</p>
+							<!-- /.End Description -->
+							<!-- Start Post Date --><span class="posted-on">
+                <time class="entry-date published" datetime="2016-09-09T10:06:40+00:00">September 9,
+                  2016</time>
+              </span>
+							<!-- /.End Post Date -->
+						</div>
+					</div>
+					<!-- /.End Entry Content -->
+					<!-- Start Entry Header -->
+					<header class="entry-header">
+						<!-- Start Category --><a href="blog-category.html" class="entry-cat mb-1 d-block fw-semibold">Gynecologist/Obstetrician</a>
+						<!-- /.End Category -->
+						<!-- Start Title -->
+						<h3 class="entry-title fs-17 fw-semibold mb-0"><a class="d-block text-dark"
+                href="blog-details.html">Teething troubles? Schedule a dental
+                checkup</a></h3>
+						<!-- /.End Title -->
+					</header>
+					<!-- /.End Entry Header -->
+				</article>
+				<!-- /.End Blog Article -->
+				<!-- Start Blog Article -->
+				<article class="thumb-post" data-aos="fade" data-aos-delay="500">
+					<!-- Start Entry Content -->
+					<div class="entry-content mb-3 overflow-hidden position-relative rounded">
+						<!-- Start Post Image -->
+						<a href="blog-details.html"><img src="assets/img/blog/06-md.jpg" class="entry-img overflow-hidden h-100 bg-light" alt=""></a>
+						<!-- /.End Post Image -->
+						<div class="entry-content-caption h-100 overflow-hidden p-4 position-absolute start-0 text-white top-0 w-100">
+							<!-- Start Description -->
+							<p>A collection of free iPhone 7 and iPhone 7 Plus mockups for Photoshop and Sketch to showcase your app or website in the new Apple device.</p>
+							<!-- /.End Description -->
+							<!-- Start Post Date --><span class="posted-on">
+                <time class="entry-date published" datetime="2016-09-09T10:06:40+00:00">September 9,
+                  2016</time>
+              </span>
+							<!-- /.End Post Date -->
+						</div>
+					</div>
+					<!-- /.End Entry Content -->
+					<!-- Start Entry Header -->
+					<header class="entry-header">
+						<!-- Start Category --><a href="blog-category.html" class="entry-cat mb-1 d-block fw-semibold">Physiotherapist</a>
+						<!-- /.End Category -->
+						<!-- Start Title -->
+						<h3 class="entry-title fs-17 fw-semibold mb-0"><a class="d-block text-dark"
+                href="blog-details.html">Teething troubles? Schedule a dental
+                checkup</a></h3>
+						<!-- /.End Title -->
+					</header>
+					<!-- /.End Entry Header -->
+				</article>
+				<!-- /.End Blog Article -->
+				<!-- Start Blog Article -->
+				<article class="thumb-post" data-aos="fade" data-aos-delay="600">
+					<!-- Start Entry Content -->
+					<div class="entry-content mb-3 overflow-hidden position-relative rounded">
+						<!-- Start Post Image -->
+						<a href="blog-details.html"><img src="assets/img/blog/05-md.jpg" class="entry-img overflow-hidden h-100 bg-light" alt=""></a>
+						<!-- /.End Post Image -->
+						<div class="entry-content-caption h-100 overflow-hidden p-4 position-absolute start-0 text-white top-0 w-100">
+							<!-- Start Description -->
+							<p>A collection of free iPhone 7 and iPhone 7 Plus mockups for Photoshop and Sketch to showcase your app or website in the new Apple device.</p>
+							<!-- /.End Description -->
+							<!-- Start Post Date --><span class="posted-on">
+                <time class="entry-date published" datetime="2016-09-09T10:06:40+00:00">September 9,
+                  2016</time>
+              </span>
+							<!-- /.End Post Date -->
+						</div>
+					</div>
+					<!-- /.End Entry Content -->
+					<!-- Start Entry Header -->
+					<header class="entry-header">
+						<!-- Start Category --><a href="blog-category.html" class="entry-cat mb-1 d-block fw-semibold">General surgeon</a>
+						<!-- /.End Category -->
+						<!-- Start Title -->
+						<h3 class="entry-title fs-17 fw-semibold mb-0"><a class="d-block text-dark"
+                href="blog-details.html">Teething troubles? Schedule a dental
+                checkup</a></h3>
+						<!-- /.End Title -->
+					</header>
+					<!-- /.End Entry Header -->
+				</article>
+				<!-- /.End Blog Article -->
+				<!-- Start Blog Article -->
+				<article class="thumb-post" data-aos="fade" data-aos-delay="700">
+					<!-- Start Entry Content -->
+					<div class="entry-content mb-3 overflow-hidden position-relative rounded">
+						<!-- Start Post Image -->
+						<a href="blog-details.html"><img src="assets/img/blog/07-md.jpg" class="entry-img overflow-hidden h-100 bg-light" alt=""></a>
+						<!-- /.End Post Image -->
+						<div class="entry-content-caption h-100 overflow-hidden p-4 position-absolute start-0 text-white top-0 w-100">
+							<!-- Start Description -->
+							<p>A collection of free iPhone 7 and iPhone 7 Plus mockups for Photoshop and Sketch to showcase your app or website in the new Apple device.</p>
+							<!-- /.End Description -->
+							<!-- Start Post Date --><span class="posted-on">
+                <time class="entry-date published" datetime="2016-09-09T10:06:40+00:00">September 9,
+                  2016</time>
+              </span>
+							<!-- /.End Post Date -->
+						</div>
+					</div>
+					<!-- /.End Entry Content -->
+					<!-- Start Entry Header -->
+					<header class="entry-header">
+						<!-- Start Category --><a href="blog-category.html" class="entry-cat mb-1 d-block fw-semibold">Orthopedist</a>
+						<!-- /.End Category -->
+						<!-- Start Title -->
+						<h3 class="entry-title fs-17 fw-semibold mb-0"><a class="d-block text-dark"
+                href="blog-details.html">Teething troubles? Schedule a dental
+                checkup</a></h3>
+						<!-- /.End Title -->
+					</header>
+					<!-- /.End Entry Header -->
+				</article>
+				<!-- /.End Blog Article -->
+			</div>
+		</div>
+	</div>
+	<!-- Start Footer -->
+	<footer class="main-footer footer-dark pt-5">
+		<div class="container pt-3">
+			<!-- Start Appointment -->
+			<div class="appointment p-3 p-md-5 p-sm-4 rounded-3 text-center bg-img-hero" data-image-src="assets/img/pattern.png">
+				<h2 class="h1 fw-bold mb-0 text-capitalize appointment-title">Make an appointment! <a href="appointment.html" class="text-primary underline position-relative">Go there<i class="fa-arrow-right fa-solid fs-2 ms-2"></i></a></h2>
+			</div>
+			<!-- /.End Appointment -->
+				<div class="row">
+						<div class="col-md-6 col-lg-4 col-xl-4 py-5 py-md-5 text-center text-md-start">
+								<div class="footer-about">
+										<ul class="list-unstyled text-sm">
+												<li>Monday-Friday: <span class="fw-semibold">9.00</span> am - <span class="fw-semibold">8.00</span> pm</li>
+												<li>Saturday: <span class="fw-semibold">10.00</span> am - <span class="fw-semibold">6.00</span> pm</li>
+										</ul>
+										<p>Twitter, Inc. 1355 Market St, Suite 900 San Francisco, CA 94103 </p>
+										<a class="email-link d-block fw-semibold mb-1" href="#"><i class="fa-solid fa-phone me-2"></i><span>(123) 456-7890</span></a>
+										<a class="email-link d-block fw-semibold" href="#"><i class="fa-solid fa-envelope me-2"></i><span><span class="__cf_email__" data-cfemail="e1929491918e9395a1a58e82b6808d80cf828e8c">[email&#160;protected]</span></span></a>
+								</div>
+						</div>
+						<div class="col-sm-6 col-md-6 col-lg-auto col-xl-2 py-3 py-md-5 d-none d-md-block">
+								<h3 class="fs-21 fw-bold link-title mb-3 position-relative">About us</h3>
+								<ul class="footer-link list-unstyled menu mb-0">
+										<li class="mb-2"><a href="#" class="link d-block">About DocWala</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Careers</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Explore</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Newsroom</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Investor Relations</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Responsible Recycling</a></li>
+								</ul>
+						</div>
+						<div class="col-sm-6 col-md-4 col-lg-auto col-xl-2 py-3 py-md-5 d-none d-md-block">
+								<h3 class="fs-21 fw-bold link-title mb-3 position-relative">Pharmacy</h3>
+								<ul class="footer-link list-unstyled menu mb-0">
+									<li class="mb-2"><a href="product.html" class="link d-block">Product</a></li>
+									<li class="mb-2"><a href="product-details.html" class="link d-block">Product Details</a></li>
+									<li class="mb-2"><a href="cart.html" class="link d-block">Shopping Cart</a></li>
+									<li class="mb-2"><a href="checkout.html" class="link d-block">Checkout</a></li>
+									<li class="mb-2"><a href="checkout-complete.html" class="link d-block">Checkout Complete</a></li>
+									<li class="mb-2"><a href="order-completed.html" class="link d-block">Complete Order</a></li>
+									<li class="mb-2"><a href="empty-cart.html" class="link d-block">Cart Empty</a></li>
+							</ul>
+						</div>
+						<div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 py-3 py-md-5 d-none d-md-block d-lg-none d-xl-block">
+								<h3 class="fs-21 fw-bold link-title mb-3 position-relative">Customer care</h3>
+								<ul class="footer-link list-unstyled menu mb-0">
+										<li class="mb-2"><a href="#" class="link d-block">My Account</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Order Tracking</a></li>
+										<li class="mb-2"><a href="#" class="link d-block"> Wish List</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Customer Service</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Returns / Exchange</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">FAQs</a></li>
+										<li class="mb-2"><a href="#" class="link d-block">Product Support</a></li>
+								</ul>
+						</div>
+						<div class="col-sm-6 col-md-4 col-lg-3 col-xl-2 py-3 py-md-5 d-none d-md-block">
+								<h3 class="fs-21 fw-bold link-title mb-3 position-relative">Connect with us</h3>
+								<ul class="list-unstyled social-icon">
+										<li><a href="#"><div class="icon-wrap fs-19 d-inline-block bg-primary text-white text-center inst"><i class="fab fa-instagram"></i></div>Instagram</a></li>
+										<li><a href="#"><div class="icon-wrap fs-19 d-inline-block bg-primary text-white text-center twi"><i class="fab fa-twitter"></i></div>Twitter</a></li>
+										<li><a href="#"><div class="icon-wrap fs-19 d-inline-block bg-primary text-white text-center dri"><i class="fab fa-dribbble"></i></div>Dribbble</a></li>
+										<li><a href="#"><div class="icon-wrap fs-19 d-inline-block bg-primary text-white text-center fb"><i class="fab fa-facebook-f"></i></div>Facebook </a></li>
+								</ul>
+						</div>
+				</div>
+		</div>
+	</footer>
+	<!-- /.End Footer -->
+	<!-- Start Sub footer -->
+	<div class="py-4 py-lg-3 sub-footer sub-footer__dark">
+		<div class="container">
+				<div class="row align-items-center">
+						<div class="col">
+							<div class="align-items-center justify-content-center justify-content-lg-start row">
+								<!-- Start Footer Logo -->
+								<div class="col-sm-auto footer-logo mb-3 mb-sm-0 text-center">
+									<img class="footer-logo__white" src="assets/img/logo-white.png" alt="">
+									<img class="footer-logo__dark" src="assets/img/logo.png" alt="">
+								</div>
+								<!-- /.End Footer Logo -->
+								<!-- Start Copy Rights Text -->
+								<div class="col-sm-auto copy text-center">© 2022 DocWala - All Rights Reserved</div>
+								<!-- /.End Copy Rights Text -->
+							</div>
+						</div>
+						<div class="col-lg-auto">
+								<ul class="list-unstyled text-center mb-0">
+										<li class="list-inline-item"><a href="privacy.html">Privacy</a></li>
+										<li class="list-inline-item"><a href="#">Sitemap</a></li>
+										<li class="list-inline-item"><a href="#">Cookies</a></li>
+										<li class="list-inline-item"><a href="terms-conditions.html">Terms &amp; Conditions</a></li>
+								</ul>
+						</div>
+				</div>
+		</div>
+	</div>
+	<!-- /.End Sub footer -->
+	<!-- Optional JavaScript -->
+	<script data-cfasync="false" src="../../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="assets/plugins/jquery/jquery.min.js"></script>
+	<script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/plugins/smartmenus/jquery.smartmenus.min.js"></script>
+	<script src="assets/plugins/smartmenus/jquery.smartmenus.bootstrap-4.min.js"></script>
+	<script src="assets/plugins/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+	<script src="assets/plugins/select2/select2.min.js"></script>
+	<script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.min.js"></script>
+	<script src="assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.min.js"></script>
+	<script src="assets/plugins/OwlCarousel2/owl.carousel.min.js"></script>
+	<script src="assets/js/hideShowPassword.min.js"></script>
+	<script src="assets/plugins/ion.rangeSlider/js/ion.rangeSlider.min.js"></script>
+	<script src="assets/plugins/raty/raty.min.js"></script>
+	<script src="assets/plugins/slick/slick.min.js"></script>
+	<script src="assets/plugins/magnific-popup/jquery.magnific-popup.min.js"></script>
+	<script src="assets/plugins/vidbg/vidbg.min.js"></script>
+	<script src="assets/plugins/counter-up/waypoints.min.js"></script>
+	<script src="assets/plugins/counter-up/jquery.counterup.min.js"></script>
+	<script src="assets/plugins/typed/typed.min.js"></script>
+	<script src="assets/plugins/aos/aos.min.js"></script>
+	<script src="assets/js/read-more.js"></script>
+	<script src="assets/js/custom.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4iuUg1YDRIBRZ5e-jdssfqDuT9VLiOnY"></script>
+	<script src="assets/js/map.active.js"></script>
+
+
+<!-- Mirrored from theme.easital.com/html/docwala/v1.0/hospital-details.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 30 Mar 2026 13:08:48 GMT -->
+</html>

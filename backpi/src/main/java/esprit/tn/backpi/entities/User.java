@@ -1,7 +1,7 @@
 package esprit.tn.backpi.entities;
-
+ 
 import jakarta.persistence.*;
-
+ 
 @Entity
 @Table(name = "users")
 public class User {
@@ -13,10 +13,11 @@ public class User {
     private String name;
     
     public User() {}
-
+    public User(Long id) { this.id = id; }
+ 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
+ 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 }
