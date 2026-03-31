@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+
+
+<!-- Mirrored from theme.easital.com/html/docwala/v1.0/appointment.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 30 Mar 2026 13:09:07 GMT -->
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+	<!-- Bootstrap CSS -->
+	<link rel="shortcut icon" href="assets/img/favicon.png">
+	<link href="assets/plugins/aos/aos.min.css" rel="stylesheet">
+	<link href="assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="assets/plugins/smartmenus/jquery.smartmenus.bootstrap-4.css" rel="stylesheet">
+	<link href="assets/plugins/fontawesome/css/all.min.css" rel="stylesheet">
+	<link href="assets/css/flaticon-icon.css" rel="stylesheet">
+	<link href="assets/plugins/themify-icons/themify-icons.css" rel="stylesheet">
+	<link href="assets/plugins/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet">
+	<link href="assets/plugins/select2/select2.min.css" rel="stylesheet">
+	<link href="assets/plugins/select2-bootstrap-5/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+	<link href="assets/plugins/OwlCarousel2/css/owl.carousel.min.css" rel="stylesheet">
+	<link href="assets/plugins/OwlCarousel2/css/owl.theme.default.min.css" rel="stylesheet">
+	<link href="assets/plugins/ion.rangeSlider/css/ion.rangeSlider.min.css" rel="stylesheet">
+	<link href="assets/plugins/raty/raty.min.css" rel="stylesheet">
+	<link href="assets/plugins/slick/slick.min.css" rel="stylesheet">
+	<link href="assets/plugins/slick/slick-theme.min.css" rel="stylesheet">
+	<link href="assets/plugins/magnific-popup/magnific-popup.min.css" rel="stylesheet">
+	<link href="assets/css/style.css" rel="stylesheet">
+	<title>DocWala - Doctor Listing & Consultation HTML Template</title>
+</head>
+
+<body>
+	<!-- Page Loader -->
+	<div class="page-loader-wrapper flex-column align-items-center justify-content-center">
+		<div class="loader">
+			<div class="preloader">
+				<div class="spinner-layer pl-green">
+					<div class="circle-clipper left">
+						<div class="circle"></div>
+					</div>
+					<div class="circle-clipper right">
+						<div class="circle"></div>
+					</div>
+				</div>
+			</div>
+			<p class="fs-12 fw-semibold mb-0 mt-3 text-uppercase">Please wait...</p>
+		</div>
+	</div>
+	<!-- /.Page Loader -->
+	<div class="align-items-center d-flex justify-content-center text-center vh-100">
+		<div class="container m-auto py-5">
+			<div class="row justify-content-center">
+				<div class="col-sm-10 col-lg-10">
+					<div class="align-items-center g-4 row">
+						<div class="col-lg-6 col-xl-5">
+							<!-- Start Header Text -->
+							<div class="text-center mb-4">
+								<h3 class="fw-semibold">Get <span
+                                        class="underline position-relative text-primary">Appointment</span></h3>
+								<p class="text-muted text-center mb-0">Start your 15-day trial, no credit card required </p>
+							</div>
+							<!-- /.End Header Text -->
+							<!-- Start Tabs Nav -->
+							<ul class="nav nav-tabs mb-5" role="tablist">
+								<li class="nav-item" role="presentation">
+									<button class="nav-link ms-0 active" id="tab-one" data-bs-toggle="tab" data-bs-target="#tab-one-pane" type="button" role="tab" aria-controls="tab-one-pane" aria-selected="true">Returning Patient</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="tab-two" data-bs-toggle="tab" data-bs-target="#tab-two-pane" type="button" role="tab" aria-controls="tab-two-pane" aria-selected="false">New Registration</button>
+								</li>
+							</ul>
+							<!-- /.End Tabs Nav -->
+							<!-- Start Tab Content -->
+							<div class="tab-content">
+								<!-- Start Tab Pane -->
+								<div class="tab-pane fade show active" id="tab-one-pane" role="tabpanel" aria-labelledby="tab-one" tabindex="0">
+									<form>
+										<div class="row g-4">
+											<div class="col-sm-12">
+												<!-- Start Form Group -->
+												<div class="form-group">
+													<label class="required">Mobile Number</label>
+													<input type="number" class="form-control"> </div>
+												<!-- End Form Group -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group -->
+												<div class="form-group">
+													<label class="required">Appointment Date</label>
+													<input type="text" class="form-control datepicker" placeholder="mm-dd-yyyy"> </div>
+												<!-- End Form Group -->
+											</div>
+											<div class="col-sm-6">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Department</label>
+													<select name="state" class="form-select">
+														<option value="Rajshahi">Rajshahi</option>
+														<option value="Rangpur">Rangpur</option>
+														<option value="Mymensingh">Mymensingh</option>
+														<option value="Barisal">Barisal</option>
+														<option value="Chittagong">Chittagong</option>
+														<option value="Dhaka">Dhaka</option>
+														<option value="Khulna">Khulna</option>
+														<option value="Sylhet">Sylhet</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-6">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Doctor</label>
+													<select name="state" class="form-select">
+														<option value="Rajshahi">Begumganj</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Appointment Type</label>
+													<select name="state" class="form-select">
+														<option value="Live Video Call">Live Video Call</option>
+														<option value="Live Video Call">Docter Chamber</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Venue</label>
+													<select name="state" class="form-select">
+														<option value="Farmgate Eye hospital">Farmgate Eye hospital </option>
+														<option value="Framget">Framget</option>
+														<option value="Hitech Multi Care Hospital 03">Hitech Multi Care Hospital 03 </option>
+														<option value="Ispahani Islamia Eye Institute and Hospital"> Ispahani Islamia Eye Institute and Hospital</option>
+														<option value="national institute of child health care">national institute of child health care </option>
+														<option value="Online Video Consultation Chamber">Online Video Consultation Chamber</option>
+														<option value="Popular Diagnostic Center ">Popular Diagnostic Center </option>
+														<option value="Uttara eye hospital">Uttara eye hospital</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Patient Type</label>
+													<select name="state" class="form-select">
+														<option value="New">New</option>
+														<option value="Old">Old</option>
+														<option value="Report">Report</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group -->
+												<div class="form-group">
+													<label class="required">Problem</label>
+													<textarea class="form-control" placeholder="Write Your problem..." rows="2"></textarea>
+												</div>
+												<!-- End Form Group -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Checkbox -->
+												<div class="form-check text-start">
+													<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultOne">
+													<label class="form-check-label" for="flexCheckDefaultOne"> I agree to the <a href="terms-conditions.html" class="text-decoration-underline">Terms &amp; Conditions</a> </label>
+												</div>
+												<!-- /.End Checkbox -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Button -->
+												<button class="btn btn-primary btn-lg w-100" type="submit">Get Appointment</button>
+												<!-- /.End Button -->
+											</div>
+										</div>
+										<hr>
+										<div class="text-center"> <span>Already have an account yet? <a href="#">Sign In</a></span> </div>
+									</form>
+								</div>
+								<!-- /.End Tab Pane -->
+								<!-- Start Tab Pane -->
+								<div class="tab-pane fade" id="tab-two-pane" role="tabpanel" aria-labelledby="tab-two" tabindex="0">
+									<form>
+										<div class="row g-4">
+											<div class="col-sm-12">
+												<!-- Start Form Group -->
+												<div class="form-group">
+													<label class="required">Patient Name</label>
+													<input type="text" class="form-control" placeholder="Mr./Ms."> </div>
+												<!-- End Form Group -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group -->
+												<div class="form-group">
+													<label class="required">Phone Number</label>
+													<input type="number" class="form-control" placeholder="+880"> </div>
+												<!-- End Form Group -->
+											</div>
+											<div class="col-sm-6">
+												<!-- Start Form Group -->
+												<div class="form-group">
+													<label>Date Of Birth (Optional)</label>
+													<input type="text" class="form-control datepicker" placeholder="mm-dd-yyyy"> </div>
+												<!-- End Form Group -->
+											</div>
+											<div class="col-sm-6">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Gender</label>
+													<select name="Gender" class="form-select">
+														<option value="Male">Male</option>
+														<option value="Female">Female</option>
+														<option value="Other">Other</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group -->
+												<div class="form-group">
+													<label class="required">Appointment Date</label>
+													<input type="text" class="form-control datepicker" placeholder="mm-dd-yyyy"> </div>
+												<!-- End Form Group -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Department</label>
+													<select name="Department" class="form-select">
+														<option value="1">Cardiology</option>
+														<option value="2">Allergy sex &amp; Immunology </option>
+														<option value="3">Laser</option>
+														<option value="4">Medicine</option>
+														<option value="5">Dentistry</option>
+														<option value="9">Orthopaedic </option>
+														<option value="10">Neuromedicine</option>
+														<option value="11">Cancer (Oncology) </option>
+														<option value="12">Gynecology</option>
+														<option value="13">Pediatrics (CHILD) </option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Doctor</label>
+													<select name="Department" class="form-select">
+														<option value="133">Prof.Dr.Sk.Abdul Fattah</option>
+														<option value="449">Dr. Md. Solaiman</option>
+														<option value="498">Dr. Mohammad Almas</option>
+														<option value="598">Tamim</option>
+														<option value="604">Uzzal Chandro Pull</option>
+														<option value="610">HIMEL GHOSH</option>
+														<option value="613">Ashik Elahi </option>
+														<option value="618">Arif Absar Rizvi</option>
+														<option value="633">S M Sharfuddin </option>
+														<option value="679">Dr. Debdash Paul</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Appointment Type</label>
+													<select name="Department" class="form-select">
+														<option value="Live Video Call">Live Video Call</option>
+														<option value="Docter Chamber">Docter Chamber</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Venue</label>
+													<select name="Department" class="form-select">
+														<option value="Farmgate Eye hospital">Farmgate Eye hospital </option>
+														<option value="Hitech Multi Care Hospital 03">Hitech Multi Care Hospital 03</option>
+														<option value="Ispahani Islamia Eye Institute and Hospital"> Ispahani Islamia Eye Institute and Hospital</option>
+														<option value="national institute of child health care">national institute of child health care </option>
+														<option value="Online Video Consultation Chamber">Online Video Consultation Chamber</option>
+														<option value="Popular Diagnostic Center ">Popular Diagnostic Center </option>
+														<option value="Uttara eye hospital">Uttara eye hospital</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group (Select) -->
+												<div class="form-group">
+													<label class="required">Patient Type</label>
+													<select name="Department" class="form-select">
+														<option value="New">New</option>
+														<option value="Old">Old</option>
+														<option value="Report">Report</option>
+													</select>
+												</div>
+												<!-- /.End Form Group (Select) -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Form Group -->
+												<div class="form-group">
+													<label class="required">Problem</label>
+													<textarea class="form-control" placeholder="Write Your problem..." rows="2"></textarea>
+												</div>
+												<!-- End Form Group -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Checkbox -->
+												<div class="form-check text-start">
+													<input class="form-check-input" type="checkbox" value="" id="flexCheckDefaultTwo">
+													<label class="form-check-label" for="flexCheckDefaultTwo"> I agree to the <a href="terms-conditions.html" class="text-decoration-underline">Terms &amp; Conditions</a> </label>
+												</div>
+												<!-- /.End Checkbox -->
+											</div>
+											<div class="col-sm-12">
+												<!-- Start Button -->
+												<button class="btn btn-primary btn-lg w-100" type="submit">Get Appointment</button>
+												<!-- /.End Button -->
+											</div>
+										</div>
+										<hr>
+										<div class="text-center"> <span>Already have an account yet? <a href="#" data-toggle="modal"
+                                                    data-target="#loginModal">Sign In</a></span> </div>
+									</form>
+								</div>
+								<!-- /.End Tab Pane -->
+							</div>
+							<!-- /.End Tab Content -->
+						</div>
+						<div class="col-lg-6 col-xl-7 order-lg-first pe-xl-5">
+							<!-- Start Illustration Image --><img src="assets/img/illustration/schedule-meeting.svg" alt="" class="img-fluid">
+							<!-- /.End Illustration Image -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Optional JavaScript -->
+	<script src="assets/plugins/jquery/jquery.min.js"></script>
+	<script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/plugins/smartmenus/jquery.smartmenus.min.js"></script>
+	<script src="assets/plugins/smartmenus/jquery.smartmenus.bootstrap-4.min.js"></script>
+	<script src="assets/plugins/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+	<script src="assets/plugins/select2/select2.min.js"></script>
+	<script src="assets/plugins/theia-sticky-sidebar/ResizeSensor.min.js"></script>
+	<script src="assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.min.js"></script>
+	<script src="assets/plugins/OwlCarousel2/owl.carousel.min.js"></script>
+	<script src="assets/js/hideShowPassword.min.js"></script>
+	<script src="assets/plugins/ion.rangeSlider/js/ion.rangeSlider.min.js"></script>
+	<script src="assets/plugins/raty/raty.min.js"></script>
+	<script src="assets/plugins/slick/slick.min.js"></script>
+	<script src="assets/plugins/magnific-popup/jquery.magnific-popup.min.js"></script>
+	<script src="assets/plugins/vidbg/vidbg.min.js"></script>
+	<script src="assets/plugins/counter-up/waypoints.min.js"></script>
+	<script src="assets/plugins/counter-up/jquery.counterup.min.js"></script>
+	<script src="assets/plugins/typed/typed.min.js"></script>
+	<script src="assets/plugins/aos/aos.min.js"></script>
+	<script src="assets/js/custom.js"></script>
+</body>
+
+
+<!-- Mirrored from theme.easital.com/html/docwala/v1.0/appointment.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 30 Mar 2026 13:09:08 GMT -->
+</html>
