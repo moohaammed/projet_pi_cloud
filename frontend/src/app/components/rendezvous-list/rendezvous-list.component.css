@@ -1,0 +1,39 @@
+/* rendezvous-list styles */
+.person-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.person-chip.patient {
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+}
+.person-chip.medecin {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+}
+.date-cell {
+  white-space: nowrap;
+}
+.date-cell small {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+.motif-cell {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.id-badge {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.06);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
