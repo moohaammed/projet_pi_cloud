@@ -2,12 +2,12 @@ package esprit.tn.backpi.services.collaboration;
 
 import esprit.tn.backpi.dto.collaboration.CommentCreateDto;
 import esprit.tn.backpi.dto.collaboration.CommentResponseDto;
-import esprit.tn.backpi.entities.User;
 import esprit.tn.backpi.entities.collaboration.Comment;
 import esprit.tn.backpi.entities.collaboration.Publication;
-import esprit.tn.backpi.repositories.UserRepository;
+import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repositories.collaboration.CommentRepository;
 import esprit.tn.backpi.repositories.collaboration.PublicationRepository;
+import esprit.tn.backpi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -91,7 +91,7 @@ public class CommentService {
         
         if (comment.getAuthor() != null) {
             dto.setAuthorId(comment.getAuthor().getId());
-            dto.setAuthorName(comment.getAuthor().getName());
+            dto.setAuthorName(comment.getAuthor().getNom());
         }
         
         if (comment.getPublication() != null) {

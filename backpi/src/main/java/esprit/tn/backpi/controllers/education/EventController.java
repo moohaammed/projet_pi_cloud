@@ -1,7 +1,7 @@
 package esprit.tn.backpi.controllers.education;
 
 import esprit.tn.backpi.entities.education.Event;
-import esprit.tn.backpi.services.FileStorageService;
+import esprit.tn.backpi.services.collaboration.FileStorageService;
 import esprit.tn.backpi.services.education.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

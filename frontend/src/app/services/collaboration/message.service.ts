@@ -1,6 +1,13 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
  
+export interface PollOptionDto {
+  id: number;
+  text: string;
+  votes: number;
+  voterIds: number[];
+}
+ 
 export interface MessageDto {
   id: number;
   content: string;
@@ -15,7 +22,13 @@ export interface MessageDto {
   parentMessageId?: number;
   parentMessageContent?: string;
   parentMessageSenderName?: string;
+  type?: 'TEXT' | 'POLL';
+  pollQuestion?: string;
+  pollOptions?: PollOptionDto[];
+  pinned?: boolean;
 }
+ 
+export type MessageResponseDto = MessageDto;
  
 export interface MessageCreateRequest {
   content: string;
@@ -23,6 +36,9 @@ export interface MessageCreateRequest {
   receiverId?: number;
   chatGroupId?: number;
   parentMessageId?: number;
+  type?: 'TEXT' | 'POLL';
+  pollQuestion?: string;
+  pollOptions?: string[];
 }
  
 @Injectable({
@@ -48,16 +64,23 @@ export class MessageService {
     if (req.receiverId) formData.append('receiverId', req.receiverId.toString());
     if (req.chatGroupId) formData.append('chatGroupId', req.chatGroupId.toString());
     if (req.parentMessageId) formData.append('parentMessageId', req.parentMessageId.toString());
+    if (req.type) formData.append('type', req.type);
+    if (req.pollQuestion) formData.append('pollQuestion', req.pollQuestion);
+    if (req.pollOptions) {
+      req.pollOptions.forEach(opt => formData.append('pollOptions', opt));
+    }
     if (file) formData.append('file', file);
     return this.http.post<MessageDto>(this.baseUrl, formData);
   }
  
-  deleteMessage(id: number) { 
-    return this.http.delete(`${this.baseUrl}/${id}`).subscribe(() => {
-      this.messages.update(msgs => msgs.filter(m => m.id !== id));
-    });
+  fetchDirectMessages(userId1: number, userId2: number) {
+    return this.http.get<MessageDto[]>(`${this.baseUrl}/direct/${userId1}/${userId2}`);
   }
-
+ 
+  deleteMessage(id: number) { 
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+ 
   updateMessage(id: number, req: MessageCreateRequest, file?: File) {
     const formData = new FormData();
     formData.append('content', req.content);
@@ -65,8 +88,16 @@ export class MessageService {
     if (req.receiverId) formData.append('receiverId', req.receiverId.toString());
     if (req.chatGroupId) formData.append('chatGroupId', req.chatGroupId.toString());
     if (file) formData.append('file', file);
-    return this.http.put<MessageDto>(`${this.baseUrl}/${id}`, formData).subscribe(updatedMsg => {
-      this.messages.update(msgs => msgs.map(m => m.id === id ? updatedMsg : m));
+    return this.http.put<MessageDto>(`${this.baseUrl}/${id}`, formData);
+  }
+ 
+  voteOnPoll(messageId: number, userId: number, optionId: number) {
+    return this.http.post<MessageDto>(`${this.baseUrl}/${messageId}/vote`, null, {
+      params: { userId, optionId }
     });
+  }
+ 
+  togglePin(messageId: number) {
+    return this.http.post<MessageDto>(`${this.baseUrl}/${messageId}/pin`, {});
   }
 }

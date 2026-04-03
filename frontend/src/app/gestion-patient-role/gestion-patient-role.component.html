@@ -1,0 +1,92 @@
+<!-- ═══════════════════════════════════════════
+     ROLE SELECTION LANDING PAGE
+═══════════════════════════════════════════ -->
+<section class="role-section py-5">
+  <div class="container">
+
+    <!-- Hero text -->
+    <div class="text-center mb-5">
+      <span class="badge bg-soft-primary text-primary px-3 py-2 mb-3 d-inline-block">
+        <i class="fa-solid fa-brain me-1"></i> Alzheimer 360° Platform
+      </span>
+      <h1 class="fw-extra-bold mb-3">Choisissez votre espace</h1>
+      <p class="lead text-muted mx-auto" style="max-width: 500px">
+        Accédez à votre interface personnalisée pour gérer votre suivi médical ou les dossiers de vos patients.
+      </p>
+    </div>
+
+    <!-- Role Cards -->
+    <div class="row g-4 justify-content-center mb-4">
+
+      <!-- Patient -->
+      <div class="col-sm-10 col-md-5">
+        <div class="role-card card border-0 shadow h-100 p-4 text-center">
+          <div class="role-card__icon mx-auto mb-4 bg-soft-primary text-primary">
+            <i class="fa-solid fa-user-injured fa-xl"></i>
+          </div>
+          <h3 class="fw-bold mb-2">Espace Patient</h3>
+          <p class="text-muted mb-4">
+            Gérez votre profil, soumettez vos analyses IRM et consultez vos résultats IA.
+          </p>
+          <ul class="list-unstyled text-start text-muted small mb-4">
+            <li class="mb-2">
+              <i class="fa-solid fa-check-circle text-success me-2"></i>Voir et modifier mon profil médical
+            </li>
+            <li class="mb-2">
+              <i class="fa-solid fa-check-circle text-success me-2"></i>Soumettre une image IRM
+            </li>
+            <li class="mb-2">
+              <i class="fa-solid fa-check-circle text-success me-2"></i>Historique des résultats IA
+            </li>
+          </ul>
+          <a id="btn-espace-patient"
+             routerLink="/patient-dashboard"
+             class="btn btn-primary btn-lg mt-auto">
+            <i class="fa-solid fa-right-to-bracket me-2"></i>Accéder
+          </a>
+        </div>
+      </div>
+
+      <!-- Médecin -->
+      <div class="col-sm-10 col-md-5">
+        <div class="role-card card border-0 shadow h-100 p-4 text-center">
+          <div class="role-card__icon mx-auto mb-4 text-success" style="background: rgba(25,135,84,0.1)">
+            <i class="fa-solid fa-user-doctor fa-xl"></i>
+          </div>
+          <h3 class="fw-bold mb-2">Espace Médecin</h3>
+          <p class="text-muted mb-4">
+            Accédez aux dossiers de tous les patients, analysez les IRM et ajoutez vos observations cliniques.
+          </p>
+          <ul class="list-unstyled text-start text-muted small mb-4">
+            <li class="mb-2">
+              <i class="fa-solid fa-check-circle text-success me-2"></i>Vue d'ensemble multi-patients
+            </li>
+            <li class="mb-2">
+              <i class="fa-solid fa-check-circle text-success me-2"></i>Analyse des résultats IA
+            </li>
+            <li class="mb-2">
+              <i class="fa-solid fa-check-circle text-success me-2"></i>Ajout d'observations médicales
+            </li>
+          </ul>
+          <a id="btn-espace-medecin"
+             routerLink="/medecin-dashboard"
+             class="btn btn-success btn-lg mt-auto">
+            <i class="fa-solid fa-right-to-bracket me-2"></i>Accéder
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Admin shortcut -->
+    <div class="text-center">
+      <p class="text-muted small mb-2">Accès administrateur</p>
+      <a id="btn-admin-gestion"
+         routerLink="/gestion-patients"
+         class="btn btn-outline-secondary btn-sm">
+        <i class="fa-solid fa-gear me-1"></i>Gestion complète des patients
+      </a>
+    </div>
+
+  </div>
+</section>
