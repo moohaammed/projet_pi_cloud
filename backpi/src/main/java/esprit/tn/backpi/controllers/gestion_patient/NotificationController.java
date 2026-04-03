@@ -10,10 +10,13 @@ import java.util.List;
 @RestController("patientNotificationController")
 @RequestMapping("/api/notifications")
 @CrossOrigin(originPatterns = "*")
-@RequiredArgsConstructor
 public class NotificationController {
 
     private final INotificationService notificationService;
+
+    public NotificationController(INotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     @GetMapping
     public List<Notificationpatient> getAllNotifications() {

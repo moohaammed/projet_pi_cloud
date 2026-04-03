@@ -10,10 +10,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/jeux")
 @CrossOrigin(originPatterns = "*")
-@RequiredArgsConstructor
 public class JeuCognitifController {
 
     private final IJeuCognitifService jeuCognitifService;
+
+    public JeuCognitifController(IJeuCognitifService jeuCognitifService) {
+        this.jeuCognitifService = jeuCognitifService;
+    }
 
     @GetMapping
     public List<JeuCognitif> getAllJeux() {

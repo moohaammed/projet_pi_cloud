@@ -5,7 +5,7 @@ import esprit.tn.backpi.entities.collaboration.Comment;
 import esprit.tn.backpi.entities.collaboration.PublicationPollOption;
 import esprit.tn.backpi.entities.collaboration.Publication;
 import esprit.tn.backpi.entities.collaboration.PublicationType;
-import esprit.tn.backpi.repositories.UserRepository;
+import esprit.tn.backpi.repository.UserRepository;
 import esprit.tn.backpi.repositories.collaboration.PublicationPollOptionRepository;
 import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repositories.collaboration.PublicationRepository;

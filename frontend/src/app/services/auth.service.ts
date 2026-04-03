@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:8089/api/auth';
+  private apiUrl = 'http://localhost:8080/api/auth';
   private isBrowser: boolean;
   private loggedIn$: BehaviorSubject<boolean>;
 

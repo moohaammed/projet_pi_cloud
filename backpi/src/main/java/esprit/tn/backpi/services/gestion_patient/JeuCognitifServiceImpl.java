@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class JeuCognitifServiceImpl implements IJeuCognitifService {
 
     private final JeuCognitifRepository jeuCognitifRepository;
+
+    public JeuCognitifServiceImpl(JeuCognitifRepository jeuCognitifRepository) {
+        this.jeuCognitifRepository = jeuCognitifRepository;
+    }
 
     @Override
     public List<JeuCognitif> retrieveAllJeux() {

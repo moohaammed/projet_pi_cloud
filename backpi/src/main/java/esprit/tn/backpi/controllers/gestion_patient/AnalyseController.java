@@ -10,10 +10,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/analyses")
 @CrossOrigin(originPatterns = "*")
-@RequiredArgsConstructor
 public class AnalyseController {
 
     private final IAnalyseService analyseService;
+
+    public AnalyseController(IAnalyseService analyseService) {
+        this.analyseService = analyseService;
+    }
 
     @GetMapping
     public List<Analyse> getAllAnalyses() {

@@ -10,10 +10,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/patients")
 @CrossOrigin(originPatterns = "*")
-@RequiredArgsConstructor
 public class PatientController {
 
     private final IPatientService patientService;
+
+    public PatientController(IPatientService patientService) {
+        this.patientService = patientService;
+    }
 
     @GetMapping
     public List<Patient> getAllPatients() {

@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class PatientServiceImpl implements IPatientService {
 
     private final PatientRepository patientRepository;
+
+    public PatientServiceImpl(PatientRepository patientRepository) {
+        this.patientRepository = patientRepository;
+    }
 
     @Override
     public List<Patient> retrieveAllPatients() {

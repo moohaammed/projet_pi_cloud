@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class AnalyseServiceImpl implements IAnalyseService {
 
     private final AnalyseRepository analyseRepository;
+
+    public AnalyseServiceImpl(AnalyseRepository analyseRepository) {
+        this.analyseRepository = analyseRepository;
+    }
 
     @Override
     public List<Analyse> retrieveAllAnalyses() {

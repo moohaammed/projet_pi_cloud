@@ -6,7 +6,7 @@ import { User, Role } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class AlzUserService {
 
-  private apiUrl = 'http://localhost:8089/api/users';
+  private apiUrl = 'http://localhost:8080/api/users';
 
   constructor(private http: HttpClient) {}
 

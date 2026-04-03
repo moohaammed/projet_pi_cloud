@@ -2,11 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
 
-<<<<<<< HEAD
 // ===== EXISTANT =====
-=======
-// Imports de ton ami (Rendez-vous & Education)
->>>>>>> origin/main
 import { RendezVousListComponent } from './components/rendezvous-list/rendezvous-list.component';
 import { RendezVousFormComponent } from './components/rendezvous-form/rendezvous-form.component';
 import { RendezVousDetailComponent } from './components/rendezvous-detail/rendezvous-detail.component';
@@ -22,7 +18,6 @@ import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard
 import { MedecinDashboardComponent } from './medecin-dashboard/medecin-dashboard.component';
 
 export const routes: Routes = [
-<<<<<<< HEAD
 
   // ===== AUTH AlzCare =====
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -98,12 +93,6 @@ export const routes: Routes = [
   },
 
   // ===== EXISTANT (inchangé) =====
-=======
-  // --- Tes Routes (Gestion Patient) ---
-  { path: 'patients', component: GestionPatientRoleComponent },
-  { path: 'patient-dashboard', component: PatientDashboardComponent },
-  { path: 'medecin-dashboard', component: MedecinDashboardComponent },
->>>>>>> origin/main
   { path: 'collaboration', component: CommunicationTestComponent },
 
   // --- Routes de l'ami (Rendez-vous) ---
@@ -118,12 +107,5 @@ export const routes: Routes = [
   { path: 'education', component: EducationComponent },
   { path: 'eventfront', component: EventFrontComponent },
 
-<<<<<<< HEAD
   { path: '**', redirectTo: 'auth/login' }
 ];
-=======
-  // --- Redirections et Wildcard (À mettre à la fin !) ---
-  { path: '', redirectTo: 'patients', pathMatch: 'full' },
-  { path: '**', redirectTo: 'patients' }
-];
->>>>>>> origin/main
