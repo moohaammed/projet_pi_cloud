@@ -41,7 +41,7 @@ public class Publication {
     private String pollQuestion;
  
     @OneToMany(mappedBy = "publication", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<PollOption> pollOptions = new ArrayList<>();
+    private List<PublicationPollOption> pollOptions = new ArrayList<>();
  
     public Publication() {}
  
@@ -81,6 +81,6 @@ public class Publication {
     public String getPollQuestion() { return pollQuestion; }
     public void setPollQuestion(String pollQuestion) { this.pollQuestion = pollQuestion; }
  
-    public List<PollOption> getPollOptions() { return pollOptions; }
-    public void setPollOptions(List<PollOption> pollOptions) { this.pollOptions = pollOptions; }
+    public List<PublicationPollOption> getPollOptions() { return pollOptions; }
+    public void setPollOptions(List<PublicationPollOption> pollOptions) { this.pollOptions = pollOptions; }
 }

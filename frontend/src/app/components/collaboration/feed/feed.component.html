@@ -143,10 +143,11 @@
               <p class="fs-16 mb-3" *ngIf="pub.content">{{ pub.content }}</p>
               
               <!-- Poll Display UI -->
-              <div *ngIf="pub.type === 'VOTE' && pub.pollQuestion" class="poll-container bg-white border rounded-3 p-3 mb-3 shadow-sm">
+              <div *ngIf="(pub.type === 'VOTE' || pub.type === 'vote') && pub.pollQuestion" class="poll-container bg-white border rounded-3 p-3 mb-3 shadow-sm">
                 <h6 class="fw-bold mb-3"><i class="fa-solid fa-square-poll-vertical text-primary me-2"></i> {{ pub.pollQuestion }}</h6>
                 <div class="poll-options">
-                  <div *ngFor="let option of pub.pollOptions; let idx = index" class="poll-option mb-2">
+                  <ng-container *ngIf="pub.pollOptions && pub.pollOptions.length > 0; else noOptions">
+                    <div *ngFor="let option of pub.pollOptions; let idx = index" class="poll-option mb-2">
                     <button class="btn btn-outline-light text-dark w-100 text-start position-relative overflow-hidden p-2" 
                             (click)="vote(pub.id!, idx)"
                             [class.border-primary]="option.voterIds?.includes(currentUserId())">
@@ -162,6 +163,12 @@
                       </div>
                     </button>
                   </div>
+                  </ng-container>
+                  <ng-template #noOptions>
+                    <div class="text-muted fs-12 italic p-2 bg-light rounded">
+                      <i class="fa-solid fa-circle-info me-1"></i> No options available for poll #{{ pub.id }}.
+                    </div>
+                  </ng-template>
                 </div>
               </div>
 

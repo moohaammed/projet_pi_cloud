@@ -3,10 +3,11 @@ package esprit.tn.backpi.services.collaboration;
 import esprit.tn.backpi.dto.collaboration.*;
 import esprit.tn.backpi.entities.User;
 import esprit.tn.backpi.entities.collaboration.Comment;
-import esprit.tn.backpi.entities.collaboration.PollOption;
+import esprit.tn.backpi.entities.collaboration.PublicationPollOption;
 import esprit.tn.backpi.entities.collaboration.Publication;
 import esprit.tn.backpi.entities.collaboration.PublicationType;
 import esprit.tn.backpi.repositories.UserRepository;
+import esprit.tn.backpi.repositories.collaboration.PublicationPollOptionRepository;
 import esprit.tn.backpi.repositories.collaboration.PublicationRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +20,18 @@ import java.util.stream.Collectors;
 public class PublicationService {
 
     private final PublicationRepository publicationRepository;
+    private final PublicationPollOptionRepository pollOptionRepository;
     private final SentimentAnalysisService sentimentAnalysisService;
     private final NotificationService notificationService;
     private final UserRepository userRepository;
 
     public PublicationService(PublicationRepository publicationRepository,
+                              PublicationPollOptionRepository pollOptionRepository,
                               SentimentAnalysisService sentimentAnalysisService,
                               NotificationService notificationService,
                               UserRepository userRepository) {
         this.publicationRepository = publicationRepository;
+        this.pollOptionRepository = pollOptionRepository;
         this.sentimentAnalysisService = sentimentAnalysisService;
         this.notificationService = notificationService;
         this.userRepository = userRepository;
@@ -57,28 +61,49 @@ public class PublicationService {
         publication.setMediaUrl(mediaUrl);
         publication.setMimeType(mimeType);
         publication.setAnonymous(dto.isAnonymous());
+        publication.setType(dto.getType()); // Explicitly set it from DTO
 
-        if (dto.getType() == PublicationType.VOTE && dto.getPollQuestion() != null) {
-            publication.setPollQuestion(dto.getPollQuestion());
-            if (dto.getPollOptions() != null) {
-                List<PollOption> options = new ArrayList<>();
-                for (String optionText : dto.getPollOptions()) {
-                    PollOption option = new PollOption();
-                    option.setText(optionText);
-                    option.setPublication(publication);
-                    options.add(option);
+        // Robust Poll Mapping
+        if (dto.getType() == PublicationType.VOTE) {
+            System.out.println("Processing VOTE publication. Question: " + dto.getPollQuestion());
+            if (dto.getPollQuestion() != null) {
+                publication.setPollQuestion(dto.getPollQuestion());
+                if (dto.getPollOptions() != null && !dto.getPollOptions().isEmpty()) {
+                    List<PublicationPollOption> options = new ArrayList<>();
+                    for (String optionText : dto.getPollOptions()) {
+                        if (optionText != null && !optionText.trim().isEmpty()) {
+                            PublicationPollOption option = new PublicationPollOption();
+                            option.setText(optionText.trim());
+                            option.setPublication(publication);
+                            options.add(option);
+                        }
+                    }
+                    publication.setPollOptions(options);
+                    System.out.println("Mapped " + options.size() + " poll options.");
+                } else {
+                    System.out.println("Warning: VOTE publication created without options.");
                 }
-                publication.setPollOptions(options);
+            } else {
+                System.out.println("Warning: VOTE publication created without a question.");
             }
         }
 
-        Double score = sentimentAnalysisService.calculateSentimentScore(publication.getContent());
+        // Use content from DTO - if it's empty, use the poll question
+        String finalContent = (dto.getContent() != null && !dto.getContent().trim().isEmpty()) 
+            ? dto.getContent() 
+            : dto.getPollQuestion();
+        
+        Double score = sentimentAnalysisService.calculateSentimentScore(finalContent);
         publication.setSentimentScore(score);
         publication.setDistressed(score <= -0.5);
+        publication.setContent(finalContent);
         
-        Publication saved = publicationRepository.save(publication);
+        Publication saved = publicationRepository.saveAndFlush(publication);
+        
+        // Final robustness: Re-fetch to ensure all cascaded/linked items are present
+        Publication fresh = publicationRepository.findById(saved.getId()).orElse(saved);
 
-        if (saved.isDistressed()) {
+        if (fresh.isDistressed()) {
             notificationService.createAndSend(
                 author.getId(),
                 "CareBot: I noticed your post might reflect some distress. Remember, you're not alone. \u2764\uFE0F",
@@ -115,12 +140,12 @@ public class PublicationService {
     public PublicationResponseDto voteInPoll(Long pubId, int optionIndex, Long userId) {
         return publicationRepository.findById(pubId).map(pub -> {
             if (pub.getType() == PublicationType.VOTE && pub.getPollOptions() != null && optionIndex < pub.getPollOptions().size()) {
-                PollOption option = pub.getPollOptions().get(optionIndex);
+                PublicationPollOption option = pub.getPollOptions().get(optionIndex);
                 
                 // Toggle vote: if user already voted for this option, remove it; otherwise add it.
                 // Alternatively, if user can only vote for one option, remove from others first.
                 // Let's implement single vote logic:
-                for (PollOption opt : pub.getPollOptions()) {
+                for (PublicationPollOption opt : pub.getPollOptions()) {
                     if (opt.getVoterIds().contains(userId)) {
                         opt.getVoterIds().remove(userId);
                         opt.setVotes(opt.getVoterIds().size());

@@ -107,22 +107,36 @@ export class FeedComponent implements OnInit {
 
   submitPublication() {
     const isVote = this.newPubType === 'VOTE';
-    const hasContent = this.newPubContent.trim().length > 0;
-    const hasQuestion = this.newPollQuestion.trim().length > 0;
+    const hasContent = this.newPubContent && this.newPubContent.trim().length > 0;
+    const hasQuestion = this.newPollQuestion && this.newPollQuestion.trim().length > 0;
 
-    if (!hasContent && (!isVote || !hasQuestion)) return;
-    
-    const validOptions = this.newPollOptions
-      .map(o => o.text.trim())
-      .filter(t => t.length > 0);
-
-    if (isVote && validOptions.length < 2) {
-      alert('Please provide at least 2 valid options for the poll.');
+    // Guard: Must have either content or a poll question if it's a vote
+    if (!hasContent && !hasQuestion) {
+      alert('Please enter some content or a poll question.');
       return;
     }
+    
+    let validOptions: string[] = [];
+    if (isVote) {
+      validOptions = this.newPollOptions
+        .map(o => o.text.trim())
+        .filter(t => t.length > 0);
+
+      if (validOptions.length < 2) {
+        alert('Please provide at least 2 valid options for the poll.');
+        return;
+      }
+      if (!hasQuestion) {
+        alert('Please provide a poll question.');
+        return;
+      }
+    }
+
+    // If it's a vote and user didn't write extra content, use the question as content
+    const finalContent = hasContent ? this.newPubContent : (isVote ? this.newPollQuestion : '');
 
     this.publicationService.createPublication({
-      content: hasContent ? this.newPubContent : (isVote ? this.newPollQuestion : ''),
+      content: finalContent,
       type: this.newPubType as any,
       authorId: this.currentUserId(),
       anonymous: this.newPubAnonymous,
@@ -130,10 +144,14 @@ export class FeedComponent implements OnInit {
       pollOptions: isVote ? validOptions : undefined
     }, this.selectedFile || undefined).subscribe({
       next: () => {
+        // Reset form
         this.newPubContent = '';
         this.newPollQuestion = '';
         this.newPollOptions = [{ text: '' }, { text: '' }];
         this.selectedFile = null;
+        this.newPubType = 'EXPERIENCE';
+        this.newPubAnonymous = false;
+        
         this.publicationService.fetchPublications();
       },
       error: (err) => {

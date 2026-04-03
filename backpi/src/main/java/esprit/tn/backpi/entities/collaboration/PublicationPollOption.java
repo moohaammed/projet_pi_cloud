@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class PollOption {
+public class PublicationPollOption {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +16,7 @@ public class PollOption {
     private int votes = 0;
 
     @ElementCollection
-    @CollectionTable(name = "poll_option_voters", joinColumns = @JoinColumn(name = "option_id"))
+    @CollectionTable(name = "publication_poll_option_voters", joinColumns = @JoinColumn(name = "option_id"))
     @Column(name = "user_id")
     private Set<Long> voterIds = new HashSet<>();
 
@@ -24,7 +24,7 @@ public class PollOption {
     @JoinColumn(name = "publication_id")
     private Publication publication;
 
-    public PollOption() {}
+    public PublicationPollOption() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
