@@ -47,13 +47,13 @@ export class RendezVousDetailComponent implements OnInit {
   }
 
   getStatutClass(statut?: StatutRendezVous): string {
-    const classes: Record<string, string> = {
-      PLANIFIE: 'badge-planifie',
-      CONFIRME: 'badge-confirme',
-      ANNULE: 'badge-annule',
-      TERMINE: 'badge-termine'
+    const map: Record<StatutRendezVous, string> = {
+      PLANIFIE: 'bg-warning',
+      CONFIRME: 'bg-success',
+      ANNULE: 'bg-danger',
+      TERMINE: 'bg-primary'
     };
-    return statut ? classes[statut] ?? '' : '';
+    return statut ? map[statut] ?? 'bg-secondary' : 'bg-secondary';
   }
 
   doDelete(): void {
