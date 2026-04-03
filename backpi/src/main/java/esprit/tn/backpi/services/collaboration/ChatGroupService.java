@@ -3,10 +3,10 @@ package esprit.tn.backpi.services.collaboration;
 import esprit.tn.backpi.dto.collaboration.ChatGroupCreateDto;
 import esprit.tn.backpi.dto.collaboration.ChatGroupResponseDto;
 import esprit.tn.backpi.dto.collaboration.MemberDto;
-import esprit.tn.backpi.entities.User;
 import esprit.tn.backpi.entities.collaboration.ChatGroup;
-import esprit.tn.backpi.repositories.UserRepository;
+import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repositories.collaboration.ChatGroupRepository;
+import esprit.tn.backpi.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -109,7 +109,7 @@ public class ChatGroupService {
 
         if (group.getMembers() != null) {
             List<MemberDto> memberDtos = group.getMembers().stream()
-                    .map(u -> new MemberDto(u.getId(), u.getName()))
+                    .map(u -> new MemberDto(u.getId(), u.getNom()))
                     .collect(Collectors.toList());
             dto.setMembers(memberDtos);
         }

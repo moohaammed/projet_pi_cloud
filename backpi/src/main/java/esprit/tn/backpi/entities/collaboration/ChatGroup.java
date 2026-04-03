@@ -1,6 +1,6 @@
 package esprit.tn.backpi.entities.collaboration;
 
-import esprit.tn.backpi.entities.User;
+import esprit.tn.backpi.entity.User;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.HashSet;
