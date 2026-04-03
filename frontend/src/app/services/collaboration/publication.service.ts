@@ -9,6 +9,13 @@ export interface CommentDto {
   createdAt: string;
 }
  
+export interface PollOptionDto {
+  id?: number;
+  text: string;
+  votes?: number;
+  voterIds?: number[];
+}
+ 
 export interface PublicationDto {
   id: number;
   content: string;
@@ -22,6 +29,8 @@ export interface PublicationDto {
   sentimentScore?: number;
   anonymous?: boolean;
   comments?: CommentDto[];
+  pollQuestion?: string;
+  pollOptions?: PollOptionDto[];
 }
  
 export interface PublicationCreateRequest {
@@ -29,6 +38,8 @@ export interface PublicationCreateRequest {
   type: string;
   authorId: number;
   anonymous?: boolean;
+  pollQuestion?: string;
+  pollOptions?: string[]; // Simplified for creation
 }
  
 @Injectable({
@@ -49,8 +60,16 @@ export class PublicationService {
     formData.append('type', req.type);
     formData.append('authorId', req.authorId.toString());
     formData.append('anonymous', (req.anonymous || false).toString());
+    if (req.pollQuestion) formData.append('pollQuestion', req.pollQuestion);
+    if (req.pollOptions) {
+      req.pollOptions.forEach(opt => formData.append('pollOptions', opt));
+    }
     if (file) formData.append('file', file);
-    return this.http.post<PublicationDto>(this.baseUrl, formData).subscribe(() => this.fetchPublications());
+    return this.http.post<PublicationDto>(this.baseUrl, formData);
+  }
+ 
+  voteInPoll(pubId: number, optionIndex: number, userId: number) {
+    return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/poll/vote`, { optionIndex, userId });
   }
  
   updatePublication(id: number, req: PublicationCreateRequest, file?: File) {
@@ -60,10 +79,11 @@ export class PublicationService {
     formData.append('authorId', req.authorId.toString());
     formData.append('anonymous', (req.anonymous || false).toString());
     if (file) formData.append('file', file);
-    return this.http.put<PublicationDto>(`${this.baseUrl}/${id}`, formData).subscribe(() => this.fetchPublications());
+    return this.http.put<PublicationDto>(`${this.baseUrl}/${id}`, formData);
   }
  
   deletePublication(id: number) {
-    return this.http.delete(`${this.baseUrl}/${id}`).subscribe(() => this.fetchPublications());
+    const url = `${this.baseUrl}/${id}`;
+    return this.http.delete(url);
   }
 }

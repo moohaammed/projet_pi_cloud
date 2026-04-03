@@ -88,6 +88,16 @@ public class ChatGroupService {
         return null;
     }
 
+    public ChatGroupResponseDto leaveGroup(Long groupId, Long userId) {
+        ChatGroup group = chatGroupRepository.findById(groupId).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
+        if (group != null && user != null) {
+            group.getMembers().remove(user);
+            return mapToResponseDto(chatGroupRepository.save(group));
+        }
+        return null;
+    }
+
     // Helper Mapping Method
     private ChatGroupResponseDto mapToResponseDto(ChatGroup group) {
         ChatGroupResponseDto dto = new ChatGroupResponseDto();

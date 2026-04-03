@@ -76,4 +76,16 @@ public class PublicationController {
         publicationService.deletePublication(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/poll/vote")
+    public ResponseEntity<PublicationResponseDto> voteInPoll(
+            @PathVariable("id") Long id,
+            @RequestBody java.util.Map<String, Object> payload) {
+        
+        int optionIndex = (int) payload.get("optionIndex");
+        Long userId = Long.valueOf(payload.get("userId").toString());
+        
+        PublicationResponseDto result = publicationService.voteInPoll(id, optionIndex, userId);
+        return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
+    }
 }

@@ -1,8 +1,10 @@
 package esprit.tn.backpi.dto.collaboration;
 
+import esprit.tn.backpi.entities.collaboration.MessageType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 public class MessageCreateDto {
 
@@ -30,8 +32,21 @@ public class MessageCreateDto {
     public Long getChatGroupId() { return chatGroupId; }
     public void setChatGroupId(Long chatGroupId) { this.chatGroupId = chatGroupId; }
  
+    private MessageType type;
+    private String pollQuestion;
+    private java.util.List<String> pollOptions;
+
+    public MessageType getType() { return type; }
+    public void setType(MessageType type) { this.type = type; }
+
+    public String getPollQuestion() { return pollQuestion; }
+    public void setPollQuestion(String pollQuestion) { this.pollQuestion = pollQuestion; }
+
+    public java.util.List<String> getPollOptions() { return pollOptions; }
+    public void setPollOptions(java.util.List<String> pollOptions) { this.pollOptions = pollOptions; }
+
     public Long getParentMessageId() { return parentMessageId; }
     public void setParentMessageId(Long parentMessageId) { this.parentMessageId = parentMessageId; }
-    
+
     private Long parentMessageId;
 }
