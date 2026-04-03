@@ -1,0 +1,141 @@
+<main class="main-content bg-white py-5">
+  <div class="container py-3">
+    <!-- Header with Navigation Buttons -->
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <div>
+            <h1 class="display-6 fw-bold mb-2">
+              Discover <span class="underline position-relative text-primary">Groups</span>
+            </h1>
+            <p class="fs-16 text-muted mb-0">Find support groups, social communities, and more.</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a routerLink="/collaboration/feed" class="btn btn-outline-primary">
+              <i class="fa-solid fa-newspaper me-2"></i> Feed
+            </a>
+            <a routerLink="/collaboration/messenger" class="btn btn-outline-primary">
+              <i class="fa-solid fa-paper-plane me-2"></i> Messenger
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Main Groups Directory Column -->
+      <div class="col-lg-8">
+        <div class="section-header mb-4 d-flex justify-content-between align-items-center">
+          <div>
+            <h2 class="fw-semibold mb-1">Explore Communities</h2>
+            <div class="sub-title fs-14 text-muted">Showing {{ groups().length }} available groups</div>
+          </div>
+          <button type="button" class="btn btn-light btn-sm shadow-sm" (click)="refreshData()">
+            <i class="fa-solid fa-rotate me-2"></i> Refresh
+          </button>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6" *ngFor="let grp of groups()">
+            <div class="card h-100 border-0 shadow-sm overflow-hidden hover-shadow">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div
+                    class="avatar-md bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
+                    {{ grp.name.substring(0, 1) }}
+                  </div>
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-light text-primary border px-3 py-2 fs-12">{{ grp.theme || 'GENERAL' }}</span>
+                    <div class="d-flex align-items-center gap-2 text-muted fs-14 fw-medium">
+                      <i class="fa-solid fa-users"></i>
+                      <span>{{ grp.members.length }} Members</span>
+                    </div>
+                  </div>
+                </div>
+
+                <h5 class="fw-bold mb-2">{{ grp.name }}</h5>
+                <p class="text-muted fs-14 mb-4 line-clamp-2">{{ grp.description }}</p>
+
+                <div class="d-flex align-items-center justify-content-between mt-auto pt-3 border-top">
+                  <div *ngIf="isMemberOf(grp)">
+                    <span class="badge bg-soft-success text-success border-success-subtle px-2 py-1 fs-12">
+                      <i class="fa-solid fa-check me-1"></i> Joined
+                    </span>
+                  </div>
+                  <div *ngIf="!isMemberOf(grp)"></div>
+
+                  <div class="d-flex gap-2">
+                    <ng-container *ngIf="isMemberOf(grp)">
+                      <button class="btn btn-primary btn-sm px-4" (click)="enterGroup(grp)">
+                        Open Chat <i class="fa-solid fa-arrow-right ms-2"></i>
+                      </button>
+                    </ng-container>
+                    <ng-container *ngIf="!isMemberOf(grp)">
+                      <button class="btn btn-warning btn-sm px-4 fw-semibold text-white" (click)="joinGroup(grp.id!)">
+                        Join Group <i class="fa-solid fa-plus ms-2"></i>
+                      </button>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="groups().length === 0" class="text-center py-5">
+          <i class="fa-solid fa-users-slash fs-48 text-muted mb-3"></i>
+          <p class="text-muted">No groups found. Be the first to create one!</p>
+        </div>
+      </div>
+
+      <!-- Create Group Sidebar Column -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-4">Create New Group</h5>
+
+            <div class="form-group mb-3">
+              <label class="form-label small">Group Name</label>
+              <input class="form-control" [(ngModel)]="newGroupName" placeholder="e.g. Health Support 101" />
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label small">Description</label>
+              <textarea class="form-control" rows="3" [(ngModel)]="newGroupDesc"
+                placeholder="Describe your group's mission..."></textarea>
+            </div>
+
+            <div class="form-group mb-4">
+              <label class="form-label small">Theme</label>
+              <select class="form-select" [(ngModel)]="newGroupTheme">
+                <option value="SUPPORT">Medical support</option>
+                <option value="SOCIAL">Social</option>
+                <option value="REGIONAL">Regional</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <h6 class="fs-14 fw-bold mb-3">Invite Members</h6>
+              <div class="list-group list-group-flush border rounded-3 comm-scroll-sm bg-light">
+                <div *ngFor="let u of users()" class="list-group-item bg-transparent py-2 border-0">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" [id]="'user-' + u.id"
+                      [checked]="selectedUserIds.includes(u.id!)" (change)="toggleUserSelection(u.id!, $event)">
+                    <label class="form-check-label fs-14" [for]="'user-' + u.id">{{ u.name }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary w-100 py-2 fw-bold" (click)="createGroup()"
+              [disabled]="newGroupName.trim().length < 3">
+              <i class="fa-solid fa-plus me-2"></i> Launch Group
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Floating Mini-Chat Widget -->
+  <app-mini-chat-widget></app-mini-chat-widget>
+</main>

@@ -53,4 +53,10 @@ public class ChatGroupController {
         ChatGroupResponseDto group = chatGroupService.joinGroup(groupId, userId);
         return group != null ? ResponseEntity.ok(group) : ResponseEntity.notFound().build();
     }
+
+    @PostMapping("/{groupId}/leave/{userId}")
+    public ResponseEntity<ChatGroupResponseDto> leaveGroup(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId) {
+        ChatGroupResponseDto group = chatGroupService.leaveGroup(groupId, userId);
+        return group != null ? ResponseEntity.ok(group) : ResponseEntity.notFound().build();
+    }
 }

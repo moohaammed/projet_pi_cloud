@@ -1,16 +1,17 @@
 package esprit.tn.backpi.services.collaboration;
 
-import esprit.tn.backpi.dto.collaboration.CommentResponseDto;
-import esprit.tn.backpi.dto.collaboration.PublicationCreateDto;
-import esprit.tn.backpi.dto.collaboration.PublicationResponseDto;
+import esprit.tn.backpi.dto.collaboration.*;
 import esprit.tn.backpi.entities.User;
 import esprit.tn.backpi.entities.collaboration.Comment;
+import esprit.tn.backpi.entities.collaboration.PollOption;
 import esprit.tn.backpi.entities.collaboration.Publication;
+import esprit.tn.backpi.entities.collaboration.PublicationType;
 import esprit.tn.backpi.repositories.UserRepository;
 import esprit.tn.backpi.repositories.collaboration.PublicationRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,20 @@ public class PublicationService {
         publication.setMimeType(mimeType);
         publication.setAnonymous(dto.isAnonymous());
 
+        if (dto.getType() == PublicationType.VOTE && dto.getPollQuestion() != null) {
+            publication.setPollQuestion(dto.getPollQuestion());
+            if (dto.getPollOptions() != null) {
+                List<PollOption> options = new ArrayList<>();
+                for (String optionText : dto.getPollOptions()) {
+                    PollOption option = new PollOption();
+                    option.setText(optionText);
+                    option.setPublication(publication);
+                    options.add(option);
+                }
+                publication.setPollOptions(options);
+            }
+        }
+
         Double score = sentimentAnalysisService.calculateSentimentScore(publication.getContent());
         publication.setSentimentScore(score);
         publication.setDistressed(score <= -0.5);
@@ -97,6 +112,30 @@ public class PublicationService {
         publicationRepository.deleteById(id);
     }
 
+    public PublicationResponseDto voteInPoll(Long pubId, int optionIndex, Long userId) {
+        return publicationRepository.findById(pubId).map(pub -> {
+            if (pub.getType() == PublicationType.VOTE && pub.getPollOptions() != null && optionIndex < pub.getPollOptions().size()) {
+                PollOption option = pub.getPollOptions().get(optionIndex);
+                
+                // Toggle vote: if user already voted for this option, remove it; otherwise add it.
+                // Alternatively, if user can only vote for one option, remove from others first.
+                // Let's implement single vote logic:
+                for (PollOption opt : pub.getPollOptions()) {
+                    if (opt.getVoterIds().contains(userId)) {
+                        opt.getVoterIds().remove(userId);
+                        opt.setVotes(opt.getVoterIds().size());
+                    }
+                }
+                
+                option.getVoterIds().add(userId);
+                option.setVotes(option.getVoterIds().size());
+                
+                return mapToResponseDto(publicationRepository.save(pub));
+            }
+            return mapToResponseDto(pub);
+        }).orElse(null);
+    }
+
     // Helper Mapping Method
     private PublicationResponseDto mapToResponseDto(Publication publication) {
         PublicationResponseDto dto = new PublicationResponseDto();
@@ -109,6 +148,20 @@ public class PublicationService {
         dto.setDistressed(publication.isDistressed());
         dto.setSentimentScore(publication.getSentimentScore());
         dto.setAnonymous(publication.isAnonymous());
+        dto.setPollQuestion(publication.getPollQuestion());
+
+        if (publication.getPollOptions() != null) {
+            dto.setPollOptions(publication.getPollOptions().stream()
+                    .map(opt -> {
+                        PollOptionResponseDto optDto = new PollOptionResponseDto();
+                        optDto.setId(opt.getId());
+                        optDto.setText(opt.getText());
+                        optDto.setVotes(opt.getVotes());
+                        optDto.setVoterIds(opt.getVoterIds());
+                        return optDto;
+                    })
+                    .collect(Collectors.toList()));
+        }
 
         if (publication.getAuthor() != null) {
             if (publication.isAnonymous()) {

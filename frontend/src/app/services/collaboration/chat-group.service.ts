@@ -1,4 +1,4 @@
-﻿import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
  
 export interface MemberDto {
@@ -39,15 +39,19 @@ export class ChatGroupService {
   }
  
   createGroup(grp: ChatGroupCreateRequest) {
-    return this.http.post<ChatGroupDto>(this.baseUrl, grp).subscribe(() => this.fetchGroups());
+    return this.http.post<ChatGroupDto>(this.baseUrl, grp);
   }
  
   deleteGroup(id: number) {
-    return this.http.delete(`${this.baseUrl}/${id}`).subscribe(() => this.fetchGroups());
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
  
   joinGroup(groupId: number, userId: number) {
-    this.http.post(`${this.baseUrl}/${groupId}/join/${userId}`, {}).subscribe(() => this.fetchGroups());
+    return this.http.post(`${this.baseUrl}/${groupId}/join/${userId}`, {});
+  }
+
+  leaveGroup(groupId: number, userId: number) {
+    return this.http.post(`${this.baseUrl}/${groupId}/leave/${userId}`, {});
   }
 
   setActiveGroup(group: ChatGroupDto | null) {

@@ -1,4 +1,4 @@
-﻿import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Client } from '@stomp/stompjs';
 import { MessageDto } from './message.service';
@@ -36,6 +36,7 @@ export class WebSocketService {
     this.stompClient.onConnect = () => {
       console.log('Connected to WS as User', userId);
       this.connected$.next(true);
+      this.subscribeToUser(userId);
     };
  
     this.stompClient.onDisconnect = () => {

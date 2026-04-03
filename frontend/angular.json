@@ -27,6 +27,10 @@
               }
             ],
             "styles": [
+              "public/template/assets/plugins/bootstrap/css/bootstrap.min.css",
+              "public/template/assets/plugins/fontawesome/css/all.min.css",
+              "public/template/assets/plugins/themify-icons/themify-icons.css",
+              "public/template/assets/css/style.css",
               "src/styles.css"
             ],
             "scripts": [],
@@ -46,8 +50,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
                 }
               ],
               "outputHashing": "all"
@@ -90,6 +94,10 @@
               }
             ],
             "styles": [
+              "public/template/assets/plugins/bootstrap/css/bootstrap.min.css",
+              "public/template/assets/plugins/fontawesome/css/all.min.css",
+              "public/template/assets/plugins/themify-icons/themify-icons.css",
+              "public/template/assets/css/style.css",
               "src/styles.css"
             ],
             "scripts": []

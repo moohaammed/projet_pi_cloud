@@ -1,0 +1,439 @@
+<main class="main-content bg-white h-100 py-5">
+  <div class="container h-100 py-3">
+    <!-- Header with Navigation Buttons -->
+    <div class="row justify-content-center mb-4">
+      <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <div>
+            <h1 class="display-6 fw-bold mb-2">
+              Collaborative <span class="underline position-relative text-primary">Messenger</span>
+            </h1>
+            <p class="fs-16 text-muted mb-0">Secure real-time communication for your health journey.</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a routerLink="/collaboration/feed" class="btn btn-outline-primary">
+              <i class="fa-solid fa-newspaper me-2"></i> Feed
+            </a>
+            <a routerLink="/collaboration/groups" class="btn btn-outline-primary">
+              <i class="fa-solid fa-users me-2"></i> Discover Groups
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm h-100 overflow-hidden">
+      <div class="row g-0 h-100">
+        <!-- Sidebar: Groups/DMs OR Group Info -->
+        <aside class="col-lg-3 border-end bg-white">
+          <!-- Contacts Sidebar (Groups and DMs) -->
+          <ng-container *ngIf="!showInfoSidebar() || !activeGroup()">
+            <div class="p-3 border-bottom">
+              <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text bg-light border-0"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" class="form-control bg-light border-0" [ngModel]="dmUserSearch()"
+                  (ngModelChange)="dmUserSearch.set($event)" placeholder="Search contacts...">
+              </div>
+
+              <ul class="nav nav-pills nav-fill mb-0" id="chat-tabs">
+                <li class="nav-item">
+                  <button class="nav-link active small" [class.active]="activeChatType() === 'GROUP'"
+                    (click)="activeChatType.set('GROUP')">Groups</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link small" [class.active]="activeChatType() === 'DM'"
+                    (click)="activeChatType.set('DM')">Direct</button>
+                </li>
+              </ul>
+            </div>
+
+            <div class="comm-scroll-lg p-0">
+              <!-- Groups List -->
+              <div *ngIf="activeChatType() === 'GROUP'" class="list-group list-group-flush">
+                <div *ngFor="let grp of groups()" class="list-group-item list-group-item-action border-0 p-3"
+                  [class.active]="activeGroup()?.id === grp.id" (click)="enterGroup(grp)">
+                  <div class="d-flex align-items-center gap-3">
+                    <div
+                      class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
+                      {{ grp.name.substring(0, 1) }}
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                      <h6 class="mb-0 text-truncate" [class.text-primary]="activeGroup()?.id === grp.id">{{ grp.name }}
+                      </h6>
+                      <span class="fs-12 text-muted text-truncate d-block">{{ grp.description }}</span>
+                    </div>
+                    <span class="badge rounded-pill bg-light text-primary border"
+                      *ngIf="activeGroup()?.id !== grp.id">{{ grp.members.length }}</span>
+                  </div>
+                </div>
+                <div *ngIf="groups().length === 0" class="p-4 text-center text-muted small">
+                  No groups joined yet.
+                </div>
+              </div>
+
+              <!-- DM Users List -->
+              <div *ngIf="activeChatType() === 'DM'" class="list-group list-group-flush">
+                <div *ngFor="let user of filteredDmUsers()" class="list-group-item list-group-item-action border-0 p-3"
+                  [class.active]="activeDmUserId() === user.id" (click)="openDmChat(user.id!)">
+                  <div class="d-flex align-items-center gap-3">
+                    <div
+                      class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
+                      {{ (user.name || 'U').substring(0, 1) }}
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0" [class.text-primary]="activeDmUserId() === user.id">{{ user.name }}</h6>
+                      <span class="fs-12 text-muted">User #{{ user.id }}</span>
+                    </div>
+                    <span class="status-indicator online"></span>
+                  </div>
+                </div>
+                <div *ngIf="filteredDmUsers().length === 0" class="p-4 text-center text-muted small">
+                  No users found.
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Group Info Sidebar -->
+          <ng-container *ngIf="showInfoSidebar() && activeGroup() as activeGrp">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+              <h6 class="mb-0 fw-bold">Group Details</h6>
+              <button class="btn btn-link btn-sm p-0 text-muted" (click)="toggleInfoSidebar()"><i
+                  class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-3 comm-scroll-lg">
+              <div class="mb-4 text-center">
+                <div
+                  class="avatar-md bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm">
+                  {{ activeGrp.name.substring(0, 1) }}
+                </div>
+                <h5 class="fw-bold mb-1">{{ activeGrp.name }}</h5>
+                <span class="badge bg-soft-primary text-primary border">{{ activeGrp.theme || 'GENERAL' }}</span>
+              </div>
+              <div class="mb-4">
+                <h6 class="fs-12 text-muted text-uppercase fw-bold mb-2 l-spacing-1">About</h6>
+                <p class="small text-muted">{{ activeGrp.description }}</p>
+                <button class="btn btn-outline-danger btn-sm w-100 mt-2" (click)="leaveGroupAction(activeGrp.id)">
+                  <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Leave Group
+                </button>
+              </div>
+              <div class="mb-4">
+                <h6 class="fs-12 text-muted text-uppercase fw-bold mb-2 l-spacing-1">Members ({{
+                  activeGrp.members.length }})</h6>
+                <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                  <div *ngFor="let member of activeGrp.members"
+                    class="list-group-item p-2 d-flex align-items-center gap-2 border-0 border-bottom">
+                    <div
+                      class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-10">
+                      {{ member.name.substring(0, 1) }}
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                      <span class="small d-block text-truncate fw-semibold">{{ member.name }}</span>
+                      <span class="fs-10 text-muted">User #{{ member.id }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <div class="col-lg-9 bg-light d-flex flex-column h-100 position-relative">
+          <ng-container *ngIf="activeGroup() || activeDmUserId(); else noChat">
+            <!-- Chat Header -->
+            <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <div
+                  class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold">
+                  {{ activeGroup()?.name?.substring(0, 1) || dmUserName.substring(0, 1) }}
+                </div>
+                <div>
+                  <h6 class="mb-0 fw-semibold">{{ activeGroup()?.name || dmUserName }}</h6>
+                  <span class="fs-12 text-muted">
+                    {{ activeGroup() ? activeGroup()?.members?.length + ' members' : 'Active conversation' }}
+                  </span>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <div class="input-group input-group-sm w-auto">
+                  <input type="text" class="form-control" [ngModel]="searchQuery()"
+                    (ngModelChange)="searchQuery.set($event)" placeholder="Search...">
+                </div>
+                <button class="btn btn-outline-warning btn-sm" *ngIf="activeGroup()" (click)="toggleHandoverPanel()"
+                  [class.active]="showHandoverPanel()" title="Shift Handover Summary">
+                  <i class="fa-solid fa-clipboard-list me-1"></i> Handover
+                </button>
+                <button class="btn btn-outline-primary btn-sm" *ngIf="activeGroup()" (click)="toggleInfoSidebar()"
+                  [class.active]="showInfoSidebar()"><i class="fa-solid fa-circle-info"></i> Info</button>
+                <button class="btn btn-outline-danger btn-sm" (click)="closeChat(); activeDmUserId.set(null)"><i
+                    class="fa-solid fa-xmark"></i> Close</button>
+              </div>
+            </div>
+
+            <!-- Handover Summary Panel -->
+            <div *ngIf="showHandoverPanel() && activeGroup()" class="handover-panel bg-white border-bottom p-3 shadow-sm">
+              <div *ngIf="handoverLoading()" class="text-center py-4">
+                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                <span class="ms-2 text-muted small">Generating handover summary...</span>
+              </div>
+              <div *ngIf="!handoverLoading() && handoverData()">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h6 class="fw-bold mb-1"><i class="fa-solid fa-clipboard-list text-warning me-2"></i>Shift Handover</h6>
+                    <span class="fs-12 text-muted">Last 8 hours of activity for {{ activeGroup()?.name }}</span>
+                  </div>
+                  <button class="btn btn-link btn-sm text-muted p-0" (click)="toggleHandoverPanel()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                
+                <!-- Summary Stats Row -->
+                <div class="row g-2 mb-3">
+                  <div class="col-4">
+                    <div class="bg-soft-primary rounded-3 p-2 text-center">
+                      <div class="fw-bold text-primary fs-20">{{ handoverData()!.totalMessages }}</div>
+                      <div class="fs-11 text-muted">Messages</div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="bg-soft-primary rounded-3 p-2 text-center">
+                      <div class="fw-bold text-primary fs-20">{{ handoverData()!.pollCount }}</div>
+                      <div class="fs-11 text-muted">Polls</div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="rounded-3 p-2 text-center" [class.bg-soft-success]="handoverData()!.averageSentiment > 0.3"
+                         [class.bg-soft-danger]="handoverData()!.averageSentiment < -0.3"
+                         [class.bg-soft-warning]="handoverData()!.averageSentiment >= -0.3 && handoverData()!.averageSentiment <= 0.3">
+                      <div class="fs-20"><i class="fa-solid" [ngClass]="getSentimentIcon(handoverData()!.averageSentiment)"></i></div>
+                      <div class="fs-11 text-muted">Mood</div>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="small text-muted bg-light rounded-3 p-2 mb-3"><i class="fa-solid fa-quote-left me-1 text-primary"></i> {{ handoverData()!.summary }}</p>
+
+                <!-- Critical Alerts -->
+                <div *ngIf="handoverData()!.criticalAlerts.length > 0" class="mb-3">
+                  <h6 class="fs-12 text-danger text-uppercase fw-bold mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Critical Alerts</h6>
+                  <div *ngFor="let alert of handoverData()!.criticalAlerts" class="d-flex align-items-start gap-2 mb-2 p-2 bg-soft-danger rounded-3">
+                    <i class="fa-solid fa-circle-exclamation text-danger mt-1 fs-12"></i>
+                    <span class="small text-dark">{{ alert }}</span>
+                  </div>
+                </div>
+
+                <!-- Pending Tasks -->
+                <div *ngIf="handoverData()!.pendingTasks.length > 0">
+                  <h6 class="fs-12 text-warning text-uppercase fw-bold mb-2"><i class="fa-solid fa-list-check me-1"></i> Pending Tasks</h6>
+                  <div *ngFor="let task of handoverData()!.pendingTasks" class="d-flex align-items-start gap-2 mb-2 p-2 bg-soft-warning rounded-3">
+                    <i class="fa-solid fa-circle-question text-warning mt-1 fs-12"></i>
+                    <span class="small text-dark">{{ task }}</span>
+                  </div>
+                </div>
+
+                <div *ngIf="handoverData()!.criticalAlerts.length === 0 && handoverData()!.pendingTasks.length === 0" class="text-center text-muted small py-2">
+                  <i class="fa-solid fa-check-circle text-success me-1"></i> All clear — no alerts or pending tasks.
+                </div>
+              </div>
+            </div>
+
+            <!-- New Pinned Messages Panel -->
+            <div *ngIf="pinnedMessages().length > 0" class="pinned-messages-panel p-2">
+              <div class="d-flex align-items-center gap-3 overflow-auto no-scrollbar">
+                <div class="flex-shrink-0 ms-2">
+                  <span class="badge bg-primary text-white p-1 rounded-circle"><i
+                      class="fa-solid fa-thumbtack fs-10"></i></span>
+                  <small class="ms-1 fw-bold text-primary text-uppercase fs-10">Pinned</small>
+                </div>
+                <div class="d-flex gap-2">
+                  <div *ngFor="let pinned of pinnedMessages()"
+                    class="pinned-chip flex-shrink-0 d-flex align-items-center gap-2 px-3 py-1 rounded-pill cursor-pointer transition-all shadow-sm"
+                    (click)="togglePin(pinned)">
+                    <span class="fs-11 text-truncate" style="max-width: 300px;">{{ pinned.content }}</span>
+                    <i class="fa-solid fa-circle-xmark fs-12 text-muted opacity-50 hover-text-danger"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Messages List -->
+            <div class="flex-grow-1 p-4 comm-scroll-lg bg-light d-flex flex-column-reverse">
+              <div class="messages-container">
+                <ng-container *ngFor="let msg of filteredMessages()">
+                  <div class="d-flex mb-4" [class.justify-content-end]="msg.senderId === currentUserId()">
+                    <div class="message-wrapper d-flex flex-column"
+                      [class.align-items-end]="msg.senderId === currentUserId()">
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="small fw-semibold" *ngIf="msg.senderId !== currentUserId()">User #{{ msg.senderId
+                          }}</span>
+                        <span class="badge bg-soft-primary text-primary fs-9 px-2" *ngIf="msg.pinned"><i
+                            class="fa-solid fa-thumbtack me-1"></i>PINNED</span>
+                        <span class="fs-10 text-muted">{{ msg.sentAt | date: 'shortTime' }}</span>
+                      </div>
+                      <div *ngIf="msg.type === 'TEXT' || !msg.type"
+                        class="message-bubble p-3 rounded-3 shadow-sm border"
+                        [class.bg-primary]="msg.senderId === currentUserId()"
+                        [class.text-white]="msg.senderId === currentUserId()"
+                        [class.bg-white]="msg.senderId !== currentUserId()" [class.message-pinned]="msg.pinned">
+                        <div *ngIf="msg.parentMessageId" class="bg-dark bg-opacity-10 rounded-2 p-2 mb-2 small">
+                          <span class="d-block text-truncate fw-bold">{{ msg.parentMessageSenderName }}</span>
+                          <span class="d-block text-truncate opacity-75" [innerHTML]="formatMessage(msg.parentMessageContent)"></span>
+                        </div>
+                        <p class="mb-0 fs-14" [innerHTML]="formatMessage(msg.content)"></p>
+                        <div *ngIf="msg.mediaUrl" class="mt-2 text-center text-sm-start">
+                          <img *ngIf="msg.mimeType?.startsWith('image/')" class="chat-media-attachment shadow-sm"
+                            [src]="'http://localhost:8080' + msg.mediaUrl" alt="Attachment" />
+                          <video *ngIf="msg.mimeType?.startsWith('video/')" class="chat-media-attachment shadow-sm"
+                            [src]="'http://localhost:8080' + msg.mediaUrl" controls></video>
+                        </div>
+                      </div>
+
+                      <!-- Poll Message -->
+                      <div *ngIf="msg.type === 'POLL'" class="poll-message-card card border shadow-sm overflow-hidden"
+                        style="min-width: 280px; max-width: 350px;" [class.message-pinned]="msg.pinned">
+                        <div class="card-header bg-soft-primary border-0 py-2 d-flex align-items-center">
+                          <i class="fa-solid fa-square-poll-vertical text-primary me-2"></i>
+                          <span class="fs-12 fw-bold text-primary text-uppercase">Team Poll</span>
+                        </div>
+                        <div class="card-body p-3 bg-white">
+                          <h6 class="fw-bold fs-14 mb-3 text-dark">{{ msg.pollQuestion }}</h6>
+                          <div class="poll-options">
+                            <div *ngFor="let opt of msg.pollOptions"
+                              class="poll-option-item p-2 mb-2 border rounded-2 cursor-pointer transition-all hover-bg-light"
+                              (click)="vote(msg.id, opt.id)">
+                              <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fs-12 fw-semibold"
+                                  [class.text-primary]="opt.voterIds.includes(currentUserId())">{{ opt.text }} <i
+                                    class="fa-solid fa-circle-check ms-1"
+                                    *ngIf="opt.voterIds.includes(currentUserId())"></i></span>
+                                <span class="fs-11 text-muted">{{ opt.votes }} votes</span>
+                              </div>
+                              <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-primary" [style.width.%]="(opt.votes / 10) * 100"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="d-flex gap-3 mt-1">
+                        <button class="btn btn-link btn-sm p-0 text-muted small" (click)="setReply(msg)"><i
+                            class="fa-solid fa-reply"></i> Reply</button>
+                        <button class="btn btn-link btn-sm p-0 text-muted small" [class.text-primary]="msg.pinned"
+                          (click)="togglePin(msg)">
+                          <i class="fa-solid fa-thumbtack"></i> {{ msg.pinned ? 'Unpin' : 'Pin' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <!-- Chat Input... -->
+            <div class="p-3 bg-white border-top">
+              <div *ngIf="replyingTo"
+                class="alert alert-light border-0 shadow-sm d-flex justify-content-between align-items-center mb-2 p-2">
+                <div class="small text-truncate"><i class="fa-solid fa-reply me-2"></i> Replying to <strong>{{
+                    replyingTo.senderName }}</strong></div>
+                <button class="btn-close" (click)="cancelReply()"></button>
+              </div>
+              <div class="d-flex gap-2 align-items-end">
+                <div class="flex-grow-1 position-relative">
+                  <div *ngIf="isPollMode()" class="card border-0 shadow-sm mb-3 bg-soft-primary-light">
+                    <div class="card-body p-3">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-square-poll-vertical me-2"></i> Create a Poll
+                        </h6>
+                        <button class="btn-close small" (click)="togglePollMode()"></button>
+                      </div>
+                      <input type="text" class="form-control mb-2 border-0 shadow-none border-bottom"
+                        [(ngModel)]="pollQuestion" placeholder="Ask a question...">
+                      <div class="poll-options-inputs mb-2">
+                        <div *ngFor="let opt of pollOptions(); let i = index; trackBy: trackByIndex"
+                          class="d-flex gap-2 mb-1 align-items-center">
+                          <span class="fs-12 text-muted fw-bold">{{ i + 1 }}.</span>
+                          <input type="text" class="form-control form-control-sm border-0 bg-white"
+                            [(ngModel)]="pollOptions()[i]" placeholder="Option {{ i + 1 }}">
+                          <button class="btn btn-link btn-sm text-danger p-0" (click)="removePollOption(i)"
+                            *ngIf="pollOptions().length > 2"><i class="fa-solid fa-circle-minus"></i></button>
+                        </div>
+                      </div>
+                      <button class="btn btn-soft-primary btn-sm w-100 fw-bold" (click)="addPollOption()"
+                        [disabled]="pollOptions().length >= 6"><i class="fa-solid fa-plus me-1"></i> Add Option</button>
+                    </div>
+                  </div>
+
+                  <div class="input-group bg-light rounded-pill shadow-sm border px-2 py-1 align-items-end">
+                    <label for="chat-file" class="btn btn-sm btn-link text-muted p-2 m-0 border-0" title="Attach File">
+                      <i class="fa-solid fa-paperclip fs-18"></i>
+                    </label>
+                    <button class="btn btn-sm btn-link text-muted p-2 m-0 border-0" (click)="togglePollMode()"
+                      [class.text-primary]="isPollMode()" title="Create Poll">
+                      <i class="fa-solid fa-square-poll-vertical fs-18"></i>
+                    </button>
+
+                    <!-- @mention dropdown -->
+                    <div *ngIf="showMentionDropdown() && mentionSuggestions().length > 0"
+                         class="mention-dropdown position-absolute bg-white border rounded-3 shadow-lg py-1"
+                         style="bottom: 100%; left: 0; right: 0; z-index: 1000; max-height: 200px; overflow-y: auto;">
+                      <div *ngFor="let member of mentionSuggestions()"
+                           class="mention-item d-flex align-items-center gap-2 px-3 py-2 cursor-pointer"
+                           (click)="insertMention(member)">
+                        <div class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold"
+                             style="width: 28px; height: 28px; font-size: 11px; flex-shrink: 0;">
+                          {{ (member.name || 'U').substring(0, 1) }}
+                        </div>
+                        <span class="fs-13 fw-semibold">{{ member.name }}</span>
+                        <span class="mention-badge">&#64;{{ member.name }}</span>
+                      </div>
+                    </div>
+
+                    <textarea class="form-control bg-transparent border-0 shadow-none px-2 py-2" rows="1"
+                      style="resize: none;"
+                      [ngModel]="activeGroup() ? newGroupMessage : dmContent"
+                      (ngModelChange)="activeGroup() ? onGroupMessageInput($event) : dmContent = $event"
+                      [placeholder]="isPollMode() ? 'Poll Question above...' : 'Type your message... (@name to mention)'"
+                      (keyup.enter)="activeGroup() ? sendGroupMessage(activeGroup()!.id) : sendDmMessage()"></textarea>
+                  </div>
+
+                  <div class="mt-2 ms-3" *ngIf="selectedMessageFile">
+                    <span
+                      class="badge bg-soft-primary text-primary border rounded-pill d-inline-flex align-items-center gap-2 px-3 py-2 shadow-sm">
+                      <i class="fa-solid fa-file-lines fs-14"></i> {{ selectedMessageFile.name }}
+                      <!-- We don't have a strict method to clear it in the TS without writing a small inline fn, but we can set it to any since strict mode is disabled -->
+                    </span>
+                  </div>
+                  <input id="chat-file" type="file" class="d-none" (change)="onMessageFileSelected($event)">
+                </div>
+
+                <button
+                  class="btn btn-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                  style="width: 48px; height: 48px; min-width: 48px;"
+                  (click)="activeGroup() ? sendGroupMessage(activeGroup()!.id) : sendDmMessage()"
+                  [disabled]="(activeGroup() ? !newGroupMessage.trim() && !selectedMessageFile : !dmContent.trim())">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-template #noChat>
+            <div class="h-100 w-100 bg-white d-flex flex-column align-items-center justify-content-center text-center p-5 rounded-end">
+              <div class="mt-5" style="transform: translateY(2rem);">
+                <div class="bg-soft-primary rounded-circle p-4 mb-4 mx-auto" style="width: fit-content;"><i
+                    class="fa-solid fa-comments fs-48 text-primary"></i></div>
+                <h4 class="fw-bold">No conversation selected</h4>
+                <p class="text-muted max-w-400 mx-auto">Select a group or a contact from the sidebar to start chatting with your
+                  community.</p>
+                <a routerLink="/collaboration/groups" class="btn btn-primary mt-3"><i class="fa-solid fa-plus me-2"></i>
+                  Join New Group</a>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Floating Mini-Chat Widget -->
+  <app-mini-chat-widget></app-mini-chat-widget>
+</main>
