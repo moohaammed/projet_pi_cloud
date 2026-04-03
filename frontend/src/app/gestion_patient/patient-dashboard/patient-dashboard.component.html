@@ -1,0 +1,299 @@
+<!-- ═══════════════════════════════════════════════
+     PAGE HEADER
+═══════════════════════════════════════════════ -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+  <div>
+    <h4 class="fw-bold mb-0">
+      <i class="fa-solid fa-hospital-user me-2 text-primary"></i>
+      Patients — Neurologie
+    </h4>
+    <p class="text-muted mb-0 small mt-1">Vue médicale complète · Alzheimer 360°</p>
+  </div>
+  <button class="btn btn-outline-primary btn-sm" (click)="fetchPatients()" [disabled]="loading">
+    <i class="fa-solid fa-rotate-right me-1"></i> Actualiser
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     STATS CARDS
+═══════════════════════════════════════════════ -->
+<div class="row g-3 mb-4">
+  <!-- Total -->
+  <div class="col-6 col-xl-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center gap-3 p-3">
+        <div class="stat-icon bg-soft-primary text-primary rounded-3">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+          <p class="mb-0 text-muted stat-label">Total</p>
+          <h4 class="mb-0 fw-bold">{{ totalPatients }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Stables -->
+  <div class="col-6 col-xl-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center gap-3 p-3">
+        <div class="stat-icon bg-success bg-opacity-10 text-success rounded-3">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <div>
+          <p class="mb-0 text-muted stat-label">Stables</p>
+          <h4 class="mb-0 fw-bold text-success">{{ stableCount }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- En suivi -->
+  <div class="col-6 col-xl-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center gap-3 p-3">
+        <div class="stat-icon bg-warning bg-opacity-10 text-warning rounded-3">
+          <i class="fa-solid fa-stethoscope"></i>
+        </div>
+        <div>
+          <p class="mb-0 text-muted stat-label">En suivi</p>
+          <h4 class="mb-0 fw-bold text-warning">{{ suiviCount }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Urgents -->
+  <div class="col-6 col-xl-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center gap-3 p-3">
+        <div class="stat-icon bg-danger bg-opacity-10 text-danger rounded-3">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <p class="mb-0 text-muted stat-label">Urgents</p>
+          <h4 class="mb-0 fw-bold text-danger">{{ urgentCount }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN CONTENT: TABLE + NOTIFICATION SIDEBAR
+═══════════════════════════════════════════════ -->
+<div class="row g-4">
+
+  <!-- ── Patient Table ──────────────────────────── -->
+  <div class="col-lg-8 col-xl-9">
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+        <p class="text-muted mt-3 mb-0">Chargement des dossiers patients...</p>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && patients.length === 0" class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="fa-solid fa-folder-open fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted fw-semibold">Aucun patient enregistré</h5>
+        <p class="text-muted small">Utilisez le formulaire à gauche pour ajouter un premier patient.</p>
+      </div>
+    </div>
+
+    <!-- Table card -->
+    <div class="card border-0 shadow-sm" *ngIf="!loading && patients.length > 0">
+      <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3 px-4">
+        <h6 class="fw-bold mb-0">
+          <i class="fa-solid fa-list-ul me-2 text-primary"></i>
+          Dossiers Patients
+          <span class="badge bg-soft-primary text-primary ms-2">{{ totalPatients }}</span>
+        </h6>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-4 fw-semibold">Patient</th>
+              <th class="fw-semibold">Âge</th>
+              <th class="fw-semibold">Sexe</th>
+              <th class="fw-semibold">Poids</th>
+              <th class="fw-semibold">Statut</th>
+              <th class="fw-semibold text-center pe-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of patients">
+              <!-- Avatar + Nom -->
+              <td class="ps-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="patient-avatar">{{ getInitials(p) }}</div>
+                  <div>
+                    <div class="fw-semibold text-dark">{{ p.nom }} {{ p.prenom }}</div>
+                    <small class="text-muted">#{{ p.id }}</small>
+                  </div>
+                </div>
+              </td>
+              <!-- Âge -->
+              <td>
+                <span class="fw-medium">{{ p.age }}</span>
+                <small class="text-muted"> ans</small>
+              </td>
+              <!-- Sexe -->
+              <td>
+                <span [class]="p.sexe === 'Homme' || p.sexe === 'M'
+                  ? 'badge rounded-pill bg-primary bg-opacity-10 text-primary'
+                  : 'badge rounded-pill bg-danger bg-opacity-10 text-danger'">
+                  <i [class]="p.sexe === 'Homme' || p.sexe === 'M'
+                    ? 'fa-solid fa-mars me-1' : 'fa-solid fa-venus me-1'"></i>
+                  {{ p.sexe }}
+                </span>
+              </td>
+              <!-- Poids -->
+              <td>{{ p.poids }} <small class="text-muted">kg</small></td>
+              <!-- Statut -->
+              <td>
+                <span [class]="getStatusBadgeClass(getPatientStatus(p))">
+                  {{ getPatientStatus(p) }}
+                </span>
+              </td>
+              <!-- Actions -->
+              <td class="text-center pe-4">
+                <div class="d-flex justify-content-center gap-2">
+                  <button id="btn-analyses-{{ p.id }}"
+                          class="btn btn-sm btn-outline-primary"
+                          (click)="viewAnalyses(p)"
+                          title="Voir les analyses">
+                    <i class="fa-solid fa-microscope me-1"></i>Analyses
+                  </button>
+                  <button id="btn-delete-{{ p.id }}"
+                          class="btn btn-sm btn-outline-danger"
+                          (click)="deletePatient(p.id)"
+                          title="Supprimer">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Notification Sidebar ───────────────────── -->
+  <div class="col-lg-4 col-xl-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white border-0 py-3 px-3 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0">
+          <i class="fa-solid fa-bell me-2 text-primary"></i>
+          Alertes
+        </h6>
+        <span class="badge bg-danger rounded-pill" *ngIf="unreadNotifCount > 0">
+          {{ unreadNotifCount }}
+        </span>
+      </div>
+
+      <div class="card-body p-0">
+        <div *ngIf="notifications.length === 0" class="text-center py-5 text-muted">
+          <i class="fa-solid fa-circle-check fa-2x mb-2 text-success"></i>
+          <p class="small mb-0">Aucune alerte active</p>
+        </div>
+
+        <div *ngFor="let notif of notifications"
+             class="notification-item px-3 py-3 border-bottom"
+             [class.read]="notif.read"
+             (click)="markAsRead(notif)"
+             role="button">
+          <div class="d-flex gap-3 align-items-start">
+            <span [class]="'notif-dot notif-dot--' + notif.type + ' mt-1 flex-shrink-0'"></span>
+            <div>
+              <p class="mb-1 small lh-sm">{{ notif.message }}</p>
+              <small class="text-muted">{{ notif.date }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL — ANALYSES DU PATIENT
+═══════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-panel__header border-bottom">
+      <div>
+        <h5 class="fw-bold mb-0">
+          <i class="fa-solid fa-microscope me-2 text-primary"></i>
+          Analyses — {{ selectedPatient?.nom }} {{ selectedPatient?.prenom }}
+        </h5>
+        <small class="text-muted">Historique complet des analyses IRM</small>
+      </div>
+      <button id="btn-close-modal" class="btn-close" (click)="closeModal()"></button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-panel__body">
+      <!-- Loading -->
+      <div *ngIf="loadingAnalyses" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-3">Chargement des analyses...</p>
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="!loadingAnalyses && patientAnalyses.length === 0" class="text-center py-5 text-muted">
+        <i class="fa-solid fa-flask fa-3x mb-3"></i>
+        <p class="fw-semibold">Aucune analyse disponible</p>
+        <small>Ce patient n'a pas encore d'analyse enregistrée.</small>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="!loadingAnalyses && patientAnalyses.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Risque IA</th>
+              <th>Interprétation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of patientAnalyses">
+              <td>
+                <span class="badge bg-secondary">{{ a.date || '—' }}</span>
+              </td>
+              <td>
+                <span [class]="getAnalyseBadgeClass(a.statut)">{{ a.statut || '—' }}</span>
+              </td>
+              <td>
+                <span *ngIf="a.pourcentageRisque != null"
+                      [class]="'fw-bold ' + (a.pourcentageRisque! > 50 ? 'text-danger' : 'text-success')">
+                  {{ a.pourcentageRisque }}%
+                </span>
+                <span *ngIf="a.pourcentageRisque == null" class="text-muted">—</span>
+              </td>
+              <td class="text-muted fst-italic">{{ a.interpretation || 'Non évaluée' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-panel__footer border-top">
+      <button id="btn-close-modal-footer" class="btn btn-outline-secondary btn-sm" (click)="closeModal()">
+        <i class="fa-solid fa-times me-1"></i>Fermer
+      </button>
+    </div>
+
+  </div>
+</div>

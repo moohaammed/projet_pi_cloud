@@ -74,8 +74,8 @@ public class CareRelayService {
                     return highRiskKeywords.stream().anyMatch(keyword -> lowerContent.contains(keyword.toLowerCase()));
                 })
                 .map(m -> {
-                    String senderName = m.getSender() != null && m.getSender().getName() != null
-                            ? m.getSender().getName() : "Unknown";
+                    String senderName = m.getSender() != null && m.getSender().getNom() != null
+                            ? m.getSender().getNom() : "Unknown";
                     String tag = (m.getSentimentScore() != null && m.getSentimentScore() < -0.7) ? "[CRITICAL]" : "[URGENT]";
                     return tag + " " + senderName + ": \"" + truncate(m.getContent(), 120) + "\"";
                 })
@@ -90,8 +90,8 @@ public class CareRelayService {
                                 && reply.getParentMessage().getId().equals(msg.getId())
                                 && !reply.getSender().getId().equals(msg.getSender().getId()));
                 if (!hasReply) {
-                    String senderName = msg.getSender() != null && msg.getSender().getName() != null
-                            ? msg.getSender().getName() : "Unknown";
+                    String senderName = msg.getSender() != null && msg.getSender().getNom() != null
+                            ? msg.getSender().getNom() : "Unknown";
                     pendingTasks.add("Unanswered question from " + senderName + ": \""
                             + truncate(msg.getContent(), 100) + "\"");
                 }

@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+/* ── Drop Zone ────────────────────────────────────── */
+.drop-zone {
+  border: 2px dashed #dee2e6;
+  border-radius: 0.75rem;
+  background: #fafafa;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+
+.drop-zone--active {
+  border-color: #800080;
+  background: rgba(128, 0, 128, 0.04);
+}
+
+.drop-zone--selected {
+  border-style: solid;
+  border-color: #198754;
+  background: rgba(25, 135, 84, 0.04);
+}
+
+.drop-zone__prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  cursor: pointer;
+}
+
+.drop-zone__file {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+}

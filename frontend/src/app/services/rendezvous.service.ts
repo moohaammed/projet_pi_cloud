@@ -9,7 +9,7 @@ import { RendezVous, StatutRendezVous } from '../models/rendezvous.model';
 export class RendezVousService {
   private readonly apiUrl = 'http://localhost:8080/api/rendezvous';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<RendezVous[]> {
     return this.http.get<RendezVous[]>(this.apiUrl);

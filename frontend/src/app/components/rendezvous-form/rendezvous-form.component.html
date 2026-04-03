@@ -7,11 +7,12 @@
             <!-- Start Header Text -->
             <div class="text-center mb-4">
               <h3 class="fw-semibold">
-                {{ isEdit ? 'Modifier' : 'Prendre' }} 
+                {{ isEdit ? 'Modifier' : 'Prendre' }}
                 <span class="underline position-relative text-primary">Rendez-vous</span>
               </h3>
               <p class="text-muted text-center mb-0">
-                {{ isEdit ? 'Mettez à jour les informations du rendez-vous #' + editId : 'Planifiez votre consultation médicale en quelques clics' }}
+                {{ isEdit ? 'Mettez à jour les informations du rendez-vous #' + editId : 'Planifiez votre consultation
+                médicale en quelques clics' }}
               </p>
             </div>
             <!-- /.End Header Text -->
@@ -43,7 +44,8 @@
                   <div class="col-sm-12">
                     <div class="form-group">
                       <label class="required">ID Patient</label>
-                      <input type="number" formControlName="patientId" class="form-control" [class.is-invalid]="isInvalid('patientId')" placeholder="Entrez votre ID patient">
+                      <input type="number" formControlName="patientId" class="form-control"
+                        [class.is-invalid]="isInvalid('patientId')" placeholder="Entrez votre ID patient">
                       <div class="invalid-feedback" *ngIf="isInvalid('patientId')">{{ getError('patientId') }}</div>
                     </div>
                   </div>
@@ -51,7 +53,8 @@
                   <div class="col-sm-12">
                     <div class="form-group">
                       <label class="required">Médecin (ID)</label>
-                      <input type="number" formControlName="medecinId" class="form-control" [class.is-invalid]="isInvalid('medecinId')" placeholder="Entrez l'ID du médecin">
+                      <input type="number" formControlName="medecinId" class="form-control"
+                        [class.is-invalid]="isInvalid('medecinId')" placeholder="Entrez l'ID du médecin">
                       <div class="invalid-feedback" *ngIf="isInvalid('medecinId')">{{ getError('medecinId') }}</div>
                     </div>
                   </div>
@@ -59,7 +62,8 @@
                   <div class="col-sm-12">
                     <div class="form-group">
                       <label class="required">Date & Heure du Rendez-vous</label>
-                      <input type="datetime-local" formControlName="dateHeure" class="form-control" [class.is-invalid]="isInvalid('dateHeure')" [min]="isEdit ? '' : minDate">
+                      <input type="datetime-local" formControlName="dateHeure" class="form-control"
+                        [class.is-invalid]="isInvalid('dateHeure')" [min]="isEdit ? '' : minDate">
                       <div class="invalid-feedback" *ngIf="isInvalid('dateHeure')">{{ getError('dateHeure') }}</div>
                     </div>
                   </div>
@@ -77,7 +81,8 @@
                   <div class="col-sm-12">
                     <div class="form-group">
                       <label class="required">Motif de consultation</label>
-                      <input type="text" formControlName="motif" class="form-control" [class.is-invalid]="isInvalid('motif')" placeholder="Ex: Consultation générale, Suivi...">
+                      <input type="text" formControlName="motif" class="form-control"
+                        [class.is-invalid]="isInvalid('motif')" placeholder="Ex: Consultation générale, Suivi...">
                       <div class="invalid-feedback" *ngIf="isInvalid('motif')">{{ getError('motif') }}</div>
                     </div>
                   </div>
@@ -85,8 +90,10 @@
                   <div class="col-sm-12">
                     <div class="form-group">
                       <label>Observations (Optionnel)</label>
-                      <textarea formControlName="observations" class="form-control" placeholder="Notes complémentaires..." rows="3"></textarea>
-                      <div class="char-count text-end small text-muted">{{ form.get('observations')?.value?.length ?? 0 }}/500</div>
+                      <textarea formControlName="observations" class="form-control"
+                        placeholder="Notes complémentaires..." rows="3"></textarea>
+                      <div class="char-count text-end small text-muted">{{ form.get('observations')?.value?.length ?? 0
+                        }}/500</div>
                     </div>
                   </div>
 
@@ -98,7 +105,8 @@
                         Traitement...
                       </span>
                     </button>
-                    <button class="btn btn-link w-100 mt-2 text-decoration-none text-muted" type="button" (click)="onCancel()" *ngIf="!submitting">
+                    <button class="btn btn-link w-100 mt-2 text-decoration-none text-muted" type="button"
+                      (click)="onCancel()" *ngIf="!submitting">
                       Annuler
                     </button>
                   </div>
@@ -109,11 +117,10 @@
           </div>
           <div class="col-lg-6 col-xl-7 order-lg-first pe-xl-5 d-none d-lg-block">
             <!-- Start Illustration Image -->
-            <img src="template/assets/img/illustration/schedule-meeting.svg" alt="" class="img-fluid" data-aos="fade-right">
+            <img src="template/assets/img/illustration/schedule-meeting.svg" alt="" class="img-fluid"
+              data-aos="fade-right">
             <!-- /.End Illustration Image -->
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>

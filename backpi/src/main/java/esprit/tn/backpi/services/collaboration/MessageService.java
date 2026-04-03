@@ -3,15 +3,15 @@ package esprit.tn.backpi.services.collaboration;
 import esprit.tn.backpi.dto.collaboration.MessageCreateDto;
 import esprit.tn.backpi.dto.collaboration.MessageResponseDto;
 import esprit.tn.backpi.dto.collaboration.PollOptionResponseDto;
-import esprit.tn.backpi.entities.User;
 import esprit.tn.backpi.entities.collaboration.ChatGroup;
 import esprit.tn.backpi.entities.collaboration.Message;
 import esprit.tn.backpi.entities.collaboration.MessagePollOption;
 import esprit.tn.backpi.entities.collaboration.MessageType;
-import esprit.tn.backpi.repositories.UserRepository;
+import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repositories.collaboration.ChatGroupRepository;
 import esprit.tn.backpi.repositories.collaboration.MessagePollOptionRepository;
 import esprit.tn.backpi.repositories.collaboration.MessageRepository;
+import esprit.tn.backpi.repository.UserRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -227,7 +227,7 @@ public class MessageService {
 
         if (message.getSender() != null) {
             dto.setSenderId(message.getSender().getId());
-            dto.setSenderName(message.getSender().getName());
+            dto.setSenderName(message.getSender().getNom());
         }
 
         if (message.getReceiver() != null) {
@@ -242,7 +242,7 @@ public class MessageService {
             dto.setParentMessageId(message.getParentMessage().getId());
             dto.setParentMessageContent(message.getParentMessage().getContent());
             if (message.getParentMessage().getSender() != null) {
-                dto.setParentMessageSenderName(message.getParentMessage().getSender().getName());
+                dto.setParentMessageSenderName(message.getParentMessage().getSender().getNom());
             }
         }
 
@@ -337,11 +337,11 @@ public class MessageService {
                 // Remove trailing punctuation and trim
                 String cleanName = currentTry.replaceAll("[.,!?;:]+$", "").trim();
                 
-                Optional<User> userOpt = userRepository.findByNameIgnoreCase(cleanName);
+                Optional<User> userOpt = userRepository.findByFullName(cleanName);
                 if (userOpt.isPresent()) {
                     User tagged = userOpt.get();
                     if (!tagged.getId().equals(sender.getId())) {
-                        String senderLabel = sender.getName() != null ? sender.getName() : "User " + sender.getId();
+                        String senderLabel = sender.getNom() != null ? sender.getNom() : "User " + sender.getId();
                         notificationService.createAndSend(
                             tagged.getId(),
                             senderLabel + " tagged you in a message",

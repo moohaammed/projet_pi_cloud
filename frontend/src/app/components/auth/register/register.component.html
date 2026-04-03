@@ -1,0 +1,97 @@
+<div class="align-items-center d-flex justify-content-center min-vh-100 py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-body p-5">
+            <div class="text-center mb-4">
+              <h3 class="fw-semibold">Créez votre
+                <span class="text-primary">compte</span>
+              </h3>
+              <p class="text-muted">Rejoignez AlzCare</p>
+            </div>
+
+            <div *ngIf="error" class="alert alert-danger py-2">
+              <i class="fa-solid fa-circle-exclamation me-2"></i>{{ error }}
+            </div>
+
+            <!-- Choix du rôle -->
+            <div class="mb-4">
+              <label class="form-label fw-medium">Je suis :</label>
+              <div class="d-flex gap-2">
+                <div *ngFor="let r of roles"
+                     class="border rounded-3 p-2 text-center flex-fill"
+                     style="cursor:pointer"
+                     [class.border-primary]="data.role === r.value"
+                     [class.bg-primary]="data.role === r.value"
+                     [class.text-white]="data.role === r.value"
+                     (click)="selectRole(r.value)">
+                  <i class="fa-solid d-block mb-1" [class]="r.icon"></i>
+                  <small>{{ r.label }}</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-6">
+                <label class="form-label fw-medium">Nom</label>
+                <input [(ngModel)]="data.nom" name="nom"
+                       class="form-control" placeholder="Nom">
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-medium">Prénom</label>
+                <input [(ngModel)]="data.prenom" name="prenom"
+                       class="form-control" placeholder="Prénom">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-medium">Email</label>
+                <input [(ngModel)]="data.email" name="email"
+                       type="email" class="form-control"
+                       placeholder="votre@email.com">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-medium">Téléphone</label>
+                <input [(ngModel)]="data.telephone" name="telephone"
+                       class="form-control" placeholder="+216 XX XXX XXX">
+              </div>
+              <div class="col-12 position-relative">
+                <label class="form-label fw-medium">Mot de passe</label>
+                <input [type]="showPassword ? 'text' : 'password'"
+                       [(ngModel)]="data.password" name="password"
+                       class="form-control" placeholder="••••••••">
+                <i class="far position-absolute"
+                   [class.fa-eye]="showPassword"
+                   [class.fa-eye-slash]="!showPassword"
+                   (click)="togglePassword()"
+                   style="right:12px; top:38px; cursor:pointer; color:#888"></i>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-medium">Confirmer le mot de passe</label>
+                <input type="password"
+                       [(ngModel)]="confirmPassword" name="confirm"
+                       class="form-control" placeholder="••••••••"
+                       [class.is-invalid]="confirmPassword && confirmPassword !== data.password">
+                <div class="invalid-feedback">
+                  Les mots de passe ne correspondent pas
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg w-100 mt-4"
+                    (click)="register()" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ loading ? 'Inscription...' : "S'inscrire" }}
+            </button>
+
+            <div class="text-center mt-3">
+              Déjà un compte ?
+              <a routerLink="/auth/login" class="text-primary fw-medium">
+                Se connecter
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
