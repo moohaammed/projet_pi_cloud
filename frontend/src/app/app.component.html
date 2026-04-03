@@ -62,6 +62,9 @@
         <li class="nav-item">
           <a class="nav-link fw-bold text-primary" routerLink="/collaboration" routerLinkActive="active">Collaboration Hub</a>
         </li>
+        <li class="nav-item" *ngIf="auth.isLoggedIn()">
+          <a class="nav-link fw-bold text-success" [routerLink]="getAccountLink()" routerLinkActive="active">Compte</a>
+        </li>
       </ul>
       
       <div class="d-flex ms-lg-5">

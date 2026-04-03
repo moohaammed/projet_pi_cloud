@@ -95,6 +95,10 @@ export const routes: Routes = [
   // ===== EXISTANT (inchangé) =====
   { path: 'collaboration', component: CommunicationTestComponent },
 
+  // --- Dashboards ---
+  { path: 'patient-dashboard', component: PatientDashboardComponent },
+  { path: 'medecin-dashboard', component: MedecinDashboardComponent },
+
   // --- Routes de l'ami (Rendez-vous) ---
   { path: 'rendezvous', component: RendezVousListComponent },
   { path: 'rendezvous/new', component: RendezVousFormComponent },
