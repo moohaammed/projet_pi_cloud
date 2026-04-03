@@ -62,6 +62,10 @@ export class MedecinDashboardComponent implements OnInit {
     });
   }
 
+  get highRiskCount(): number {
+    return this.analyses.filter(a => a.pourcentageRisque != null && a.pourcentageRisque > 50).length;
+  }
+
   viewAnalyseDetails(analyse: any) {
     this.selectedAnalyse = { ...analyse };
     this.observationToAdd = analyse.observationMedicale || '';

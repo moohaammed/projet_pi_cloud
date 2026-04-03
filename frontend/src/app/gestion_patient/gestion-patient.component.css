@@ -1,78 +1,42 @@
 :host {
-    display: block;
-    background-color: #f1f5f9;
-    min-height: 100vh;
-    padding: 2rem;
-    font-family: 'Inter', -apple-system, sans-serif;
+  display: block;
+  background: #f5f5f5;
+  min-height: 100vh;
+  font-family: 'Quicksand', sans-serif;
 }
 
-.gestion-patient-module {
-    max-width: 1400px;
-    margin: 0 auto;
+/* ── Hero Banner ─────────────────────────────────── */
+.module-hero {
+  background: linear-gradient(135deg, rgba(128, 0, 128, 0.06) 0%, rgba(255,255,255,0) 60%);
+  border-bottom: 1px solid rgba(128, 0, 128, 0.1);
 }
 
-.module-header {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
+.hero-icon-wrap {
+  width: 64px;
+  height: 64px;
+  background: rgba(128, 0, 128, 0.08);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.header-icon {
-    font-size: 3rem;
-    background: white;
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+.hero-title {
+  font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+  color: #2c3038;
+  letter-spacing: -0.02em;
 }
 
-.header-text h1 {
-    margin: 0;
-    font-size: 2rem;
-    color: #0f172a;
-    font-weight: 800;
-    letter-spacing: -0.025em;
+/* ── Sticky sidebar ──────────────────────────────── */
+.sticky-sidebar {
+  position: sticky;
+  top: 80px;
 }
 
-.header-text p {
-    margin: 0.5rem 0 0 0;
-    color: #64748b;
-    font-size: 1.1rem;
-}
-
-.module-layout {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
-}
-
-/* 40% Width for Form */
-.layout-sidebar {
-    flex: 0 0 450px;
-    position: sticky;
-    top: 2rem;
-}
-
-/* Remaining Width for Dashboard Table */
-.layout-main {
-    flex: 1;
-    min-width: 0;
-    /* Prevents flex overflow */
-}
-
-/* Responsive adjustment */
-@media (max-width: 1100px) {
-    .module-layout {
-        flex-direction: column;
-    }
-
-    .layout-sidebar {
-        flex: 1 1 auto;
-        width: 100%;
-        position: static;
-    }
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 991.98px) {
+  .sticky-sidebar {
+    position: static;
+  }
 }

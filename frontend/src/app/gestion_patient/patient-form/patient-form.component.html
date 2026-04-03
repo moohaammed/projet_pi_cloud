@@ -1,88 +1,140 @@
-<div class="form-card">
-    <div class="form-header">
-        <h3>Ajouter un Nouveau Patient</h3>
-        <p>Renseignez les informations personnelles et ajoutez le scanner IRM.</p>
-    </div>
+<div class="card border-0 shadow-sm">
 
-    <form [formGroup]="patientForm" (ngSubmit)="onSubmit()" class="modern-form">
+  <!-- Card Header -->
+  <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+    <h5 class="fw-bold mb-0">
+      <i class="fa-solid fa-user-plus me-2 text-primary"></i>
+      Nouveau Patient
+    </h5>
+    <p class="text-muted small mt-1 mb-3">Renseignez les informations du dossier médical</p>
+    <hr class="mt-0">
+  </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="nom">Nom</label>
-                <input id="nom" type="text" formControlName="nom" placeholder="Ex: Dupont"
-                    [ngClass]="{'is-invalid': patientForm.get('nom')?.invalid && patientForm.get('nom')?.touched}">
-            </div>
+  <!-- Card Body -->
+  <div class="card-body px-4 pb-4 pt-2">
+    <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
 
-            <div class="form-group">
-                <label for="prenom">Prénom</label>
-                <input id="prenom" type="text" formControlName="prenom" placeholder="Ex: Jean"
-                    [ngClass]="{'is-invalid': patientForm.get('prenom')?.invalid && patientForm.get('prenom')?.touched}">
-            </div>
+      <!-- Nom -->
+      <div class="form-group mt-4">
+        <input id="pf-nom"
+               type="text"
+               class="form-control"
+               formControlName="nom"
+               placeholder="Ex : Dupont"
+               [ngClass]="{'is-invalid': patientForm.get('nom')?.invalid && patientForm.get('nom')?.touched}">
+        <label for="pf-nom" class="required">Nom de famille</label>
+        <div class="invalid-feedback">Le nom est requis.</div>
+      </div>
+
+      <!-- Prénom -->
+      <div class="form-group mt-4">
+        <input id="pf-prenom"
+               type="text"
+               class="form-control"
+               formControlName="prenom"
+               placeholder="Ex : Jean"
+               [ngClass]="{'is-invalid': patientForm.get('prenom')?.invalid && patientForm.get('prenom')?.touched}">
+        <label for="pf-prenom" class="required">Prénom</label>
+        <div class="invalid-feedback">Le prénom est requis.</div>
+      </div>
+
+      <!-- Âge + Poids -->
+      <div class="row g-3 mt-0">
+        <div class="col-6">
+          <div class="form-group mt-4">
+            <input id="pf-age"
+                   type="number"
+                   class="form-control"
+                   formControlName="age"
+                   placeholder="45"
+                   [ngClass]="{'is-invalid': patientForm.get('age')?.invalid && patientForm.get('age')?.touched}">
+            <label for="pf-age" class="required">Âge</label>
+            <div class="invalid-feedback">Âge invalide.</div>
+          </div>
         </div>
-
-        <div class="form-row three-cols">
-            <div class="form-group">
-                <label for="age">Âge</label>
-                <input id="age" type="number" formControlName="age" placeholder="Ex: 45">
-            </div>
-
-            <div class="form-group">
-                <label for="poids">Poids (kg)</label>
-                <input id="poids" type="number" formControlName="poids" placeholder="Ex: 75">
-            </div>
-
-            <div class="form-group">
-                <label for="sexe">Sexe</label>
-                <select id="sexe" formControlName="sexe">
-                    <option value="Homme">Homme</option>
-                    <option value="Femme">Femme</option>
-                </select>
-            </div>
+        <div class="col-6">
+          <div class="form-group mt-4">
+            <input id="pf-poids"
+                   type="number"
+                   class="form-control"
+                   formControlName="poids"
+                   placeholder="75"
+                   [ngClass]="{'is-invalid': patientForm.get('poids')?.invalid && patientForm.get('poids')?.touched}">
+            <label for="pf-poids" class="required">Poids (kg)</label>
+            <div class="invalid-feedback">Poids invalide.</div>
+          </div>
         </div>
+      </div>
 
-        <div class="upload-section">
-            <label>Dossier Médical (Scanner IRM)</label>
-            <div class="drop-zone" [ngClass]="{'drag-over': dragOver, 'file-selected': selectedFile}"
-                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+      <!-- Sexe -->
+      <div class="form-group mt-4">
+        <select id="pf-sexe" class="form-select" formControlName="sexe">
+          <option value="Homme">Homme</option>
+          <option value="Femme">Femme</option>
+        </select>
+        <label for="pf-sexe">Sexe</label>
+      </div>
 
-                <input type="file" id="irmFile" (change)="onFileSelected($event)" accept=".dcm,.png,.jpg,.jpeg" hidden
-                    #fileInput>
+      <!-- IRM Upload Zone -->
+      <div class="mt-4">
+        <p class="small fw-bold text-uppercase text-muted mb-2" style="letter-spacing:.05em">
+          <i class="fa-solid fa-brain me-1 text-primary"></i>
+          Scanner IRM (optionnel)
+        </p>
 
-                <div class="drop-content" *ngIf="!selectedFile" (click)="fileInput.click()">
-                    <div class="upload-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                            viewBox="0 0 16 16">
-                            <path
-                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
-                            <path
-                                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
-                        </svg>
-                    </div>
-                    <p><strong>Cliquez pour envoyer</strong> ou glissez l'IRM ici</p>
-                    <span class="file-hint">Fichiers supportés: DCM, PNG, JPG</span>
-                </div>
+        <div class="drop-zone"
+             [class.drop-zone--active]="dragOver"
+             [class.drop-zone--selected]="selectedFile"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)">
 
-                <div class="file-info" *ngIf="selectedFile">
-                    <div class="file-details">
-                        <div class="file-icon">📄</div>
-                        <div class="file-name">
-                            <span>{{ selectedFile.name }}</span>
-                            <small>{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</small>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-remove-file"
-                        (click)="selectedFile = null; $event.stopPropagation()">✕</button>
-                </div>
+          <input type="file" id="pf-irm" #fileInput hidden
+                 (change)="onFileSelected($event)"
+                 accept=".dcm,.png,.jpg,.jpeg">
 
+          <!-- Drop prompt -->
+          <div *ngIf="!selectedFile" class="drop-zone__prompt" (click)="fileInput.click()">
+            <i class="fa-solid fa-cloud-arrow-up fa-2x text-muted mb-2"></i>
+            <p class="mb-1 small">
+              <strong class="text-primary">Cliquez</strong> ou glissez l'IRM ici
+            </p>
+            <small class="text-muted">DCM, PNG, JPG acceptés</small>
+          </div>
+
+          <!-- File selected info -->
+          <div *ngIf="selectedFile" class="drop-zone__file">
+            <i class="fa-solid fa-file-medical fa-lg text-primary flex-shrink-0"></i>
+            <div class="flex-grow-1 overflow-hidden">
+              <p class="mb-0 fw-semibold text-truncate small">{{ selectedFile.name }}</p>
+              <small class="text-muted">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</small>
             </div>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn-primary" [disabled]="patientForm.invalid || isSubmitting">
-                <span *ngIf="!isSubmitting">Enregistrer le patient</span>
-                <span *ngIf="isSubmitting" class="loader"></span>
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger flex-shrink-0"
+                    (click)="selectedFile = null; $event.stopPropagation()">
+              <i class="fa-solid fa-times"></i>
             </button>
+          </div>
+
         </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="d-grid mt-4">
+        <button id="btn-submit-patient"
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="patientForm.invalid || isSubmitting">
+          <span *ngIf="!isSubmitting">
+            <i class="fa-solid fa-save me-2"></i>Enregistrer le patient
+          </span>
+          <span *ngIf="isSubmitting">
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            Enregistrement...
+          </span>
+        </button>
+      </div>
 
     </form>
+  </div>
 </div>

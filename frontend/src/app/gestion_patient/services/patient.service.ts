@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Patient } from '../models/patient.model';
+import { Patient, Analyse } from '../models/patient.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,25 +9,26 @@ import { Patient } from '../models/patient.model';
 export class PatientService {
 
   private apiUrl = 'http://localhost:8080/api/patients';
+  private analyseUrl = 'http://localhost:8080/api/analyses';
 
   constructor(private http: HttpClient) {}
 
+  /** Récupère tous les patients */
   getAllPatients(): Observable<Patient[]> {
     return this.http.get<Patient[]>(this.apiUrl);
+  }
+
+  /** Alias pour compatibilité */
+  getPatients(): Observable<Patient[]> {
+    return this.getAllPatients();
   }
 
   getPatientById(id: number): Observable<Patient> {
     return this.http.get<Patient>(`${this.apiUrl}/${id}`);
   }
 
-  // ✅ addPatient / createPatient — unifié sous addPatient
-  addPatient(patient: any): Observable<Patient> {
-    return this.http.post<Patient>(this.apiUrl, patient);
-  }
-
-  // alias pour compatibilité avec patient-form.component.ts qui appelle createPatient()
   createPatient(patient: any): Observable<Patient> {
-    return this.addPatient(patient);
+    return this.http.post<Patient>(this.apiUrl, patient);
   }
 
   updatePatient(id: number, patient: any): Observable<Patient> {
@@ -36,5 +37,10 @@ export class PatientService {
 
   deletePatient(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  /** Récupère les analyses d'un patient */
+  getAnalysesByPatient(patientId: number): Observable<Analyse[]> {
+    return this.http.get<Analyse[]>(`${this.analyseUrl}/patient/${patientId}`);
   }
 }

@@ -1,25 +1,41 @@
-<div class="gestion-patient-module">
+<!-- ═══════════════════════════════════════════════
+     MODULE HERO BANNER
+═══════════════════════════════════════════════ -->
+<div class="module-hero mb-4">
+  <div class="container-fluid px-4 py-4">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <div class="hero-icon-wrap">
+        <i class="fa-solid fa-brain fa-2x text-primary"></i>
+      </div>
+      <div>
+        <h1 class="fw-extra-bold mb-0 hero-title">
+          Gestion des Patients &amp; Analyses IRM
+        </h1>
+        <p class="text-muted mb-0 mt-1">
+          Module IA Alzheimer · Enregistrement · Diagnostic neurologique
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <div class="module-header">
-        <div class="header-icon">🏥</div>
-        <div class="header-text">
-            <h1>Gestion des Patients et Analyses IRM</h1>
-            <p>Module IA pour l'enregistrement des patients et le diagnostic Alzheimer.</p>
-        </div>
+<!-- ═══════════════════════════════════════════════
+     MAIN LAYOUT: FORM (LEFT) + DASHBOARD (RIGHT)
+═══════════════════════════════════════════════ -->
+<div class="container-fluid px-4 pb-5">
+  <div class="row g-4 align-items-start">
+
+    <!-- ── Sticky Form Sidebar ── -->
+    <div class="col-lg-4 col-xl-3">
+      <div class="sticky-sidebar">
+        <app-patient-form (patientAdded)="onPatientAdded()"></app-patient-form>
+      </div>
     </div>
 
-    <div class="module-layout">
-
-        <!-- Left Column: Form -->
-        <div class="layout-sidebar">
-            <app-patient-form (patientAdded)="onPatientAdded()"></app-patient-form>
-        </div>
-
-        <!-- Right Column: Dashboard -->
-        <div class="layout-main">
-            <app-patient-dashboard></app-patient-dashboard>
-        </div>
-
+    <!-- ── Patient Dashboard ── -->
+    <div class="col-lg-8 col-xl-9">
+      <app-patient-dashboard></app-patient-dashboard>
     </div>
 
+  </div>
 </div>
