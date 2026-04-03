@@ -1,0 +1,88 @@
+<div class="form-card">
+    <div class="form-header">
+        <h3>Ajouter un Nouveau Patient</h3>
+        <p>Renseignez les informations personnelles et ajoutez le scanner IRM.</p>
+    </div>
+
+    <form [formGroup]="patientForm" (ngSubmit)="onSubmit()" class="modern-form">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nom">Nom</label>
+                <input id="nom" type="text" formControlName="nom" placeholder="Ex: Dupont"
+                    [ngClass]="{'is-invalid': patientForm.get('nom')?.invalid && patientForm.get('nom')?.touched}">
+            </div>
+
+            <div class="form-group">
+                <label for="prenom">Prénom</label>
+                <input id="prenom" type="text" formControlName="prenom" placeholder="Ex: Jean"
+                    [ngClass]="{'is-invalid': patientForm.get('prenom')?.invalid && patientForm.get('prenom')?.touched}">
+            </div>
+        </div>
+
+        <div class="form-row three-cols">
+            <div class="form-group">
+                <label for="age">Âge</label>
+                <input id="age" type="number" formControlName="age" placeholder="Ex: 45">
+            </div>
+
+            <div class="form-group">
+                <label for="poids">Poids (kg)</label>
+                <input id="poids" type="number" formControlName="poids" placeholder="Ex: 75">
+            </div>
+
+            <div class="form-group">
+                <label for="sexe">Sexe</label>
+                <select id="sexe" formControlName="sexe">
+                    <option value="Homme">Homme</option>
+                    <option value="Femme">Femme</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="upload-section">
+            <label>Dossier Médical (Scanner IRM)</label>
+            <div class="drop-zone" [ngClass]="{'drag-over': dragOver, 'file-selected': selectedFile}"
+                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+
+                <input type="file" id="irmFile" (change)="onFileSelected($event)" accept=".dcm,.png,.jpg,.jpeg" hidden
+                    #fileInput>
+
+                <div class="drop-content" *ngIf="!selectedFile" (click)="fileInput.click()">
+                    <div class="upload-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                            <path
+                                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                        </svg>
+                    </div>
+                    <p><strong>Cliquez pour envoyer</strong> ou glissez l'IRM ici</p>
+                    <span class="file-hint">Fichiers supportés: DCM, PNG, JPG</span>
+                </div>
+
+                <div class="file-info" *ngIf="selectedFile">
+                    <div class="file-details">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">
+                            <span>{{ selectedFile.name }}</span>
+                            <small>{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-remove-file"
+                        (click)="selectedFile = null; $event.stopPropagation()">✕</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary" [disabled]="patientForm.invalid || isSubmitting">
+                <span *ngIf="!isSubmitting">Enregistrer le patient</span>
+                <span *ngIf="isSubmitting" class="loader"></span>
+            </button>
+        </div>
+
+    </form>
+</div>

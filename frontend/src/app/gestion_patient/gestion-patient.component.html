@@ -1,0 +1,25 @@
+<div class="gestion-patient-module">
+
+    <div class="module-header">
+        <div class="header-icon">🏥</div>
+        <div class="header-text">
+            <h1>Gestion des Patients et Analyses IRM</h1>
+            <p>Module IA pour l'enregistrement des patients et le diagnostic Alzheimer.</p>
+        </div>
+    </div>
+
+    <div class="module-layout">
+
+        <!-- Left Column: Form -->
+        <div class="layout-sidebar">
+            <app-patient-form (patientAdded)="onPatientAdded()"></app-patient-form>
+        </div>
+
+        <!-- Right Column: Dashboard -->
+        <div class="layout-main">
+            <app-patient-dashboard></app-patient-dashboard>
+        </div>
+
+    </div>
+
+</div>

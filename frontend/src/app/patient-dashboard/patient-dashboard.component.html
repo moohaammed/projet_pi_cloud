@@ -1,0 +1,210 @@
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Espace Patient</h2>
+        <button routerLink="/patients" class="btn btn-outline-secondary">Retour au choix</button>
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success border-0 shadow-sm" role="alert">
+        <strong>Succès!</strong> {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger border-0 shadow-sm" role="alert">
+        <strong>Erreur!</strong> {{ errorMessage }}
+    </div>
+
+    <!-- Patient ID Lookup Panel -->
+    <div class="card shadow-sm border-0 mb-4" *ngIf="!patientId">
+        <div class="card-body d-flex gap-3 align-items-end">
+            <div class="flex-grow-1">
+                <label class="form-label small fw-bold text-muted">Charger un Patient existant (ID)</label>
+                <input type="number" class="form-control" [(ngModel)]="patientId" name="lookupId" placeholder="Ex: 5">
+            </div>
+            <button class="btn btn-outline-primary" (click)="loadPatient()">Charger</button>
+            <span class="text-muted small align-self-center">— ou créez-en un nouveau ci-dessous —</span>
+        </div>
+    </div>
+    <div class="alert alert-info border-0 d-flex justify-content-between align-items-center" *ngIf="patientId">
+        <span>🏥 Patient actif : <strong>ID {{ patientId }}</strong> — {{ patient.nom }} {{ patient.prenom }}</span>
+        <button class="btn btn-sm btn-outline-secondary"
+            (click)="patientId = null; patient = { nom: '', prenom: '', age: null, poids: null, sexe: 'Homme', user_id: null }; analyses = []">Changer
+            de patient</button>
+    </div>
+
+    <div class="row g-4">
+        <!-- Profile Form -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h4 class="mb-0 text-secondary">Mon Profil</h4>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="isLoadingPatient" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 text-muted">Chargement du profil...</p>
+                    </div>
+
+                    <form *ngIf="!isLoadingPatient" (ngSubmit)="updateProfile()" #profileForm="ngForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">Nom</label>
+                                <input type="text" class="form-control" [(ngModel)]="patient.nom" name="nom" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">Prénom</label>
+                                <input type="text" class="form-control" [(ngModel)]="patient.prenom" name="prenom"
+                                    required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small fw-bold">Âge</label>
+                                <input type="number" class="form-control" [(ngModel)]="patient.age" name="age" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small fw-bold">Poids (kg)</label>
+                                <input type="number" class="form-control" [(ngModel)]="patient.poids" name="poids"
+                                    required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small fw-bold">Sexe</label>
+                                <select class="form-select" [(ngModel)]="patient.sexe" name="sexe">
+                                    <option value="Homme">Homme</option>
+                                    <option value="Femme">Femme</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="button" class="btn btn-success flex-grow-1" (click)="addPatient()"
+                                [disabled]="isSubmitting || profileForm.invalid">
+                                <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>Créer
+                                Patient
+                            </button>
+                            <button type="submit" class="btn btn-primary flex-grow-1"
+                                [disabled]="isSubmitting || profileForm.invalid">
+                                Mettre à jour
+                            </button>
+                            <button type="button" class="btn btn-danger" (click)="deletePatient()">
+                                Supprimer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Analyse -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h4 class="mb-0 text-secondary">Nouvelle Analyse</h4>
+                </div>
+                <div class="card-body">
+                    <form (ngSubmit)="submitAnalyse()" #analyseForm="ngForm">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">Rapport Médical (Importer un
+                                fichier)</label>
+                            <input type="file" class="form-control" (change)="onFileSelected($event, 'rapport_medical')"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">Image IRM (Importer depuis le
+                                bureau)</label>
+                            <input type="file" class="form-control" accept="image/*"
+                                (change)="onFileSelected($event, 'image_irm')" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-bold">Score Jeu Cognitif</label>
+                            <input type="number" class="form-control" [(ngModel)]="newAnalyse.score_jeu"
+                                name="score_jeu" placeholder="Optionnel">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 py-2"
+                            [disabled]="isSubmitting || !newAnalyse.rapport_medical || !newAnalyse.image_irm">
+                            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>Analyser IRM
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History List -->
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-secondary">Historique de mes Analyses</h4>
+            <button class="btn btn-sm btn-outline-primary" (click)="loadAnalyses()">Actualiser</button>
+        </div>
+        <div class="card-body">
+            <div *ngIf="isLoadingAnalyses" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+
+            <div class="table-responsive" *ngIf="!isLoadingAnalyses">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th>Risque IA</th>
+                            <th>Interprétation</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let a of analyses">
+                            <td><span class="badge bg-secondary">{{ a.date }}</span></td>
+                            <td>
+                                <span class="badge"
+                                    [ngClass]="{'bg-warning': a.statut=='EN_COURS', 'bg-success': a.statut=='TERMINÉ'}">
+                                    {{ a.statut }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold"
+                                    [ngClass]="{'text-danger': a.pourcentageRisque>50, 'text-success': a.pourcentageRisque<=50}"
+                                    *ngIf="a.pourcentageRisque != null">
+                                    {{ a.pourcentageRisque }}%
+                                </span>
+                                <span class="text-muted" *ngIf="a.pourcentageRisque == null">-</span>
+                            </td>
+                            <td><span class="text-muted fst-italic">{{ a.interpretation || 'Aucune' }}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-info text-white"
+                                    (click)="viewDetails(a)">Afficher</button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="analyses.length === 0">
+                            <td colspan="5" class="text-center text-muted py-4">Aucune analyse trouvée dans
+                                l'historique.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal Modal-like View -->
+    <div *ngIf="selectedAnalyse" class="card border-0 shadow mt-4 mb-5 border-start border-4 border-info">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-info">Détails de l'analyse du {{ selectedAnalyse.date }}</h5>
+            <button type="button" class="btn-close" (click)="selectedAnalyse = null"></button>
+        </div>
+        <div class="card-body row">
+            <div class="col-md-8">
+                <p><strong>Rapport Médical:</strong> <span class="text-muted">{{ selectedAnalyse.rapportMedical
+                        }}</span></p>
+                <p><strong>Résultat IA:</strong> <span class="badge bg-primary">{{ selectedAnalyse.pourcentageRisque ||
+                        'N/A' }} %</span></p>
+                <p><strong>Interprétation IA:</strong> <span class="text-muted">{{ selectedAnalyse.interpretation ||
+                        'Non évalué' }}</span></p>
+                <p><strong>Score Jeu Cognitif:</strong> <span class="badge bg-secondary">{{ selectedAnalyse.scoreJeu ||
+                        'N/A' }}</span></p>
+                <div *ngIf="selectedAnalyse.observationMedicale" class="alert alert-warning mt-3 border-0">
+                    <h6 class="alert-heading fw-bold">👩‍⚕️ Observation du Médecin:</h6>
+                    <p class="mb-0">{{ selectedAnalyse.observationMedicale }}</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <img *ngIf="selectedAnalyse.imageIRM" [src]="selectedAnalyse.imageIRM"
+                    class="img-fluid rounded shadow-sm border" alt="IRM uploadée" />
+                <span *ngIf="!selectedAnalyse.imageIRM" class="text-muted d-block mt-4">Aucune image fournie</span>
+            </div>
+        </div>
+    </div>
+</div>
