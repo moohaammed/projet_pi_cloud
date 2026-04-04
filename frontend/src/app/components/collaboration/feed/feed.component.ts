@@ -3,12 +3,13 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { PublicationService, PublicationDto } from '../../../services/collaboration/publication.service';
-import { UserService } from '../../../services/user.service';
+import { AlzUserService } from '../../../services/alz-user.service';
 import { NotificationService } from '../../../services/collaboration/notification.service';
 import { CommentService } from '../../../services/collaboration/comment.service';
 import { WebSocketService } from '../../../services/collaboration/websocket.service';
 import { MessageService } from '../../../services/collaboration/message.service';
 
+import { AuthService } from '../../../services/auth.service';
 import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.component';
 
 @Component({
@@ -19,17 +20,32 @@ import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.co
   styleUrls: ['./feed.component.scss']
 })
 export class FeedComponent implements OnInit {
+  authService = inject(AuthService);
   publicationService = inject(PublicationService);
-  userService = inject(UserService);
+  userService = inject(AlzUserService);
   notificationService = inject(NotificationService);
   commentService = inject(CommentService);
   webSocketService = inject(WebSocketService);
   messageService = inject(MessageService);
   platformId = inject(PLATFORM_ID);
 
-  currentUserId = signal<number>(1); // Simulated user ID
+  currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1); 
+  currentUser = computed(() => this.authService.getCurrentUser());
   publications = computed(() => this.publicationService.publications());
   notifications = computed(() => this.notificationService.notifications());
+  
+  getUserName(userId: number): string {
+    const user = this.userService.users().find(u => u.id === userId);
+    if (!user) return 'User ' + userId;
+    const fullName = [user.prenom, user.nom].filter(Boolean).join(' ');
+    return fullName || 'User ' + userId;
+  }
+ 
+  getUserInitials(userId: number): string {
+    const name = this.getUserName(userId);
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  }
   
   newPubContent = '';
   newPubType = 'EXPERIENCE';

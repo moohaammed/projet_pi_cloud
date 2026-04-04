@@ -6,11 +6,12 @@ import { RouterModule } from '@angular/router';
 import { PublicationDto } from '../../../services/collaboration/publication.service';
 import { MessageService, MessageDto } from '../../../services/collaboration/message.service';
 import { ChatGroupService, ChatGroupDto, MemberDto } from '../../../services/collaboration/chat-group.service';
-import { UserService } from '../../../services/user.service';
+import { AlzUserService } from '../../../services/alz-user.service';
 import { WebSocketService } from '../../../services/collaboration/websocket.service';
 import { NotificationService } from '../../../services/collaboration/notification.service';
 import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.component';
 import { CareRelayService, HandoverDTO } from '../../../services/collaboration/care-relay.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-messenger',
@@ -20,16 +21,30 @@ import { CareRelayService, HandoverDTO } from '../../../services/collaboration/c
   styleUrls: ['./messenger.component.scss']
 })
 export class MessengerComponent implements OnInit {
+  authService = inject(AuthService);
   messageService = inject(MessageService);
   chatGroupService = inject(ChatGroupService);
-  userService = inject(UserService);
+  userService = inject(AlzUserService);
   webSocketService = inject(WebSocketService);
   sanitizer = inject(DomSanitizer);
   notificationService = inject(NotificationService);
   careRelayService = inject(CareRelayService);
   platformId = inject(PLATFORM_ID);
 
-  currentUserId = signal<number>(1);
+  currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1);
+
+  getUserName(userId: number): string {
+    const user = this.userService.users().find(u => u.id === userId);
+    if (!user) return 'User ' + userId;
+    const fullName = [user.prenom, user.nom].filter(Boolean).join(' ');
+    return fullName || 'User ' + userId;
+  }
+
+  getUserInitials(userId: number): string {
+    const name = this.getUserName(userId);
+    if (!name || name.startsWith('User ')) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  }
   activeChatType = signal<'GROUP' | 'DM'>('GROUP');
   activeDmUserId = signal<number | null>(null);
   showInfoSidebar = signal<boolean>(false);
@@ -305,7 +320,9 @@ export class MessengerComponent implements OnInit {
 
   get dmUserName(): string {
     const user = this.userService.users().find(u => u.id === this.activeDmUserId());
-    return user ? user.name || 'User ' + user.id : 'User ' + this.activeDmUserId();
+    if (!user) return 'User ' + this.activeDmUserId();
+    const fullName = [user.prenom, user.nom].filter(Boolean).join(' ');
+    return fullName || 'User ' + user.id;
   }
 
   toggleHandoverPanel() {

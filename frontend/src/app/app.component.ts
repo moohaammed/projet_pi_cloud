@@ -1,7 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AuthService } from './services/auth.service';
+
 import { CommonModule } from '@angular/common';
+import { AuthService } from './services/auth.service';
+
 
 @Component({
   selector: 'app-root',
@@ -13,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class AppComponent {
   title = 'MediSync';
   navOpen = false;
+
   private authService = inject(AuthService);
 
   getAccountLink(): string {
@@ -30,5 +33,7 @@ export class AppComponent {
 
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
+
+
   }
 }

@@ -3,8 +3,9 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { ChatGroupService, ChatGroupDto } from '../../../services/collaboration/chat-group.service';
-import { UserService } from '../../../services/user.service';
+import { AlzUserService } from '../../../services/alz-user.service';
 import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.component';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-groups-list',
@@ -14,12 +15,13 @@ import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.co
   styleUrls: ['./groups-list.component.scss']
 })
 export class GroupsListComponent implements OnInit {
+  authService = inject(AuthService);
   chatGroupService = inject(ChatGroupService);
-  userService = inject(UserService);
+  userService = inject(AlzUserService);
   router = inject(Router);
   platformId = inject(PLATFORM_ID);
 
-  currentUserId = signal<number>(1);
+  currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1);
   groups = computed(() => this.chatGroupService.groups());
   users = computed(() => this.userService.users());
 

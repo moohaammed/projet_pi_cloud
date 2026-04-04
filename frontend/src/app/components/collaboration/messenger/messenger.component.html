@@ -78,10 +78,10 @@
                   <div class="d-flex align-items-center gap-3">
                     <div
                       class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
-                      {{ (user.name || 'U').substring(0, 1) }}
+                      {{ (user.prenom || 'U').substring(0, 1) }}
                     </div>
                     <div class="flex-grow-1">
-                      <h6 class="mb-0" [class.text-primary]="activeDmUserId() === user.id">{{ user.name }}</h6>
+                      <h6 class="mb-0" [class.text-primary]="activeDmUserId() === user.id">{{ user.prenom }} {{ user.nom }}</h6>
                       <span class="fs-12 text-muted">User #{{ user.id }}</span>
                     </div>
                     <span class="status-indicator online"></span>
@@ -263,8 +263,7 @@
                     <div class="message-wrapper d-flex flex-column"
                       [class.align-items-end]="msg.senderId === currentUserId()">
                       <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="small fw-semibold" *ngIf="msg.senderId !== currentUserId()">User #{{ msg.senderId
-                          }}</span>
+                        <span class="small fw-semibold" *ngIf="msg.senderId !== currentUserId()">{{ getUserName(msg.senderId) }}</span>
                         <span class="badge bg-soft-primary text-primary fs-9 px-2" *ngIf="msg.pinned"><i
                             class="fa-solid fa-thumbtack me-1"></i>PINNED</span>
                         <span class="fs-10 text-muted">{{ msg.sentAt | date: 'shortTime' }}</span>
