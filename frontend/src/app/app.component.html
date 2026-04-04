@@ -62,6 +62,16 @@
         <li class="nav-item">
           <a class="nav-link fw-bold text-primary" routerLink="/collaboration" routerLinkActive="active">Collaboration Hub</a>
         </li>
+        <li class="nav-item" *ngIf="isLoggedIn()">
+          <a class="nav-link border rounded px-3 ms-lg-3" [routerLink]="getAccountLink()" routerLinkActive="active">
+            <i class="fa-solid fa-user-circle me-1"></i>Mon Compte
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="!isLoggedIn()">
+          <a class="nav-link border rounded px-3 ms-lg-3" routerLink="/auth/login" routerLinkActive="active">
+            <i class="fa-solid fa-right-to-bracket me-1"></i>Connexion
+          </a>
+        </li>
       </ul>
       
       <div class="d-flex ms-lg-5">

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { RendezVousService } from '../../services/rendezvous.service';
 import { RendezVous, StatutRendezVous } from '../../models/rendezvous.model';
+import { VideoCallComponent } from '../videocall/videocall.component';
 
 @Component({
   selector: 'app-rendezvous-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, VideoCallComponent],
   templateUrl: './rendezvous-detail.component.html',
   styleUrls: ['./rendezvous-detail.component.css']
 })
@@ -16,6 +17,7 @@ export class RendezVousDetailComponent implements OnInit {
   loading = true;
   error = '';
   deleteConfirm = false;
+  showVideoCall = false;
 
   statutLabels: Record<StatutRendezVous, string> = {
     PLANIFIE: 'Planifié',
@@ -63,5 +65,9 @@ export class RendezVousDetailComponent implements OnInit {
         error: () => { this.error = 'Erreur lors de la suppression.'; }
       });
     }
+  }
+
+  toggleVideoCall(): void {
+    this.showVideoCall = !this.showVideoCall;
   }
 }

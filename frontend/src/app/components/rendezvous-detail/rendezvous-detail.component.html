@@ -1,6 +1,8 @@
-<div class="page-header bg-img-hero py-5" style="background-image: url('template/assets/img/header/page-title-01.png'); background-size: cover; background-position: center;">
+<div class="page-header bg-img-hero py-5"
+  style="background-image: url('template/assets/img/header/page-title-01.png'); background-size: cover; background-position: center;">
   <div class="container py-4 text-center">
-    <h1 class="fw-bold mb-0 text-dark">Détails du <span class="text-primary underline position-relative">Rendez-vous</span></h1>
+    <h1 class="fw-bold mb-0 text-dark">Détails du <span
+        class="text-primary underline position-relative">Rendez-vous</span></h1>
     <p class="text-muted mt-2" *ngIf="rv">Consultation #{{ rv.id }} — {{ rv.motif }}</p>
   </div>
 </div>
@@ -22,10 +24,12 @@
       <!-- Detail Card -->
       <div class="card border-0 rounded-4 shadow-lg overflow-hidden" *ngIf="rv && !loading">
         <!-- Status Header -->
-        <div [ngClass]="['px-4 py-3 text-white d-flex justify-content-between align-items-center', getStatutClass(rv.statut)]">
+        <div
+          [ngClass]="['px-4 py-3 text-white d-flex justify-content-between align-items-center', getStatutClass(rv.statut)]">
           <div class="d-flex align-items-center">
             <i class="fa-solid fa-calendar-check me-2 fs-5"></i>
-            <span class="fw-bold text-uppercase small" style="letter-spacing: 1px;">Rendez-vous {{ rv.statut ? statutLabels[rv.statut] : '—' }}</span>
+            <span class="fw-bold text-uppercase small" style="letter-spacing: 1px;">Rendez-vous {{ rv.statut ?
+              statutLabels[rv.statut] : '—' }}</span>
           </div>
           <div class="small opacity-75">#{{ rv.id }}</div>
         </div>
@@ -100,13 +104,18 @@
 
           <!-- Actions -->
           <div class="d-flex flex-wrap gap-3 mt-5 pt-4 border-top">
-            <button class="btn btn-warning px-4 py-2 rounded-pill fw-bold shadow-sm" [routerLink]="['/rendezvous', rv.id, 'edit']">
+            <button class="btn btn-warning px-4 py-2 rounded-pill fw-bold shadow-sm"
+              [routerLink]="['/rendezvous', rv.id, 'edit']">
               <i class="fa-solid fa-pen-to-square me-2"></i>Modifier
+            </button>
+            <button class="btn btn-info text-white px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="toggleVideoCall()">
+              <i class="fa-solid fa-video me-2"></i>Appel Vidéo
             </button>
             <button class="btn btn-danger px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="deleteConfirm = true">
               <i class="fa-solid fa-trash-can me-2"></i>Supprimer
             </button>
-            <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold ms-md-auto" routerLink="/rendezvous">
+            <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold ms-md-auto"
+              routerLink="/rendezvous">
               <i class="fa-solid fa-chevron-left me-2"></i>Retour à la liste
             </button>
           </div>
@@ -117,7 +126,8 @@
 </div>
 
 <!-- Delete confirm modal -->
-<div class="modal fade show" tabindex="-1" *ngIf="deleteConfirm" style="display: block; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
+<div class="modal fade show" tabindex="-1" *ngIf="deleteConfirm"
+  style="display: block; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 rounded-4 shadow">
       <div class="modal-body p-4 text-center">
@@ -134,3 +144,7 @@
     </div>
   </div>
 </div>
+
+<!-- Video Call Overlay -->
+<app-videocall *ngIf="showVideoCall && rv" [roomId]="rv.id ? rv.id.toString() : ''" (closeCall)="showVideoCall = false">
+</app-videocall>

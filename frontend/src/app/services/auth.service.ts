@@ -17,7 +17,14 @@ export class AuthService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    this.loggedIn$ = new BehaviorSubject<boolean>(this.isLoggedIn());
+    let initialLoginStatus = false;
+    try {
+      initialLoginStatus = this.isLoggedIn();
+    } catch (e) {
+      console.error('Error during initial login check:', e);
+      if (this.isBrowser) localStorage.removeItem('user');
+    }
+    this.loggedIn$ = new BehaviorSubject<boolean>(initialLoginStatus);
   }
 
   login(data: any): Observable<any> {
@@ -61,13 +68,23 @@ export class AuthService {
 
   getRole(): string {
     if (!this.isBrowser) return '';
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return user.role || '';
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.role || '';
+    } catch (e) {
+      console.error('AuthService: error parsing user role', e);
+      return '';
+    }
   }
 
   getCurrentUser(): any {
     if (!this.isBrowser) return {};
-    return JSON.parse(localStorage.getItem('user') || '{}');
+    try {
+      return JSON.parse(localStorage.getItem('user') || '{}');
+    } catch (e) {
+      console.error('AuthService: error parsing current user', e);
+      return {};
+    }
   }
 
   redirectByRole(): void {

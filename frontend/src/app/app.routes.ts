@@ -92,20 +92,23 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // ===== EXISTANT (inchangé) =====
+  // --- Routes Collaboration & Dashboards ---
   { path: 'collaboration', component: CommunicationTestComponent },
+  { path: 'patient-dashboard', component: PatientDashboardComponent, canActivate: [authGuard] },
+  { path: 'medecin-dashboard', component: MedecinDashboardComponent, canActivate: [authGuard] },
+  { path: 'gestion-patient-role', component: GestionPatientRoleComponent, canActivate: [authGuard] },
 
   // --- Routes de l'ami (Rendez-vous) ---
-  { path: 'rendezvous', component: RendezVousListComponent },
-  { path: 'rendezvous/new', component: RendezVousFormComponent },
-  { path: 'rendezvous/:id', component: RendezVousDetailComponent },
-  { path: 'rendezvous/:id/edit', component: RendezVousFormComponent },
+  { path: 'rendezvous', component: RendezVousListComponent, canActivate: [authGuard] },
+  { path: 'rendezvous/new', component: RendezVousFormComponent, canActivate: [authGuard] },
+  { path: 'rendezvous/:id', component: RendezVousDetailComponent, canActivate: [authGuard] },
+  { path: 'rendezvous/:id/edit', component: RendezVousFormComponent, canActivate: [authGuard] },
 
   // --- Routes Education ---
-  { path: 'events', component: EventListComponent },
-  { path: 'activities', component: ActivityListComponent },
-  { path: 'education', component: EducationComponent },
-  { path: 'eventfront', component: EventFrontComponent },
+  { path: 'events', component: EventListComponent, canActivate: [authGuard] },
+  { path: 'activities', component: ActivityListComponent, canActivate: [authGuard] },
+  { path: 'education', component: EducationComponent, canActivate: [authGuard] },
+  { path: 'eventfront', component: EventFrontComponent, canActivate: [authGuard] },
 
   { path: '**', redirectTo: 'auth/login' }
 ];

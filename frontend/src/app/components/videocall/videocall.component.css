@@ -1,0 +1,126 @@
+.video-call-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+}
+
+.video-call-container {
+  width: 90vw;
+  height: 90vh;
+  background: #111;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.main-video-area {
+  height: calc(100% - 100px);
+  position: relative;
+  background: #000;
+}
+
+.remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px 20px 0 0;
+}
+
+.local-video-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 280px;
+  height: 180px;
+  background: #222;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 4px solid #fff;
+  z-index: 10;
+}
+
+.local-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.status-badge {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.controls-bar {
+  height: 100px;
+  background: rgba(20, 20, 20, 0.95);
+  padding: 0 40px;
+}
+
+.btn-control {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1.2rem;
+}
+
+.btn-control:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+  color: #fff;
+}
+
+.btn-control.btn-danger {
+  background: rgba(220, 38, 38, 0.8);
+}
+
+.btn-control.btn-danger:hover {
+  background: rgba(220, 38, 38, 1);
+}
+
+.btn-call-start {
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-hangup {
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: #dc2626;
+  border: none;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+}
+
+.btn-hangup:hover {
+  background: #b91c1c;
+}
