@@ -39,10 +39,10 @@
                  (click)="openMiniChatConversation(user.id!)">
               <div class="d-flex align-items-center gap-3">
                 <div class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 35px; height: 35px; font-size: 13px;">
-                  {{ (user.name || 'U').substring(0, 1) }}
+                  {{ (user.prenom || 'U').substring(0, 1) }}
                 </div>
                 <div class="flex-grow-1">
-                  <h6 class="mb-0 fs-14 fw-semibold text-dark">{{ user.name }}</h6>
+                  <h6 class="mb-0 fs-14 fw-semibold text-dark">{{ user.prenom }} {{ user.nom }}</h6>
                   <span class="fs-12 text-muted">User #{{ user.id }}</span>
                 </div>
               </div>

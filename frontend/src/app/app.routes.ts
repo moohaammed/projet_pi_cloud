@@ -93,7 +93,47 @@ export const routes: Routes = [
   },
 
   // ===== EXISTANT (inchangé) =====
-  { path: 'collaboration', component: CommunicationTestComponent },
+  {
+    path: 'collaboration',
+    component: CommunicationTestComponent,
+    children: [
+      {
+        path: 'feed',
+        loadComponent: () =>
+          import('./components/collaboration/feed/feed.component')
+            .then(m => m.FeedComponent)
+      },
+      {
+        path: 'messenger',
+        loadComponent: () =>
+          import('./components/collaboration/messenger/messenger.component')
+            .then(m => m.MessengerComponent)
+      },
+      {
+        path: 'groups',
+        loadComponent: () =>
+          import('./components/collaboration/groups-list/groups-list.component')
+            .then(m => m.GroupsListComponent)
+      }
+    ]
+  },
+
+  // --- Dashboard Routes ---
+  {
+    path: 'patient-dashboard',
+    component: PatientDashboardComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'medecin-dashboard',
+    component: MedecinDashboardComponent,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'gestion-patient-role',
+    component: GestionPatientRoleComponent,
+    canActivate: [authGuard]
+  },
 
   // --- Routes de l'ami (Rendez-vous) ---
   { path: 'rendezvous', component: RendezVousListComponent },

@@ -121,7 +121,7 @@
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" [id]="'user-' + u.id"
                       [checked]="selectedUserIds.includes(u.id!)" (change)="toggleUserSelection(u.id!, $event)">
-                    <label class="form-check-label fs-14" [for]="'user-' + u.id">{{ u.name }}</label>
+                    <label class="form-check-label fs-14" [for]="'user-' + u.id">{{ u.prenom }} {{ u.nom }}</label>
                   </div>
                 </div>
               </div>

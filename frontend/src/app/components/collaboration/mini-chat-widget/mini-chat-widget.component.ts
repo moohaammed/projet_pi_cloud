@@ -2,9 +2,10 @@ import { Component, inject, OnInit, signal, effect, untracked, computed } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatGroupService, ChatGroupDto } from '../../../services/collaboration/chat-group.service';
-import { UserService } from '../../../services/user.service';
+import { AlzUserService } from '../../../services/alz-user.service';
 import { WebSocketService } from '../../../services/collaboration/websocket.service';
 import { MessageService } from '../../../services/collaboration/message.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-mini-chat-widget',
@@ -14,12 +15,13 @@ import { MessageService } from '../../../services/collaboration/message.service'
   styleUrls: ['./mini-chat-widget.component.scss']
 })
 export class MiniChatWidgetComponent implements OnInit {
-  userService = inject(UserService);
+  authService = inject(AuthService);
+  userService = inject(AlzUserService);
   webSocketService = inject(WebSocketService);
   messageService = inject(MessageService);
   chatGroupService = inject(ChatGroupService);
 
-  currentUserId = signal<number>(1); // Simulated user ID
+  currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1); 
 
   // Mini Chat State
   isMiniChatOpen = signal(false);
@@ -33,7 +35,10 @@ export class MiniChatWidgetComponent implements OnInit {
   filteredChatUsers = computed(() => {
     const q = this.miniChatSearch().toLowerCase();
     if (!q) return this.chatUsers();
-    return this.chatUsers().filter(u => u.name?.toLowerCase().includes(q));
+    return this.chatUsers().filter(u => {
+      const fullName = (u.prenom + ' ' + u.nom).toLowerCase();
+      return fullName.includes(q);
+    });
   });
 
   chatGroups = computed(() => this.chatGroupService.groups());
@@ -56,12 +61,17 @@ export class MiniChatWidgetComponent implements OnInit {
   });
 
   miniChatTitle = computed(() => {
-    if (this.activeMiniChatUserId()) {
-      const uid = this.activeMiniChatUserId();
-      return this.userService.users().find(u => u.id === uid)?.name || `User ${uid}`;
-    } else if (this.activeMiniChatGroupId()) {
-      const gid = this.activeMiniChatGroupId();
-      return this.chatGroupService.groups().find((g: ChatGroupDto) => g.id === gid)?.name || `Group ${gid}`;
+    const activeUserId = this.activeMiniChatUserId();
+    if (activeUserId) {
+      const user = this.userService.users().find(u => u.id === activeUserId);
+      if (!user) return `User ${activeUserId}`;
+      return `${user.prenom} ${user.nom}`.trim() || `User ${activeUserId}`;
+    }
+    
+    const activeGroupId = this.activeMiniChatGroupId();
+    if (activeGroupId) {
+      const grp = this.chatGroupService.groups().find((g: ChatGroupDto) => g.id === activeGroupId);
+      return grp?.name || `Group ${activeGroupId}`;
     }
     return '';
   });
