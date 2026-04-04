@@ -2,8 +2,9 @@ package esprit.tn.backpi.controllers.collaboration;
 
 import esprit.tn.backpi.dto.collaboration.MessageCreateDto;
 import esprit.tn.backpi.dto.collaboration.MessageResponseDto;
-import esprit.tn.backpi.services.collaboration.MessageService;
 import esprit.tn.backpi.services.collaboration.FileStorageService;
+import esprit.tn.backpi.services.collaboration.MessageService;
+import esprit.tn.backpi.entities.collaboration.MessageType;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +35,11 @@ public class MessageController {
     @GetMapping("/group/{groupId}")
     public List<MessageResponseDto> getMessagesByGroup(@PathVariable("groupId") Long groupId) {
         return messageService.getMessagesByGroup(groupId);
+    }
+
+    @GetMapping("/direct/{u1}/{u2}")
+    public List<MessageResponseDto> getDirectMessages(@PathVariable("u1") Long u1, @PathVariable("u2") Long u2) {
+        return messageService.getDirectMessages(u1, u2);
     }
 
     @GetMapping("/{id}")
@@ -80,5 +86,18 @@ public class MessageController {
     public ResponseEntity<Void> deleteMessage(@PathVariable("id") Long id) {
         messageService.deleteMessage(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/vote")
+    public MessageResponseDto voteOnPoll(
+            @PathVariable("id") Long id,
+            @RequestParam("userId") Long userId,
+            @RequestParam("optionId") Long optionId) {
+        return messageService.voteOnPoll(id, userId, optionId);
+    }
+ 
+    @PostMapping("/{id}/pin")
+    public MessageResponseDto togglePin(@PathVariable("id") Long id) {
+        return messageService.togglePin(id);
     }
 }

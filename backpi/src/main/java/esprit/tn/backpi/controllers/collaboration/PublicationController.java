@@ -2,6 +2,7 @@ package esprit.tn.backpi.controllers.collaboration;
 
 import esprit.tn.backpi.dto.collaboration.PublicationCreateDto;
 import esprit.tn.backpi.dto.collaboration.PublicationResponseDto;
+import esprit.tn.backpi.entities.collaboration.PublicationType;
 import esprit.tn.backpi.services.collaboration.PublicationService;
 import esprit.tn.backpi.services.collaboration.FileStorageService;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,25 @@ public class PublicationController {
     @PostMapping(consumes = "multipart/form-data")
     public PublicationResponseDto createPublication(
             @Valid @ModelAttribute PublicationCreateDto dto,
+            @RequestParam(value = "type", required = false) String typeStr,
+            @RequestParam(value = "pollOptions", required = false) List<String> pollOptions,
+            @RequestParam(value = "pollQuestion", required = false) String pollQuestion,
             @RequestParam(value = "file", required = false) MultipartFile file) {
+
+        // Log incoming poll options
+        if (typeStr != null && dto.getType() == null) {
+            try {
+                dto.setType(PublicationType.valueOf(typeStr.toUpperCase()));
+            } catch (Exception e) {
+                // Ignore invalid type
+            }
+        }
+        if (pollOptions != null) {
+            dto.setPollOptions(pollOptions);
+        }
+        if (pollQuestion != null) {
+            dto.setPollQuestion(pollQuestion);
+        }
 
         String mediaUrl = null;
         String mimeType = null;
@@ -75,5 +94,17 @@ public class PublicationController {
     public ResponseEntity<Void> deletePublication(@PathVariable("id") Long id) {
         publicationService.deletePublication(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/poll/vote")
+    public ResponseEntity<PublicationResponseDto> voteInPoll(
+            @PathVariable("id") Long id,
+            @RequestBody java.util.Map<String, Object> payload) {
+        
+        int optionIndex = (int) payload.get("optionIndex");
+        Long userId = Long.valueOf(payload.get("userId").toString());
+        
+        PublicationResponseDto result = publicationService.voteInPoll(id, optionIndex, userId);
+        return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
     }
 }

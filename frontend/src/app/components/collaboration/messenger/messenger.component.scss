@@ -1,0 +1,180 @@
+.comm-scroll-lg {
+  height: calc(100vh - 350px);
+  overflow-y: auto;
+}
+
+.message-bubble {
+  max-width: 100%;
+  transition: all 0.2s ease;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.online {
+  background: #28a745;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+.pinned-messages-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 10;
+  border-bottom: 1px solid rgba(128, 0, 128, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.pinned-chip {
+  max-width: 400px;
+  background: #fff;
+  border: 1px solid rgba(128, 0, 128, 0.2);
+  color: var(--bs-primary);
+  font-weight: 500;
+
+  &:hover {
+    background: rgba(128, 0, 128, 0.05);
+  }
+}
+
+.message-pinned {
+  border: 2px solid var(--bs-primary) !important;
+  box-shadow: 0 0 10px rgba(128, 0, 128, 0.2);
+}
+
+.poll-message-card {
+  border-radius: 12px;
+  background: #fff;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.poll-option-item {
+  border: 1px solid #eee;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--bs-primary);
+    background-color: rgba(128, 0, 128, 0.05);
+  }
+
+  &.active {
+    border-color: var(--bs-primary);
+    background-color: rgba(128, 0, 128, 0.08);
+  }
+}
+
+.bg-soft-primary-light {
+  background-color: rgba(128, 0, 128, 0.03);
+  border: 1px dashed rgba(128, 0, 128, 0.2) !important;
+}
+
+.l-spacing-1 {
+  letter-spacing: 1px;
+}
+
+.progress {
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  transition: width 0.6s ease;
+}
+
+.chat-media-attachment {
+  max-width: 100%;
+  max-height: 280px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 0.5rem;
+}
+
+.list-group-item.active {
+  background-color: rgba(128, 0, 128, 0.08) !important;
+  border-color: transparent !important;
+  color: inherit;
+}
+
+/* Override default Bootstrap blue for the active chat tab */
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+  background-color: rgba(128, 0, 128, 0.15) !important;
+  color: var(--bs-primary) !important;
+  font-weight: bold;
+}
+
+/* Ensure inactive tabs look clickable */
+.nav-pills .nav-link {
+  color: #6c757d;
+}
+
+/* @Mention dropdown */
+.mention-dropdown {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.15s ease-out;
+}
+
+.mention-item {
+  transition: background 0.15s ease;
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.07);
+  }
+}
+
+/* Highlight @mentions in rendered message bubbles */
+:host ::ng-deep .mention-tag {
+  color: #ff9f43 !important; /* default for receiver bubbles (white) */
+  font-weight: 700;
+  background: rgba(255, 159, 67, 0.15);
+  border-radius: 4px;
+  padding: 0 4px;
+  display: inline-block;
+  border: 1px solid rgba(255, 159, 67, 0.3);
+}
+
+/* Specific highlight when inside a sender bubble (blue) */
+:host ::ng-deep .bg-primary .mention-tag {
+  color: #fff200 !important; /* bright yellow for visibility on blue */
+  background: rgba(255, 242, 0, 0.2);
+  border-color: rgba(255, 242, 0, 0.4);
+}
+
+.mention-badge {
+    font-size: 11px;
+    background: #ff9f43;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: auto;
+    font-weight: 600;
+}

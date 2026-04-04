@@ -1,8 +1,8 @@
 package esprit.tn.backpi.entities.collaboration;
 
-import esprit.tn.backpi.entities.User;
 import jakarta.persistence.*;
 
+import esprit.tn.backpi.entity.User;
 import java.time.Instant;
 
 @Entity

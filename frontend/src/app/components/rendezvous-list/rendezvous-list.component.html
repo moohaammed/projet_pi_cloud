@@ -1,0 +1,184 @@
+<div class="page-header bg-img-hero py-5" style="background-image: url('template/assets/img/header/page-title-01.png'); background-size: cover; background-position: center;">
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <h1 class="text-center mb-0 fw-bold text-dark">
+          Vos <span class="text-primary underline position-relative">Rendez-vous</span> Médicaux
+        </h1>
+        <p class="text-center mt-2 text-muted">
+          Gérez, suivez et organisez toutes vos consultations en ligne en toute simplicité.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Start Search & Filter Form -->
+<div class="container mt-n5 position-relative z-1 mb-5">
+  <div class="bg-white rounded-4 p-4 shadow-lg">
+    <div class="row align-items-end g-3">
+      <div class="col-lg-3 col-md-6">
+        <div class="form-group">
+          <label class="form-label fw-bold small text-uppercase">ID Patient</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0"><i class="fa-solid fa-user-injured text-primary"></i></span>
+            <input type="number" class="form-control bg-light border-0" placeholder="Ex: 1" [(ngModel)]="searchPatientId" (ngModelChange)="applyFilters()">
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="form-group">
+          <label class="form-label fw-bold small text-uppercase">ID Médecin</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0"><i class="fa-solid fa-user-md text-primary"></i></span>
+            <input type="number" class="form-control bg-light border-0" placeholder="Ex: 2" [(ngModel)]="searchMedecinId" (ngModelChange)="applyFilters()">
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="form-group">
+          <label class="form-label fw-bold small text-uppercase">Statut</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0"><i class="fa-solid fa-sliders text-primary"></i></span>
+            <select class="form-select bg-light border-0" [(ngModel)]="filterStatut" (ngModelChange)="applyFilters()">
+              <option value="">Tous les statuts</option>
+              <option *ngFor="let s of statutOptions" [value]="s">{{ statutLabels[s] }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 d-flex gap-2">
+        <button class="btn btn-warning w-100 py-2 fw-semibold shadow-sm" (click)="resetFilters()">
+          <i class="fa-solid fa-rotate me-2"></i>Réinitialiser
+        </button>
+        <a routerLink="/rendezvous/new" class="btn btn-primary btn-icon flex-shrink-0 d-flex align-items-center justify-content-center p-0" style="width: 42px; height: 42px;">
+          <i class="fa-solid fa-plus"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.End Search Form -->
+
+<div class="container pb-5">
+  <div class="row">
+    <!-- Error Alert -->
+    <div class="col-12" *ngIf="error">
+      <div class="alert alert-danger shadow-sm rounded-3">
+        <i class="fa-solid fa-circle-exclamation me-2"></i> {{ error }}
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="col-12 text-center py-5" *ngIf="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted fw-medium">Récupération de vos rendez-vous...</p>
+    </div>
+
+    <!-- List Items -->
+    <div class="col-12" *ngIf="!loading">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h6 class="fw-bold mb-0 text-muted small text-uppercase">
+          Résultats: <strong>{{ filteredList.length }}</strong> rendez-vous trouvé(s)
+        </h6>
+      </div>
+
+      <div class="row g-4" *ngIf="filteredList.length > 0; else noData">
+        <div class="col-lg-6" *ngFor="let rv of filteredList">
+          <div class="card border-0 rounded-4 shadow-sm card-hover overflow-hidden h-100">
+            <div class="card-body p-0">
+              <div class="d-sm-flex align-items-stretch">
+                <!-- Status Sidebar -->
+                <div [ngClass]="['d-flex flex-column align-items-center justify-content-center px-3 py-4 text-white', getStatutClass(rv.statut)]" style="width: 100px; min-width: 100px;">
+                  <i class="fa-solid fa-calendar-check fs-2 mb-2"></i>
+                  <span class="text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ rv.statut ? statutLabels[rv.statut] : '—' }}</span>
+                </div>
+
+                <div class="p-4 flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold mb-0 text-dark">Rendez-vous #{{ rv.id }}</h5>
+                    <span class="badge bg-light text-primary rounded-pill fw-bold">#P-{{ rv.patientId }}</span>
+                  </div>
+
+                  <p class="text-primary fw-medium mb-3">
+                    <i class="fa-solid fa-user-doctor me-2"></i>Médecin : ID {{ rv.medecinId }}
+                  </p>
+
+                  <div class="d-flex flex-wrap gap-3 mb-4">
+                    <div class="d-flex align-items-center text-muted small">
+                      <i class="fa-solid fa-clock me-2 text-primary opacity-75"></i>
+                      {{ rv.dateHeure | date:'dd MMM yyyy à HH:mm' }}
+                    </div>
+                    <div class="d-flex align-items-center text-muted small">
+                      <i class="fa-solid fa-clipboard-list me-2 text-primary opacity-75"></i>
+                      {{ rv.motif | slice:0:30 }}{{ rv.motif.length > 30 ? '...' : '' }}
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2 mt-auto pt-3 border-top">
+                    <a [routerLink]="['/rendezvous', rv.id]" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                      <i class="fa-solid fa-eye me-1 text-primary"></i> Détails
+                    </a>
+                    <a [routerLink]="['/rendezvous', rv.id, 'edit']" class="btn btn-outline-warning btn-sm rounded-pill px-3">
+                      <i class="fa-solid fa-pen me-1"></i> Modifier
+                    </a>
+                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-auto" (click)="confirmDelete(rv.id!)">
+                      <i class="fa-solid fa-trash me-1"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination Placeholder -->
+      <nav class="mt-5" *ngIf="filteredList.length > 0">
+        <ul class="pagination justify-content-center m-0">
+          <li class="page-item active"><a class="page-link shadow-sm border-0 rounded-3 mx-1" href="#">1</a></li>
+          <li class="page-item"><a class="page-link shadow-sm border-0 rounded-3 mx-1 text-muted" href="#">2</a></li>
+          <li class="page-item ms-3">
+            <a class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm" href="#">Suivant <i class="fa-solid fa-arrow-right ms-2"></i></a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Empty State -->
+    <ng-template #noData>
+      <div class="col-12 py-5 text-center">
+        <div class="bg-white p-5 rounded-4 shadow-sm">
+          <img src="template/assets/img/illustration/schedule-meeting.svg" alt="Empty" style="width: 200px; opacity: 0.5;" class="mb-4">
+          <h4 class="fw-bold">Aucun rendez-vous trouvé</h4>
+          <p class="text-muted">Commencez par planifier votre premier rendez-vous médical.</p>
+          <a routerLink="/rendezvous/new" class="btn btn-primary btn-lg px-5 mt-3 rounded-pill shadow">
+            Nouveau Rendez-vous
+          </a>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- Modal logic stayed the same but let's use template modal classes if needed -->
+<!-- Delete confirm modal -->
+<div class="modal fade show" tabindex="-1" *ngIf="deleteConfirmId !== null" style="display: block; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow">
+      <div class="modal-body p-4 text-center">
+        <div class="text-danger mb-3 p-3 bg-danger bg-opacity-10 d-inline-block rounded-circle">
+          <i class="fa-solid fa-triangle-exclamation fs-1"></i>
+        </div>
+        <h4 class="fw-bold">Confirmer la suppression</h4>
+        <p class="text-muted">Voulez-vous vraiment supprimer le rendez-vous <strong>#{{ deleteConfirmId }}</strong> ? Cette action est irréversible.</p>
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-light w-100 py-2 rounded-3" (click)="cancelDelete()">Annuler</button>
+          <button class="btn btn-danger w-100 py-2 rounded-3" (click)="doDelete(deleteConfirmId!)">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

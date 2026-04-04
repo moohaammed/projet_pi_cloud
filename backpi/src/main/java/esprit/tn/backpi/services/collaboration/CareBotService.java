@@ -2,7 +2,7 @@ package esprit.tn.backpi.services.collaboration;
 
 import esprit.tn.backpi.dto.collaboration.MessageResponseDto;
 import esprit.tn.backpi.entities.collaboration.Message;
-import esprit.tn.backpi.entities.User;
+import esprit.tn.backpi.entity.User;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import java.time.Instant;

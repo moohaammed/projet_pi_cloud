@@ -26,16 +26,14 @@
                 "input": "public"
               }
             ],
-           "styles": [
-  "node_modules/bootstrap/dist/css/bootstrap.min.css",
-  "src/styles.css"
-],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "server.ts"
-            }
+            "styles": [
+              "public/template/assets/plugins/bootstrap/css/bootstrap.min.css",
+              "public/template/assets/plugins/fontawesome/css/all.min.css",
+              "public/template/assets/plugins/themify-icons/themify-icons.css",
+              "public/template/assets/css/style.css",
+              "src/styles.css"
+            ],
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -47,8 +45,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
                 }
               ],
               "outputHashing": "all"
@@ -59,7 +57,7 @@
               "sourceMap": true
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -91,6 +89,10 @@
               }
             ],
             "styles": [
+              "public/template/assets/plugins/bootstrap/css/bootstrap.min.css",
+              "public/template/assets/plugins/fontawesome/css/all.min.css",
+              "public/template/assets/plugins/themify-icons/themify-icons.css",
+              "public/template/assets/css/style.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -100,6 +102,6 @@
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": "ac3aa07b-3428-44c1-90ea-a511cd8e126d"
   }
 }
