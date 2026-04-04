@@ -1,15 +1,4 @@
 <div class="video-call-overlay">
-<<<<<<< Updated upstream
-  <div class="video-call-container shadow-2xl">
-    <div class="main-video-area">
-      <!-- Remote Video (Big) -->
-      <video #remoteVideo autoplay playsinline class="remote-video"></video>
-      <div class="status-badge" *ngIf="connectionStatus">{{ connectionStatus }}</div>
-      
-      <!-- Local Video (Picture in Picture) -->
-      <div class="local-video-container shadow-lg">
-        <video #localVideo autoplay playsinline muted class="local-video"></video>
-=======
   <!-- Liste des participants en haut à gauche -->
   <div class="participants-list shadow-lg animate-fade-in" *ngIf="participants.size > 0">
     <div class="d-flex align-items-center mb-3">
@@ -38,28 +27,10 @@
         <div class="overlay-icons" *ngIf="isVideoOff">
           <i class="fa-solid fa-video-slash text-danger"></i>
         </div>
->>>>>>> Stashed changes
       </div>
     </div>
 
     <!-- Controls Bar -->
-<<<<<<< Updated upstream
-    <div class="controls-bar d-flex justify-content-center align-items-center gap-4">
-      <button class="btn btn-control" [class.btn-danger]="isMuted" (click)="toggleMute()">
-        <i class="fa-solid" [class.fa-microphone]="!isMuted" [class.fa-microphone-slash]="isMuted"></i>
-      </button>
-
-      <button class="btn btn-control" [class.btn-danger]="isVideoOff" (click)="toggleVideo()">
-        <i class="fa-solid" [class.fa-video]="!isVideoOff" [class.fa-video-slash]="isVideoOff"></i>
-      </button>
-
-      <button class="btn btn-primary btn-call-start" (click)="startCall()">
-        <i class="fa-solid fa-phone-volume me-2"></i> Démarrer l'Appel
-      </button>
-
-      <button class="btn btn-danger btn-hangup" (click)="hangup()">
-        <i class="fa-solid fa-phone-slash me-2"></i> Raccrocher
-=======
     <div class="controls-bar py-3 px-4 d-flex justify-content-center gap-3">
       <button [class]="isMuted ? 'btn btn-danger btn-circle shadow' : 'btn btn-dark btn-outline-light btn-circle shadow'" (click)="toggleMute()">
         <i [class]="isMuted ? 'fa-solid fa-microphone-slash' : 'fa-solid fa-microphone'"></i>
@@ -79,7 +50,6 @@
       <button class="btn btn-danger d-flex align-items-center gap-2 px-4 rounded-pill shadow" (click)="hangup()">
         <i class="fa-solid fa-phone-slash"></i>
         RACCROCHER
->>>>>>> Stashed changes
       </button>
     </div>
   </div>

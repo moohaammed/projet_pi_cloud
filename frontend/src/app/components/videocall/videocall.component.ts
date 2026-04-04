@@ -21,16 +21,13 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   private localStream?: MediaStream;
   private peerConnection?: RTCPeerConnection;
   private subscription?: Subscription;
+  private signalSubscription?: Subscription;
   private currentUser: any;
 
   public isMuted = false;
   public isVideoOff = false;
   public connectionStatus = 'Initialisation...';
-<<<<<<< Updated upstream
-=======
   public participants: Map<string, string> = new Map();
-  public incomingCall: boolean = false;
->>>>>>> Stashed changes
 
   private readonly iceServers = {
     iceServers: [
@@ -48,101 +45,100 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    console.log('VC: Initialisation pour la room:', this.roomId);
     this.videoCallService.connect(this.currentUser.id.toString());
     
     this.subscription = this.videoCallService.isConnected$.subscribe(connected => {
       if (connected) {
+        console.log('VC: Connecté au serveur, inscription à la room...');
         this.videoCallService.subscribe(this.roomId);
         this.startLocalStream();
-<<<<<<< Updated upstream
-=======
-        // Signaler sa présence
-        setTimeout(() => this.sendJoinSignal(), 1000);
->>>>>>> Stashed changes
+        // Attendre un peu que la souscription soit effective sur le serveur
+        setTimeout(() => {
+          console.log('VC: Envoi du signal JOIN');
+          this.sendJoinSignal();
+        }, 1500);
       }
     });
 
-    this.videoCallService.signalMessages$.subscribe(msg => {
+    this.signalSubscription = this.videoCallService.signalMessages$.subscribe(msg => {
       this.handleSignalMessage(msg);
     });
   }
 
   ngOnDestroy() {
-<<<<<<< Updated upstream
-=======
     this.sendLeaveSignal();
->>>>>>> Stashed changes
     this.hangup();
     this.subscription?.unsubscribe();
+    this.signalSubscription?.unsubscribe();
     this.videoCallService.disconnect();
   }
 
-<<<<<<< Updated upstream
-  private async startLocalStream() {
-    try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      if (this.localVideo) {
-        this.localVideo.nativeElement.srcObject = this.localStream;
-      }
-      this.connectionStatus = 'Prêt. En attente de l\'autre participant...';
-    } catch (err) {
-      console.error('Erreur accès média:', err);
-      this.connectionStatus = 'Erreur: Accès caméra/micro refusé';
-=======
+  private getUserDisplayName(): string {
+    if (!this.currentUser) return 'Utilisateur inconnu';
+    return this.currentUser.nom || this.currentUser.firstName || this.currentUser.username || this.currentUser.email || 'Utilisateur';
+  }
+
   private sendJoinSignal() {
+    const senderId = this.currentUser?.id ? this.currentUser.id.toString() : Math.random().toString(36).substring(7);
     this.videoCallService.sendSignal(this.roomId, {
       type: 'join',
-      senderId: this.currentUser.id.toString(),
-      data: { name: this.currentUser.nom || 'Utilisateur' }
+      senderId: senderId,
+      data: { name: this.getUserDisplayName() }
     });
   }
 
-  private processJoin(msg: SignalMessage) {
-    if (msg.senderId === this.currentUser.id.toString()) return;
-    
-    const name = msg.data?.name || `Utilisateur ${msg.senderId}`;
-    this.participants.set(msg.senderId, name);
-    console.log(`--- ${name} a rejoint l'appel ---`);
-    
-    // Si nous sommes déjà connectés, on répond pour dire qu'on est là
-    if (msg.type === 'join') {
-      this.videoCallService.sendSignal(this.roomId, {
-        type: 'join-reply',
-        senderId: this.currentUser.id.toString(),
-        data: { name: this.currentUser.nom || 'Utilisateur' }
-      });
-    }
-  }
-
   private sendLeaveSignal() {
+    const senderId = this.currentUser?.id ? this.currentUser.id.toString() : 'unknown';
     this.videoCallService.sendSignal(this.roomId, {
       type: 'leave',
-      senderId: this.currentUser.id.toString(),
+      senderId: senderId,
       data: {}
     });
   }
 
+  private processJoin(msg: SignalMessage) {
+    const myId = this.currentUser?.id ? this.currentUser.id.toString() : '';
+    if (msg.senderId === myId) return;
+    
+    // Si 'data' est null ou un string, on gère l'erreur
+    let dataObj = msg.data;
+    if (typeof msg.data === 'string') {
+      try { dataObj = JSON.parse(msg.data); } catch (e) {}
+    }
+    
+    const name = dataObj?.name || `Utilisateur ${msg.senderId}`;
+    this.participants.set(msg.senderId, name);
+    console.log(`VC: ${name} est maintenant en ligne.`);
+    
+    if (msg.type === 'join') {
+      console.log('VC: Réponse JOIN-REPLY à', msg.senderId);
+      this.videoCallService.sendSignal(this.roomId, {
+        type: 'join-reply',
+        senderId: myId,
+        data: { name: this.getUserDisplayName() }
+      });
+    }
+  }
+
   private async startLocalStream() {
     try {
-      // Tentative 1: Vidéo + Audio
       this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     } catch (e) {
-      console.warn("Échec vidéo+audio, tentative audio seul...", e);
+      console.warn("VC: Erreur caméra, repli micro seul...", e);
       try {
-        // Tentative 2: Audio seul (plus de chances de marcher)
         this.localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
         this.isVideoOff = true;
       } catch (e2) {
-        console.error("Échec total d'accès média", e2);
-        this.connectionStatus = 'Erreur: Accès caméra/micro refusé';
+        console.error("VC: Accès média impossible !");
+        this.connectionStatus = 'Erreur: Accès refusé';
         return;
       }
     }
 
     if (this.localStream) {
-      this.localVideo.nativeElement.srcObject = this.localStream;
+      if (this.localVideo) this.localVideo.nativeElement.srcObject = this.localStream;
       this.connectionStatus = 'Prêt';
->>>>>>> Stashed changes
     }
   }
 
@@ -151,24 +147,20 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
+        const senderId = this.currentUser?.id ? this.currentUser.id.toString() : 'unknown';
         this.videoCallService.sendSignal(this.roomId, {
           type: 'ice-candidate',
-          senderId: this.currentUser.id.toString(),
+          senderId: senderId,
           data: event.candidate
         });
       }
     };
 
     this.peerConnection.ontrack = (event) => {
-<<<<<<< Updated upstream
+      console.log('VC: --- Flux audio/vidéo distant reçu ! ---');
       if (this.remoteVideo) {
         this.remoteVideo.nativeElement.srcObject = event.streams[0];
-=======
-      console.log('--- Flux audio/vidéo distant reçu ! ---');
-      if (this.remoteVideo) {
-        this.remoteVideo.nativeElement.srcObject = event.streams[0];
-        this.remoteVideo.nativeElement.volume = 1.0; // S'assurer que le son n'est pas à 0
->>>>>>> Stashed changes
+        this.remoteVideo.nativeElement.volume = 1.0;
         this.connectionStatus = 'Connecté';
       }
     };
@@ -181,52 +173,30 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
 
   public async startCall() {
-<<<<<<< Updated upstream
-=======
-    console.log('--- Démarrage de l\'appel (OFFER) ---');
->>>>>>> Stashed changes
+    console.log('VC: --- Initiation de l\'appel WebRTC ---');
     this.createPeerConnection();
     const offer = await this.peerConnection!.createOffer();
     await this.peerConnection!.setLocalDescription(offer);
 
+    const senderId = this.currentUser?.id ? this.currentUser.id.toString() : 'unknown';
     this.videoCallService.sendSignal(this.roomId, {
       type: 'offer',
-      senderId: this.currentUser.id.toString(),
+      senderId: senderId,
       data: offer
     });
     this.connectionStatus = 'Appel en cours...';
   }
 
   private async handleSignalMessage(msg: SignalMessage) {
-<<<<<<< Updated upstream
-    if (msg.senderId === this.currentUser.id.toString()) return;
+    const myId = this.currentUser?.id ? this.currentUser.id.toString() : '';
+    if (!msg || msg.senderId === myId) return;
+    
+    console.log('VC REÇU:', msg.type);
 
-    if (msg.type === 'offer') {
-      this.createPeerConnection();
-      await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(msg.data));
-      const answer = await this.peerConnection!.createAnswer();
-      await this.peerConnection!.setLocalDescription(answer);
-
-      this.videoCallService.sendSignal(this.roomId, {
-        type: 'answer',
-        senderId: this.currentUser.id.toString(),
-        data: answer
-      });
-    } else if (msg.type === 'answer') {
-      await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(msg.data));
-    } else if (msg.type === 'ice-candidate') {
-      try {
-        await this.peerConnection?.addIceCandidate(new RTCIceCandidate(msg.data));
-      } catch (e) {
-        console.error('Erreur ajout ICE candidate', e);
-      }
-=======
-    if (!msg || msg.senderId === this.currentUser.id.toString()) return;
-    console.log(' Signal reçu:', msg.type, 'de', msg.senderId, 'Données:', msg.data);
-
-    if (!msg.data) {
-      console.warn('Signal reçu sans données, ignorer.');
-      return;
+    // On s'assure que si les données sont un string (cas possible de transformation backend), on le parse.
+    let dataPayload = msg.data;
+    if (typeof msg.data === 'string' && (msg.type === 'offer' || msg.type === 'answer' || msg.type === 'ice-candidate')) {
+       try { dataPayload = JSON.parse(msg.data); } catch (e) {}
     }
 
     try {
@@ -234,32 +204,27 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         this.processJoin(msg);
       } else if (msg.type === 'leave') {
         this.participants.delete(msg.senderId);
-        console.log(`Utilisateur ${msg.senderId} a quitté.`);
       } else if (msg.type === 'offer') {
-        console.log('-> Réception d\'une OFFER, création de l\'ANSWER...');
+        console.log('VC: Réception OFFER, envoi ANSWER...');
         this.createPeerConnection();
-        await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(msg.data));
+        await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(dataPayload));
         const answer = await this.peerConnection!.createAnswer();
         await this.peerConnection!.setLocalDescription(answer);
-
         this.videoCallService.sendSignal(this.roomId, {
           type: 'answer',
-          senderId: this.currentUser.id.toString(),
+          senderId: myId,
           data: answer
         });
-        console.log('-> ANSWER envoyée.');
       } else if (msg.type === 'answer') {
-        console.log('-> ANSWER reçue, finalisation de la connexion.');
-        await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(msg.data));
+        console.log('VC: Réception ANSWER, connexion établie.');
+        await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(dataPayload));
       } else if (msg.type === 'ice-candidate') {
-        if (this.peerConnection && msg.data && msg.data.candidate) {
-          await this.peerConnection.addIceCandidate(new RTCIceCandidate(msg.data));
-          console.log('-> ICE Candidate ajouté avec succès.');
+        if (this.peerConnection && dataPayload && dataPayload.candidate) {
+          await this.peerConnection.addIceCandidate(new RTCIceCandidate(dataPayload));
         }
       }
     } catch (e) {
-      console.error('Erreur lors du traitement du signal WebRTC:', e);
->>>>>>> Stashed changes
+      console.error('VC RTC Error:', e);
     }
   }
 

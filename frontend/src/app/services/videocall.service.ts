@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Client, Message } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 export interface SignalMessage {
   type: string;
@@ -23,23 +23,31 @@ export class VideoCallService {
   constructor() {}
 
   public connect(userId: string): void {
+    if (this.stompClient?.connected) return; // Déjà connecté
+
+    console.log('WS: Connexion pour user:', userId);
     const socket = new SockJS(`http://localhost:8080/ws?userId=${userId}`);
     this.stompClient = new Client({
       webSocketFactory: () => socket,
-      debug: (msg) => console.log(msg),
+      debug: (msg) => console.log('STOMP Debug:', msg),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     });
 
     this.stompClient.onConnect = (frame) => {
-      console.log('Connected to Stomp: ' + frame);
+      console.log('WS: Connecté avec succès !');
       this.isConnected$.next(true);
     };
 
     this.stompClient.onStompError = (frame) => {
-      console.error('Broker reported error: ' + frame.headers['message']);
-      console.error('Additional details: ' + frame.body);
+      console.error('WS Error:', frame);
+      this.isConnected$.next(false);
+    };
+
+    this.stompClient.onWebSocketClose = () => {
+      console.warn('WS: Déconnecté.');
+      this.isConnected$.next(false);
     };
 
     this.stompClient.activate();
@@ -47,30 +55,27 @@ export class VideoCallService {
 
   public subscribe(roomId: string): void {
     if (this.stompClient && this.stompClient.connected) {
+      console.log('WS: Souscription au topic /topic/call/' + roomId);
       this.stompClient.subscribe(`/topic/call/${roomId}`, (message: Message) => {
         const signal: SignalMessage = JSON.parse(message.body);
+        console.log('WS SIGNAL REÇU:', signal.type, 'de', signal.senderId);
         this.signalSubject.next(signal);
       });
+    } else {
+      console.error('WS: Impossible de souscrire, non connecté.');
     }
   }
 
-<<<<<<< Updated upstream
-  public sendSignal(roomId: string, signal: SignalMessage): void {
-    if (this.stompClient && this.stompClient.connected) {
-      this.stompClient.publish({
-        destination: `/app/call/${roomId}`,
-        body: JSON.stringify(signal)
-      });
-=======
   public sendSignal(roomId: string, message: any) {
     if (this.stompClient && this.stompClient.connected) {
+      // Envoi direct sur le broker pour éviter toute perte de données par le Java
       this.stompClient.publish({
         destination: `/topic/call/${roomId}`,
         body: JSON.stringify(message)
       });
+      console.log('WS SIGNAL ENVOYÉ:', message.type);
     } else {
-      console.error("Impossible d'envoyer le signal : client déconnecté.");
->>>>>>> Stashed changes
+      console.error("WS: Échec envoi signal - client déconnecté.");
     }
   }
 

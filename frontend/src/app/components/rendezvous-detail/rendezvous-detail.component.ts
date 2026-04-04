@@ -58,9 +58,9 @@ export class RendezVousDetailComponent implements OnInit {
     return statut ? map[statut] ?? 'bg-secondary' : 'bg-secondary';
   }
 
-  doDelete(): void {
-    if (this.rv?.id) {
-      this.service.delete(this.rv.id).subscribe({
+  deleteRv(id: number): void {
+    if (confirm('Voulez-vous vraiment supprimer ce rendez-vous ?')) {
+      this.service.delete(id).subscribe({
         next: () => this.router.navigate(['/rendezvous']),
         error: () => { this.error = 'Erreur lors de la suppression.'; }
       });
