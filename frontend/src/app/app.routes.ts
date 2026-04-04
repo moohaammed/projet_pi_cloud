@@ -134,8 +134,14 @@ export const routes: Routes = [
     component: GestionPatientRoleComponent,
     canActivate: [authGuard]
   },
+  // ===== EXISTANT =====
+  { path: 'collaboration', component: CommunicationTestComponent },
 
-  // --- Routes de l'ami (Rendez-vous) ---
+  // --- Dashboards ---
+  { path: 'patient-dashboard', component: PatientDashboardComponent },
+  { path: 'medecin-dashboard', component: MedecinDashboardComponent },
+
+  // --- Routes Rendez-vous ---
   { path: 'rendezvous', component: RendezVousListComponent },
   { path: 'rendezvous/new', component: RendezVousFormComponent },
   { path: 'rendezvous/:id', component: RendezVousDetailComponent },
