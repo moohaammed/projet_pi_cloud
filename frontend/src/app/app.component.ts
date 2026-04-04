@@ -1,13 +1,27 @@
-import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterModule, CommonModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'frontend';
+  title = 'MediSync';
+  navOpen = false;
+  auth = inject(AuthService);
+
+  getAccountLink(): string {
+    const role = this.auth.getRole();
+    if (role === 'DOCTOR') {
+      return '/medecin-dashboard';
+    } else if (role === 'PATIENT') {
+      return '/patient-dashboard';
+    }
+    return '/';
+  }
 }

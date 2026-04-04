@@ -1,17 +1,105 @@
-<nav style="background: #2c3e50; padding: 1rem; color: white; display: flex; justify-content: space-between; align-items: center;">
-  <span style="font-size: 1.2rem; font-weight: bold;">
-    360° Alzheimer Support Platform
-  </span>
+<!-- Start Topbar -->
+<div class="topbar d-none d-lg-block py-3">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-4 col-lg-3 col-xl-4">
+        <a routerLink="/" class="headerLogo">
+          <img src="template/assets/img/logo.png" alt="Logo" height="40">
+        </a>
+      </div>
+      <div class="col-md-8 col-lg-9 col-xl-8 d-none d-md-block">
+        <div class="d-flex justify-content-end">
+          <div class="d-flex align-items-center help-info">
+            <div class="flex-shrink-0 icon">
+              <i class="fa-clock fa-solid fs-30 text-primary"></i>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="fw-bold help-info__title mb-0">MON - FRI: 08:00AM - 20:00PM</h6>
+              <p class="sub-text mb-0">Saturday and Sunday - <span class="fw-semibold text-danger">CLOSED</span></p>
+            </div>
+          </div>
+          <div class="d-flex align-items-center help-info ms-4">
+            <div class="flex-shrink-0 icon">
+              <i class="fa-solid fa-mobile-button fs-30 text-primary"></i>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="fw-bold help-info__title mb-0">+ 0800 2466 7921</h6>
+              <p class="sub-text mb-0">Contact Us For Help</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /.End Topbar -->
 
-  <div>
-    <a routerLink="/" style="color: white; margin-right: 20px; text-decoration: none;">Home</a>
-    <!--<a routerLink="/events" style="color: white; margin-right: 20px; text-decoration: none;">Evénements</a> -->
-   <!-- <a routerLink="/activities" style="color: white; margin-right: 20px; text-decoration: none;">Activities</a>-->
-    <a routerLink="/education" style="color: white; margin-right: 20px; text-decoration: none;">Education</a>
-    <a routerLink="/eventfront" style="color: white; margin-right: 20px; text-decoration: none;">liste des évènements</a>
-    <a routerLink="/collaboration" style="color: white; text-decoration: none; font-weight: bold;">Collaboration Hub</a>
+<!-- Start Navbar -->
+<nav class="custom-navbar navbar navbar-expand-lg sticky-top no-logo bg-white shadow-sm">
+  <div class="container">
+    <a class="border-end navbar-brand pe-3 pe-sm-4 py-0" routerLink="/"> 
+      <img class="logo-dark" src="template/assets/img/logo.png" alt="MediSync" height="30">
+    </a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/rendezvous" routerLinkActive="active">Rendez-vous</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/education" routerLinkActive="active">Education</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/eventfront" routerLinkActive="active">Évènements</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-primary" routerLink="/collaboration" routerLinkActive="active">Collaboration Hub</a>
+        </li>
+        <li class="nav-item" *ngIf="auth.isLoggedIn()">
+          <a class="nav-link fw-bold text-success" [routerLink]="getAccountLink()" routerLinkActive="active">Compte</a>
+        </li>
+      </ul>
+      
+      <div class="d-flex ms-lg-5">
+        <a routerLink="/rendezvous/new" class="btn btn-primary ms-2 ms-xl-0">
+          <i class="fa-solid fa-calendar-plus me-2"></i>Nouveau RDV
+        </a>
+      </div>
+    </div>
   </div>
 </nav>
+<!-- /.End of navbar -->
 
-<main style="padding: 20px;">
+<main>
   <router-outlet></router-outlet>
+</main>
+
+<footer class="main-footer footer-dark pt-5 mt-5 bg-dark text-white">
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-lg-4">
+        <img src="template/assets/img/logo-white.png" alt="Logo White" height="40" class="mb-3">
+        <p class="text-muted">360° Alzheimer Support Platform & MediSync — La solution complète pour le suivi médical et le soutien aux familles.</p>
+      </div>
+      <div class="col-lg-4 ms-auto">
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a routerLink="/rendezvous" class="text-muted text-decoration-none">Gestion Rendez-vous</a></li>
+          <li><a routerLink="/education" class="text-muted text-decoration-none">Espace Education</a></li>
+          <li><a routerLink="/collaboration" class="text-muted text-decoration-none">Hub Collaboration</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="mt-4 border-secondary">
+    <div class="text-center pb-3">
+      <p class="mb-0 text-muted small">© 2026 Alzheimer Support Platform. Tous droits réservés.</p>
+    </div>
+  </div>
+</footer>

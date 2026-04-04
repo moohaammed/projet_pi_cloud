@@ -2,17 +2,24 @@ package esprit.tn.backpi.services.collaboration;
 
 import esprit.tn.backpi.dto.collaboration.MessageCreateDto;
 import esprit.tn.backpi.dto.collaboration.MessageResponseDto;
-import esprit.tn.backpi.entities.User;
+import esprit.tn.backpi.dto.collaboration.PollOptionResponseDto;
 import esprit.tn.backpi.entities.collaboration.ChatGroup;
 import esprit.tn.backpi.entities.collaboration.Message;
-import esprit.tn.backpi.repositories.UserRepository;
+import esprit.tn.backpi.entities.collaboration.MessagePollOption;
+import esprit.tn.backpi.entities.collaboration.MessageType;
+import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repositories.collaboration.ChatGroupRepository;
+import esprit.tn.backpi.repositories.collaboration.MessagePollOptionRepository;
 import esprit.tn.backpi.repositories.collaboration.MessageRepository;
+import esprit.tn.backpi.repository.UserRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,13 +33,16 @@ public class MessageService {
     private final UserRepository userRepository;
     private final ChatGroupRepository chatGroupRepository;
 
+    private final MessagePollOptionRepository pollOptionRepository;
+
     public MessageService(MessageRepository messageRepository,
                           SimpMessagingTemplate messagingTemplate,
                           SentimentAnalysisService sentimentAnalysisService,
                           CareBotService careBotService,
                           NotificationService notificationService,
                           UserRepository userRepository,
-                          ChatGroupRepository chatGroupRepository) {
+                          ChatGroupRepository chatGroupRepository,
+                          MessagePollOptionRepository pollOptionRepository) {
         this.messageRepository = messageRepository;
         this.messagingTemplate = messagingTemplate;
         this.sentimentAnalysisService = sentimentAnalysisService;
@@ -40,6 +50,7 @@ public class MessageService {
         this.notificationService = notificationService;
         this.userRepository = userRepository;
         this.chatGroupRepository = chatGroupRepository;
+        this.pollOptionRepository = pollOptionRepository;
     }
 
     public List<MessageResponseDto> getAllMessages() {
@@ -49,7 +60,14 @@ public class MessageService {
     }
 
     public List<MessageResponseDto> getMessagesByGroup(Long groupId) {
-        List<Message> msgs = messageRepository.findByChatGroupId(groupId);
+        List<Message> msgs = messageRepository.findByChatGroupIdOrderBySentAtDesc(groupId);
+        return msgs.stream()
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<MessageResponseDto> getDirectMessages(Long userId1, Long userId2) {
+        List<Message> msgs = messageRepository.findDirectMessages(userId1, userId2);
         return msgs.stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
@@ -85,6 +103,21 @@ public class MessageService {
         message.setSentAt(Instant.now());
         message.setMediaUrl(mediaUrl);
         message.setMimeType(mimeType);
+        
+        if (dto.getType() != null) {
+            message.setType(dto.getType());
+            if (dto.getType() == MessageType.POLL) {
+                message.setPollQuestion(dto.getPollQuestion());
+                if (dto.getPollOptions() != null) {
+                    for (String optionContent : dto.getPollOptions()) {
+                        MessagePollOption opt = new MessagePollOption();
+                        opt.setText(optionContent);
+                        opt.setMessage(message);
+                        message.getPollOptions().add(opt);
+                    }
+                }
+            }
+        }
  
         if (dto.getParentMessageId() != null) {
             Message parent = messageRepository.findById(dto.getParentMessageId())
@@ -98,6 +131,9 @@ public class MessageService {
 
         Message savedObj = messageRepository.save(message);
         MessageResponseDto responseDto = mapToResponseDto(savedObj);
+
+        // ── @mention detection ─────────────────────────────────────────────
+        processMentions(savedObj.getContent(), sender);
 
         // Broadcast to group WebSocket topic
         if (savedObj.getChatGroup() != null) {
@@ -186,10 +222,12 @@ public class MessageService {
         dto.setSentAt(message.getSentAt());
         dto.setDistressed(message.isDistressed());
         dto.setSentimentScore(message.getSentimentScore());
+        dto.setPinned(message.isPinned());
+        dto.setViewedByUserIds(message.getViewedByUserIds());
 
         if (message.getSender() != null) {
             dto.setSenderId(message.getSender().getId());
-            dto.setSenderName(message.getSender().getName());
+            dto.setSenderName(message.getSender().getNom());
         }
 
         if (message.getReceiver() != null) {
@@ -204,10 +242,124 @@ public class MessageService {
             dto.setParentMessageId(message.getParentMessage().getId());
             dto.setParentMessageContent(message.getParentMessage().getContent());
             if (message.getParentMessage().getSender() != null) {
-                dto.setParentMessageSenderName(message.getParentMessage().getSender().getName());
+                dto.setParentMessageSenderName(message.getParentMessage().getSender().getNom());
             }
         }
 
+        dto.setType(message.getType());
+        dto.setPollQuestion(message.getPollQuestion());
+        if (message.getPollOptions() != null) {
+            dto.setPollOptions(message.getPollOptions().stream()
+                .map(opt -> {
+                    PollOptionResponseDto optDto = new PollOptionResponseDto();
+                    optDto.setId(opt.getId());
+                    optDto.setText(opt.getText());
+                    optDto.setVotes(opt.getVoterIds().size());
+                    optDto.setVoterIds(opt.getVoterIds());
+                    return optDto;
+                }).collect(Collectors.toList()));
+        }
+
         return dto;
+    }
+
+    public MessageResponseDto voteOnPoll(Long messageId, Long userId, Long optionId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+
+        if (message.getType() != MessageType.POLL) {
+            throw new RuntimeException("Message is not a poll");
+        }
+
+        // Remove user's previous votes on this poll
+        for (MessagePollOption opt : message.getPollOptions()) {
+            opt.getVoterIds().remove(userId);
+            opt.setVotesCount(opt.getVoterIds().size());
+        }
+
+        // Add new vote
+        MessagePollOption selectedOption = message.getPollOptions().stream()
+                .filter(opt -> opt.getId().equals(optionId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Option not found"));
+        
+        selectedOption.getVoterIds().add(userId);
+        selectedOption.setVotesCount(selectedOption.getVoterIds().size());
+
+        Message saved = messageRepository.save(message);
+        MessageResponseDto responseDto = mapToResponseDto(saved);
+
+        // Broadcast update
+        if (saved.getChatGroup() != null) {
+            messagingTemplate.convertAndSend("/topic/group/" + saved.getChatGroup().getId(), responseDto);
+        } else if (saved.getReceiver() != null) {
+            messagingTemplate.convertAndSendToUser(saved.getReceiver().getId().toString(), "/queue/direct", responseDto);
+            messagingTemplate.convertAndSendToUser(saved.getSender().getId().toString(), "/queue/direct", responseDto);
+        }
+
+        return responseDto;
+    }
+    public MessageResponseDto togglePin(Long messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+        message.setPinned(!message.isPinned());
+        Message saved = messageRepository.save(message);
+        MessageResponseDto responseDto = mapToResponseDto(saved);
+        
+        // Broadcast update via WebSocket
+        if (saved.getChatGroup() != null) {
+            messagingTemplate.convertAndSend("/topic/group/" + saved.getChatGroup().getId(), responseDto);
+        } else if (saved.getReceiver() != null) {
+            messagingTemplate.convertAndSendToUser(saved.getReceiver().getId().toString(), "/queue/direct", responseDto);
+            messagingTemplate.convertAndSendToUser(saved.getSender().getId().toString(), "/queue/direct", responseDto);
+        }
+        
+        return responseDto;
+    }
+
+    /**
+     * Parses @Name tokens from the message content and sends a TAG_MENTION
+     * notification to each matched user (excluding the sender).
+     */
+    private void processMentions(String content, User sender) {
+        if (content == null || !content.contains("@")) return;
+
+        // Regex to match @Name patterns (supports accents, dots, dashes, etc.)
+        Pattern mentionPattern = Pattern.compile("@([a-zA-Z0-9À-ÿ._-]+(?:\\s[a-zA-Z0-9À-ÿ._-]+)*)");
+        Matcher matcher = mentionPattern.matcher(content);
+
+        while (matcher.find()) {
+            String fullName = matcher.group(1).trim();
+            String currentTry = fullName;
+            boolean found = false;
+
+            while (!currentTry.isEmpty()) {
+                // Remove trailing punctuation and trim
+                String cleanName = currentTry.replaceAll("[.,!?;:]+$", "").trim();
+                
+                Optional<User> userOpt = userRepository.findByFullName(cleanName);
+                if (userOpt.isPresent()) {
+                    User tagged = userOpt.get();
+                    if (!tagged.getId().equals(sender.getId())) {
+                        String senderLabel = sender.getNom() != null ? sender.getNom() : "User " + sender.getId();
+                        notificationService.createAndSend(
+                            tagged.getId(),
+                            senderLabel + " tagged you in a message",
+                            "TAG_MENTION"
+                        );
+                    }
+                    found = true;
+                    break;
+                }
+
+                // Peel off the last word
+                int lastSpace = currentTry.lastIndexOf(' ');
+                if (lastSpace != -1) {
+                    currentTry = currentTry.substring(0, lastSpace);
+                } else {
+                    currentTry = "";
+                }
+            }
+        }
     }
 }
