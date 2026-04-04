@@ -18,13 +18,6 @@ import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard
 import { MedecinDashboardComponent } from './medecin-dashboard/medecin-dashboard.component';
 
 export const routes: Routes = [
-<<<<<<< HEAD
-    { path: 'collaboration', component: CommunicationTestComponent },
-    { path: 'events', component: EventListComponent },
-    { path: 'activities', component: ActivityListComponent },
-    { path: 'education', component: EducationComponent },
-    { path: 'eventfront', component: EventFrontComponent }
-=======
 
   // ===== AUTH AlzCare =====
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -99,14 +92,14 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // ===== EXISTANT (inchangé) =====
+  // ===== EXISTANT =====
   { path: 'collaboration', component: CommunicationTestComponent },
 
   // --- Dashboards ---
   { path: 'patient-dashboard', component: PatientDashboardComponent },
   { path: 'medecin-dashboard', component: MedecinDashboardComponent },
 
-  // --- Routes de l'ami (Rendez-vous) ---
+  // --- Routes Rendez-vous ---
   { path: 'rendezvous', component: RendezVousListComponent },
   { path: 'rendezvous/new', component: RendezVousFormComponent },
   { path: 'rendezvous/:id', component: RendezVousDetailComponent },
@@ -119,5 +112,4 @@ export const routes: Routes = [
   { path: 'eventfront', component: EventFrontComponent },
 
   { path: '**', redirectTo: 'auth/login' }
->>>>>>> 5945078a5eefea0e1d3189a2b6f8a96385fdadb8
 ];
