@@ -54,12 +54,23 @@ export class VideoCallService {
     }
   }
 
+<<<<<<< Updated upstream
   public sendSignal(roomId: string, signal: SignalMessage): void {
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.publish({
         destination: `/app/call/${roomId}`,
         body: JSON.stringify(signal)
       });
+=======
+  public sendSignal(roomId: string, message: any) {
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.publish({
+        destination: `/topic/call/${roomId}`,
+        body: JSON.stringify(message)
+      });
+    } else {
+      console.error("Impossible d'envoyer le signal : client déconnecté.");
+>>>>>>> Stashed changes
     }
   }
 

@@ -1,5 +1,6 @@
 .video-call-overlay {
   position: fixed;
+<<<<<<< Updated upstream
   top: 0;
   left: 0;
   right: 0;
@@ -123,4 +124,127 @@
 
 .btn-hangup:hover {
   background: #b91c1c;
+=======
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(15px);
+}
+
+.participants-list {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 200px;
+  z-index: 10001;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.badge-online {
+  width: 8px;
+  height: 8px;
+  background: #2ecc71;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #2ecc71;
+}
+
+.call-container {
+  width: 90vw;
+  height: 85vh;
+  background: #111;
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-wrapper {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.remote-placeholder {
+  position: absolute;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.local-video-pip {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 240px;
+  height: 160px;
+  border-radius: 16px;
+  border: 2px solid #fff;
+  overflow: hidden;
+}
+
+.controls-bar {
+  background: rgba(18, 18, 18, 0.8);
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.pulse-loader {
+  width: 60px;
+  height: 60px;
+  background: #006be6;
+  border-radius: 50%;
+  box-shadow: 0 0 0 rgba(0, 107, 230, 0.4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 107, 230, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(0, 107, 230, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 107, 230, 0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+>>>>>>> Stashed changes
 }

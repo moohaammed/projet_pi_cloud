@@ -1,4 +1,5 @@
 <div class="video-call-overlay">
+<<<<<<< Updated upstream
   <div class="video-call-container shadow-2xl">
     <div class="main-video-area">
       <!-- Remote Video (Big) -->
@@ -8,10 +9,41 @@
       <!-- Local Video (Picture in Picture) -->
       <div class="local-video-container shadow-lg">
         <video #localVideo autoplay playsinline muted class="local-video"></video>
+=======
+  <!-- Liste des participants en haut à gauche -->
+  <div class="participants-list shadow-lg animate-fade-in" *ngIf="participants.size > 0">
+    <div class="d-flex align-items-center mb-3">
+      <i class="fas fa-users text-white-50 me-2"></i>
+      <h6 class="text-white mb-0">Participants ({{ participants.size }})</h6>
+    </div>
+    <div *ngFor="let p of participants | keyvalue" class="participant-item">
+      <div class="badge-online me-2"></div>
+      <span class="text-white-50 small me-1">#{{ p.key }}</span>
+      <span class="text-white fw-bold">{{ p.value }}</span>
+    </div>
+  </div>
+
+  <div class="call-container shadow-lg animate-fade-in">
+    <!-- Main Video (Remote) -->
+    <div class="video-wrapper remote-video">
+      <video #remoteVideo autoplay playsinline class="w-100 h-100"></video>
+      <div class="remote-placeholder" *ngIf="connectionStatus !== 'Connecté'">
+        <div class="pulse-loader mb-3"></div>
+        <span>{{ connectionStatus }}</span>
+      </div>
+      
+      <!-- Local Video (Picture-in-Picture) -->
+      <div class="local-video-pip shadow">
+        <video #localVideo autoplay playsinline [muted]="true"></video>
+        <div class="overlay-icons" *ngIf="isVideoOff">
+          <i class="fa-solid fa-video-slash text-danger"></i>
+        </div>
+>>>>>>> Stashed changes
       </div>
     </div>
 
     <!-- Controls Bar -->
+<<<<<<< Updated upstream
     <div class="controls-bar d-flex justify-content-center align-items-center gap-4">
       <button class="btn btn-control" [class.btn-danger]="isMuted" (click)="toggleMute()">
         <i class="fa-solid" [class.fa-microphone]="!isMuted" [class.fa-microphone-slash]="isMuted"></i>
@@ -27,6 +59,27 @@
 
       <button class="btn btn-danger btn-hangup" (click)="hangup()">
         <i class="fa-solid fa-phone-slash me-2"></i> Raccrocher
+=======
+    <div class="controls-bar py-3 px-4 d-flex justify-content-center gap-3">
+      <button [class]="isMuted ? 'btn btn-danger btn-circle shadow' : 'btn btn-dark btn-outline-light btn-circle shadow'" (click)="toggleMute()">
+        <i [class]="isMuted ? 'fa-solid fa-microphone-slash' : 'fa-solid fa-microphone'"></i>
+      </button>
+      
+      <button [class]="isVideoOff ? 'btn btn-danger btn-circle shadow' : 'btn btn-dark btn-outline-light btn-circle shadow'" (click)="toggleVideo()">
+        <i [class]="isVideoOff ? 'fa-solid fa-video-slash' : 'fa-solid fa-video'"></i>
+      </button>
+
+      <button class="btn btn-primary d-flex align-items-center gap-2 px-4 rounded-pill shadow" 
+              *ngIf="connectionStatus.includes('Prêt')" 
+              (click)="startCall()">
+        <i class="fa-solid fa-phone-flip"></i>
+        DÉMARRER L'APPEL
+      </button>
+
+      <button class="btn btn-danger d-flex align-items-center gap-2 px-4 rounded-pill shadow" (click)="hangup()">
+        <i class="fa-solid fa-phone-slash"></i>
+        RACCROCHER
+>>>>>>> Stashed changes
       </button>
     </div>
   </div>

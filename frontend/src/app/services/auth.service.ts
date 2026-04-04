@@ -28,10 +28,16 @@ export class AuthService {
   }
 
   login(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
+    return this.http.post(`${this.apiUrl}/login`, data, { responseType: 'text' }).pipe(
       tap(res => {
-        if (this.isBrowser) {
-          localStorage.setItem('user', JSON.stringify(res));
+        let user;
+        try {
+          user = JSON.parse(res);
+        } catch (e) {
+          user = res; // C'est peut-être juste un message
+        }
+        if (this.isBrowser && typeof user === 'object') {
+          localStorage.setItem('user', JSON.stringify(user));
         }
         this.loggedIn$.next(true);
       })
@@ -39,10 +45,16 @@ export class AuthService {
   }
 
   register(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, data).pipe(
+    return this.http.post(`${this.apiUrl}/register`, data, { responseType: 'text' }).pipe(
       tap(res => {
-        if (this.isBrowser) {
-          localStorage.setItem('user', JSON.stringify(res));
+        let user;
+        try {
+          user = JSON.parse(res);
+        } catch (e) {
+          user = res;
+        }
+        if (this.isBrowser && typeof user === 'object') {
+          localStorage.setItem('user', JSON.stringify(user));
         }
         this.loggedIn$.next(true);
       })

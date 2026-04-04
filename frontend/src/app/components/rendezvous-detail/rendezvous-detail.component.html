@@ -104,8 +104,15 @@
 
           <!-- Actions -->
           <div class="d-flex flex-wrap gap-3 mt-5 pt-4 border-top">
+<<<<<<< Updated upstream
             <button class="btn btn-warning px-4 py-2 rounded-pill fw-bold shadow-sm"
               [routerLink]="['/rendezvous', rv.id, 'edit']">
+=======
+            <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="showVideoCall = true">
+              <i class="fa-solid fa-video me-2"></i>Lancer l'Appel
+            </button>
+            <button class="btn btn-warning px-4 py-2 rounded-pill fw-bold shadow-sm" [routerLink]="['/rendezvous', rv.id, 'edit']">
+>>>>>>> Stashed changes
               <i class="fa-solid fa-pen-to-square me-2"></i>Modifier
             </button>
             <button class="btn btn-info text-white px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="toggleVideoCall()">
@@ -145,6 +152,14 @@
   </div>
 </div>
 
+<<<<<<< Updated upstream
 <!-- Video Call Overlay -->
 <app-videocall *ngIf="showVideoCall && rv" [roomId]="rv.id ? rv.id.toString() : ''" (closeCall)="showVideoCall = false">
 </app-videocall>
+=======
+<!-- Interface d'appel vidéo (Overlay) -->
+<app-videocall *ngIf="showVideoCall" 
+               [roomId]="rv!.id!.toString()" 
+               (closeCall)="showVideoCall = false">
+</app-videocall>
+>>>>>>> Stashed changes
