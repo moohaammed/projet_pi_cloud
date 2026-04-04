@@ -92,14 +92,14 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // ===== EXISTANT (inchangé) =====
+  // ===== EXISTANT =====
   { path: 'collaboration', component: CommunicationTestComponent },
 
   // --- Dashboards ---
   { path: 'patient-dashboard', component: PatientDashboardComponent },
   { path: 'medecin-dashboard', component: MedecinDashboardComponent },
 
-  // --- Routes de l'ami (Rendez-vous) ---
+  // --- Routes Rendez-vous ---
   { path: 'rendezvous', component: RendezVousListComponent },
   { path: 'rendezvous/new', component: RendezVousFormComponent },
   { path: 'rendezvous/:id', component: RendezVousDetailComponent },
