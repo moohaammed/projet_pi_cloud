@@ -8,7 +8,7 @@ import { CommunicationTestComponent } from './components/collaboration/communica
 export const routes: Routes = [
     { path: 'collaboration', component: CommunicationTestComponent },
     { path: 'events', component: EventListComponent },
-     { path: 'activities', component: ActivityListComponent },
-      {  path: 'education', component: EducationComponent },
-       { path: 'eventfront', component: EventFrontComponent }
+    { path: 'activities', component: ActivityListComponent },
+    { path: 'education', component: EducationComponent },
+    { path: 'eventfront', component: EventFrontComponent }
 ];
