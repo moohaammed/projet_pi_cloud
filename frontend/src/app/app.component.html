@@ -35,16 +35,6 @@
             style="letter-spacing: 1.5px; opacity: 0.7;" *ngIf="!isSidebarCollapsed">Admin Portal</p>
           <ul class="nav flex-column gap-2 w-100 pb-3">
 
-            <li class="nav-item w-100">
-              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/home" routerLinkActive="active-purple fw-semibold shadow-sm"
-                [routerLinkActiveOptions]="{exact:true}" style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Home Portal' : ''">
-                <i class="fa-solid fa-house fs-5" [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Home Portal</span>
-              </a>
-            </li>
 
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
@@ -64,6 +54,16 @@
                 <i class="fa-solid fa-comments fs-5" [class.me-3]="!isSidebarCollapsed"
                   [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Collaboration</span>
+              </a>
+            </li>
+
+            <li class="nav-item w-100">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/admin/rendezvous" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Rendez-vous' : ''">
+                <i class="fa-solid fa-calendar-check fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Rendez-Vous</span>
               </a>
             </li>
 
@@ -250,13 +250,13 @@
   style="z-index: 9999; max-width: min(520px, 94vw);">
   <i class="fa-solid fa-video text-success fs-5"></i>
   <span class="fw-medium flex-grow-1">{{ inv.callerName }} is calling…</span>
-  <button type="button" class="btn btn-success btn-sm rounded-pill px-3" (click)="acceptIncomingVideoCall()">Accept</button>
-  <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3" (click)="declineIncomingVideoCall()">Decline</button>
+  <button type="button" class="btn btn-success btn-sm rounded-pill px-3"
+    (click)="acceptIncomingVideoCall()">Accept</button>
+  <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3"
+    (click)="declineIncomingVideoCall()">Decline</button>
 </div>
 
 <!-- GLOBAL VIDEO CALL OVERLAY -->
-<app-videocall
-  *ngIf="showVideoCall() && videoCallRoomId()"
-  [roomId]="videoCallRoomId()"
+<app-videocall *ngIf="showVideoCall() && videoCallRoomId()" [roomId]="videoCallRoomId()"
   (closeCall)="closeGlobalVideoCall()">
 </app-videocall>
