@@ -54,8 +54,6 @@ export class AppComponent {
   }
 
   isLoggedIn(): boolean {
-    return this.authService.isLoggedIn();
-
-
+    return this.auth.isLoggedIn();
   }
 }
