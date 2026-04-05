@@ -110,6 +110,10 @@ export const routes: Routes = [
       {
         path: 'collaboration',
         loadComponent: () => import('./components/collaboration/admin-collaboration-dashboard/admin-collaboration-dashboard.component').then(m => m.AdminCollaborationDashboardComponent)
+      },
+      {
+        path: 'rendezvous',
+        loadComponent: () => import('./components/dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
       }
     ]
   },
