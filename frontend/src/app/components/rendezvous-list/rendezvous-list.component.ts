@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RendezVous, StatutRendezVous } from '../../models/rendezvous.model';
 import { RendezVousService } from '../../services/rendezvous.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-rendezvous-list',
@@ -21,6 +22,7 @@ export class RendezVousListComponent implements OnInit {
   searchMedecinId = '';
   filterStatut = '';
   deleteConfirmId: number | null = null;
+  currentUser: any = null;
 
   statutOptions: StatutRendezVous[] = ['PLANIFIE', 'CONFIRME', 'ANNULE', 'TERMINE'];
 
@@ -31,7 +33,12 @@ export class RendezVousListComponent implements OnInit {
     TERMINE: 'Terminé'
   };
 
-  constructor(private service: RendezVousService) {}
+  constructor(
+    private service: RendezVousService,
+    private authService: AuthService
+  ) {
+    this.currentUser = this.authService.getCurrentUser();
+  }
 
   ngOnInit(): void {
     this.loadAll();
@@ -54,7 +61,17 @@ export class RendezVousListComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.filteredList = this.rendezvousList.filter(rv => {
+    let baseList = this.rendezvousList;
+
+    if (this.currentUser) {
+      if (this.currentUser.role === 'DOCTOR') {
+        baseList = baseList.filter(rv => rv.medecinId === this.currentUser.id);
+      } else if (this.currentUser.role === 'PATIENT') {
+        baseList = baseList.filter(rv => rv.patientId === this.currentUser.id);
+      }
+    }
+
+    this.filteredList = baseList.filter(rv => {
       const matchPatient = this.searchPatientId === '' || rv.patientId?.toString().includes(this.searchPatientId);
       const matchMedecin = this.searchMedecinId === '' || rv.medecinId?.toString().includes(this.searchMedecinId);
       const matchStatut = this.filterStatut === '' || rv.statut === this.filterStatut;

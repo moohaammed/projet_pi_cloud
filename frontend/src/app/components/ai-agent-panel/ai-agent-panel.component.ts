@@ -59,7 +59,7 @@ export class AiAgentPanelComponent implements OnInit, OnDestroy {
   // ── Private ────────────────────────────────────────────────────────────────
   private recognition: any = null;
   private newPatientLines = 0;
-  private readonly TRIGGER = 3; // analyse after every patient utterance
+  private readonly TRIGGER = 1; // analyse after every patient utterance
 
   constructor(private cdr: ChangeDetectorRef, private zone: NgZone) { }
 

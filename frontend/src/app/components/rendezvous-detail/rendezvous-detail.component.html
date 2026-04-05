@@ -60,12 +60,13 @@
 
         <div class="card-footer bg-light p-4 px-5 border-top border-opacity-10">
           <div class="d-flex flex-wrap gap-3 align-items-center">
-            
+
             <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="showVideoCall = true">
               <i class="fa-solid fa-video me-2"></i>Lancer l'Appel
             </button>
 
-            <button class="btn btn-warning px-4 py-2 rounded-pill fw-bold shadow-sm" [routerLink]="['/rendezvous', rv.id, 'edit']">
+            <button class="btn btn-warning px-4 py-2 rounded-pill fw-bold shadow-sm"
+              [routerLink]="['/rendezvous', rv.id, 'edit']">
               <i class="fa-solid fa-pen-to-square me-2"></i>Modifier
             </button>
 
@@ -73,7 +74,8 @@
               <i class="fa-solid fa-trash-can me-2"></i>Supprimer
             </button>
 
-            <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold ms-md-auto" routerLink="/rendezvous">
+            <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold ms-md-auto"
+              routerLink="/rendezvous">
               <i class="fa-solid fa-chevron-left me-2"></i>Retour à la liste
             </button>
           </div>
@@ -84,7 +86,8 @@
 </div>
 
 <!-- Lancement de l'appel Vidéo -->
-<app-videocall *ngIf="showVideoCall && rv" [roomId]="rv.id.toString()" (closeCall)="showVideoCall = false"></app-videocall>
+<app-videocall *ngIf="showVideoCall && rv" [roomId]="rv.id.toString()"
+  (closeCall)="showVideoCall = false"></app-videocall>
 
 <!-- Delete confirm modal -->
 <div class="modal fade show" tabindex="-1" *ngIf="deleteConfirm"
@@ -96,10 +99,12 @@
           <i class="fa-solid fa-circle-exclamation fa-4x animate-bounce"></i>
         </div>
         <h3 class="fw-bold mb-3">Êtes-vous sûr ?</h3>
-        <p class="text-secondary mb-4">Voulez-vous vraiment supprimer ce rendez-vous ? Cette action est irréversible.</p>
+        <p class="text-secondary mb-4">Voulez-vous vraiment supprimer ce rendez-vous ? Cette action est irréversible.
+        </p>
         <div class="d-flex justify-content-center gap-3">
           <button class="btn btn-light px-4 rounded-pill fw-bold" (click)="deleteConfirm = false">Abandonner</button>
-          <button class="btn btn-danger px-4 rounded-pill fw-bold" *ngIf="rv" (click)="deleteRv(rv!.id)">Confirmer la suppression</button>
+          <button class="btn btn-danger px-4 rounded-pill fw-bold" *ngIf="rv" (click)="deleteRv(rv!.id)">Confirmer la
+            suppression</button>
         </div>
       </div>
     </div>
