@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -48,9 +49,13 @@ export class AppComponent {
     }
     if (role === 'DOCTOR') {
       return '/medecin-dashboard';
-    } else if (role === 'PATIENT') {
-      return '/patient-dashboard';
     }
-    return '/';
+    return '/patient-dashboard';
+  }
+
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+
+
   }
 }

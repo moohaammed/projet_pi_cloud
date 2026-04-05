@@ -17,7 +17,7 @@
 <div class="container mt-n5 position-relative z-1 mb-5">
   <div class="bg-white rounded-4 p-4 shadow-lg">
     <div class="row align-items-end g-3">
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-3 col-md-6" *ngIf="currentUser?.role !== 'PATIENT'">
         <div class="form-group">
           <label class="form-label fw-bold small text-uppercase">ID Patient</label>
           <div class="input-group">
@@ -26,7 +26,7 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-3 col-md-6" *ngIf="currentUser?.role !== 'DOCTOR'">
         <div class="form-group">
           <label class="form-label fw-bold small text-uppercase">ID Médecin</label>
           <div class="input-group">

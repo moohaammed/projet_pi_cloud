@@ -11,7 +11,7 @@ import { ActivityListComponent } from './components/education/activity/activity-
 import { EducationComponent } from './components/education/activity/education.component';
 import { EventFrontComponent } from './components/education/event/event_front';
 
-// Tes imports (Gestion Patient & Collaboration)
+// Gestion Patient & Collaboration
 import { CommunicationTestComponent } from './components/collaboration/communication-test/communication-test.component';
 import { GestionPatientRoleComponent } from './gestion-patient-role/gestion-patient-role.component';
 import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard.component';
@@ -61,7 +61,7 @@ export const routes: Routes = [
   },
 
 
-  // ===== EXISTANT (inchangé) =====
+  // ===== COLLABORATION (Avec sous-routes lazy-loadées) =====
   {
     path: 'collaboration',
     component: CommunicationTestComponent,
@@ -112,7 +112,7 @@ export const routes: Routes = [
     ]
   },
 
-  // --- Dashboard Routes ---
+  // ===== DASHBOARDS & ROLES =====
   {
     path: 'patient-dashboard',
     component: PatientDashboardComponent,
@@ -130,21 +130,18 @@ export const routes: Routes = [
   },
   // ===== EXISTANT =====
 
-  // --- Dashboards ---
-  { path: 'patient-dashboard', component: PatientDashboardComponent },
-  { path: 'medecin-dashboard', component: MedecinDashboardComponent },
+  // ===== RENDEZ-VOUS =====
+  { path: 'rendezvous', component: RendezVousListComponent, canActivate: [authGuard] },
+  { path: 'rendezvous/new', component: RendezVousFormComponent, canActivate: [authGuard] },
+  { path: 'rendezvous/:id', component: RendezVousDetailComponent, canActivate: [authGuard] },
+  { path: 'rendezvous/:id/edit', component: RendezVousFormComponent, canActivate: [authGuard] },
 
-  // --- Routes Rendez-vous ---
-  { path: 'rendezvous', component: RendezVousListComponent },
-  { path: 'rendezvous/new', component: RendezVousFormComponent },
-  { path: 'rendezvous/:id', component: RendezVousDetailComponent },
-  { path: 'rendezvous/:id/edit', component: RendezVousFormComponent },
+  // ===== EDUCATION =====
+  { path: 'events', component: EventListComponent, canActivate: [authGuard] },
+  { path: 'activities', component: ActivityListComponent, canActivate: [authGuard] },
+  { path: 'education', component: EducationComponent, canActivate: [authGuard] },
+  { path: 'eventfront', component: EventFrontComponent, canActivate: [authGuard] },
 
-  // --- Routes Education ---
-  { path: 'events', component: EventListComponent },
-  { path: 'activities', component: ActivityListComponent },
-  { path: 'education', component: EducationComponent },
-  { path: 'eventfront', component: EventFrontComponent },
-
+  // Page 404 / Redirection par défaut
   { path: '**', redirectTo: 'auth/login' }
 ];
