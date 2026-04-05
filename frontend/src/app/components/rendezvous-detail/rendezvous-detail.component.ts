@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { RendezVousService } from '../../services/rendezvous.service';
 import { RendezVous, StatutRendezVous } from '../../models/rendezvous.model';
 import { VideoCallComponent } from '../videocall/videocall.component';
 import { AuthService } from '../../services/auth.service';
+import { VideoCallService, SignalMessage } from '../../services/videocall.service';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-rendezvous-detail',
@@ -14,12 +16,19 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./rendezvous-detail.component.css']
 })
 export class RendezVousDetailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(RendezVousService);
+  private authService = inject(AuthService);
+  private videoCallService = inject(VideoCallService);
+
   rv: RendezVous | null = null;
   loading = true;
   error = '';
   deleteConfirm = false;
-  showVideoCall = false;
   currentUser: any = null;
+
+  showVideoCall = inject(VideoCallService).showCallOverlay;
 
   statutLabels: Record<StatutRendezVous, string> = {
     PLANIFIE: 'Planifié',
@@ -28,12 +37,7 @@ export class RendezVousDetailComponent implements OnInit {
     TERMINE: 'Terminé'
   };
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: RendezVousService,
-    private authService: AuthService
-  ) {
+  constructor() {
     this.currentUser = this.authService.getCurrentUser();
   }
 
@@ -42,6 +46,7 @@ export class RendezVousDetailComponent implements OnInit {
     if (id) {
       this.service.getById(+id).subscribe({
         next: (data) => {
+          console.log('VC: RendezVous data loaded', data);
           // Check access
           if (this.currentUser) {
             if (this.currentUser.role === 'DOCTOR' && data.medecinId !== this.currentUser.id) {
@@ -87,6 +92,81 @@ export class RendezVousDetailComponent implements OnInit {
   }
 
   toggleVideoCall(): void {
-    this.showVideoCall = !this.showVideoCall;
+    if (!this.showVideoCall() && this.rv) {
+      this.sendRendezvousInvite();
+      this.videoCallService.openCall(this.rv.id.toString());
+    } else {
+      this.videoCallService.closeCallOverlay();
+    }
+  }
+
+  private sendRendezvousInvite(): void {
+    if (!this.rv || !this.currentUser) {
+      console.warn('VC: RendezVous or CurrentUser not found', this.rv, this.currentUser);
+      return;
+    }
+
+    const me = this.currentUser.id;
+    const roomId = this.rv.id.toString();
+    
+    // Use loose equality or conversion to be safe with string vs number
+    let otherParticipantId = null;
+    const isDoctor = String(this.currentUser.role).toUpperCase() === 'DOCTOR';
+    const isPatient = String(this.currentUser.role).toUpperCase() === 'PATIENT';
+
+    // Access the fields safely, sometimes they might be on different property names depending on backend serialization
+    const pId = this.rv.patientId || (this.rv as any)['patient_id'];
+    const mId = this.rv.medecinId || (this.rv as any)['medecin_id'] || (this.rv as any)['medecinId'];
+
+    if (isDoctor) {
+      otherParticipantId = pId;
+    } else if (isPatient) {
+      otherParticipantId = mId;
+    }
+
+    console.log('VC: Rendezvous context check', {
+      currentUserId: me,
+      currentUserRole: this.currentUser.role,
+      rvPatientId: pId,
+      rvMedecinId: mId,
+      isDoctor,
+      isPatient,
+      determinedOtherId: otherParticipantId
+    });
+
+    if (otherParticipantId == null) {
+      console.error('VC: Could not determine other participant ID. Signal not sent.', this.rv);
+      return;
+    }
+
+    // Connect and subscribe before sending
+    this.videoCallService.connect(me.toString());
+    this.videoCallService.ensureSubscribedToRoom(roomId);
+
+    const sendInvite = () => {
+      const u = this.currentUser;
+      const callerName = [u?.prenom, u?.nom].filter(Boolean).join(' ') || 
+                         (u as any)?.username || 
+                         u?.email || 
+                         'Someone';
+      const invite: SignalMessage = {
+        type: 'rendezvous-invite',
+        senderId: String(me),
+        recipientId: String(otherParticipantId),
+        data: { roomId, callerName }
+      };
+      this.videoCallService.sendSignal(roomId, invite);
+    };
+
+    if (this.videoCallService.isConnected$.value) {
+      sendInvite();
+    } else {
+      this.videoCallService.isConnected$.pipe(
+        filter(c => c),
+        take(1)
+      ).subscribe(() => {
+        sendInvite();
+      });
+    }
   }
 }

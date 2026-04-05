@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 export interface MemberDto {
   id: number;
   name: string;
+  role?: string;
 }
  
 export interface ChatGroupDto {
@@ -14,6 +15,16 @@ export interface ChatGroupDto {
   category?: string;
   createdAt?: string;
   members: MemberDto[];
+  ownerId?: number;
+  ownerName?: string;
+}
+
+export interface GroupJoinRequest {
+  id: number;
+  user: { id: number; nom: string; prenom: string };
+  group: ChatGroupDto;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  createdAt: string;
 }
  
 export interface ChatGroupCreateRequest {
@@ -41,6 +52,10 @@ export class ChatGroupService {
   createGroup(grp: ChatGroupCreateRequest) {
     return this.http.post<ChatGroupDto>(this.baseUrl, grp);
   }
+
+  getGroupById(id: number) {
+    return this.http.get<ChatGroupDto>(`${this.baseUrl}/${id}`);
+  }
  
   deleteGroup(id: number) {
     return this.http.delete(`${this.baseUrl}/${id}`);
@@ -52,6 +67,22 @@ export class ChatGroupService {
 
   leaveGroup(groupId: number, userId: number) {
     return this.http.post(`${this.baseUrl}/${groupId}/leave/${userId}`, {});
+  }
+
+  requestJoin(groupId: number, userId: number) {
+    return this.http.post(`${this.baseUrl}/${groupId}/request-join/${userId}`, {});
+  }
+
+  getPendingRequests(ownerId: number) {
+    return this.http.get<GroupJoinRequest[]>(`${this.baseUrl}/owner/${ownerId}/pending-requests`);
+  }
+
+  approveRequest(requestId: number) {
+    return this.http.post(`${this.baseUrl}/requests/${requestId}/approve`, {});
+  }
+
+  rejectRequest(requestId: number) {
+    return this.http.post(`${this.baseUrl}/requests/${requestId}/reject`, {});
   }
 
   setActiveGroup(group: ChatGroupDto | null) {

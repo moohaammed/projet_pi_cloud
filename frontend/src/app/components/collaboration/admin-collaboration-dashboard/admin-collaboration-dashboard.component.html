@@ -1,0 +1,456 @@
+<!-- Page Header WITH INNER DROPDOWN -->
+<div
+  class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-black border-opacity-10 position-relative"
+  style="z-index: 10;">
+  <div class="d-flex align-items-center gap-4">
+    <div class="section-header text-start mb-0">
+      <h2 class="fw-bold mb-1 section-header__title text-capitalize fs-28">
+        Collaboration <span class="underline position-relative text-primary">Hub</span>
+      </h2>
+      <div class="sub-title fs-14 text-muted">Manage community groups and safety filters.</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+
+    <!-- VIEW SWITCHER DROPDOWN -->
+    <div class="dropdown me-2" style="position: relative;">
+      <button
+        class="btn btn-soft-primary fw-bold rounded-pill shadow-sm d-flex justify-content-between align-items-center small px-4 py-2"
+        style="width: 210px; border: 1px solid rgba(128,0,128,0.2);" (click)="dropdownOpen = !dropdownOpen">
+        <span class="text-truncate">
+          <i class="fa-solid fa-heart-pulse me-2" *ngIf="currentView === 'health'"></i>
+          <i class="fa-solid fa-users-gear me-2" *ngIf="currentView === 'groups'"></i>
+          <i class="fa-solid fa-shield-exclamation me-2" *ngIf="currentView === 'moderation'"></i>
+          <i class="fa-solid fa-bullhorn me-2" *ngIf="currentView === 'announcements'"></i>
+          {{ viewLabel(currentView) }}
+        </span>
+        <i class="fa-solid fa-chevron-down ms-2" style="font-size: 0.8rem;"></i>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <ul class="dropdown-menu shadow-lg border-0 rounded-4 mt-2 p-2 w-100 show animate-fade-in" *ngIf="dropdownOpen"
+        style="position: absolute; top: 100%; right: 0; min-width: 240px;">
+
+        <li>
+          <button class="dropdown-item py-2 fw-medium rounded-3" [class.active-soft]="currentView === 'health'"
+            (click)="switchView('health'); dropdownOpen = false">
+            <i class="fa-solid fa-heart-pulse me-3 text-muted w-15px"></i> Health Dashboard
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item py-2 fw-medium rounded-3" [class.active-soft]="currentView === 'groups'"
+            (click)="switchView('groups'); dropdownOpen = false">
+            <i class="fa-solid fa-users-gear me-3 text-muted w-15px"></i> Groups & Members
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item py-2 fw-medium rounded-3 d-flex justify-content-between align-items-center"
+            [class.active-soft]="currentView === 'moderation'" (click)="switchView('moderation'); dropdownOpen = false">
+            <div><i class="fa-solid fa-shield-exclamation me-3 text-muted w-15px"></i> Moderation</div>
+            <span class="badge bg-danger rounded-pill"
+              *ngIf="kpis.pendingModeration > 0">{{kpis.pendingModeration}}</span>
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item py-2 fw-medium rounded-3" [class.active-soft]="currentView === 'announcements'"
+            (click)="switchView('announcements'); dropdownOpen = false">
+            <i class="fa-solid fa-bullhorn me-3 text-muted w-15px"></i> Announcements
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <button
+      class="btn btn-soft-primary fw-bold rounded-pill shadow-sm d-flex justify-content-center align-items-center py-2"
+      style="width: 160px; border: 1px solid rgba(128,0,128,0.1);" (click)="scanHistory()">
+      <i class="fa-solid fa-magnifying-glass me-2"></i> Scan Logs
+    </button>
+    <button class="btn btn-primary fw-bold rounded-pill shadow-sm d-flex justify-content-center align-items-center py-2"
+      style="width: 140px;" (click)="reload()">
+      <i class="fa-solid fa-arrows-rotate me-2"></i> Refresh
+    </button>
+  </div>
+</div>
+
+<!-- Alert area -->
+<div *ngIf="error" class="alert alert-danger shadow-sm rounded-4 border-0 mb-4">{{ error }}</div>
+
+<!-- MODULAR VIEW SWITCHER (collaboration sub-views) -->
+<div [ngSwitch]="currentView" class="position-relative z-1" (click)="dropdownOpen = false">
+
+  <!-- 1. HEALTH & ANALYTICS VIEW -->
+  <div *ngSwitchCase="'health'" class="animate-fade-in">
+    <section class="mb-5 mt-4">
+      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Safety Vitals</h2>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div
+            class="card shadow border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-warning">
+            <div class="card-body p-4">
+              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Unresolved safety alerts
+              </div>
+              <div class="fs-1 fw-bold text-dark mb-1 d-flex align-items-end">
+                {{ kpis.unresolvedSafetyAlerts }}
+                <span
+                  class="fs-14 text-warning ms-2 mb-2 px-2 py-1 bg-soft-warning rounded-pill fw-bold">Critical</span>
+              </div>
+              <p class="small mb-0 text-muted">Distress signals pending review by nursing staff.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div
+            class="card shadow border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-danger">
+            <div class="card-body p-4">
+              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Pending moderation</div>
+              <div class="fs-1 fw-bold text-dark mb-1 d-flex align-items-end">
+                {{ kpis.pendingModeration }}
+                <span class="fs-14 text-danger ms-2 mb-2 px-2 py-1 bg-soft-danger rounded-pill fw-bold">Action
+                  Required</span>
+              </div>
+              <p class="small mb-0 text-muted">Feed posts flagged by safety filters.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-5">
+      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Engagement & Stress Trend</h2>
+      <div class="card shadow rounded-4 border-0 p-4 bg-white">
+        <canvas #complianceCanvas height="250"></canvas>
+      </div>
+    </section>
+
+    <section class="mb-5">
+      <h2 class="h6 mb-3 fw-bold text-secondary text-uppercase">Safety logs</h2>
+      <div class="table-responsive card shadow-sm rounded-4 border-0 overflow-hidden">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">Patient</th>
+              <th class="py-3 text-uppercase small fw-bold text-muted">Alert type</th>
+              <th class="py-3 text-uppercase small fw-bold text-muted">Time</th>
+              <th class="py-3 text-uppercase small fw-bold text-muted">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of safetyLogs">
+              <td class="ps-4 fw-medium">{{ row.patientName }}</td>
+              <td>{{ alertTypeLabel(row.alertType) }}</td>
+              <td>{{ row.time | date : 'medium' }}</td>
+              <td><span class="badge rounded-pill px-3 py-2"
+                  [ngClass]="row.status === 'OPEN' ? 'bg-danger':'bg-success'">{{ row.status }}</span></td>
+            </tr>
+            <tr *ngIf="!loading && safetyLogs.length === 0">
+              <td colspan="4" class="text-muted text-center py-5">No safety events recorded.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mb-5">
+      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Private Communication Analysis
+      </h2>
+      <div class="table-responsive card shadow rounded-4 border-0 overflow-hidden bg-white">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-soft-primary border-bottom border-black border-opacity-10">
+            <tr>
+              <th class="ps-4 py-3 text-uppercase small fw-bold text-primary">Chat Participants</th>
+              <th class="py-3 text-uppercase small fw-bold text-primary text-center">Volume</th>
+              <th class="py-3 text-uppercase small fw-bold text-danger text-center">Distress Hits</th>
+              <th class="py-3 text-uppercase small fw-bold text-primary text-end pe-4">Last Activity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of dmMeta">
+              <td class="ps-4 fw-medium">
+                <div class="d-flex align-items-center">
+                  <span class="badge bg-soft-primary text-primary me-2">#{{ d.userIdA }}</span>
+                  <i class="fa-solid fa-arrows-left-right text-muted mx-2 fs-12"></i>
+                  <span class="badge bg-soft-primary text-primary">#{{ d.userIdB }}</span>
+                </div>
+              </td>
+              <td class="text-center fw-bold text-dark">{{ d.messageCount }}</td>
+              <td class="text-center">
+                <span [class]="d.distressedMessageCount > 0 ? 'text-danger fw-bold' : 'text-muted'">
+                  {{ d.distressedMessageCount }}
+                </span>
+              </td>
+              <td class="text-end pe-4 text-muted small">{{ d.lastActivity | date : 'medium' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- 2. GROUP & MEMBER MANAGEMENT VIEW -->
+  <div *ngSwitchCase="'groups'" class="animate-fade-in mt-4">
+    <section class="mb-5">
+      <div class="card shadow border-0 p-4 mb-4 rounded-4 bg-white">
+        <div class="input-group search-form rounded-pill bg-grey px-3 py-1">
+          <span class="input-group-text bg-transparent border-0"><i
+              class="fa-solid fa-user-shield text-primary"></i></span>
+          <input type="number" class="form-control bg-transparent border-0 ps-2"
+            placeholder="Enter System User ID to inspect group memberships..." [(ngModel)]="searchUserId">
+          <button class="btn btn-primary fw-bold rounded-pill px-4 ms-2 my-1" (click)="doSearch()">Inspect
+            Member</button>
+        </div>
+      </div>
+
+      <div *ngIf="searchResultGroups.length > 0"
+        class="card shadow border-0 mb-5 rounded-4 overflow-hidden border-start border-5 border-primary animate-fade-in">
+        <div class="card-header bg-soft-primary border-0 py-3 ps-4 d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-primary"><i class="fa-solid fa-search me-2"></i> Results for User
+            #{{searchUserId}}</span>
+          <button class="btn btn-sm btn-link text-primary text-decoration-none fw-bold"
+            (click)="searchResultGroups = []">Clear</button>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li *ngFor="let g of searchResultGroups"
+            class="list-group-item d-flex justify-content-between align-items-center p-4 border-bottom">
+            <div>
+              <h6 class="mb-1 fw-bold text-dark">{{ g.name }}</h6>
+              <span class="badge rounded-pill small fw-bold" [ngClass]="getCategoryBadgeClass(g.category)">{{ g.category }}</span>
+            </div>
+            <div class="text-end">
+              <div class="fw-bold text-dark">{{ g.memberCount }}</div>
+              <div class="text-muted small">Total Members</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="mb-5">
+      <div class="section-header text-start mb-4">
+        <h3 class="h6 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Community Directory</h3>
+      </div>
+      <div class="table-responsive card shadow rounded-4 border-0 overflow-hidden bg-white">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-soft-primary border-bottom border-black border-opacity-10">
+            <tr>
+              <th class="ps-4 py-3 text-uppercase small fw-bold text-primary">Group Entity</th>
+              <th class="py-3 text-uppercase small fw-bold text-primary">Classification</th>
+              <th class="py-3 text-uppercase small fw-bold text-primary text-center">Members</th>
+              <th class="py-3 text-uppercase small fw-bold text-primary">Lead/Owner</th>
+              <th class="text-end pe-4 py-3 text-uppercase small fw-bold text-primary">Management</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let g of groups">
+              <td class="ps-4">
+                <div class="fw-bold text-dark">{{ g.name }}</div>
+                <div class="text-muted small truncate-1" style="max-width: 200px;">{{ g.description }}</div>
+              </td>
+              <td><span class="badge px-3 py-2 rounded-pill small fw-bold" [ngClass]="getCategoryBadgeClass(g.category)">{{ g.category
+                  }}</span></td>
+              <td class="text-center fw-bold">{{ g.memberCount }}</td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="bg-grey rounded-circle me-2 d-flex align-items-center justify-content-center"
+                    style="width: 30px; height: 30px;">
+                    <i class="fa-solid fa-user fs-12 text-muted"></i>
+                  </div>
+                  <span class="text-muted small">{{ g.ownerName || 'Auto-System' }}</span>
+                </div>
+              </td>
+              <td class="text-end pe-4">
+                <button class="btn btn-soft-primary btn-sm fw-bold rounded-pill px-3 me-2" (click)="startEdit(g)">
+                  <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                </button>
+                <button class="btn btn-soft-danger btn-sm fw-bold rounded-pill px-3" (click)="deleteGroup(g.id)">
+                  <i class="fa-solid fa-archive me-1"></i> Archive
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="groups.length === 0">
+              <td colspan="5" class="text-center py-5 text-muted">
+                <i class="fa-solid fa-users-slash fs-2 opacity-25 mb-2 d-block"></i>
+                No active community groups found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- 3. MODERATION QUEUE VIEW -->
+  <div *ngSwitchCase="'moderation'" class="animate-fade-in mt-4">
+    <section class="mb-5">
+      <div class="section-header text-start mb-4">
+        <h3 class="h6 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Moderation Backlog</h3>
+      </div>
+      <div class="card shadow border-0 table-responsive rounded-4 overflow-hidden bg-white">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-soft-primary border-bottom border-black border-opacity-10">
+            <tr>
+              <th class="ps-4 py-3 text-uppercase small fw-bold text-primary">Incident Author</th>
+              <th class="py-3 text-uppercase small fw-bold text-primary">Flag Reason</th>
+              <th class="py-3 text-uppercase small fw-bold text-primary w-25">Reported Content</th>
+              <th class="text-end pe-4 py-3 text-uppercase small fw-bold text-primary">Resolution</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of moderation">
+              <td class="ps-4">
+                <div class="fw-bold text-dark d-flex align-items-center">
+                  {{ m.authorName }}
+                  <span class="ms-2 badge bg-danger rounded-circle p-1" style="width: 8px; height: 8px;"
+                    title="High Risk"></span>
+                </div>
+                <div class="small text-muted">{{ m.flaggedAt | date : 'short' }}</div>
+              </td>
+              <td><span class="badge bg-soft-danger text-danger px-3 py-2 rounded-pill small fw-bold text-uppercase">{{
+                  m.reason }}</span>
+              </td>
+              <td>
+                <div class="p-3 bg-grey rounded-4 small text-wrap text-break border shadow-sm italic"
+                  style="max-width: 400px; border-style: dashed !important;">
+                  "{{ m.contentPreview }}"
+                </div>
+              </td>
+              <td class="text-end pe-4 text-nowrap">
+                <div class="d-flex flex-column gap-2 align-items-end">
+                  <button class="btn btn-primary btn-sm fw-bold rounded-pill px-3 shadow-sm w-100"
+                    (click)="approvePost(m.publicationId)">
+                    <i class="fa-solid fa-check-double me-1"></i> Approve
+                  </button>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-soft-danger btn-sm fw-bold rounded-pill px-3 shadow-sm"
+                      (click)="deletePost(m.publicationId)">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm fw-bold rounded-pill px-3 shadow-sm"
+                      (click)="banUser(m.authorId)">
+                      <i class="fa-solid fa-user-slash me-1"></i> Ban Author
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="moderation.length === 0">
+              <td colspan="4" class="text-center py-5">
+                <div class="text-success mb-3"><i class="fa-solid fa-shield-check fs-1 opacity-25"></i></div>
+                <h5 class="fw-bold text-dark">System Safely Maintained</h5>
+                <p class="small text-muted mb-0">The moderation queue is currently clear.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- 4. ANNOUNCEMENTS VIEW -->
+  <div *ngSwitchCase="'announcements'" class="animate-fade-in mt-4">
+    <section class="mb-4">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="card shadow border-0 p-5 rounded-4 bg-white">
+            <div class="d-flex align-items-center mb-4">
+              <div
+                class="bg-soft-primary text-primary rounded-circle p-3 me-3 d-flex align-items-center justify-content-center shadow-sm">
+                <i class="fa-solid fa-broadcast-tower fs-4"></i>
+              </div>
+              <div>
+                <h4 class="mb-0 fw-bold text-dark">Global Broadcast</h4>
+                <p class="text-muted small mb-0">Your message will be pinned to all community feeds.</p>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;">Message
+                Body</label>
+              <textarea
+                class="form-control bg-grey border-0 rounded-4 p-4 shadow-sm fs-15 transition-all focus-ring-primary"
+                rows="6" placeholder="What important update do you want to share with everyone?"
+                [(ngModel)]="announcementText" style="resize: none;"></textarea>
+            </div>
+            <div class="text-end">
+              <button class="btn btn-primary btn-lg fw-bold rounded-pill px-5 shadow hov-grow"
+                (click)="sendAnnouncement()" [disabled]="!announcementText">
+                <i class="fa-solid fa-paper-plane me-2"></i> Send Announcement
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 mt-4 mt-lg-0">
+          <div class="card border-0 bg-soft-primary rounded-4 p-4 shadow h-100">
+            <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-lightbulb me-2"></i> Admin Best Practices</h6>
+            <ul class="list-unstyled small text-dark opacity-75 d-flex flex-column gap-3">
+              <li class="d-flex align-items-start">
+                <i class="fa-solid fa-check text-success me-2 mt-1"></i>
+                Keep messages concise and helpful.
+              </li>
+              <li class="d-flex align-items-start">
+                <i class="fa-solid fa-check text-success me-2 mt-1"></i>
+                Use announcements for platform updates or system maintenance warnings.
+              </li>
+              <li class="d-flex align-items-start">
+                <i class="fa-solid fa-check text-success me-2 mt-1"></i>
+                Announcements will feature a distinct "System Admin" badge.
+              </li>
+            </ul>
+            <div class="mt-auto pt-4 text-center">
+              <img src="template/assets/img/icon/bullhorn-large.png" alt="" class="img-fluid opacity-25"
+                style="max-height: 120px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div> <!-- closes currentView ngSwitch -->
+
+<!-- EDIT GROUP MODAL (STYLIZED) -->
+<div *ngIf="editingGroup" class="modal-backdrop fade show" style="z-index: 1040; background-color: rgba(0,0,0,0.4);">
+</div>
+<div *ngIf="editingGroup" class="modal fade show d-block animate-fade-in" tabindex="-1" style="z-index: 1050;">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden bg-white">
+      <div class="modal-header border-0 bg-soft-primary p-4">
+        <h5 class="modal-title fw-bold text-primary">Update Community Entity</h5>
+        <button type="button" class="btn-close rounded-circle border-0 bg-white shadow-sm p-2"
+          (click)="cancelEdit()"></button>
+      </div>
+      <div class="modal-body p-4 pt-4">
+        <div class="mb-4">
+          <label class="form-label fw-bold text-muted small text-uppercase">Entity Name</label>
+          <input type="text"
+            class="form-control form-control-lg bg-grey border-0 rounded-4 px-3 py-2 shadow-sm fs-15 fw-bold"
+            [(ngModel)]="editingGroup.name">
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-bold text-muted small text-uppercase">Public Description</label>
+          <textarea class="form-control bg-grey border-0 rounded-4 p-3 shadow-sm fs-14" rows="3"
+            [(ngModel)]="editingGroup.description" style="resize: none;"></textarea>
+        </div>
+        <div class="mb-2">
+          <label class="form-label fw-bold text-muted small text-uppercase">Category Classification</label>
+          <select class="form-select form-select-lg bg-grey border-0 rounded-4 shadow-sm fs-15 fw-semibold"
+            [(ngModel)]="editingGroup.category">
+            <option value="PATIENTS">Patient Community</option>
+            <option value="FAMILY">Family Support</option>
+            <option value="PROFESSIONAL">Clinical Experts</option>
+            <option value="MIXED">Mixed Community</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer border-0 p-4 pt-0">
+        <button type="button" class="btn btn-soft-primary fw-bold rounded-pill px-4 me-2 border-0"
+          (click)="cancelEdit()">Discard</button>
+        <button type="button" class="btn btn-primary fw-bold rounded-pill px-5 shadow" (click)="saveEdit()">
+          Save Configuration
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

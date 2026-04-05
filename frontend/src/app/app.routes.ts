@@ -16,11 +16,12 @@ import { CommunicationTestComponent } from './components/collaboration/communica
 import { GestionPatientRoleComponent } from './gestion-patient-role/gestion-patient-role.component';
 import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard.component';
 import { MedecinDashboardComponent } from './medecin-dashboard/medecin-dashboard.component';
+import { HomeComponent } from './components/home/home.component';
 
 export const routes: Routes = [
 
   // ===== AUTH AlzCare =====
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: 'auth/login',
     loadComponent: () =>
@@ -33,6 +34,7 @@ export const routes: Routes = [
       import('./components/auth/register/register.component')
         .then(m => m.RegisterComponent)
   },
+  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
 
   // ===== USERS AlzCare =====
   {
@@ -60,43 +62,13 @@ export const routes: Routes = [
     data: { roles: ['ADMIN'] }
   },
 
-  // ===== HOSPITALS AlzCare =====
-  {
-    path: 'hospitals',
-    loadComponent: () =>
-      import('./components/hospital/hospital-list/hospital-list.component')
-        .then(m => m.HospitalListComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'hospitals/new',
-    loadComponent: () =>
-      import('./components/hospital/hospital-form/hospital-form.component')
-        .then(m => m.HospitalFormComponent),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['ADMIN'] }
-  },
-  {
-    path: 'hospitals/edit/:id',
-    loadComponent: () =>
-      import('./components/hospital/hospital-form/hospital-form.component')
-        .then(m => m.HospitalFormComponent),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['ADMIN'] }
-  },
-  {
-    path: 'hospitals/:id',
-    loadComponent: () =>
-      import('./components/hospital/hospital-detail/hospital-detail.component')
-        .then(m => m.HospitalDetailComponent),
-    canActivate: [authGuard]
-  },
 
   // ===== COLLABORATION (Avec sous-routes lazy-loadées) =====
   {
     path: 'collaboration',
     component: CommunicationTestComponent,
     children: [
+      { path: '', redirectTo: 'feed', pathMatch: 'full' },
       {
         path: 'feed',
         loadComponent: () =>
@@ -133,7 +105,11 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        loadComponent: () => import('./components/dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+        loadComponent: () => import('./components/admin-dashboard-home/admin-dashboard-home.component').then(m => m.AdminDashboardHomeComponent)
+      },
+      {
+        path: 'collaboration',
+        loadComponent: () => import('./components/collaboration/admin-collaboration-dashboard/admin-collaboration-dashboard.component').then(m => m.AdminCollaborationDashboardComponent)
       }
     ]
   },
@@ -154,6 +130,7 @@ export const routes: Routes = [
     component: GestionPatientRoleComponent,
     canActivate: [authGuard]
   },
+  // ===== EXISTANT =====
 
   // ===== RENDEZ-VOUS =====
   { path: 'rendezvous', component: RendezVousListComponent, canActivate: [authGuard] },

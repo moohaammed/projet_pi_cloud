@@ -91,7 +91,8 @@ public class CommentService {
         
         if (comment.getAuthor() != null) {
             dto.setAuthorId(comment.getAuthor().getId());
-            dto.setAuthorName(comment.getAuthor().getNom());
+            String fullName = (comment.getAuthor().getPrenom() + " " + comment.getAuthor().getNom()).trim();
+            dto.setAuthorName(fullName.isEmpty() ? "User " + comment.getAuthor().getId() : fullName);
         }
         
         if (comment.getPublication() != null) {

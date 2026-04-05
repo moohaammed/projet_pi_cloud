@@ -94,7 +94,7 @@ export class LoginComponent implements AfterViewInit {
         this.loading = false;
         this.error = err.status === 0
           ? 'Serveur inaccessible'
-          : err.error || 'Email ou mot de passe incorrect';
+          : (err.error?.message || err.error || 'Email ou mot de passe incorrect');
       }
     });
   }

@@ -17,6 +17,8 @@ public class ChatGroupCreateDto {
 
     private List<Long> memberIds;
 
+    private Long ownerId;
+
     public ChatGroupCreateDto() {}
 
     public String getName() { return name; }
@@ -30,4 +32,7 @@ public class ChatGroupCreateDto {
 
     public List<Long> getMemberIds() { return memberIds; }
     public void setMemberIds(List<Long> memberIds) { this.memberIds = memberIds; }
+
+    public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
 }
