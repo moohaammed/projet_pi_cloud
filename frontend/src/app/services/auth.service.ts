@@ -1,7 +1,7 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, map, of, delay } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
@@ -78,6 +78,25 @@ export class AuthService {
         this.loggedIn$.next(true);
       })
     );
+  }
+
+  // ==== MOCK GOOGLE LOGIN ====
+  loginWithGoogle(token: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/google`, { token }).pipe(
+      tap((user: any) => {
+        if (this.isBrowser && typeof user === 'object') {
+          localStorage.setItem('user', JSON.stringify(user));
+        }
+        this.loggedIn$.next(true);
+      })
+    );
+  }
+
+  // ==== MOT DE PASSE OUBLIÉ ====
+  resetPassword(email: string): Observable<any> {
+    // Appel normal vers le backend
+    // Assurez-vous que l'endpoint "forgot-password" ou "reset-password" existe et envoie l'email.
+    return this.http.post(`${this.apiUrl}/reset-password`, { email });
   }
 
   logout(): void {

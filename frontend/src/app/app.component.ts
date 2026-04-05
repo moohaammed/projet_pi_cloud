@@ -9,7 +9,6 @@ import { VideoCallService } from './services/videocall.service';
 import { VideoCallComponent } from './components/videocall/videocall.component';
 import { Subscription } from 'rxjs';
 
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -201,6 +200,9 @@ export class AppComponent implements OnDestroy {
     }
     if (role === 'DOCTOR') {
       return '/medecin-dashboard';
+    }
+    if (role === 'ADMIN') {
+      return '/admin/dashboard';
     }
     return '/patient-dashboard';
   }
