@@ -1,13 +1,17 @@
-import { Component, Input, OnInit, OnDestroy, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import {
+  Component, Input, OnInit, OnDestroy,
+  ViewChild, ElementRef, Output, EventEmitter
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VideoCallService, SignalMessage } from '../../services/videocall.service';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { AiAgentPanelComponent } from '../ai-agent-panel/ai-agent-panel.component';
 
 @Component({
   selector: 'app-videocall',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AiAgentPanelComponent],
   templateUrl: './videocall.component.html',
   styleUrl: './videocall.component.css'
 })
@@ -29,6 +33,26 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   public connectionStatus = 'Initialisation...';
   public participants: Map<string, string> = new Map();
 
+  // ── AI Agent Panel ──────────────────────────────────────────────────────────
+  public showAgentPanel = false;
+
+  public toggleAgentPanel(): void {
+    this.showAgentPanel = !this.showAgentPanel;
+  }
+
+  /** Returns the display name of the remote participant (patient) */
+  public getPatientName(): string {
+    const first = this.participants.values().next().value;
+    return first || 'Patient';
+  }
+
+  /** Returns the current user's display name (doctor) */
+  public getDoctorName(): string {
+    return this.getUserDisplayName();
+  }
+
+  // ── WebRTC / Signaling (unchanged) ─────────────────────────────────────────
+
   private readonly iceServers = {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
@@ -47,13 +71,12 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     console.log('VC: Initialisation pour la room:', this.roomId);
     this.videoCallService.connect(this.currentUser.id.toString());
-    
+
     this.subscription = this.videoCallService.isConnected$.subscribe(connected => {
       if (connected) {
         console.log('VC: Connecté au serveur, inscription à la room...');
         this.videoCallService.subscribe(this.roomId);
         this.startLocalStream();
-        // Attendre un peu que la souscription soit effective sur le serveur
         setTimeout(() => {
           console.log('VC: Envoi du signal JOIN');
           this.sendJoinSignal();
@@ -100,17 +123,16 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   private processJoin(msg: SignalMessage) {
     const myId = this.currentUser?.id ? this.currentUser.id.toString() : '';
     if (msg.senderId === myId) return;
-    
-    // Si 'data' est null ou un string, on gère l'erreur
+
     let dataObj = msg.data;
     if (typeof msg.data === 'string') {
-      try { dataObj = JSON.parse(msg.data); } catch (e) {}
+      try { dataObj = JSON.parse(msg.data); } catch (e) { }
     }
-    
+
     const name = dataObj?.name || `Utilisateur ${msg.senderId}`;
     this.participants.set(msg.senderId, name);
     console.log(`VC: ${name} est maintenant en ligne.`);
-    
+
     if (msg.type === 'join') {
       console.log('VC: Réponse JOIN-REPLY à', msg.senderId);
       this.videoCallService.sendSignal(this.roomId, {
@@ -125,12 +147,12 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     } catch (e) {
-      console.warn("VC: Erreur caméra, repli micro seul...", e);
+      console.warn('VC: Erreur caméra, repli micro seul...', e);
       try {
         this.localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
         this.isVideoOff = true;
       } catch (e2) {
-        console.error("VC: Accès média impossible !");
+        console.error('VC: Accès média impossible !');
         this.connectionStatus = 'Erreur: Accès refusé';
         return;
       }
@@ -190,13 +212,12 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   private async handleSignalMessage(msg: SignalMessage) {
     const myId = this.currentUser?.id ? this.currentUser.id.toString() : '';
     if (!msg || msg.senderId === myId) return;
-    
+
     console.log('VC REÇU:', msg.type);
 
-    // On s'assure que si les données sont un string (cas possible de transformation backend), on le parse.
     let dataPayload = msg.data;
     if (typeof msg.data === 'string' && (msg.type === 'offer' || msg.type === 'answer' || msg.type === 'ice-candidate')) {
-       try { dataPayload = JSON.parse(msg.data); } catch (e) {}
+      try { dataPayload = JSON.parse(msg.data); } catch (e) { }
     }
 
     try {
