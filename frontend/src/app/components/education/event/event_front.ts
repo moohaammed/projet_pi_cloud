@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/education/event.service';
 import { CalendarEvent } from '../../../models/education/event.model';
+import { ShareEventDialogComponent } from '../../collaboration/share-event-dialog/share-event-dialog.component';
 
 @Component({
   selector: 'app-event-front',
   templateUrl: './event_front.html',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ShareEventDialogComponent],
   styles: [`
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800&display=swap');
 
@@ -290,6 +292,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
     .action-btn:hover { transform: scale(1.12); }
     .edit-btn   { background: rgba(255, 255, 255, 0.92); color: var(--green); }
     .delete-btn { background: rgba(255, 255, 255, 0.92); color: #c0392b; }
+    .share-btn  { background: rgba(255, 255, 255, 0.92); color: #5b4cdb; }
 
     /* ── CARD BODY ── */
     .card-body {
@@ -628,6 +631,9 @@ export class EventFrontComponent implements OnInit {
   showForm = false;
   searchQuery = '';
 
+  shareDialogOpen = false;
+  shareEvent: CalendarEvent | null = null;
+
   currentPage = 1;
   pageSize = 6;
 
@@ -642,9 +648,21 @@ export class EventFrontComponent implements OnInit {
     userId: 1
   };
 
-  constructor(private eventService: EventService) {}
+  constructor(
+    private eventService: EventService,
+    private route: ActivatedRoute
+  ) {}
 
-  ngOnInit() { this.load(); }
+  ngOnInit() {
+    this.load();
+    this.route.queryParamMap.subscribe((params) => {
+      const h = params.get('highlight');
+      if (!h) return;
+      setTimeout(() => {
+        document.getElementById('edu-event-' + h)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 450);
+    });
+  }
 
   load() {
     this.eventService.getAll().subscribe((data: CalendarEvent[]) => {
@@ -780,6 +798,16 @@ export class EventFrontComponent implements OnInit {
   }
 
   openForm() { this.reset(); this.showForm = true; }
+
+  openShareDialog(ev: CalendarEvent) {
+    this.shareEvent = ev;
+    this.shareDialogOpen = true;
+  }
+
+  onShareDialogChange(open: boolean) {
+    this.shareDialogOpen = open;
+    if (!open) this.shareEvent = null;
+  }
 
   reset() {
     this.selectedFile = null; this.errors = {};

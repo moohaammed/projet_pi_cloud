@@ -60,43 +60,13 @@ export const routes: Routes = [
     data: { roles: ['ADMIN'] }
   },
 
-  // ===== HOSPITALS AlzCare =====
-  {
-    path: 'hospitals',
-    loadComponent: () =>
-      import('./components/hospital/hospital-list/hospital-list.component')
-        .then(m => m.HospitalListComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'hospitals/new',
-    loadComponent: () =>
-      import('./components/hospital/hospital-form/hospital-form.component')
-        .then(m => m.HospitalFormComponent),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['ADMIN'] }
-  },
-  {
-    path: 'hospitals/edit/:id',
-    loadComponent: () =>
-      import('./components/hospital/hospital-form/hospital-form.component')
-        .then(m => m.HospitalFormComponent),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['ADMIN'] }
-  },
-  {
-    path: 'hospitals/:id',
-    loadComponent: () =>
-      import('./components/hospital/hospital-detail/hospital-detail.component')
-        .then(m => m.HospitalDetailComponent),
-    canActivate: [authGuard]
-  },
 
   // ===== EXISTANT (inchangé) =====
   {
     path: 'collaboration',
     component: CommunicationTestComponent,
     children: [
+      { path: '', redirectTo: 'feed', pathMatch: 'full' },
       {
         path: 'feed',
         loadComponent: () =>
@@ -114,6 +84,30 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/collaboration/groups-list/groups-list.component')
             .then(m => m.GroupsListComponent)
+      },
+      {
+        path: 'groups/:groupId/feed',
+        loadComponent: () =>
+          import('./components/collaboration/feed/feed.component')
+            .then(m => m.FeedComponent)
+      },
+    ]
+  },
+
+  // --- ADMIN ROUTES ---
+  {
+    path: 'admin',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./components/admin-dashboard-home/admin-dashboard-home.component').then(m => m.AdminDashboardHomeComponent)
+      },
+      {
+        path: 'collaboration',
+        loadComponent: () => import('./components/collaboration/admin-collaboration-dashboard/admin-collaboration-dashboard.component').then(m => m.AdminCollaborationDashboardComponent)
       }
     ]
   },
@@ -135,7 +129,6 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   // ===== EXISTANT =====
-  { path: 'collaboration', component: CommunicationTestComponent },
 
   // --- Dashboards ---
   { path: 'patient-dashboard', component: PatientDashboardComponent },

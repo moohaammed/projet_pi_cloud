@@ -1,1 +1,182 @@
-/* app.component.css - Empty as style is now handled by template global CSS and Bootstrap */
+:root {
+  --docwala-purple: #800080;
+  --docwala-soft-purple: rgba(128, 0, 128, 0.1);
+  --docwala-grey: #f5f5f5;
+  --docwala-dark: #2c3038;
+}
+
+.admin-wrapper {
+  overflow: hidden;
+  color: #555a64;
+}
+
+.bg-grey {
+  background-color: var(--docwala-grey) !important;
+}
+
+.bg-soft-primary {
+  background-color: var(--docwala-soft-purple) !important;
+}
+
+.text-primary {
+  color: var(--docwala-purple) !important;
+}
+
+.bg-soft-success { background-color: rgba(40, 167, 69, 0.1) !important; }
+.bg-soft-info { background-color: rgba(23, 162, 184, 0.1) !important; }
+.bg-soft-warning { background-color: rgba(255, 193, 7, 0.1) !important; }
+.bg-soft-danger { background-color: rgba(220, 53, 69, 0.1) !important; }
+
+.text-success { color: #28a745 !important; }
+.text-info { color: #17a2b8 !important; }
+.text-warning { color: #ffc107 !important; }
+.text-danger { color: #dc3545 !important; }
+
+.bg-gradient-primary {
+  background: linear-gradient(180deg, #f8f9fa, rgba(255, 255, 255, 0) 100%);
+}
+
+.nav-link {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  color: #555a64 !important;
+}
+
+.nav-link i {
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover i {
+  transform: translateX(3px);
+}
+
+.nav-link.active-purple {
+  background-color: var(--docwala-soft-purple) !important;
+  color: var(--docwala-purple) !important;
+  box-shadow: 0 4px 12px rgba(128, 0, 128, 0.08) !important;
+}
+
+.nav-link.active-purple i {
+  color: var(--docwala-purple) !important;
+}
+
+.nav-link:not(.active-purple):hover {
+  background-color: #ffffff !important;
+  color: var(--docwala-purple) !important;
+  transform: translateX(5px);
+}
+
+.search-form {
+  transition: all 0.3s ease;
+  border: 1px solid transparent !important;
+  height: 40px;
+  display: flex !important;
+  align-items: center !important;
+  align-self: center;
+}
+
+.search-form .input-group-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.search-form .form-control {
+  height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.search-form:focus-within {
+  background-color: #fff !important;
+  border-color: var(--docwala-soft-purple) !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05), 0 0 0 0.25rem rgba(128, 0, 128, 0.1);
+  max-width: 500px !important;
+}
+
+.hover-primary:hover {
+  color: var(--docwala-purple) !important;
+  transition: color 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.admin-wrapper aside .nav-link {
+  animation: slideInRight 0.4s ease forwards;
+}
+
+/* PREMIUM FORM STYLES */
+.search-form .form-control:focus, 
+.search-form .form-select:focus {
+  box-shadow: none !important;
+  color: var(--docwala-purple) !important;
+}
+
+.search-form i {
+  transition: color 0.3s ease;
+}
+
+.search-form:focus-within i {
+  color: var(--docwala-purple) !important;
+}
+
+.fs-28 { font-size: 28px !important; }
+.fs-15 { font-size: 15px !important; }
+.fs-14 { font-size: 14px !important; }
+.extra-small { font-size: 11px !important; }
+
+.section-header__title .underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 3px;
+  background-color: var(--docwala-purple);
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.transition-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+
+.w-15px { width: 15px !important; }
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

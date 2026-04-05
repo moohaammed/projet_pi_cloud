@@ -12,9 +12,18 @@ export class AlzUserService {
   constructor(private http: HttpClient) {}
 
   fetchUsers(): void {
+    console.log('AlzUserService: Fetching all users from', this.apiUrl);
     this.http.get<User[]>(this.apiUrl).subscribe({
-      next: (data) => this.users.set(data),
-      error: (err) => console.error('Error fetching users:', err)
+      next: (data) => {
+        console.log(`AlzUserService: Successfully fetched ${data.length} users.`);
+        this.users.set(data);
+        if (data.length === 0) {
+          console.warn('AlzUserService: Backend returned an empty user list.');
+        }
+      },
+      error: (err) => {
+        console.error('AlzUserService: Critical error fetching users from backend:', err);
+      }
     });
   }
 

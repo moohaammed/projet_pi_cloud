@@ -18,14 +18,20 @@ export interface MessageDto {
   senderName: string;
   receiverId?: number;
   chatGroupId?: number;
+  isDistressed?: boolean;
   distressed?: boolean;
   parentMessageId?: number;
   parentMessageContent?: string;
   parentMessageSenderName?: string;
-  type?: 'TEXT' | 'POLL';
+  type?: 'TEXT' | 'POLL' | 'PUBLICATION' | 'BOT_MESSAGE' | 'MEDICATION_REMINDER';
   pollQuestion?: string;
   pollOptions?: PollOptionDto[];
+  sharedPublicationId?: number;
+  sharedPublication?: any; // To hold the nested publication object
   pinned?: boolean;
+  isPinned?: boolean;
+  sentimentScore?: number;
+  fromBot?: boolean;
 }
  
 export type MessageResponseDto = MessageDto;
@@ -36,7 +42,8 @@ export interface MessageCreateRequest {
   receiverId?: number;
   chatGroupId?: number;
   parentMessageId?: number;
-  type?: 'TEXT' | 'POLL';
+  sharedPublicationId?: number;
+  type?: 'TEXT' | 'POLL' | 'PUBLICATION' | 'BOT_MESSAGE';
   pollQuestion?: string;
   pollOptions?: string[];
 }
@@ -64,6 +71,7 @@ export class MessageService {
     if (req.receiverId) formData.append('receiverId', req.receiverId.toString());
     if (req.chatGroupId) formData.append('chatGroupId', req.chatGroupId.toString());
     if (req.parentMessageId) formData.append('parentMessageId', req.parentMessageId.toString());
+    if (req.sharedPublicationId) formData.append('sharedPublicationId', req.sharedPublicationId.toString());
     if (req.type) formData.append('type', req.type);
     if (req.pollQuestion) formData.append('pollQuestion', req.pollQuestion);
     if (req.pollOptions) {
@@ -76,7 +84,11 @@ export class MessageService {
   fetchDirectMessages(userId1: number, userId2: number) {
     return this.http.get<MessageDto[]>(`${this.baseUrl}/direct/${userId1}/${userId2}`);
   }
- 
+
+  fetchBotMessages(userId: number) {
+    return this.http.get<MessageDto[]>(`${this.baseUrl}/bot/${userId}`);
+  }
+
   deleteMessage(id: number) { 
     return this.http.delete(`${this.baseUrl}/${id}`);
   }

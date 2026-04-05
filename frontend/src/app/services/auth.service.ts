@@ -73,10 +73,10 @@ export class AuthService {
   redirectByRole(): void {
     const role = this.getRole();
     switch (role) {
-      case 'ADMIN':    this.router.navigate(['/users']); break;
-      case 'DOCTOR':   this.router.navigate(['/hospitals']); break;
-      case 'PATIENT':  this.router.navigate(['/hospitals']); break;
-      case 'RELATION': this.router.navigate(['/hospitals']); break;
+      case 'ADMIN':    this.router.navigate(['/admin/dashboard']); break;
+      case 'DOCTOR':   this.router.navigate(['/medecin-dashboard']); break;
+      case 'PATIENT':  this.router.navigate(['/patient-dashboard']); break;
+      case 'RELATION': this.router.navigate(['/patient-dashboard']); break;
       default:         this.router.navigate(['/auth/login']);
     }
   }

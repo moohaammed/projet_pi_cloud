@@ -40,6 +40,25 @@ public class Publication {
  
     @OneToMany(mappedBy = "publication", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<PublicationPollOption> pollOptions = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "group_id")
+    private ChatGroup chatGroup;
+
+    /** When type is EVENT: id in `events` table (education module). */
+    @Column(name = "linked_event_id")
+    private Long linkedEventId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "moderation_status", length = 32)
+    private ModerationStatus moderationStatus = ModerationStatus.NONE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "moderation_reason", length = 32)
+    private ModerationReason moderationReason;
+
+    @Column(name = "moderation_flagged_at")
+    private Instant moderationFlaggedAt;
  
     public Publication() {}
 
@@ -70,4 +89,17 @@ public class Publication {
  
     public List<PublicationPollOption> getPollOptions() { return pollOptions; }
     public void setPollOptions(List<PublicationPollOption> pollOptions) { this.pollOptions = pollOptions; }
+
+    public ChatGroup getChatGroup() { return chatGroup; }
+    public void setChatGroup(ChatGroup chatGroup) { this.chatGroup = chatGroup; }
+
+    public Long getLinkedEventId() { return linkedEventId; }
+    public void setLinkedEventId(Long linkedEventId) { this.linkedEventId = linkedEventId; }
+
+    public ModerationStatus getModerationStatus() { return moderationStatus; }
+    public void setModerationStatus(ModerationStatus moderationStatus) { this.moderationStatus = moderationStatus; }
+    public ModerationReason getModerationReason() { return moderationReason; }
+    public void setModerationReason(ModerationReason moderationReason) { this.moderationReason = moderationReason; }
+    public Instant getModerationFlaggedAt() { return moderationFlaggedAt; }
+    public void setModerationFlaggedAt(Instant moderationFlaggedAt) { this.moderationFlaggedAt = moderationFlaggedAt; }
 }

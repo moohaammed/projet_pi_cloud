@@ -1,13 +1,14 @@
 import { Component, inject, OnInit, signal, effect, untracked, PLATFORM_ID, computed, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { PublicationService, PublicationDto } from '../../../services/collaboration/publication.service';
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { PublicationService, PublicationDto, SharedEventPreviewDto } from '../../../services/collaboration/publication.service';
 import { AlzUserService } from '../../../services/alz-user.service';
-import { NotificationService } from '../../../services/collaboration/notification.service';
 import { CommentService } from '../../../services/collaboration/comment.service';
+import { NotificationService } from '../../../services/collaboration/notification.service';
 import { WebSocketService } from '../../../services/collaboration/websocket.service';
 import { MessageService } from '../../../services/collaboration/message.service';
+import { ChatGroupService, ChatGroupDto } from '../../../services/collaboration/chat-group.service';
 
 import { AuthService } from '../../../services/auth.service';
 import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.component';
@@ -27,18 +28,36 @@ export class FeedComponent implements OnInit {
   commentService = inject(CommentService);
   webSocketService = inject(WebSocketService);
   messageService = inject(MessageService);
+  chatGroupService = inject(ChatGroupService);
+  route = inject(ActivatedRoute);
   platformId = inject(PLATFORM_ID);
+
+  groupId = signal<number | null>(null);
+  currentGroup = signal<ChatGroupDto | null>(null);
 
   currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1); 
   currentUser = computed(() => this.authService.getCurrentUser());
   publications = computed(() => this.publicationService.publications());
   notifications = computed(() => this.notificationService.notifications());
+  unreadCount = computed(() => this.notificationService.unreadCount());
   
   getUserName(userId: number): string {
+    // 1. Try to find in the fetched users list
     const user = this.userService.users().find(u => u.id === userId);
-    if (!user) return 'User ' + userId;
-    const fullName = [user.prenom, user.nom].filter(Boolean).join(' ');
-    return fullName || 'User ' + userId;
+    if (user) {
+      const fullName = [user.prenom, user.nom].filter(Boolean).join(' ');
+      return fullName || 'User ' + userId;
+    }
+
+    // 2. Fallback: If it's the current user, use AuthService data
+    const current = this.currentUser();
+    if (current && current.id === userId) {
+      const fullName = [current.prenom, current.nom].filter(Boolean).join(' ');
+      return fullName || 'User ' + userId;
+    }
+
+    // 3. Last resort fallback
+    return 'User ' + userId;
   }
  
   getUserInitials(userId: number): string {
@@ -62,6 +81,56 @@ export class FeedComponent implements OnInit {
   editingAnonymous: boolean = false;
   openDropdownId: number | null = null;
 
+  // --- SHARING LOGIC ---
+  showShareModal = signal<boolean>(false);
+  sharingPost = signal<PublicationDto | null>(null);
+  chatGroups = computed(() => this.chatGroupService.groups());
+  shareSearchQuery = signal<string>('');
+  
+  filteredGroups = computed(() => {
+    const query = this.shareSearchQuery().toLowerCase();
+    return this.chatGroups().filter(g => 
+      g.name.toLowerCase().includes(query) || 
+      (g.description && g.description.toLowerCase().includes(query))
+    );
+  });
+
+  openShareModal(pub: PublicationDto) {
+    this.sharingPost.set(pub);
+    this.showShareModal.set(true);
+    this.chatGroupService.fetchGroups(); // Ensure groups are loaded
+  }
+
+  closeShareModal() {
+    this.showShareModal.set(false);
+    this.sharingPost.set(null);
+    this.shareSearchQuery.set('');
+  }
+
+  sharePostToGroup(groupId: number) {
+    const pub = this.sharingPost();
+    if (!pub || !pub.id) return;
+
+    this.messageService.createMessage({
+      content: `Shared a post: "${pub.content?.substring(0, 50)}${pub.content && pub.content.length > 50 ? '...' : ''}"`,
+      senderId: this.currentUserId(),
+      chatGroupId: groupId,
+      type: 'PUBLICATION',
+      sharedPublicationId: pub.id
+    }).subscribe({
+      next: () => {
+        alert('Post shared successfully!');
+        this.closeShareModal();
+        this.refreshData(); // Refresh to update share count
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Failed to share post: ' + (err.error?.message || err.message));
+      }
+    });
+  }
+  // --- END SHARING LOGIC ---
+
   constructor() {
     effect(() => {
       const uid = this.currentUserId();
@@ -84,16 +153,66 @@ export class FeedComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.refreshData();
-    }
+    this.route.params.subscribe(params => {
+      if (params['groupId']) {
+        this.groupId.set(Number(params['groupId']));
+      } else {
+        this.groupId.set(null);
+      }
+      if (isPlatformBrowser(this.platformId)) {
+        this.refreshData();
+      }
+    });
   }
 
   refreshData() {
-    this.publicationService.fetchPublications();
-    this.notificationService.fetchNotifications(this.currentUserId());
+    const gid = this.groupId();
+    const uid = this.currentUserId();
+
+    if (gid) {
+      this.publicationService.fetchGroupFeed(gid);
+      this.chatGroupService.fetchGroups(); // Refresh all just in case
+      // Find the specific group
+      this.chatGroupService.getGroupById(gid).subscribe(grp => this.currentGroup.set(grp));
+    } else if (uid) {
+      this.publicationService.fetchPersonalizedFeed(uid);
+    } else {
+      this.publicationService.fetchPublications();
+    }
+
+    this.notificationService.fetchNotifications(uid);
     this.userService.fetchUsers();
   }
+
+  // --- EMOJI PICKER LOGIC ---
+  showPostEmojiPicker = signal<boolean>(false);
+  showCommentEmojiPicker = signal<{[key: number]: boolean}>({});
+  
+  readonly EMOJI_LIST = [
+    '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😻','😼','😽','🙀','😿','😾',
+    '👋','🤚','🖐','✋','🖖','👌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','🦾','🦵','🦿','🦶','👣','👂','🦻','👃','🧠','🦷','🦴','👀','👁','👅','👄',
+    '❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','☮️','✝️','☪️','🕉','☸️','✡️','🔯',
+    '🔥','✨','⭐','🌟','☁️','☀️','🌈','☘️','🍀','🌸','🌹','🌻','🌱','🌿','🍃','🍂','🍁','🍄','🌾','🌵','🌴','🌳','🌲'
+  ];
+
+  toggleEmojiPicker(type: 'POST' | 'COMMENT', id?: number) {
+    if (type === 'POST') {
+      this.showPostEmojiPicker.set(!this.showPostEmojiPicker());
+    } else if (type === 'COMMENT' && id !== undefined) {
+      const current = this.showCommentEmojiPicker();
+      this.showCommentEmojiPicker.set({ ...current, [id]: !current[id] });
+    }
+  }
+
+  addEmoji(emoji: string, type: 'POST' | 'COMMENT', id?: number) {
+    if (type === 'POST') {
+      this.newPubContent += emoji;
+    } else if (type === 'COMMENT' && id !== undefined) {
+      const currentVal = this.newCommentContent[id] || '';
+      this.newCommentContent[id] = currentVal + emoji;
+    }
+  }
+  // --- END EMOJI LOGIC ---
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -157,7 +276,8 @@ export class FeedComponent implements OnInit {
       authorId: this.currentUserId(),
       anonymous: this.newPubAnonymous,
       pollQuestion: isVote ? this.newPollQuestion : undefined,
-      pollOptions: isVote ? validOptions : undefined
+      pollOptions: isVote ? validOptions : undefined,
+      groupId: this.groupId() || undefined
     }, this.selectedFile || undefined).subscribe({
       next: () => {
         // Reset form
@@ -168,18 +288,19 @@ export class FeedComponent implements OnInit {
         this.newPubType = 'EXPERIENCE';
         this.newPubAnonymous = false;
         
-        this.publicationService.fetchPublications();
+        this.refreshData();
       },
       error: (err) => {
         console.error('Error creating publication:', err);
-        alert('Failed to post. Please try again.');
+        alert('Failed to post: ' + (err.error?.message || err.message || 'Please try again.'));
       }
     });
   }
 
   vote(pubId: number, optionIndex: number) {
-    this.publicationService.voteInPoll(pubId, optionIndex, this.currentUserId()).subscribe(() => {
-      this.publicationService.fetchPublications();
+    this.publicationService.voteInPoll(pubId, optionIndex, this.currentUserId()).subscribe({
+      next: () => this.refreshData(),
+      error: (err) => alert('Error voting: ' + (err.error?.message || err.message))
     });
   }
 
@@ -190,6 +311,24 @@ export class FeedComponent implements OnInit {
     return Math.round(((option.votes || 0) / totalVotes) * 100);
   }
 
+  sharedEventImageUrl(ev: SharedEventPreviewDto): string {
+    if (ev.imageUrl) return 'http://localhost:8080' + ev.imageUrl;
+    return 'assets/images/event-placeholder.jpg';
+  }
+
+  onSharedEventImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/event-placeholder.jpg';
+  }
+
+  formatSharedEventDate(raw: string): string {
+    try {
+      return new Date(raw).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    } catch {
+      return raw;
+    }
+  }
+
   submitComment(pubId: number) {
     const content = this.newCommentContent[pubId];
     if (!content?.trim()) return;
@@ -197,9 +336,12 @@ export class FeedComponent implements OnInit {
       content,
       publicationId: pubId,
       authorId: this.currentUserId()
-    }).subscribe(() => {
-      this.newCommentContent[pubId] = '';
-      this.publicationService.fetchPublications();
+    }).subscribe({
+      next: () => {
+        this.newCommentContent[pubId] = '';
+        this.refreshData();
+      },
+      error: (err) => alert('Error posting comment: ' + (err.error?.message || err.message))
     });
   }
 
@@ -207,13 +349,13 @@ export class FeedComponent implements OnInit {
     this.openDropdownId = null;
     if (type === 'PUBLICATION') {
       this.publicationService.deletePublication(id).subscribe({
-        next: () => this.publicationService.fetchPublications(),
-        error: (err) => alert('Error deleting publication: ' + err.message)
+        next: () => this.refreshData(),
+        error: (err) => alert('Error deleting publication: ' + (err.error?.message || err.message))
       });
     } else {
       this.commentService.deleteComment(id).subscribe({
-        next: () => this.publicationService.fetchPublications(),
-        error: (err) => alert('Error deleting comment: ' + err.message)
+        next: () => this.refreshData(),
+        error: (err) => alert('Error deleting comment: ' + (err.error?.message || err.message))
       });
     }
   }
@@ -240,7 +382,7 @@ export class FeedComponent implements OnInit {
       }, this.selectedFile || undefined).subscribe({
         next: () => {
           this.cancelEdit();
-          this.publicationService.fetchPublications();
+          this.refreshData();
         },
         error: (err) => {
           console.error(err);
@@ -255,7 +397,7 @@ export class FeedComponent implements OnInit {
       }).subscribe({
         next: () => {
           this.cancelEdit();
-          this.publicationService.fetchPublications();
+          this.refreshData();
         },
         error: (err) => {
           console.error(err);
@@ -279,12 +421,16 @@ export class FeedComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
+    
+    // Dropdown handling
     if (!target.closest('.dropdown')) {
       this.openDropdownId = null;
     }
-  }
 
-  deleteNotification(id: number) {
-    this.notificationService.deleteNotification(id);
+    // Emoji picker handling
+    if (!target.closest('.emoji-picker-container') && !target.closest('.btn-emoji-toggle')) {
+      this.showPostEmojiPicker.set(false);
+      this.showCommentEmojiPicker.set({});
+    }
   }
 }

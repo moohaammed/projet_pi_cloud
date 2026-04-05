@@ -48,7 +48,7 @@ export class RegisterComponent {
       },
       error: (err: any) => {
         this.loading = false;
-        this.error = err.error || 'Une erreur est survenue';
+        this.error = err.error?.message || err.error || 'Une erreur est survenue';
       }
     });
   }

@@ -17,6 +17,11 @@ public class MessageCreateDto {
 
     private Long receiverId;
     private Long chatGroupId;
+    private MessageType type;
+    private String pollQuestion;
+    private List<String> pollOptions;
+    private Long parentMessageId;
+    private Long sharedPublicationId;
 
     public MessageCreateDto() {}
 
@@ -31,10 +36,6 @@ public class MessageCreateDto {
 
     public Long getChatGroupId() { return chatGroupId; }
     public void setChatGroupId(Long chatGroupId) { this.chatGroupId = chatGroupId; }
- 
-    private MessageType type;
-    private String pollQuestion;
-    private java.util.List<String> pollOptions;
 
     public MessageType getType() { return type; }
     public void setType(MessageType type) { this.type = type; }
@@ -42,11 +43,12 @@ public class MessageCreateDto {
     public String getPollQuestion() { return pollQuestion; }
     public void setPollQuestion(String pollQuestion) { this.pollQuestion = pollQuestion; }
 
-    public java.util.List<String> getPollOptions() { return pollOptions; }
-    public void setPollOptions(java.util.List<String> pollOptions) { this.pollOptions = pollOptions; }
+    public List<String> getPollOptions() { return pollOptions; }
+    public void setPollOptions(List<String> pollOptions) { this.pollOptions = pollOptions; }
 
     public Long getParentMessageId() { return parentMessageId; }
     public void setParentMessageId(Long parentMessageId) { this.parentMessageId = parentMessageId; }
 
-    private Long parentMessageId;
+    public Long getSharedPublicationId() { return sharedPublicationId; }
+    public void setSharedPublicationId(Long sharedPublicationId) { this.sharedPublicationId = sharedPublicationId; }
 }
