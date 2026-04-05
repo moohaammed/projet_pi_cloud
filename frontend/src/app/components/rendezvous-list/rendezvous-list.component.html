@@ -1,4 +1,5 @@
-<div class="page-header bg-img-hero py-5" style="background-image: url('template/assets/img/header/page-title-01.png'); background-size: cover; background-position: center;">
+<div class="page-header bg-img-hero py-5"
+  style="background-image: url('template/assets/img/header/page-title-01.png'); background-size: cover; background-position: center;">
   <div class="container py-4">
     <div class="row justify-content-center">
       <div class="col-lg-7">
@@ -14,6 +15,7 @@
 </div>
 
 <!-- Start Search & Filter Form -->
+<!-- Start Search & Filter Form -->
 <div class="container mt-n5 position-relative z-1 mb-5">
   <div class="bg-white rounded-4 p-4 shadow-lg">
     <div class="row align-items-end g-3">
@@ -21,8 +23,10 @@
         <div class="form-group">
           <label class="form-label fw-bold small text-uppercase">ID Patient</label>
           <div class="input-group">
-            <span class="input-group-text bg-light border-0"><i class="fa-solid fa-user-injured text-primary"></i></span>
-            <input type="number" class="form-control bg-light border-0" placeholder="Ex: 1" [(ngModel)]="searchPatientId" (ngModelChange)="applyFilters()">
+            <span class="input-group-text bg-light border-0"><i
+                class="fa-solid fa-user-injured text-primary"></i></span>
+            <input type="number" class="form-control bg-light border-0" placeholder="Ex: 1"
+              [(ngModel)]="searchPatientId" (ngModelChange)="applyFilters()">
           </div>
         </div>
       </div>
@@ -31,7 +35,8 @@
           <label class="form-label fw-bold small text-uppercase">ID Médecin</label>
           <div class="input-group">
             <span class="input-group-text bg-light border-0"><i class="fa-solid fa-user-md text-primary"></i></span>
-            <input type="number" class="form-control bg-light border-0" placeholder="Ex: 2" [(ngModel)]="searchMedecinId" (ngModelChange)="applyFilters()">
+            <input type="number" class="form-control bg-light border-0" placeholder="Ex: 2"
+              [(ngModel)]="searchMedecinId" (ngModelChange)="applyFilters()">
           </div>
         </div>
       </div>
@@ -51,7 +56,9 @@
         <button class="btn btn-warning w-100 py-2 fw-semibold shadow-sm" (click)="resetFilters()">
           <i class="fa-solid fa-rotate me-2"></i>Réinitialiser
         </button>
-        <a routerLink="/rendezvous/new" class="btn btn-primary btn-icon flex-shrink-0 d-flex align-items-center justify-content-center p-0" style="width: 42px; height: 42px;">
+        <a routerLink="/rendezvous/new"
+          class="btn btn-primary btn-icon flex-shrink-0 d-flex align-items-center justify-content-center p-0"
+          style="width: 42px; height: 42px;">
           <i class="fa-solid fa-plus"></i>
         </a>
       </div>
@@ -59,6 +66,45 @@
   </div>
 </div>
 <!-- /.End Search Form -->
+
+<div class="container mb-4" *ngIf="upcomingIn30MinsList.length > 0 || unconfirmedTodayAlerts > 0">
+  <div class="row">
+    <div class="col-12 d-flex flex-column gap-3">
+      <!-- Imminent Appointments -->
+      <div
+        class="alert alert-danger shadow-sm rounded-4 border-0 d-flex align-items-center justify-content-between mb-0 w-100"
+        *ngFor="let imminentRv of upcomingIn30MinsList">
+        <div class="d-flex align-items-center">
+          <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+            style="width: 40px; height: 40px;">
+            <i class="fa-solid fa-bell fs-5 bell-shake"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-0 text-dark">Rappel Imminent</h6>
+            <span class="mt-1 small">Votre rendez-vous #{{ imminentRv.id }} {{ imminentRv.motif ? '(' + imminentRv.motif
+              + ')' : '' }} est prévu dans moins de 30 minutes. Veuillez vous préparer.</span>
+          </div>
+        </div>
+        <a [routerLink]="['/rendezvous', imminentRv.id]"
+          class="btn btn-sm btn-outline-danger ms-4 rounded-pill px-3">Détails</a>
+      </div>
+
+      <!-- Unconfirmed Today -->
+      <div class="alert alert-warning shadow-sm rounded-4 border-0 d-flex align-items-center mb-0 w-100"
+        *ngIf="unconfirmedTodayAlerts > 0">
+        <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+          style="width: 40px; height: 40px;">
+          <i class="fa-solid fa-triangle-exclamation fs-5"></i>
+        </div>
+        <div>
+          <h6 class="fw-bold mb-0 text-dark">Confirmation requise</h6>
+          <span class="mt-1 small">Vous avez {{ unconfirmedTodayAlerts }} rendez-vous prévu(s) aujourd'hui qui n'est/ne
+            sont pas encore confirmé(s).</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="container pb-5">
   <div class="row">
@@ -79,79 +125,104 @@
 
     <!-- List Items -->
     <div class="col-12" *ngIf="!loading">
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <h6 class="fw-bold mb-0 text-muted small text-uppercase">
           Résultats: <strong>{{ filteredList.length }}</strong> rendez-vous trouvé(s)
         </h6>
+        <div class="btn-group shadow-sm" role="group">
+          <input type="radio" class="btn-check" name="viewRadio" id="viewList" [checked]="viewMode === 'list'"
+            (click)="viewMode = 'list'">
+          <label class="btn btn-outline-primary" for="viewList"><i class="fa-solid fa-list me-2"></i>Liste</label>
+          <input type="radio" class="btn-check" name="viewRadio" id="viewCalendar" [checked]="viewMode === 'calendar'"
+            (click)="viewMode = 'calendar'">
+          <label class="btn btn-outline-primary" for="viewCalendar"><i
+              class="fa-solid fa-calendar-alt me-2"></i>Calendrier</label>
+        </div>
       </div>
 
-      <div class="row g-4" *ngIf="filteredList.length > 0; else noData">
-        <div class="col-lg-6" *ngFor="let rv of filteredList">
-          <div class="card border-0 rounded-4 shadow-sm card-hover overflow-hidden h-100">
-            <div class="card-body p-0">
-              <div class="d-sm-flex align-items-stretch">
-                <!-- Status Sidebar -->
-                <div [ngClass]="['d-flex flex-column align-items-center justify-content-center px-3 py-4 text-white', getStatutClass(rv.statut)]" style="width: 100px; min-width: 100px;">
-                  <i class="fa-solid fa-calendar-check fs-2 mb-2"></i>
-                  <span class="text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ rv.statut ? statutLabels[rv.statut] : '—' }}</span>
-                </div>
+      <div *ngIf="viewMode === 'calendar'" class="bg-white p-4 rounded-4 shadow-sm mb-4" style="min-height: 750px;">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+      </div>
 
-                <div class="p-4 flex-grow-1">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="fw-bold mb-0 text-dark">Rendez-vous #{{ rv.id }}</h5>
-                    <span class="badge bg-light text-primary rounded-pill fw-bold">#P-{{ rv.patientId }}</span>
+      <ng-container *ngIf="viewMode === 'list'">
+        <div class="row g-4" *ngIf="filteredList.length > 0; else noData">
+          <div class="col-lg-6" *ngFor="let rv of filteredList">
+            <div class="card border-0 rounded-4 shadow-sm card-hover overflow-hidden h-100">
+              <div class="card-body p-0">
+                <div class="d-sm-flex align-items-stretch">
+                  <!-- Status Sidebar -->
+                  <div
+                    [ngClass]="['d-flex flex-column align-items-center justify-content-center px-3 py-4 text-white', getStatutClass(rv.statut)]"
+                    style="width: 100px; min-width: 100px;">
+                    <i class="fa-solid fa-calendar-check fs-2 mb-2"></i>
+                    <span class="text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ rv.statut ?
+                      statutLabels[rv.statut] : '—' }}</span>
                   </div>
 
-                  <p class="text-primary fw-medium mb-3">
-                    <i class="fa-solid fa-user-doctor me-2"></i>Médecin : ID {{ rv.medecinId }}
-                  </p>
-
-                  <div class="d-flex flex-wrap gap-3 mb-4">
-                    <div class="d-flex align-items-center text-muted small">
-                      <i class="fa-solid fa-clock me-2 text-primary opacity-75"></i>
-                      {{ rv.dateHeure | date:'dd MMM yyyy à HH:mm' }}
+                  <div class="p-4 flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h5 class="fw-bold mb-0 text-dark">Rendez-vous #{{ rv.id }}</h5>
+                      <button class="btn btn-sm btn-light text-primary rounded-pill fw-bold shadow-sm"
+                        (click)="openPatientProfile(rv.patientId)" title="Dossier Patient">
+                        <i class="fa-solid fa-user me-1"></i> #P-{{ rv.patientId }}
+                      </button>
                     </div>
-                    <div class="d-flex align-items-center text-muted small">
-                      <i class="fa-solid fa-clipboard-list me-2 text-primary opacity-75"></i>
-                      {{ rv.motif | slice:0:30 }}{{ rv.motif.length > 30 ? '...' : '' }}
-                    </div>
-                  </div>
 
-                  <div class="d-flex gap-2 mt-auto pt-3 border-top">
-                    <a [routerLink]="['/rendezvous', rv.id]" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-                      <i class="fa-solid fa-eye me-1 text-primary"></i> Détails
-                    </a>
-                    <a [routerLink]="['/rendezvous', rv.id, 'edit']" class="btn btn-outline-warning btn-sm rounded-pill px-3">
-                      <i class="fa-solid fa-pen me-1"></i> Modifier
-                    </a>
-                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-auto" (click)="confirmDelete(rv.id!)">
-                      <i class="fa-solid fa-trash me-1"></i>
-                    </button>
+                    <p class="text-primary fw-medium mb-3">
+                      <i class="fa-solid fa-user-doctor me-2"></i>Médecin : ID {{ rv.medecinId }}
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                      <div class="d-flex align-items-center text-muted small">
+                        <i class="fa-solid fa-clock me-2 text-primary opacity-75"></i>
+                        {{ rv.dateHeure | date:'dd MMM yyyy à HH:mm' }}
+                      </div>
+                      <div class="d-flex align-items-center text-muted small">
+                        <i class="fa-solid fa-clipboard-list me-2 text-primary opacity-75"></i>
+                        {{ rv.motif | slice:0:30 }}{{ rv.motif.length > 30 ? '...' : '' }}
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-auto pt-3 border-top">
+                      <a [routerLink]="['/rendezvous', rv.id]" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                        <i class="fa-solid fa-eye me-1 text-primary"></i> Détails
+                      </a>
+                      <a [routerLink]="['/rendezvous', rv.id, 'edit']"
+                        class="btn btn-outline-warning btn-sm rounded-pill px-3">
+                        <i class="fa-solid fa-pen me-1"></i> Modifier
+                      </a>
+                      <button class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-auto"
+                        (click)="confirmDelete(rv.id!)">
+                        <i class="fa-solid fa-trash me-1"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Pagination Placeholder -->
-      <nav class="mt-5" *ngIf="filteredList.length > 0">
-        <ul class="pagination justify-content-center m-0">
-          <li class="page-item active"><a class="page-link shadow-sm border-0 rounded-3 mx-1" href="#">1</a></li>
-          <li class="page-item"><a class="page-link shadow-sm border-0 rounded-3 mx-1 text-muted" href="#">2</a></li>
-          <li class="page-item ms-3">
-            <a class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm" href="#">Suivant <i class="fa-solid fa-arrow-right ms-2"></i></a>
-          </li>
-        </ul>
-      </nav>
+        <!-- Pagination Placeholder -->
+        <nav class="mt-5" *ngIf="filteredList.length > 0 && viewMode === 'list'">
+          <ul class="pagination justify-content-center m-0">
+            <li class="page-item active"><a class="page-link shadow-sm border-0 rounded-3 mx-1" href="#">1</a></li>
+            <li class="page-item"><a class="page-link shadow-sm border-0 rounded-3 mx-1 text-muted" href="#">2</a></li>
+            <li class="page-item ms-3">
+              <a class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm" href="#">Suivant <i
+                  class="fa-solid fa-arrow-right ms-2"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </ng-container>
     </div>
 
     <!-- Empty State -->
     <ng-template #noData>
       <div class="col-12 py-5 text-center">
         <div class="bg-white p-5 rounded-4 shadow-sm">
-          <img src="template/assets/img/illustration/schedule-meeting.svg" alt="Empty" style="width: 200px; opacity: 0.5;" class="mb-4">
+          <img src="template/assets/img/illustration/schedule-meeting.svg" alt="Empty"
+            style="width: 200px; opacity: 0.5;" class="mb-4">
           <h4 class="fw-bold">Aucun rendez-vous trouvé</h4>
           <p class="text-muted">Commencez par planifier votre premier rendez-vous médical.</p>
           <a routerLink="/rendezvous/new" class="btn btn-primary btn-lg px-5 mt-3 rounded-pill shadow">
@@ -165,7 +236,8 @@
 
 <!-- Modal logic stayed the same but let's use template modal classes if needed -->
 <!-- Delete confirm modal -->
-<div class="modal fade show" tabindex="-1" *ngIf="deleteConfirmId !== null" style="display: block; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
+<div class="modal fade show" tabindex="-1" *ngIf="deleteConfirmId !== null"
+  style="display: block; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 rounded-4 shadow">
       <div class="modal-body p-4 text-center">
@@ -173,12 +245,97 @@
           <i class="fa-solid fa-triangle-exclamation fs-1"></i>
         </div>
         <h4 class="fw-bold">Confirmer la suppression</h4>
-        <p class="text-muted">Voulez-vous vraiment supprimer le rendez-vous <strong>#{{ deleteConfirmId }}</strong> ? Cette action est irréversible.</p>
+        <p class="text-muted">Voulez-vous vraiment supprimer le rendez-vous <strong>#{{ deleteConfirmId }}</strong> ?
+          Cette action est irréversible.</p>
         <div class="d-flex gap-2 mt-4">
           <button class="btn btn-light w-100 py-2 rounded-3" (click)="cancelDelete()">Annuler</button>
           <button class="btn btn-danger w-100 py-2 rounded-3" (click)="doDelete(deleteConfirmId!)">Supprimer</button>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Patient Profile -->
+<div class="modal fade show" tabindex="-1" *ngIf="selectedPatientId !== null"
+  style="display: block; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999;">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+      <!-- Header -->
+      <div class="modal-header border-0 bg-primary bg-gradient text-white p-4">
+        <div class="d-flex align-items-center">
+          <div
+            class="bg-white rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-3 shadow-sm me-3"
+            style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-user-injured"></i>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">Dossier Patient</h4>
+            <div class="text-white-50 small mt-1">Identifiant Unique : #{{ selectedPatientId }}</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-light rounded-circle shadow-sm" style="width: 40px; height: 40px;"
+          (click)="closePatientProfile()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body p-4 bg-light">
+        <div class="row g-4">
+          <!-- Statut Card -->
+          <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-3">
+              <span class="small text-uppercase text-muted fw-bold mb-2">Comportement Patient</span>
+              <h4 class="mb-0 fw-bold text-{{ patientStatus.color }}">
+                {{ patientStatus.label }}
+              </h4>
+            </div>
+          </div>
+
+          <!-- Notes Médicales -->
+          <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+              <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-notes-medical text-primary me-2"></i>Notes
+                  Médicales</h6>
+              </div>
+              <div class="card-body p-4">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item px-0 border-0 text-muted small py-2 d-flex align-items-start"
+                    *ngFor="let note of patientNotes">
+                    <i class="fa-solid fa-check text-success mt-1 me-2"></i> {{ note }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Historique -->
+          <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+              <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h6 class="fw-bold mb-0 text-dark"><i
+                    class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Historique des RDV</h6>
+              </div>
+              <div class="card-body p-4">
+                <div class="timeline-container" style="max-height: 250px; overflow-y: auto;">
+                  <div class="d-flex align-items-start mb-3" *ngFor="let h of patientHistory">
+                    <span class="badge {{ getStatutClass(h.statut) }} text-center" style="min-width: 80px;">{{ h.statut
+                      ? statutLabels[h.statut] : 'N/A' }}</span>
+                    <div class="ms-3 mb-2 px-3 py-2 bg-light rounded-3 flex-grow-1">
+                      <div class="small fw-bold text-dark">{{ h.dateHeure | date:'dd MMM yyyy à HH:mm' }}</div>
+                      <div class="small text-muted text-truncate" style="max-width: 150px;"
+                        [title]="h.motif || 'Aucun motif'">{{ h.motif || '—' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

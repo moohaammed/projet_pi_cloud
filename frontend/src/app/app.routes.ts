@@ -114,6 +114,26 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/collaboration/groups-list/groups-list.component')
             .then(m => m.GroupsListComponent)
+      },
+      {
+        path: 'groups/:groupId/feed',
+        loadComponent: () =>
+          import('./components/collaboration/feed/feed.component')
+            .then(m => m.FeedComponent)
+      },
+    ]
+  },
+
+  // --- ADMIN ROUTES ---
+  {
+    path: 'admin',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./components/dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
       }
     ]
   },
