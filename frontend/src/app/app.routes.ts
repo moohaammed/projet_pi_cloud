@@ -16,11 +16,12 @@ import { CommunicationTestComponent } from './components/collaboration/communica
 import { GestionPatientRoleComponent } from './gestion-patient-role/gestion-patient-role.component';
 import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard.component';
 import { MedecinDashboardComponent } from './medecin-dashboard/medecin-dashboard.component';
+import { HomeComponent } from './components/home/home.component';
 
 export const routes: Routes = [
 
   // ===== AUTH AlzCare =====
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: 'auth/login',
     loadComponent: () =>
@@ -33,6 +34,7 @@ export const routes: Routes = [
       import('./components/auth/register/register.component')
         .then(m => m.RegisterComponent)
   },
+  { path: 'home', component: HomeComponent, canActivate: [authGuard] },
 
   // ===== USERS AlzCare =====
   {

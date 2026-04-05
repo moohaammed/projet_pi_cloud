@@ -113,6 +113,38 @@ export class MiniChatWidgetComponent implements OnInit {
     return '';
   });
 
+  getUserName(userId: number): string {
+    const user = this.userService.users().find(u => u.id === userId);
+    if (user) return `${user.prenom} ${user.nom}`.trim() || `User ${userId}`;
+    const current = this.authService.getCurrentUser();
+    if (current && current.id === userId) return `${current.prenom} ${current.nom}`.trim() || `User ${userId}`;
+    return `User ${userId}`;
+  }
+
+  getUserInitials(userId: number): string {
+    const name = this.getUserName(userId);
+    if (!name || name.startsWith('User ')) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  }
+
+  getUserImage(userId: number): string | null {
+    const user = this.userService.users().find(u => u.id === userId);
+    let imageUrl = null;
+    if (user && user.image) {
+      imageUrl = user.image;
+    } else {
+      const current = this.authService.getCurrentUser();
+      if (current && current.id === userId && current.image) {
+        imageUrl = current.image;
+      }
+    }
+
+    if (imageUrl && imageUrl.startsWith('/uploads/')) {
+      return 'http://localhost:8080' + imageUrl;
+    }
+    return imageUrl;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;

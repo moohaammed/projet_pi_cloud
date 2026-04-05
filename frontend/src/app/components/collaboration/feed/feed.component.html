@@ -21,7 +21,10 @@
   <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
     <div class="card-body p-4">
       <div class="d-flex align-items-center gap-3 mb-3">
-        <div
+        <div *ngIf="getUserImage(currentUserId())" class="avatar-sm rounded-circle overflow-hidden shadow-sm">
+          <img [src]="getUserImage(currentUserId())" class="w-100 h-100 object-fit-cover" alt="User Image">
+        </div>
+        <div *ngIf="!getUserImage(currentUserId())"
           class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
           {{ getUserInitials(currentUserId()) }}
         </div>
@@ -125,7 +128,10 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex align-items-center gap-3">
           <!-- AVATAR -->
-          <div
+          <div *ngIf="!pub.anonymous && getUserImage(pub.authorId)" class="avatar-md rounded-circle overflow-hidden shadow-sm">
+            <img [src]="getUserImage(pub.authorId)" class="w-100 h-100 object-fit-cover" alt="Author Image">
+          </div>
+          <div *ngIf="pub.anonymous || !getUserImage(pub.authorId)"
             class="avatar-md bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-15">
             <ng-container *ngIf="pub.type === 'ANNOUNCEMENT'; else normalInitials">
               <i class="fa-solid fa-bullhorn"></i>
@@ -313,7 +319,10 @@
       <!-- Comments List -->
       <div class="comments-section mt-4">
         <div *ngFor="let comment of pub.comments" class="social-comment d-flex gap-3 mb-3">
-          <div
+          <div *ngIf="getUserImage(comment.authorId)" class="avatar-sm flex-shrink-0 rounded-circle overflow-hidden shadow-sm">
+            <img [src]="getUserImage(comment.authorId)" class="w-100 h-100 object-fit-cover" alt="Commenter Image">
+          </div>
+          <div *ngIf="!getUserImage(comment.authorId)"
             class="avatar-sm flex-shrink-0 bg-soft-secondary rounded-circle d-flex align-items-center justify-content-center text-dark fw-bold fs-11">
             {{ (comment.authorName || 'U').substring(0,1).toUpperCase() }}
           </div>
@@ -348,7 +357,10 @@
 
         <!-- NEW Comment Input with Avatar -->
         <div class="new-comment-social d-flex gap-3 mt-4 align-items-start">
-          <div
+          <div *ngIf="getUserImage(currentUserId())" class="avatar-sm flex-shrink-0 rounded-circle overflow-hidden shadow-sm">
+            <img [src]="getUserImage(currentUserId())" class="w-100 h-100 object-fit-cover" alt="User Image">
+          </div>
+          <div *ngIf="!getUserImage(currentUserId())"
             class="avatar-sm flex-shrink-0 bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-11">
             {{ getUserInitials(currentUserId()) }}
           </div>

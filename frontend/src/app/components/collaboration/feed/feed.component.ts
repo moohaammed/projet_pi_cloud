@@ -65,6 +65,28 @@ export class FeedComponent implements OnInit {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
   }
+
+  getUserImage(userId: number): string | null {
+    // 1. Try to find in the fetched users list
+    const user = this.userService.users().find(u => u.id === userId);
+    let imageUrl = null;
+    if (user && user.image) {
+      imageUrl = user.image;
+    }
+
+    // 2. Fallback: If it's the current user, use AuthService data
+    if (!imageUrl) {
+      const current = this.currentUser();
+      if (current && current.id === userId && current.image) {
+        imageUrl = current.image;
+      }
+    }
+
+    if (imageUrl && imageUrl.startsWith('/uploads/')) {
+      return 'http://localhost:8080' + imageUrl;
+    }
+    return imageUrl;
+  }
   
   newPubContent = '';
   newPubType = 'EXPERIENCE';

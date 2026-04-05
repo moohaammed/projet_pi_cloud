@@ -45,6 +45,25 @@ export class AuthService {
   }
 
   register(data: any): Observable<any> {
+    // If it's FormData, let the browser handle the content type and boundary
+    if (data instanceof FormData) {
+      return this.http.post(`${this.apiUrl}/register`, data, { responseType: 'text' }).pipe(
+        tap(res => {
+          let user;
+          try {
+            user = JSON.parse(res);
+          } catch (e) {
+            user = res;
+          }
+          if (this.isBrowser && typeof user === 'object') {
+            localStorage.setItem('user', JSON.stringify(user));
+          }
+          this.loggedIn$.next(true);
+        })
+      );
+    }
+
+    // Fallback for JSON registration if needed
     return this.http.post(`${this.apiUrl}/register`, data, { responseType: 'text' }).pipe(
       tap(res => {
         let user;
@@ -104,7 +123,7 @@ export class AuthService {
     switch (role) {
       case 'ADMIN':    this.router.navigate(['/admin/dashboard']); break;
       case 'DOCTOR':   this.router.navigate(['/medecin-dashboard']); break;
-      case 'PATIENT':  this.router.navigate(['/patient-dashboard']); break;
+      case 'PATIENT':  this.router.navigate(['/home']); break;
       case 'RELATION': this.router.navigate(['/patient-dashboard']); break;
       default:         this.router.navigate(['/auth/login']);
     }

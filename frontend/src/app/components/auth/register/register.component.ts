@@ -15,12 +15,14 @@ export class RegisterComponent {
 
   data = {
     nom: '', prenom: '', email: '',
-    password: '', telephone: '', role: Role.PATIENT
+    password: '', telephone: '', image: '', role: Role.PATIENT
   };
   confirmPassword = '';
   loading = false;
   error = '';
   showPassword = false;
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
 
   roles = [
     { value: Role.DOCTOR,   label: 'Médecin',       icon: 'fa-user-doctor' },
@@ -29,6 +31,18 @@ export class RegisterComponent {
   ];
 
   constructor(private authService: AuthService, private router: Router) {}
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   register(): void {
     if (!this.data.nom || !this.data.email || !this.data.password) {
@@ -41,7 +55,19 @@ export class RegisterComponent {
     }
     this.loading = true;
     this.error = '';
-    this.authService.register(this.data).subscribe({
+
+    const formData = new FormData();
+    formData.append('nom', this.data.nom);
+    formData.append('prenom', this.data.prenom);
+    formData.append('email', this.data.email);
+    formData.append('password', this.data.password);
+    formData.append('telephone', this.data.telephone);
+    formData.append('role', this.data.role);
+    if (this.selectedFile) {
+      formData.append('file', this.selectedFile);
+    }
+
+    this.authService.register(formData).subscribe({
       next: () => {
         this.loading = false;
         this.authService.redirectByRole();
