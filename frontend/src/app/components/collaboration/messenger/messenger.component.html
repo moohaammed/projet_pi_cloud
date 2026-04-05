@@ -101,6 +101,13 @@
               </div>
             </div>
             <div class="d-flex align-items-center gap-2">
+              <button *ngIf="canStartVideoCall()" type="button"
+                class="btn btn-success btn-sm rounded-pill px-3 shadow-sm"
+                (click)="openMessengerVideoCall()"
+                title="Video call (same system as rendezvous — share this chat and press Démarrer l'appel)">
+                <i class="fa-solid fa-video me-1"></i>
+                Video call
+              </button>
               <button *ngIf="activeChatType() === 'BOT'" type="button"
                 class="btn btn-outline-secondary btn-sm rounded-pill px-3"
                 [disabled]="medReminderLoading()"

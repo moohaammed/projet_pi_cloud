@@ -61,7 +61,7 @@
         <div class="card-footer bg-light p-4 px-5 border-top border-opacity-10">
           <div class="d-flex flex-wrap gap-3 align-items-center">
 
-            <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="showVideoCall = true">
+            <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="toggleVideoCall()">
               <i class="fa-solid fa-video me-2"></i>Lancer l'Appel
             </button>
 
@@ -84,10 +84,6 @@
     </div>
   </div>
 </div>
-
-<!-- Lancement de l'appel Vidéo -->
-<app-videocall *ngIf="showVideoCall && rv" [roomId]="rv.id.toString()"
-  (closeCall)="showVideoCall = false"></app-videocall>
 
 <!-- Delete confirm modal -->
 <div class="modal fade show" tabindex="-1" *ngIf="deleteConfirm"

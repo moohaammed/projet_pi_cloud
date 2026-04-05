@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal, effect, untracked, PLATFORM_ID, computed, SecurityContext, HostListener } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, DestroyRef, signal, effect, untracked, PLATFORM_ID, computed, SecurityContext, HostListener } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,16 +14,21 @@ import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.co
 import { CareRelayService, HandoverDTO } from '../../../services/collaboration/care-relay.service';
 import { AuthService } from '../../../services/auth.service';
 import { CareBotService } from '../../../services/collaboration/care-bot.service';
+import { VideoCallComponent } from '../../videocall/videocall.component';
+import { VideoCallService } from '../../../services/videocall.service';
+import { Subscription } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-messenger',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MiniChatWidgetComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MiniChatWidgetComponent, VideoCallComponent],
   templateUrl: './messenger.component.html',
   styleUrls: ['./messenger.component.scss']
 })
-export class MessengerComponent implements OnInit {
+export class MessengerComponent implements OnInit, OnDestroy {
   authService = inject(AuthService);
+  videoCallService = inject(VideoCallService);
   messageService = inject(MessageService);
   chatGroupService = inject(ChatGroupService);
   userService = inject(AlzUserService);
@@ -34,6 +40,7 @@ export class MessengerComponent implements OnInit {
   route = inject(ActivatedRoute);
   router = inject(Router);
   careBotApi = inject(CareBotService);
+  private destroyRef = inject(DestroyRef);
 
   currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1);
   medReminderLoading = signal(false);
@@ -86,7 +93,18 @@ export class MessengerComponent implements OnInit {
   }
   activeChatType = signal<'GROUP' | 'DM' | 'BOT'>('GROUP');
   activeDmUserId = signal<number | null>(null);
+  /** Incoming ring handled by AppComponent/VideoCallService. */
+  private videoListenRoomId = '';
   showInfoSidebar = signal<boolean>(false);
+
+  /** Video call available for group chat or 1:1 DM (not CareBot thread). */
+  canStartVideoCall = computed(() => {
+    const t = this.activeChatType();
+    if (t === 'BOT') return false;
+    if (t === 'GROUP') return !!this.activeGroup()?.id;
+    if (t === 'DM') return this.activeDmUserId() != null;
+    return false;
+  });
   showHandoverPanel = signal<boolean>(false);
   handoverData = computed(() => this.careRelayService.handover());
   notifications = computed(() => this.notificationService.notifications());
@@ -251,6 +269,34 @@ export class MessengerComponent implements OnInit {
         });
       }
     }, { allowSignalWrites: true });
+
+    effect(() => {
+      const uid = this.currentUserId();
+      const chatType = this.activeChatType();
+      const group = this.activeGroup();
+      const dmOther = this.activeDmUserId();
+      if (!isPlatformBrowser(this.platformId)) return;
+      untracked(() => {
+        let roomId = '';
+        if (chatType === 'GROUP' && group?.id != null) {
+          roomId = `collab-group-${group.id}`;
+        } else if (chatType === 'DM' && dmOther != null) {
+          const a = Math.min(uid, dmOther);
+          const b = Math.max(uid, dmOther);
+          roomId = `collab-dm-${a}-${b}`;
+        }
+        const prev = this.videoListenRoomId;
+        if (prev && prev !== roomId) {
+          this.videoCallService.unsubscribeFromRoom(prev);
+        }
+        this.videoListenRoomId = roomId;
+        // Always connect video STOMP so /user/queue/videocall (DM ring) works even if no chat is selected.
+        this.videoCallService.connect(String(uid));
+        if (roomId) {
+          this.videoCallService.ensureSubscribedToRoom(roomId);
+        }
+      });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit() {
@@ -259,8 +305,23 @@ export class MessengerComponent implements OnInit {
       this.route.queryParams.subscribe(params => {
         if (params['dm']) {
           this.openDmChat(Number(params['dm']));
+        } else if (params['group']) {
+          const gid = Number(params['group']);
+          const grp = this.chatGroupService.groups().find(g => g.id === gid);
+          if (grp) {
+            this.enterGroup(grp);
+          } else {
+            this.chatGroupService.getGroupById(gid).subscribe(g => this.enterGroup(g));
+          }
         }
       });
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (this.videoListenRoomId) {
+      this.videoCallService.unsubscribeFromRoom(this.videoListenRoomId);
     }
   }
 
@@ -327,6 +388,72 @@ export class MessengerComponent implements OnInit {
     this.messageService.fetchBotMessages(this.currentUserId()).subscribe(data => {
       this.botMessages.set(data);
     });
+  }
+
+  private computeMessengerVideoRoomId(): string {
+    const me = this.currentUserId();
+    if (this.activeChatType() === 'GROUP') {
+      const gid = this.activeGroup()?.id;
+      if (gid == null) return '';
+      return `collab-group-${gid}`;
+    }
+    if (this.activeChatType() === 'DM') {
+      const other = this.activeDmUserId();
+      if (other == null) return '';
+      const a = Math.min(me, other);
+      const b = Math.max(me, other);
+      return `collab-dm-${a}-${b}`;
+    }
+    return '';
+  }
+
+  openMessengerVideoCall(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const me = this.currentUserId();
+    const roomId = this.computeMessengerVideoRoomId();
+    if (!roomId) return;
+
+    this.videoCallService.connect(String(me));
+    this.videoCallService.ensureSubscribedToRoom(roomId);
+
+    const sendInvite = () => {
+      const u = this.authService.getCurrentUser();
+      const callerName =
+        [u?.prenom, u?.nom].filter(Boolean).join(' ') ||
+        (u as any)?.username ||
+        u?.email ||
+        'Someone';
+      const invite: {
+        type: string;
+        senderId: string;
+        data: { roomId: string; callerName: string };
+        recipientId?: string;
+      } = {
+        type: 'messenger-invite',
+        senderId: String(me),
+        data: { roomId, callerName },
+      };
+      if (this.activeChatType() === 'DM' && this.activeDmUserId() != null) {
+        invite.recipientId = String(this.activeDmUserId());
+      }
+      this.videoCallService.sendSignal(roomId, invite);
+    };
+
+    if (this.videoCallService.isConnected$.value) {
+      sendInvite();
+      this.videoCallService.openCall(roomId);
+    } else {
+      this.videoCallService.isConnected$
+        .pipe(filter((c) => c), take(1), takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          sendInvite();
+          this.videoCallService.openCall(roomId);
+        });
+    }
+  }
+
+  closeMessengerVideoCall(): void {
+    this.videoCallService.closeCallOverlay();
   }
 
   sendGroupMessage(groupId: number) {

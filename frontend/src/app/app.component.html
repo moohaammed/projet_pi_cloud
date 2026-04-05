@@ -232,3 +232,20 @@
     </footer>
   </ng-template>
 </ng-template>
+
+<!-- GLOBAL VIDEO CALL RINGING UI -->
+<div *ngIf="incomingVideoCall() as inv"
+  class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-4 py-3 bg-dark text-white rounded-4 shadow-lg d-flex flex-wrap align-items-center gap-3"
+  style="z-index: 9999; max-width: min(520px, 94vw);">
+  <i class="fa-solid fa-video text-success fs-5"></i>
+  <span class="fw-medium flex-grow-1">{{ inv.callerName }} is calling…</span>
+  <button type="button" class="btn btn-success btn-sm rounded-pill px-3" (click)="acceptIncomingVideoCall()">Accept</button>
+  <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3" (click)="declineIncomingVideoCall()">Decline</button>
+</div>
+
+<!-- GLOBAL VIDEO CALL OVERLAY -->
+<app-videocall
+  *ngIf="showVideoCall() && videoCallRoomId()"
+  [roomId]="videoCallRoomId()"
+  (closeCall)="closeGlobalVideoCall()">
+</app-videocall>

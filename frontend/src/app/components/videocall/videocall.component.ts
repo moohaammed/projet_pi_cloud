@@ -26,6 +26,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   private peerConnection?: RTCPeerConnection;
   private subscription?: Subscription;
   private signalSubscription?: Subscription;
+  private joinResendTimers: number[] = [];
   private currentUser: any;
 
   public isMuted = false;
@@ -77,10 +78,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
         console.log('VC: Connecté au serveur, inscription à la room...');
         this.videoCallService.subscribe(this.roomId);
         this.startLocalStream();
-        setTimeout(() => {
-          console.log('VC: Envoi du signal JOIN');
-          this.sendJoinSignal();
-        }, 1500);
+        this.scheduleJoinSignals();
       }
     });
 
@@ -90,11 +88,31 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.clearJoinTimers();
     this.sendLeaveSignal();
     this.hangup();
     this.subscription?.unsubscribe();
     this.signalSubscription?.unsubscribe();
-    this.videoCallService.disconnect();
+    if (this.roomId) {
+      this.videoCallService.unsubscribeFromRoom(this.roomId);
+    }
+  }
+
+  private scheduleJoinSignals(): void {
+    this.clearJoinTimers();
+    const delays = [120, 700, 2200];
+    delays.forEach((ms) => {
+      const id = window.setTimeout(() => {
+        console.log('VC: Envoi du signal JOIN (retry cadence)');
+        this.sendJoinSignal();
+      }, ms);
+      this.joinResendTimers.push(id);
+    });
+  }
+
+  private clearJoinTimers(): void {
+    this.joinResendTimers.forEach((t) => window.clearTimeout(t));
+    this.joinResendTimers = [];
   }
 
   private getUserDisplayName(): string {
@@ -122,7 +140,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   private processJoin(msg: SignalMessage) {
     const myId = this.currentUser?.id ? this.currentUser.id.toString() : '';
-    if (msg.senderId === myId) return;
+    if (String(msg.senderId) === String(myId)) return;
 
     let dataObj = msg.data;
     if (typeof msg.data === 'string') {
@@ -211,7 +229,8 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   private async handleSignalMessage(msg: SignalMessage) {
     const myId = this.currentUser?.id ? this.currentUser.id.toString() : '';
-    if (!msg || msg.senderId === myId) return;
+    if (!msg || String(msg.senderId) === String(myId)) return;
+    if (msg.type === 'messenger-invite') return;
 
     console.log('VC REÇU:', msg.type);
 
