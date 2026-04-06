@@ -1,1 +1,98 @@
-<p>user-list works!</p>
+<div class="row mb-5 animate-fade-in">
+  <div class="col-12">
+    <div class="section-header text-start mb-4">
+      <h2 class="fw-bold mb-1 section-header__title text-capitalize fs-28">
+        User <span class="underline position-relative text-primary">Management</span>
+      </h2>
+      <div class="sub-title fs-15 text-muted">Review, activate, or restrict platform access for all registered members.</div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow rounded-4 overflow-hidden bg-white animate-fade-in">
+  <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+       <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold mr-3">
+          {{ users.length }} Total Users
+       </span>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-soft-primary btn-sm fw-bold rounded-pill px-4" (click)="load()">
+        <i class="fa-solid fa-arrows-rotate me-2"></i> Sync
+      </button>
+      <a routerLink="/users/new" class="btn btn-primary btn-sm fw-bold rounded-pill px-4">
+        <i class="fa-solid fa-plus me-2"></i> Add User
+      </a>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="bg-grey border-bottom border-black border-opacity-10">
+        <tr>
+          <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">User Profile</th>
+          <th class="py-3 text-uppercase small fw-bold text-muted">Role</th>
+          <th class="py-3 text-uppercase small fw-bold text-muted">Contact</th>
+          <th class="py-3 text-uppercase small fw-bold text-muted">Status</th>
+          <th class="text-end pe-4 py-3 text-uppercase small fw-bold text-muted">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of users">
+          <td class="ps-4 py-3">
+            <div class="d-flex align-items-center">
+              <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 42px; height: 42px;">
+                {{ u.nom ? u.nom[0] : 'U' }}
+              </div>
+              <div>
+                <div class="fw-bold text-dark">{{ u.prenom }} {{ u.nom }}</div>
+                <div class="text-muted small">UID: #{{ u.id }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge rounded-pill px-3 py-1 fw-bold small text-uppercase" 
+                  [ngClass]="{
+                    'bg-soft-primary text-primary': u.role === 'ADMIN',
+                    'bg-soft-success text-success': u.role === 'DOCTOR',
+                    'bg-soft-info text-info': u.role === 'PATIENT' || u.role === 'RELATION'
+                  }">
+              {{ u.role }}
+            </span>
+          </td>
+          <td>
+            <div class="small fw-medium"><i class="fa-regular fa-envelope me-1 text-muted"></i> {{ u.email }}</div>
+            <div class="small text-muted" *ngIf="u.telephone"><i class="fa fa-phone me-1 text-muted" style="font-size: 10px;"></i> {{ u.telephone }}</div>
+          </td>
+          <td>
+            <div class="form-check form-switch cursor-pointer">
+              <input class="form-check-input" type="checkbox" [checked]="u.actif" (change)="toggleActif(u.id!)" style="cursor: pointer;">
+              <span class="small ms-2 fw-bold" [class.text-success]="u.actif" [class.text-danger]="!u.actif">
+                {{ u.actif ? 'Active' : 'Suspended' }}
+              </span>
+            </div>
+          </td>
+          <td class="text-end pe-4">
+            <div class="dropdown">
+              <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
+                <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 animate-fade-in">
+                <li><a class="dropdown-item py-2 fw-medium rounded-3" [routerLink]="['/users/edit', u.id]"><i class="fa-solid fa-pen-to-square me-2 text-muted"></i> Edit Profile</a></li>
+                <li><button class="dropdown-item py-2 fw-medium rounded-3 text-danger" (click)="delete(u.id!)"><i class="fa-solid fa-trash-can me-2"></i> Remove Access</button></li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="loading">
+           <td colspan="5" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status"></div>
+           </td>
+        </tr>
+        <tr *ngIf="!loading && users.length === 0">
+          <td colspan="5" class="text-center py-5 text-muted">No users found in the system.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

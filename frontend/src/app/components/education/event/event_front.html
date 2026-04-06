@@ -141,7 +141,7 @@
 
   <!-- ── GRILLE ── -->
   <div class="events-grid" *ngIf="pagedEvents.length > 0">
-    <div class="event-card" *ngFor="let event of pagedEvents">
+    <div class="event-card" *ngFor="let event of pagedEvents" [attr.id]="event.id != null ? 'edu-event-' + event.id : null">
 
       <div class="card-image-wrapper">
         <img [src]="getImageUrl(event.imageUrl)" [alt]="event.title" class="card-image" (error)="onImgError($event)"/>
@@ -149,6 +149,12 @@
           {{ isUpcoming(event.startDateTime) ? 'À venir' : 'Passé' }}
         </div>
         <div class="card-actions-overlay">
+          <button class="action-btn share-btn" type="button" (click)="openShareDialog(event); $event.stopPropagation()" title="Partager dans la communauté">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </button>
           <button class="action-btn edit-btn" (click)="edit(event)" title="Modifier">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -244,5 +250,11 @@
       Créer un événement
     </button>
   </div>
+
+  <app-share-event-dialog
+    [open]="shareDialogOpen"
+    (openChange)="onShareDialogChange($event)"
+    [event]="shareEvent"
+  ></app-share-event-dialog>
 
 </div>

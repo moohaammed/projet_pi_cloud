@@ -2,6 +2,7 @@ package esprit.tn.backpi.controllers.collaboration;
 
 import esprit.tn.backpi.dto.collaboration.PublicationCreateDto;
 import esprit.tn.backpi.dto.collaboration.PublicationResponseDto;
+import esprit.tn.backpi.entities.collaboration.PublicationType;
 import esprit.tn.backpi.services.collaboration.PublicationService;
 import esprit.tn.backpi.services.collaboration.FileStorageService;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,16 @@ public class PublicationController {
         return publicationService.getAllPublications();
     }
 
+    @GetMapping("/feed/{userId}")
+    public List<PublicationResponseDto> getPersonalizedFeed(@PathVariable("userId") Long userId) {
+        return publicationService.getPersonalizedFeed(userId);
+    }
+
+    @GetMapping("/group/{groupId}")
+    public List<PublicationResponseDto> getGroupFeed(@PathVariable("groupId") Long groupId) {
+        return publicationService.getGroupFeed(groupId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PublicationResponseDto> getPublicationById(@PathVariable("id") Long id) {
         PublicationResponseDto publication = publicationService.getPublicationById(id);
@@ -40,7 +51,30 @@ public class PublicationController {
     @PostMapping(consumes = "multipart/form-data")
     public PublicationResponseDto createPublication(
             @Valid @ModelAttribute PublicationCreateDto dto,
+            @RequestParam(value = "type", required = false) String typeStr,
+            @RequestParam(value = "pollOptions", required = false) List<String> pollOptions,
+            @RequestParam(value = "pollQuestion", required = false) String pollQuestion,
+            @RequestParam(value = "linkedEventId", required = false) Long linkedEventId,
             @RequestParam(value = "file", required = false) MultipartFile file) {
+
+        if (linkedEventId != null) {
+            dto.setLinkedEventId(linkedEventId);
+        }
+
+        // Log incoming poll options
+        if (typeStr != null && dto.getType() == null) {
+            try {
+                dto.setType(PublicationType.valueOf(typeStr.toUpperCase()));
+            } catch (Exception e) {
+                // Ignore invalid type
+            }
+        }
+        if (pollOptions != null) {
+            dto.setPollOptions(pollOptions);
+        }
+        if (pollQuestion != null) {
+            dto.setPollQuestion(pollQuestion);
+        }
 
         String mediaUrl = null;
         String mimeType = null;

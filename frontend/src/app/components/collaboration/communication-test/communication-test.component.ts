@@ -1,58 +1,91 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.component';
- 
+import { ChatGroupService } from '../../../services/collaboration/chat-group.service';
+import { AlzUserService } from '../../../services/alz-user.service';
+import { AuthService } from '../../../services/auth.service';
+import { NotificationService } from '../../../services/collaboration/notification.service';
+import { FormsModule } from '@angular/forms';
+import { filter } from 'rxjs/operators';
+
 @Component({
   selector: 'app-communication-test',
   standalone: true,
-  imports: [CommonModule, RouterModule, MiniChatWidgetComponent],
+  imports: [CommonModule, RouterModule, MiniChatWidgetComponent, FormsModule],
   templateUrl: './communication-test.component.html',
-  styles: [`
-    .max-h-500 { max-height: 500px; }
-    .cursor-pointer { cursor: pointer; }
-    .transition-all { transition: all 0.2s ease-in-out; }
-    .hover-bg-light:hover { background-color: #f8f9fa !important; }
-    .shadow-soft-primary { box-shadow: 0 10px 30px -10px rgba(0, 107, 230, 0.2) !important; }
-    .btn-soft-primary { background: rgba(0, 107, 230, 0.1); color: #006be6; border: none; }
-    .btn-soft-primary:hover { background: rgba(0, 107, 230, 0.2); }
-    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .leading-relaxed { line-height: 1.6; }
-    .message-bubble:hover { transform: translateY(-3px); transition: transform 0.2s; }
-  `]
+  styleUrls: ['./communication-test.component.scss']
 })
-export class CommunicationTestComponent {
-  // Local Mock State
-  pollVotes = signal<number[]>([42, 58]);
+export class CommunicationTestComponent implements OnInit {
+  private chatGroupService = inject(ChatGroupService);
+  private userService = inject(AlzUserService);
+  private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
+  private router = inject(Router);
+
+  currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1);
+  currentUser = computed(() => this.authService.getCurrentUser());
+
+  notifications = computed(() => this.notificationService.notifications());
+  unreadCount = computed(() => this.notificationService.unreadCount());
+
+  // Admin detection: hide sidebar when ADMIN role or on /collaboration/admin route
+  private currentUrl = signal<string>(this.router.url);
+  isAdmin = computed(() => {
+    const role = this.authService.getRole();
+    return role === 'ADMIN' || this.currentUrl().includes('/collaboration/admin');
+  });
+
+  // Search state for sidebar
+  groupSearchQuery = signal<string>('');
+
+  // Pinned Care Board (Mock state preserved)
   pinnedMessages = signal<any[]>([]);
- 
-  sampleMessages = [
-    { id: 1, author: 'Dr. Mike', time: '10:15 AM', content: 'Patient B was very agitated today during therapy. Avoid loud music tonight in the shared wing.' },
-    { id: 2, author: 'Caregiver Anna', time: '09:45 AM', content: 'The new specialized diet plan for Mrs. Henderson is ready. Please ensure she consumes only the labeled meals.' },
-    { id: 3, author: 'Nurse Sarah', time: '11:20 AM', content: 'Physical therapist will arrive at 1:00 PM instead of 1:30 PM today.' },
-    { id: 4, author: 'Admin Leo', time: 'Yesterday', content: 'Welcome to the new coordination dashboard! Happy to see everyone collaborating.' }
-  ];
- 
-  vote(index: number) {
-    const current = [...this.pollVotes()];
-    current[index] += 2; // Simulate voting
-    // Rebalance for mock visual (oversimplified)
-    const other = index === 0 ? 1 : 0;
-    current[other] -= 1;
-    if (current[other] < 0) current[other] = 0;
-    this.pollVotes.set(current);
-  }
- 
-  pinMessage(msg: any) {
-    if (!this.pinnedMessages().some(m => m.id === msg.id)) {
-      this.pinnedMessages.set([msg, ...this.pinnedMessages()]);
+
+  // Navigation & Social State
+  joinedGroups = computed(() => {
+    const uid = this.currentUserId();
+    return this.chatGroupService.groups().filter(g => 
+      g.members.some(m => m.id === uid)
+    );
+  });
+
+  contacts = computed(() => {
+    const uid = this.currentUserId();
+    return this.userService.users().filter(u => u.id !== uid);
+  });
+
+  ngOnInit() {
+    // Track URL changes so isAdmin() reactive computation stays in sync
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe((e: any) => this.currentUrl.set(e.urlAfterRedirects || e.url));
+
+    this.chatGroupService.fetchGroups();
+    this.userService.fetchUsers();
+    const uid = this.currentUserId();
+    if (uid) {
+      this.notificationService.fetchNotifications(uid);
     }
   }
- 
+
+  markAsRead(id: number) {
+    this.notificationService.markAsRead(id);
+  }
+
+  deleteNotification(id: number) {
+    this.notificationService.deleteNotification(id);
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
+  }
+
+  isRouteActive(route: string): boolean {
+    return this.router.url.includes(route);
+  }
+
   unpinMessage(id: number) {
     this.pinnedMessages.set(this.pinnedMessages().filter(m => m.id !== id));
   }

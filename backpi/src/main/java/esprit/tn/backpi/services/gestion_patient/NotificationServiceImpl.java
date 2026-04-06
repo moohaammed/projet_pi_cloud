@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationServiceImpl implements INotificationService {
 
     private final PatientNotificationRepository notificationRepository;
+
+    public NotificationServiceImpl(PatientNotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
 
     @Override
     public List<Notificationpatient> retrieveAllNotifications() {

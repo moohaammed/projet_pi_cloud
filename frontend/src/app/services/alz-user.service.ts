@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User, Role } from '../models/user.model';
@@ -6,9 +6,26 @@ import { User, Role } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class AlzUserService {
 
-  private apiUrl = 'http://localhost:8089/api/users';
+  private apiUrl = 'http://localhost:8080/api/users';
+  users = signal<User[]>([]);
 
   constructor(private http: HttpClient) {}
+
+  fetchUsers(): void {
+    console.log('AlzUserService: Fetching all users from', this.apiUrl);
+    this.http.get<User[]>(this.apiUrl).subscribe({
+      next: (data) => {
+        console.log(`AlzUserService: Successfully fetched ${data.length} users.`);
+        this.users.set(data);
+        if (data.length === 0) {
+          console.warn('AlzUserService: Backend returned an empty user list.');
+        }
+      },
+      error: (err) => {
+        console.error('AlzUserService: Critical error fetching users from backend:', err);
+      }
+    });
+  }
 
   getAll(): Observable<User[]> {
     return this.http.get<User[]>(this.apiUrl);

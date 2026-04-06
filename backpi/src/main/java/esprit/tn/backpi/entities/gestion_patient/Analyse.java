@@ -45,4 +45,38 @@ public class Analyse {
     @ManyToOne
     @JoinColumn(name = "jeu_cognitif_id", nullable = true)
     private JeuCognitif jeuCognitif;
+
+    // Manual Getters and Setters to bypass potential Lombok issues
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
+    
+    public String getStatut() { return statut; }
+    public void setStatut(String statut) { this.statut = statut; }
+    
+    public String getRapportMedical() { return rapportMedical; }
+    public void setRapportMedical(String rapportMedical) { this.rapportMedical = rapportMedical; }
+    
+    public String getImageIRM() { return imageIRM; }
+    public void setImageIRM(String imageIRM) { this.imageIRM = imageIRM; }
+    
+    public Double getScoreJeu() { return scoreJeu; }
+    public void setScoreJeu(Double scoreJeu) { this.scoreJeu = scoreJeu; }
+    
+    public Double getPourcentageRisque() { return pourcentageRisque; }
+    public void setPourcentageRisque(Double pourcentageRisque) { this.pourcentageRisque = pourcentageRisque; }
+    
+    public String getInterpretation() { return interpretation; }
+    public void setInterpretation(String interpretation) { this.interpretation = interpretation; }
+    
+    public String getObservationMedicale() { return observationMedicale; }
+    public void setObservationMedicale(String observationMedicale) { this.observationMedicale = observationMedicale; }
+    
+    public Patient getPatient() { return patient; }
+    public void setPatient(Patient patient) { this.patient = patient; }
+    
+    public JeuCognitif getJeuCognitif() { return jeuCognitif; }
+    public void setJeuCognitif(JeuCognitif jeuCognitif) { this.jeuCognitif = jeuCognitif; }
 }

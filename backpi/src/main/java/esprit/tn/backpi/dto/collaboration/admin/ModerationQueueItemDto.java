@@ -1,0 +1,32 @@
+package esprit.tn.backpi.dto.collaboration.admin;
+
+import esprit.tn.backpi.entities.collaboration.ModerationReason;
+import esprit.tn.backpi.entities.collaboration.PublicationType;
+
+import java.time.Instant;
+
+public class ModerationQueueItemDto {
+
+    private Long publicationId;
+    private String authorName;
+    private Long authorId;
+    private String contentPreview;
+    private ModerationReason reason;
+    private Instant flaggedAt;
+    private PublicationType type;
+
+    public Long getPublicationId() { return publicationId; }
+    public void setPublicationId(Long publicationId) { this.publicationId = publicationId; }
+    public String getAuthorName() { return authorName; }
+    public void setAuthorName(String authorName) { this.authorName = authorName; }
+    public Long getAuthorId() { return authorId; }
+    public void setAuthorId(Long authorId) { this.authorId = authorId; }
+    public String getContentPreview() { return contentPreview; }
+    public void setContentPreview(String contentPreview) { this.contentPreview = contentPreview; }
+    public ModerationReason getReason() { return reason; }
+    public void setReason(ModerationReason reason) { this.reason = reason; }
+    public Instant getFlaggedAt() { return flaggedAt; }
+    public void setFlaggedAt(Instant flaggedAt) { this.flaggedAt = flaggedAt; }
+    public PublicationType getType() { return type; }
+    public void setType(PublicationType type) { this.type = type; }
+}

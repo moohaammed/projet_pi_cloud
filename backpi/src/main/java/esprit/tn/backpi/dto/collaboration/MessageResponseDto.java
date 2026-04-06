@@ -1,6 +1,7 @@
 package esprit.tn.backpi.dto.collaboration;
  
 import esprit.tn.backpi.entities.collaboration.MessageType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.List;
  
@@ -21,16 +22,19 @@ public class MessageResponseDto {
     private String parentMessageContent;
     private String parentMessageSenderName;
  
+    private PublicationResponseDto sharedPublication;
  
     private boolean isDistressed;
     private Double sentimentScore;
  
+    @JsonProperty("isPinned")
     private boolean isPinned;
     private java.util.List<Long> viewedByUserIds;
  
     private MessageType type;
     private String pollQuestion;
     private java.util.List<PollOptionResponseDto> pollOptions;
+    private boolean fromBot;
  
     public MessageResponseDto() {}
  
@@ -83,6 +87,9 @@ public class MessageResponseDto {
     public String getParentMessageSenderName() { return parentMessageSenderName; }
     public void setParentMessageSenderName(String parentMessageSenderName) { this.parentMessageSenderName = parentMessageSenderName; }
  
+    public PublicationResponseDto getSharedPublication() { return sharedPublication; }
+    public void setSharedPublication(PublicationResponseDto sharedPublication) { this.sharedPublication = sharedPublication; }
+ 
     public MessageType getType() { return type; }
     public void setType(MessageType type) { this.type = type; }
  
@@ -91,4 +98,7 @@ public class MessageResponseDto {
  
     public java.util.List<PollOptionResponseDto> getPollOptions() { return pollOptions; }
     public void setPollOptions(java.util.List<PollOptionResponseDto> pollOptions) { this.pollOptions = pollOptions; }
+
+    public boolean isFromBot() { return fromBot; }
+    public void setFromBot(boolean fromBot) { this.fromBot = fromBot; }
 }

@@ -1,0 +1,28 @@
+.sed-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(22, 46, 36, 0.4);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.sed-card {
+  width: 100%;
+  max-width: 440px;
+  animation: sed-in 0.22s ease-out;
+}
+
+@keyframes sed-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

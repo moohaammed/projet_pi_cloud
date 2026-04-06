@@ -1,0 +1,51 @@
+/* User Form Component Styles - Admin Portal (Aligned with Patient App) */
+
+.card {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.card-header-simple {
+  background: transparent;
+  border-bottom: 1px solid #eee;
+  padding: 2rem 3rem 1rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #555a64;
+  margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #dee2e6;
+  font-size: 14px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #800080;
+  box-shadow: 0 0 0 0.2rem rgba(128, 0, 128, 0.15);
+}
+
+.btn-lg-custom {
+  padding: 0.8rem 2rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+}
+
+.bg-soft-primary {
+  background-color: rgba(128, 0, 128, 0.05) !important;
+}
+
+.underline::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #800080;
+  opacity: 0.3;
+}
