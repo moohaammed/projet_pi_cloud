@@ -63,6 +63,10 @@ export class MessageService {
   fetchMessagesByGroup(gid: number) {
     this.http.get<MessageDto[]>(`${this.baseUrl}/group/${gid}`).subscribe(data => this.messages.set(data));
   }
+
+  fetchMessagesByGroupSync(gid: number) {
+    return this.http.get<MessageDto[]>(`${this.baseUrl}/group/${gid}`);
+  }
  
   createMessage(req: MessageCreateRequest, file?: File) {
     const formData = new FormData();

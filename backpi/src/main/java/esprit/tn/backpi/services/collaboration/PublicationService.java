@@ -39,6 +39,7 @@ public class PublicationService {
     private final ChatGroupRepository chatGroupRepository;
     private final MessageRepository messageRepository;
     private final EventRepository eventRepository;
+    private final CareBotService careBotService;
 
     public PublicationService(PublicationRepository publicationRepository,
                               PublicationPollOptionRepository pollOptionRepository,
@@ -47,7 +48,8 @@ public class PublicationService {
                               UserRepository userRepository,
                               ChatGroupRepository chatGroupRepository,
                               MessageRepository messageRepository,
-                              EventRepository eventRepository) {
+                              EventRepository eventRepository,
+                              @org.springframework.context.annotation.Lazy CareBotService careBotService) {
         this.publicationRepository = publicationRepository;
         this.pollOptionRepository = pollOptionRepository;
         this.sentimentAnalysisService = sentimentAnalysisService;
@@ -56,28 +58,29 @@ public class PublicationService {
         this.chatGroupRepository = chatGroupRepository;
         this.messageRepository = messageRepository;
         this.eventRepository = eventRepository;
+        this.careBotService = careBotService;
     }
 
     public List<PublicationResponseDto> getAllPublicPublications() {
-        return publicationRepository.findByChatGroupIsNullOrderByCreatedAtDesc().stream()
+        return publicationRepository.findByChatGroupIsNullOrderByCreatedAtDesc(Instant.now()).stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 
     public List<PublicationResponseDto> getAllPublications() {
-        return publicationRepository.findAllByOrderByCreatedAtDesc().stream()
+        return publicationRepository.findAllByOrderByCreatedAtDesc(Instant.now()).stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 
     public List<PublicationResponseDto> getPersonalizedFeed(Long userId) {
-        return publicationRepository.findPersonalizedFeed(userId).stream()
+        return publicationRepository.findPersonalizedFeed(userId, Instant.now()).stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 
     public List<PublicationResponseDto> getGroupFeed(Long groupId) {
-        return publicationRepository.findByChatGroupIdOrderByCreatedAtDesc(groupId).stream()
+        return publicationRepository.findByChatGroupIdOrderByCreatedAtDesc(groupId, Instant.now()).stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
@@ -189,6 +192,8 @@ public class PublicationService {
                 "CareBot: I noticed your post might reflect some distress. Remember, you're not alone. \u2764\uFE0F",
                 "CAREBOT"
             );
+            // Also send a private chat message from CareBot for direct interaction
+            careBotService.sendReassurance(author);
         } else {
             notificationService.createAndSend(
                 author.getId(),
@@ -217,15 +222,32 @@ public class PublicationService {
         publicationRepository.deleteById(id);
     }
 
+    public PublicationResponseDto toggleSupport(Long pubId, Long userId) {
+        return publicationRepository.findById(pubId).map(pub -> {
+            String currentIds = pub.getSupportIds();
+            List<String> idList = new ArrayList<>();
+            if (currentIds != null && !currentIds.trim().isEmpty()) {
+                idList = new ArrayList<>(List.of(currentIds.split(",")));
+            }
+            
+            String uidStr = String.valueOf(userId);
+            if (idList.contains(uidStr)) {
+                idList.remove(uidStr);
+            } else {
+                idList.add(uidStr);
+            }
+            
+            pub.setSupportIds(String.join(",", idList));
+            return mapToResponseDto(publicationRepository.save(pub));
+        }).orElse(null);
+    }
+
     public PublicationResponseDto voteInPoll(Long pubId, int optionIndex, Long userId) {
         return publicationRepository.findById(pubId).map(pub -> {
             if (pub.getType() == PublicationType.VOTE && pub.getPollOptions() != null && optionIndex < pub.getPollOptions().size()) {
-                PublicationPollOption option = pub.getPollOptions().get(optionIndex);
+                esprit.tn.backpi.entities.collaboration.PublicationPollOption option = pub.getPollOptions().get(optionIndex);
                 
-                // Toggle vote: if user already voted for this option, remove it; otherwise add it.
-                // Alternatively, if user can only vote for one option, remove from others first.
-                // Let's implement single vote logic:
-                for (PublicationPollOption opt : pub.getPollOptions()) {
+                for (esprit.tn.backpi.entities.collaboration.PublicationPollOption opt : pub.getPollOptions()) {
                     if (opt.getVoterIds().contains(userId)) {
                         opt.getVoterIds().remove(userId);
                         opt.setVotes(opt.getVoterIds().size());
@@ -254,6 +276,14 @@ public class PublicationService {
         dto.setSentimentScore(publication.getSentimentScore());
         dto.setAnonymous(publication.isAnonymous());
         dto.setPollQuestion(publication.getPollQuestion());
+        dto.setSupportIds(publication.getSupportIds());
+        
+        String sIds = publication.getSupportIds();
+        if (sIds != null && !sIds.isEmpty()) {
+            dto.setSupportCount(sIds.split(",").length);
+        } else {
+            dto.setSupportCount(0);
+        }
 
         if (publication.getChatGroup() != null) {
             dto.setGroupId(publication.getChatGroup().getId());

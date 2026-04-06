@@ -122,4 +122,14 @@ public class PublicationController {
         PublicationResponseDto result = publicationService.voteInPoll(id, optionIndex, userId);
         return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
     }
+
+    @PostMapping("/{id}/support")
+    public ResponseEntity<PublicationResponseDto> toggleSupport(
+            @PathVariable("id") Long id,
+            @RequestBody java.util.Map<String, Object> payload) {
+        
+        Long userId = Long.valueOf(payload.get("userId").toString());
+        PublicationResponseDto result = publicationService.toggleSupport(id, userId);
+        return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
+    }
 }

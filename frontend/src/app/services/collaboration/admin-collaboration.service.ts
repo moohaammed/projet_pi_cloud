@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { PublicationDto } from './publication.service';
 
 export interface SystemHealthKpis {
   unresolvedSafetyAlerts: number;
@@ -49,6 +50,32 @@ export interface ChatGroupAdmin {
   memberCount: number;
   createdAt: string;
   ownerName?: string;
+}
+
+export interface EngagementMix {
+  publications: number;
+  comments: number;
+  messages: number;
+  shares: number;
+}
+
+export interface SentimentDistribution {
+  positive: number;
+  neutral: number;
+  negative: number;
+}
+
+export interface AiImpact {
+  totalMessages: number;
+  summariesGenerated: number;
+  summariesViewed: number;
+}
+
+export interface ClinicalPulse {
+  topThemes: string[];
+  aiSummary: string;
+  sentimentVelocity: string;
+  totalAnalyzed: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -121,8 +148,12 @@ export class AdminCollaborationService {
     return this.http.put<void>(`${this.base}/groups/${groupId}`, dto, { headers: this.headers() });
   }
 
-  postAnnouncement(content: string): Observable<void> {
-    return this.http.post<void>(`${this.base}/announcement`, { content }, { headers: this.headers() });
+  postAnnouncement(content: string, groupId?: number, scheduledAt?: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/announcement`, { content, groupId, scheduledAt }, { headers: this.headers() });
+  }
+
+  getScheduledAnnouncements(): Observable<PublicationDto[]> {
+    return this.http.get<PublicationDto[]>(`${this.base}/announcements/scheduled`, { headers: this.headers() });
   }
 
   getUserGroups(userId: number): Observable<ChatGroupAdmin[]> {
@@ -135,5 +166,28 @@ export class AdminCollaborationService {
 
   banUser(userId: number): Observable<void> {
     return this.http.post<void>(`${this.base}/moderation/users/${userId}/ban`, {}, { headers: this.headers() });
+  }
+
+  getEngagementMix(): Observable<EngagementMix> {
+    return this.http.get<EngagementMix>(`${this.base}/analytics/engagement-mix`, { headers: this.headers() });
+  }
+
+  getSentimentDistribution(): Observable<SentimentDistribution> {
+    return this.http.get<SentimentDistribution>(`${this.base}/analytics/sentiment-distribution`, { headers: this.headers() });
+  }
+
+  getAiImpact(): Observable<AiImpact> {
+    return this.http.get<AiImpact>(`${this.base}/analytics/ai-impact`, { headers: this.headers() });
+  }
+
+  getPulse(): Observable<ClinicalPulse> {
+    return this.http.get<ClinicalPulse>(`${this.base}/analytics/clinical-pulse`, { headers: this.headers() });
+  }
+
+  getRetrospective(groupId: number, hours: number): Observable<any> {
+    return this.http.get<any>(`${this.base}/analytics/retrospective`, {
+      headers: this.headers(),
+      params: { groupId: String(groupId), hours: String(hours) }
+    });
   }
 }

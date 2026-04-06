@@ -406,23 +406,13 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   fetchHandoverSummary() {
-    const grp = this.activeGroup();
-    if (!grp?.id) return;
-
-    this.isGeneratingSummary.set(true);
-    this.currentSummary.set(null);
-
-    this.messageService.getAiHandoverSummary(grp.id).subscribe({
-      next: (res) => {
-        this.currentSummary.set(res.summary);
-        this.isGeneratingSummary.set(false);
-      },
-      error: (err) => {
-        console.error('Error fetching AI summary:', err);
-        this.currentSummary.set('Failed to generate AI summary. Please try again.');
-        this.isGeneratingSummary.set(false);
-      }
-    });
+    this.showInfoSidebar.set(true);
+    if (!this.showHandoverPanel()) {
+      this.toggleHandoverPanel();
+    } else {
+      const grp = this.activeGroup();
+      if (grp) this.careRelayService.loadHandover(grp.id!);
+    }
   }
 
   openBotChat() {
@@ -576,11 +566,14 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   sendDmMessage() {
-    if (!this.dmContent.trim() || !this.activeDmUserId()) return;
+    const trimmed = this.dmContent.trim();
+    if (!trimmed || !this.activeDmUserId()) return;
+    
     this.messageService.createMessage({
-      content: this.dmContent,
+      content: trimmed,
       senderId: this.currentUserId(),
-      receiverId: this.activeDmUserId()!
+      receiverId: this.activeDmUserId()!,
+      type: 'TEXT'
     }).subscribe(() => {
       this.dmContent = '';
       this.refreshData();

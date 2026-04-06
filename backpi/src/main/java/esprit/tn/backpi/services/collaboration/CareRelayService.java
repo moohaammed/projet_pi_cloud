@@ -20,13 +20,16 @@ public class CareRelayService {
     private final MessageRepository messageRepository;
     private final PublicationRepository publicationRepository;
     private final SentimentAnalysisService sentimentAnalysisService;
+    private final HandoverService handoverService;
 
     public CareRelayService(MessageRepository messageRepository,
                             PublicationRepository publicationRepository,
-                            SentimentAnalysisService sentimentAnalysisService) {
+                            SentimentAnalysisService sentimentAnalysisService,
+                            HandoverService handoverService) {
         this.messageRepository = messageRepository;
         this.publicationRepository = publicationRepository;
         this.sentimentAnalysisService = sentimentAnalysisService;
+        this.handoverService = handoverService;
     }
 
     /**
@@ -103,18 +106,10 @@ public class CareRelayService {
                 .filter(p -> p.getType() == PublicationType.VOTE)
                 .collect(Collectors.toList());
 
-        // ── 4. Mood label ─────────────────────────────────────────────────
-        String moodLabel;
-        if (averageSentiment > 0.3) moodLabel = "Positive";
-        else if (averageSentiment < -0.3) moodLabel = "Concerning";
-        else moodLabel = "Stable";
+        // ── 4. Mood label logic removed as Gemini takes over narrative summary ──
 
-        // ── 5. Build summary text ─────────────────────────────────────────
-        String summaryText = String.format(
-                "%d messages, %d publications, %d poll(s) | Mood: %s (avg %.2f) | %d alert(s), %d pending question(s)",
-                messages.size(), publications.size(), polls.size(),
-                moodLabel, averageSentiment,
-                criticalAlerts.size(), pendingTasks.size());
+        // ── 5. Build AI Narrative Summary via Gemini ─────────────────────
+        String summaryText = handoverService.generateHandoverSummary(groupId, hours);
 
         // ── 6. Assemble DTO ───────────────────────────────────────────────
         HandoverDTO dto = new HandoverDTO();

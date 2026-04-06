@@ -15,16 +15,23 @@ public interface PublicationRepository extends JpaRepository<Publication, Long> 
     
     List<Publication> findByCreatedAtAfterOrderByCreatedAtDesc(Instant since);
 
-    List<Publication> findAllByOrderByCreatedAtDesc();
+    @Query("SELECT p FROM Publication p WHERE p.createdAt <= :now AND (p.chatGroup IS NULL OR EXISTS (SELECT 1 FROM p.chatGroup.members m WHERE m.id = :userId)) ORDER BY p.createdAt DESC")
+    List<Publication> findPersonalizedFeed(@Param("userId") Long userId, @Param("now") Instant now);
 
-    List<Publication> findByChatGroupIsNullOrderByCreatedAtDesc();
+    @Query("SELECT p FROM Publication p WHERE p.chatGroup.id = :groupId AND p.createdAt <= :now ORDER BY p.createdAt DESC")
+    List<Publication> findByChatGroupIdOrderByCreatedAtDesc(@Param("groupId") Long groupId, @Param("now") Instant now);
 
-    List<Publication> findByChatGroupIdOrderByCreatedAtDesc(Long groupId);
+    @Query("SELECT p FROM Publication p WHERE p.chatGroup IS NULL AND p.createdAt <= :now ORDER BY p.createdAt DESC")
+    List<Publication> findByChatGroupIsNullOrderByCreatedAtDesc(@Param("now") Instant now);
 
-    @Query("SELECT p FROM Publication p WHERE p.chatGroup IS NULL OR EXISTS (SELECT 1 FROM p.chatGroup.members m WHERE m.id = :userId) ORDER BY p.createdAt DESC")
-    List<Publication> findPersonalizedFeed(@Param("userId") Long userId);
+    @Query("SELECT p FROM Publication p WHERE p.createdAt <= :now ORDER BY p.createdAt DESC")
+    List<Publication> findAllByOrderByCreatedAtDesc(@Param("now") Instant now);
 
     List<Publication> findByModerationStatusOrderByModerationFlaggedAtDesc(ModerationStatus moderationStatus);
 
     long countByModerationStatus(ModerationStatus moderationStatus);
+
+    long countByType(PublicationType type);
+
+    List<Publication> findByTypeAndCreatedAtAfterOrderByCreatedAtAsc(PublicationType type, Instant now);
 }
