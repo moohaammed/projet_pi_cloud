@@ -16,6 +16,13 @@ import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard
 import { MedecinDashboardComponent } from './medecin-dashboard/medecin-dashboard.component';
 import { HomeComponent } from './components/home/home.component';
 
+// Donation
+import { DonationListComponent } from './components/donation/donation-list/donation-list.component';
+import { DonationFormComponent } from './components/donation/donation-form/donation-form.component';
+import { DonationSuccessComponent } from './components/donation/donation-success/donation-success.component';
+import { DonationCancelComponent } from './components/donation/donation-cancel/donation-cancel.component';
+import { MyDonationsComponent } from './components/donation/my-donations/my-donations.component';
+
 export const routes: Routes = [
   // ===== AUTH AlzCare =====
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -125,6 +132,10 @@ export const routes: Routes = [
       {
         path: 'rendezvous',
         loadComponent: () => import('./components/dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+      },
+      {
+        path: 'donations',
+        loadComponent: () => import('./components/donation/admin-donation/admin-donation.component').then(m => m.AdminDonationComponent)
       }
     ]
   },
@@ -169,6 +180,13 @@ export const routes: Routes = [
   { path: 'activities', component: ActivityListComponent, canActivate: [authGuard] },
   { path: 'education', component: EducationComponent, canActivate: [authGuard] },
   { path: 'eventfront', component: EventFrontComponent, canActivate: [authGuard] },
+
+  // ===== DONATIONS =====
+  { path: 'donations', component: DonationListComponent },
+  { path: 'donations/success', component: DonationSuccessComponent },
+  { path: 'donations/cancel', component: DonationCancelComponent },
+  { path: 'my-donations', component: MyDonationsComponent, canActivate: [authGuard] },
+  { path: 'donations/:campaignId', component: DonationFormComponent },
 
 
   // --- Routes Education ---

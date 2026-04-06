@@ -23,7 +23,7 @@
              style="width:36px; height:36px; font-size:13px"
              [style.background]="selectedPatient?.id === p.id ? 'rgba(255,255,255,0.3)' : '#e8f4ff'"
              [style.color]="selectedPatient?.id === p.id ? 'white' : '#0d6efd'">
-          {{ p.nom?.charAt(0) }}{{ p.prenom?.charAt(0) }}
+          {{ p.nom.charAt(0) }}{{ p.prenom.charAt(0) }}
         </div>
         <div>
           <div class="fw-semibold small">{{ p.nom }} {{ p.prenom }}</div>
