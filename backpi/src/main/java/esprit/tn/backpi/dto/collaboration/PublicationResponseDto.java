@@ -33,6 +33,8 @@ public class PublicationResponseDto {
 
     private int commentCount;
     private int shareCount;
+    private int supportCount;
+    private String supportIds;
  
     public PublicationResponseDto() {}
  
@@ -78,12 +80,18 @@ public class PublicationResponseDto {
  
     public List<CommentResponseDto> getComments() { return comments; }
     public void setComments(List<CommentResponseDto> comments) { this.comments = comments; }
-
+ 
     public int getCommentCount() { return commentCount; }
     public void setCommentCount(int commentCount) { this.commentCount = commentCount; }
-
+ 
     public int getShareCount() { return shareCount; }
     public void setShareCount(int shareCount) { this.shareCount = shareCount; }
+
+    public int getSupportCount() { return supportCount; }
+    public void setSupportCount(int supportCount) { this.supportCount = supportCount; }
+
+    public String getSupportIds() { return supportIds; }
+    public void setSupportIds(String supportIds) { this.supportIds = supportIds; }
 
     public Long getGroupId() { return groupId; }
     public void setGroupId(Long groupId) { this.groupId = groupId; }

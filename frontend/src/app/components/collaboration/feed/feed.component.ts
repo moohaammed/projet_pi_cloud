@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, effect, untracked, PLATFORM_ID, computed, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { PublicationService, PublicationDto, SharedEventPreviewDto } from '../../../services/collaboration/publication.service';
 import { AlzUserService } from '../../../services/alz-user.service';
 import { CommentService } from '../../../services/collaboration/comment.service';
@@ -32,6 +32,7 @@ export class FeedComponent implements OnInit {
   messageService = inject(MessageService);
   chatGroupService = inject(ChatGroupService);
   route = inject(ActivatedRoute);
+  router = inject(Router);
   platformId = inject(PLATFORM_ID);
 
   groupId = signal<number | null>(null);
@@ -296,6 +297,10 @@ export class FeedComponent implements OnInit {
     });
   }
 
+  openDmChat(userId: number) {
+    this.router.navigate(['/collaboration/messenger'], { queryParams: { dm: userId } });
+  }
+
   refreshData() {
     const gid = this.groupId();
     const uid = this.currentUserId();
@@ -446,6 +451,19 @@ export class FeedComponent implements OnInit {
     });
   }
 
+  toggleSupport(pubId: number) {
+    this.publicationService.toggleSupport(pubId, this.currentUserId()).subscribe({
+      next: () => this.refreshData(),
+      error: (err) => alert('Error: ' + (err.error?.message || err.message))
+    });
+  }
+
+  isSupportedByMe(pub: PublicationDto): boolean {
+    if (!pub.supportIds) return false;
+    const ids = pub.supportIds.split(',');
+    return ids.includes(this.currentUserId().toString());
+  }
+
   getVotePercentage(pub: PublicationDto, option: any): number {
     if (!pub.pollOptions || pub.pollOptions.length === 0) return 0;
     const totalVotes = pub.pollOptions.reduce((sum, opt) => sum + (opt.votes || 0), 0);
@@ -463,7 +481,8 @@ export class FeedComponent implements OnInit {
     img.src = 'assets/images/event-placeholder.jpg';
   }
 
-  formatSharedEventDate(raw: string): string {
+  formatSharedEventDate(raw: string | undefined): string {
+    if (!raw) return 'Not specified';
     try {
       return new Date(raw).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
     } catch {

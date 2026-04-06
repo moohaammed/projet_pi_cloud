@@ -7,36 +7,36 @@
   aria-labelledby="sed-title"
 >
   <div class="sed-card" (click)="$event.stopPropagation()">
-    <div class="card-header d-flex justify-content-between align-items-start">
+    <div class="card-header d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
-        <div class="sed-title-icon">
+        <div class="sed-title-icon shadow-sm">
           <i class="fa-solid fa-share-nodes"></i>
         </div>
         <div>
-          <h2 id="sed-title" class="h5 fw-bold mb-1 text-dark">Share to Feed</h2>
-          <p class="text-muted mb-0" style="font-size: 0.8125rem;">Post an event card to the collaboration feed</p>
+          <h4 id="sed-title" class="fw-black mb-1 text-doc-heading ls-n1">Share Clinical Event</h4>
+          <p class="text-doc-secondary mb-0 opacity-75" style="font-size: 0.8125rem;">Propagate event intelligence to collaboration feeds.</p>
         </div>
       </div>
-      <button type="button" class="sed-btn-close" (click)="close()" aria-label="Close">
+      <button type="button" class="sed-btn-close shadow-sm" (click)="close()" aria-label="Close">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
     <div class="card-body">
-      <div class="sed-event-preview mb-3">
-        <div class="d-flex align-items-start">
-          <div class="sed-event-icon">
-            <i class="fa-regular fa-calendar-check"></i>
+      <div class="sed-event-preview mb-4 animate-fade-in shadow-sm border-0">
+        <div class="d-flex align-items-center">
+          <div class="sed-event-icon shadow-doc border-0">
+            <i class="fa-solid fa-calendar-check text-primary"></i>
           </div>
           <div class="flex-grow-1" style="min-width: 0;">
-            <div class="fw-semibold text-dark text-truncate" style="font-size: 0.9375rem;">{{ event.title }}</div>
-            <div class="d-flex flex-wrap gap-3 mt-1">
-              <div class="sed-event-meta" *ngIf="event.startDateTime">
-                <i class="fa-regular fa-clock"></i>
-                <span>{{ event.startDateTime | date : 'medium' }}</span>
+            <div class="fw-black text-doc-heading text-truncate ls-n1 fs-16 mb-1">{{ event.title }}</div>
+            <div class="d-flex flex-wrap gap-4 mt-1">
+              <div class="sed-event-meta fw-bold text-uppercase fs-10 letter-spacing-1" *ngIf="event.startDateTime">
+                <i class="fa-solid fa-clock-rotate-left me-1"></i>
+                <span>{{ event.startDateTime | date : 'MMM d, HH:mm' }}</span>
               </div>
-              <div class="sed-event-meta" *ngIf="event.location">
-                <i class="fa-solid fa-location-dot"></i>
+              <div class="sed-event-meta fw-bold text-uppercase fs-10 letter-spacing-1" *ngIf="event.location">
+                <i class="fa-solid fa-map-pin me-1"></i>
                 <span class="text-truncate">{{ event.location }}</span>
               </div>
             </div>
@@ -66,19 +66,19 @@
       </div>
     </div>
 
-    <div class="card-footer d-flex justify-content-end gap-2">
-      <button type="button" class="sed-btn-secondary" (click)="close()" [disabled]="submitting()">
-        {{ success() ? 'Close' : 'Cancel' }}
+    <div class="card-footer d-flex justify-content-end align-items-center gap-3">
+      <button type="button" class="sed-btn-secondary px-5" (click)="close()" [disabled]="submitting()">
+        {{ success() ? 'Dismiss' : 'Discard' }}
       </button>
       <button
         type="button"
-        class="sed-btn-primary"
+        class="sed-btn-primary px-5 shadow-doc"
         (click)="submit()"
         [disabled]="submitting() || success() || !(event.title ?? '').trim()"
       >
-        <span class="sed-spinner" *ngIf="submitting()"></span>
-        <i class="fa-solid fa-paper-plane" *ngIf="!submitting()"></i>
-        <span>Post to feed</span>
+        <span class="spinner-border spinner-border-sm me-2" *ngIf="submitting()"></span>
+        <i class="fa-solid fa-paper-plane-top" *ngIf="!submitting()"></i>
+        <span>Share to Feed</span>
       </button>
     </div>
   </div>

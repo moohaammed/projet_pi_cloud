@@ -59,7 +59,10 @@ public class Publication {
 
     @Column(name = "moderation_flagged_at")
     private Instant moderationFlaggedAt;
- 
+
+    @Lob
+    private String supportIds = "";
+
     public Publication() {}
 
     public Long getId() { return id; }
@@ -102,4 +105,7 @@ public class Publication {
     public void setModerationReason(ModerationReason moderationReason) { this.moderationReason = moderationReason; }
     public Instant getModerationFlaggedAt() { return moderationFlaggedAt; }
     public void setModerationFlaggedAt(Instant moderationFlaggedAt) { this.moderationFlaggedAt = moderationFlaggedAt; }
+
+    public String getSupportIds() { return supportIds != null ? supportIds : ""; }
+    public void setSupportIds(String supportIds) { this.supportIds = supportIds; }
 }

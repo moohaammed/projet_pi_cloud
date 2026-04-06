@@ -18,8 +18,10 @@ public class HandoverController {
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<Map<String, String>> getHandoverSummary(@PathVariable Long groupId) {
-        String summary = handoverService.generateHandoverSummary(groupId);
+    public ResponseEntity<Map<String, String>> getHandoverSummary(
+            @PathVariable Long groupId,
+            @RequestParam(defaultValue = "24") int hours) {
+        String summary = handoverService.generateHandoverSummary(groupId, hours);
         return ResponseEntity.ok(Collections.singletonMap("summary", summary));
     }
 }

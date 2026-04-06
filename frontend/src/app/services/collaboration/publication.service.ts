@@ -46,6 +46,8 @@ export interface PublicationDto {
   shareCount?: number;
   linkedEventId?: number;
   linkedEvent?: SharedEventPreviewDto | null;
+  supportCount?: number;
+  supportIds?: string;
 }
  
 export interface PublicationCreateRequest {
@@ -98,6 +100,10 @@ export class PublicationService {
  
   voteInPoll(pubId: number, optionIndex: number, userId: number) {
     return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/poll/vote`, { optionIndex, userId });
+  }
+
+  toggleSupport(pubId: number, userId: number) {
+    return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/support`, { userId });
   }
  
   updatePublication(id: number, req: PublicationCreateRequest, file?: File) {
