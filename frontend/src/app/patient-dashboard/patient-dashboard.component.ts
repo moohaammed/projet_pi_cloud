@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
+import { PatientProgressionService } from '../services/patient-progression.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-patient-dashboard',
@@ -26,17 +28,56 @@ export class PatientDashboardComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
 
+  patientScoreQuiz: number = 0;
+  patientStadeQuiz: string = 'LEGER';
+  patientScoreGame: number = 0;
+  patientStadeGame: string = 'LEGER';
+  patientScoreFinal: number = 0;
+  progressionHistory: any[] = [];
+  isLoadingProgression = false;
+
   constructor(
     private patientService: PatientService,
-    private analyseService: AnalyseService
+    private analyseService: AnalyseService,
+    private progressionService: PatientProgressionService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user && user.id) {
+       this.loadProgression(user.id);
+    }
     // Load only if we have a known patient ID
     if (this.patientId) {
       this.loadPatientProfile();
       this.loadAnalyses();
     }
+  }
+
+  loadProgression(userId: number) {
+    this.isLoadingProgression = true;
+    this.progressionService.getScoreAndStade(userId).subscribe({
+      next: (data) => {
+        this.patientScoreQuiz = data.scoreQuiz;
+        this.patientStadeQuiz = data.stadeQuiz;
+        this.patientScoreGame = data.scoreGame;
+        this.patientStadeGame = data.stadeGame;
+        this.patientScoreFinal = (this.patientScoreQuiz + this.patientScoreGame) / 2;
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.progressionService.getHistory(userId).subscribe({
+      next: (data) => {
+        this.progressionHistory = data || [];
+        this.isLoadingProgression = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoadingProgression = false;
+      }
+    });
   }
 
   showSuccess(msg: string) {

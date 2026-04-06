@@ -179,6 +179,59 @@
             </div>
           </div>
 
+          <!-- Progression Card -->
+          <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="!isLoadingProgression">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-brain text-primary me-2"></i>Progression Cognitive du Patient</h5>
+                <h5 class="fw-bold text-success mb-0">Score Global: {{ progressionScoreFinal }} pts</h5>
+              </div>
+
+              <div class="row g-4">
+                <!-- Quiz Column -->
+                <div class="col-md-6 border-end">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-muted text-uppercase mb-0">Parcours Quiz</h6>
+                    <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold" (click)="resetPatientProgression('QUIZ')" [disabled]="isResetting">
+                      <i class="fa-solid fa-rotate-left me-1"></i>Réinitialiser
+                    </button>
+                  </div>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="text-start">
+                      <div class="small text-muted mb-1">Stade Diagnostiqué</div>
+                      <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill shadow-sm">{{ progressionStadeQuiz }}</span>
+                    </div>
+                    <div class="text-start ms-auto">
+                      <div class="small text-muted mb-1">Score Cumulé</div>
+                      <strong class="text-dark fs-5">{{ progressionScoreQuiz }} pts</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Game Column -->
+                <div class="col-md-6">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-muted text-uppercase mb-0">Parcours Jeux</h6>
+                    <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold" (click)="resetPatientProgression('GAME')" [disabled]="isResetting">
+                      <i class="fa-solid fa-rotate-left me-1"></i>Réinitialiser
+                    </button>
+                  </div>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="text-start">
+                      <div class="small text-muted mb-1">Stade Diagnostiqué</div>
+                      <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill shadow-sm">{{ progressionStadeGame }}</span>
+                    </div>
+                    <div class="text-start ms-auto">
+                      <div class="small text-muted mb-1">Score Cumulé</div>
+                      <strong class="text-dark fs-5">{{ progressionScoreGame }} pts</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
           <!-- Analyses Table -->
           <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
@@ -299,6 +352,46 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Activity History Table -->
+          <div class="card border-0 shadow-sm mb-4 mt-4" *ngIf="!isLoadingProgression && progressionHistory.length > 0">
+            <div class="card-header bg-white border-0 py-3 px-4">
+               <h6 class="fw-bold mb-0">
+                  <i class="fa-solid fa-gamepad me-2 text-primary"></i>Historique des Activités Cognitives
+               </h6>
+            </div>
+            <div class="card-body px-4 pb-4">
+               <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                     <thead class="table-light">
+                        <tr>
+                           <th>Date</th>
+                           <th>Activité</th>
+                           <th>Résultat</th>
+                           <th>Stade Final</th>
+                           <th>Score Gagné</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr *ngFor="let h of progressionHistory">
+                           <td><span class="badge bg-secondary">{{ h.playedAt | date:'short' }}</span></td>
+                           <td>
+                             <span class="fw-semibold">{{ h.activity?.title }}</span>
+                             <span class="badge bg-light text-dark shadow-sm ms-2">{{ h.activity?.type }}</span>
+                           </td>
+                           <td>
+                             <span class="badge" [ngClass]="h.reussi ? 'bg-success' : 'bg-danger'">
+                               {{ h.reussi ? 'Réussi' : 'Échoué' }}
+                             </span>
+                           </td>
+                           <td class="fw-bold text-muted">{{ h.currentStade }}</td>
+                           <td class="text-success fw-bold">+{{ h.scoreSession }}</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
             </div>
           </div>
 

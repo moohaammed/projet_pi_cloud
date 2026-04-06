@@ -69,6 +69,40 @@
       </button>
     </div>
 
+    <div class="row mb-4" *ngIf="!isLoadingProgression">
+       <div class="col-12">
+           <div class="card border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #800080, #5c005c); border-radius: 16px;">
+               <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                   <div>
+                       <h4 class="fw-bold mb-1"><i class="fa-solid fa-brain me-2"></i>Ma Progression Cognitive</h4>
+                       <p class="mb-0 opacity-75">Statut de votre suivi et de vos activités éducatives.</p>
+                   </div>
+                   <div class="d-flex gap-4 text-center">
+                       <div>
+                           <div class="text-uppercase small opacity-75 fw-bold mb-1">Stade Quiz</div>
+                           <span class="badge bg-white px-3 py-2 fs-6 rounded-pill shadow-sm" style="color: #800080;">{{ patientStadeQuiz }}</span>
+                           <div class="mt-2 small opacity-75">{{ patientScoreQuiz }} pts</div>
+                       </div>
+                       <div class="border-start border-light border-opacity-25 px-4 text-start">
+                           <div class="text-uppercase small opacity-75 fw-bold mb-1 text-center">Stade Jeu</div>
+                           <div class="text-center">
+                               <span class="badge bg-white px-3 py-2 fs-6 rounded-pill shadow-sm" style="color: #800080;">{{ patientStadeGame }}</span>
+                           </div>
+                           <div class="mt-2 small opacity-75 text-center">{{ patientScoreGame }} pts</div>
+                       </div>
+                       <div class="border-start border-light border-opacity-25 px-4 text-start">
+                           <div class="text-uppercase small opacity-75 fw-bold mb-1">Score Global</div>
+                           <h3 class="fw-bold mb-0 text-white">{{ patientScoreFinal }} pts</h3>
+                       </div>
+                       <div>
+                           <a routerLink="/education" class="btn btn-light fw-bold px-4 py-2 shadow-sm rounded-pill mt-2" style="color: #800080;">Jouer</a>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+    </div>
+
     <!-- ══ Main Row ═══════════════════════════════════ -->
     <div class="row g-4">
 
@@ -319,6 +353,49 @@
               <p class="small">Aucune image fournie</p>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Activity History ═══════════════════════════ -->
+    <div class="card border-0 shadow-sm mt-4" *ngIf="!isLoadingProgression">
+      <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+        <h5 class="fw-bold mb-0">
+          <i class="fa-solid fa-gamepad me-2 text-primary"></i>
+          Historique des Activités
+        </h5>
+        <p class="text-muted small mt-1 mb-0">Vos sessions de Quiz et Jeux cognitifs.</p>
+      </div>
+      <hr class="mx-4 mt-3 mb-0">
+      <div class="card-body px-4 pb-4">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Activité</th>
+                <th>Résultat</th>
+                <th>Stade Final</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let h of progressionHistory">
+                <td><span class="badge bg-secondary">{{ h.playedAt | date:'short' }}</span></td>
+                <td>{{ h.activity?.title }} <span class="badge bg-light text-dark shadow-sm ms-2">{{ h.activity?.type }}</span></td>
+                <td>
+                  <span class="badge" [ngClass]="h.reussi ? 'bg-success' : 'bg-danger'">
+                    {{ h.reussi ? 'Réussi' : 'Échoué' }}
+                  </span>
+                </td>
+                <td class="fw-bold text-muted">{{ h.currentStade }}</td>
+                <td class="text-success fw-bold">+{{ h.scoreSession }}</td>
+              </tr>
+              <tr *ngIf="progressionHistory.length === 0">
+                <td colspan="5" class="text-center text-muted py-4">Aucune activité jouée pour le moment. Allez jouer depuis l'Espace Education !</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
