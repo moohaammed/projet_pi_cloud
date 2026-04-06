@@ -20,6 +20,10 @@ export class PatientDashboardComponent implements OnInit {
   newAnalyse: any = { rapport_medical: '', image_irm: '', score_jeu: null };
   selectedAnalyse: any = null;
 
+  chatQuestion: string = '';
+  chatHistory: {sender: string, text: string}[] = [];
+  isChatting: boolean = false;
+
   isLoadingPatient = false;
   isLoadingAnalyses = false;
   isSubmitting = false;
@@ -151,33 +155,61 @@ export class PatientDashboardComponent implements OnInit {
     const dateStr = new Date().toISOString().split('T')[0];
 
     if (!this.patientId) { this.showError('Sélectionnez ou créez un patient d\'abord.'); this.isSubmitting = false; return; }
-    // Explicit format exactly as required
-    const payload = {
-      patient_id: this.patientId!,
-      date: dateStr,
-      statut: "EN_COURS",
-      rapport_medical: this.newAnalyse.rapport_medical,
-      image_irm: this.newAnalyse.image_irm,
-      score_jeu: this.newAnalyse.score_jeu,
-      pourcentage_risque: null,
-      interpretation: null
+
+    const interpretation = this.newAnalyse.interpretation || null;
+    const risque = this.newAnalyse.pourcentage_risque || null;
+
+    const saveToSpring = (obsJSON: string | null) => {
+      const payload = {
+        patient_id: this.patientId!,
+        date: dateStr,
+        statut: interpretation ? "TERMINÉ" : "EN_COURS",
+        rapport_medical: this.newAnalyse.rapport_medical,
+        image_irm: this.newAnalyse.image_irm,
+        score_jeu: this.newAnalyse.score_jeu,
+        pourcentage_risque: risque,
+        interpretation: interpretation,
+        observation_medicale: obsJSON
+      };
+
+      this.analyseService.addAnalyse(payload).subscribe({
+        next: (data) => {
+          console.log('[PatientDashboard] Analyse insérée avec succès:', data);
+          this.showSuccess("Analyse envoyée et enregistrée dans la base de données !");
+          this.newAnalyse = { rapport_medical: '', image_irm: '', score_jeu: null, interpretation: null, pourcentage_risque: null };
+          this.loadAnalyses();
+          this.isSubmitting = false;
+        },
+        error: (err) => {
+          const msg = err?.error?.message || err?.message || err?.error || JSON.stringify(err);
+          console.error('[PatientDashboard] Error submitAnalyse:', err);
+          this.showError(`Erreur lors de l'envoi de l'analyse: ${msg}`);
+          this.isSubmitting = false;
+        }
+      });
     };
 
-    this.analyseService.addAnalyse(payload).subscribe({
-      next: (data) => {
-        console.log('[PatientDashboard] Analyse insérée avec succès:', data);
-        this.showSuccess("Analyse envoyée et enregistrée dans la base de données !");
-        this.newAnalyse = { rapport_medical: '', image_irm: '', score_jeu: null };
-        this.loadAnalyses();
-        this.isSubmitting = false;
-      },
-      error: (err) => {
-        const msg = err?.error?.message || err?.message || err?.error || JSON.stringify(err);
-        console.error('[PatientDashboard] Error submitAnalyse:', err);
-        this.showError(`Erreur lors de l'envoi de l'analyse: ${msg}`);
-        this.isSubmitting = false;
-      }
-    });
+    // If report exists, run Gemini Analysis before saving
+    if (this.newAnalyse.rapport_medical) {
+      console.log('[PatientDashboard] Calling Gemini /analyze-report...');
+      this.analyseService.analyzeReport(
+        this.newAnalyse.rapport_medical,
+        interpretation || 'Pas de diagnostic IRM',
+        this.newAnalyse.score_jeu ? this.newAnalyse.score_jeu.toString() : 'Non évalué'
+      ).subscribe({
+        next: (geminiData) => {
+          console.log('[PatientDashboard] Gemini Success:', geminiData);
+          saveToSpring(JSON.stringify(geminiData));
+        },
+        error: (err) => {
+          console.error("Gemini API error:", err);
+          this.showError("Le serveur IA Gemini est indisponible. Enregistrement sans résumé...");
+          saveToSpring(null);
+        }
+      });
+    } else {
+      saveToSpring(null);
+    }
   }
 
   onFileSelected(event: any, field: 'rapport_medical' | 'image_irm') {
@@ -186,6 +218,22 @@ export class PatientDashboardComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.newAnalyse[field] = e.target.result;
+
+        // If user selects an MRI, call ML API immediately to preview prediction!
+        if (field === 'image_irm') {
+          console.log('[PatientDashboard] Image selected. Calling ML API...');
+          this.analyseService.predictAlzheimer(this.newAnalyse.image_irm).subscribe({
+            next: (mlResult) => {
+              this.newAnalyse.interpretation = mlResult.prediction;
+              this.newAnalyse.pourcentage_risque = mlResult.confidence;
+              console.log('[PatientDashboard] ML API Success:', mlResult);
+            },
+            error: (err) => {
+              console.error("Machine Learning API error:", err);
+              this.showError("Impossible de joindre le serveur IA pour l'analyse immédiate.");
+            }
+          });
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -193,5 +241,53 @@ export class PatientDashboardComponent implements OnInit {
 
   viewDetails(analyse: any) {
     this.selectedAnalyse = analyse;
+    this.chatHistory = [];
+    
+    if (this.selectedAnalyse.observationMedicale) {
+      try {
+        this.selectedAnalyse.geminiData = JSON.parse(this.selectedAnalyse.observationMedicale);
+      } catch (e) {
+        console.warn("Failed to parse observationMedicale as JSON", e);
+        this.selectedAnalyse.geminiData = null;
+      }
+    } else {
+      this.selectedAnalyse.geminiData = null;
+    }
+  }
+
+  sendMessage() {
+    if (!this.chatQuestion.trim()) return;
+
+    const reportContent = this.selectedAnalyse?.rapportMedical 
+                       || this.selectedAnalyse?.observationMedicale 
+                       || '';
+
+    if (!reportContent) {
+      this.chatHistory.push({
+        sender: 'bot', 
+        text: 'Aucun rapport médical disponible pour cette analyse.'
+      });
+      return;
+    }
+
+    const userQ = this.chatQuestion;
+    this.chatHistory.push({sender: 'user', text: userQ});
+    this.chatQuestion = '';
+    this.isChatting = true;
+
+    this.analyseService.chatWithReport(userQ, reportContent).subscribe({
+      next: (response) => {
+        this.chatHistory.push({sender: 'bot', text: response});
+        this.isChatting = false;
+      },
+      error: (err) => {
+        console.error("Chat error:", err);
+        this.chatHistory.push({
+          sender: 'bot', 
+          text: 'Désolé, une erreur technique est survenue avec l\'assistant IA.'
+        });
+        this.isChatting = false;
+      }
+    });
   }
 }

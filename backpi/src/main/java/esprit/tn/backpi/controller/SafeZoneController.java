@@ -1,4 +1,4 @@
-package tn.esprit.projetalzeihmer.controller;
+package esprit.tn.backpi.controller;
 
 
 import esprit.tn.backpi.entity.SafeZone;
