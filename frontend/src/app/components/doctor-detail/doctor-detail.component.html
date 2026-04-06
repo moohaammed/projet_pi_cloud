@@ -1,0 +1,94 @@
+<div class="doctor-detail-container bg-light min-vh-100 pb-5">
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary-theme" role="status"></div>
+    <p class="text-muted mt-2">Loading profile...</p>
+  </div>
+
+  <div *ngIf="!isLoading && doctor">
+    <!-- Header Section (Image & Name overlay) -->
+    <div class="header-banner position-relative">
+      <div class="header-overlay"></div>
+      
+      <!-- Top buttons -->
+      <div class="top-nav position-absolute w-100 d-flex justify-content-between p-4" style="z-index: 10;">
+        <button class="btn btn-light rounded-circle shadow-sm icon-btn" (click)="goBack()">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <button class="btn btn-light rounded-circle shadow-sm icon-btn text-danger">
+          <i class="fa-solid fa-heart"></i>
+        </button>
+      </div>
+
+      <!-- Doctor Photo (can be large image) -->
+      <img [src]="doctor.profileImageUrl || 'assets/default-large-doc.jpg'" 
+           (error)="$event.target.src='https://ui-avatars.com/api/?name=' + doctor.firstName + '+' + doctor.lastName + '&background=random&size=512'"
+           class="banner-img w-100" alt="Doctor Hero Image">
+      
+      <!-- Bottom Info Overlay -->
+      <div class="banner-bottom-info position-absolute w-100 p-4 text-white">
+        <h1 class="fw-bold mb-1">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h1>
+        <p class="mb-0 fs-5 opacity-75"><i class="fa-solid fa-stethoscope me-2"></i>{{ doctor.specialite || 'Neurologist - General Hospital' }}</p>
+      </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="container mt-n4 position-relative" style="z-index: 20;">
+      <div class="card border-0 shadow-sm content-card">
+        <div class="card-body p-4 p-md-5">
+          
+          <!-- Stats Row -->
+          <div class="row text-center g-3 mb-5 border-bottom pb-4">
+            <div class="col-4">
+              <div class="stat-box p-3 rounded-4 bg-soft-theme">
+                <i class="fa-solid fa-users fa-lg theme-text mb-2 d-block"></i>
+                <h4 class="fw-bold mb-0">320+</h4>
+                <small class="text-muted fw-semibold">Patients</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="stat-box p-3 rounded-4 bg-soft-theme">
+                <i class="fa-solid fa-medal fa-lg theme-text mb-2 d-block"></i>
+                <h4 class="fw-bold mb-0">10+</h4>
+                <small class="text-muted fw-semibold">Years Exp.</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="stat-box p-3 rounded-4 bg-soft-theme">
+                <i class="fa-solid fa-star fa-lg text-warning mb-2 d-block"></i>
+                <h4 class="fw-bold mb-0">520+</h4>
+                <small class="text-muted fw-semibold">Reviews</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- About Section -->
+          <h4 class="fw-bold mb-3 heading-text">About Doctor</h4>
+          <p class="text-muted lh-lg mb-0" style="font-size: 1.05rem;">
+            {{ doctor.bio || 'This doctor is part of the Alzcare network, specializing in neurological behavior and diagnostic evaluations for cognitive impairments. They have an extensive background in patient-centric care and provide detailed analysis for early stage detection and progression.' }}
+          </p>
+
+          <div class="mt-4 pt-2">
+             <h5 class="fw-bold mb-3 heading-text">Working time</h5>
+             <p class="text-muted mb-0"><i class="fa-regular fa-clock me-2 theme-text"></i> Monday - Friday, 08:00 AM - 05:00 PM</p>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- Call to Action Button in fixed bottom or just below -->
+      <div class="mt-4 pb-4">
+        <button class="btn btn-theme-gradient w-100 py-3 rounded-pill fw-bold fs-5 shadow-lg d-flex align-items-center justify-content-center gap-2" (click)="makeAppointment()">
+          Book Appointment <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Not found -->
+  <div *ngIf="!isLoading && !doctor" class="text-center py-5">
+    <h3 class="text-muted">Doctor not found</h3>
+    <button class="btn btn-primary mt-3" (click)="goBack()">Go Back</button>
+  </div>
+</div>

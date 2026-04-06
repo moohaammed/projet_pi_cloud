@@ -8,6 +8,8 @@ import { EventListComponent } from './components/education/event/event-list.comp
 import { ActivityListComponent } from './components/education/activity/activity-list.component';
 import { EducationComponent } from './components/education/activity/education.component';
 import { EventFrontComponent } from './components/education/event/event_front';
+import { ContactDoctorComponent } from './components/contact-doctor/contact-doctor.component';
+import { DoctorDetailComponent } from './components/doctor-detail/doctor-detail.component';
 
 // Gestion Patient & Collaboration
 import { CommunicationTestComponent } from './components/collaboration/communication-test/communication-test.component';
@@ -136,6 +138,14 @@ export const routes: Routes = [
       {
         path: 'donations',
         loadComponent: () => import('./components/donation/admin-donation/admin-donation.component').then(m => m.AdminDonationComponent)
+      },
+      {
+        path: 'patients',
+        loadComponent: () => import('./components/admin-gestion-patient/admin-gestion-patient.component').then(m => m.AdminGestionPatientComponent)
+      },
+      {
+        path: 'medecins',
+        loadComponent: () => import('./components/admin-gestion-medecin/admin-gestion-medecin.component').then(m => m.AdminGestionMedecinComponent)
       }
     ]
   },
@@ -156,6 +166,8 @@ export const routes: Routes = [
     component: GestionPatientRoleComponent,
     canActivate: [authGuard]
   },
+  { path: 'contact-doctor', component: ContactDoctorComponent },
+  { path: 'doctor-detail/:id', component: DoctorDetailComponent },
   // ===== EXISTANT =====
 
 

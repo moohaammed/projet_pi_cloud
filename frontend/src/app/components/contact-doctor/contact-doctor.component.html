@@ -1,0 +1,69 @@
+<div class="doctor-page-container">
+  <div class="header-section py-4 px-4 mb-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h2 class="fw-bold mb-1 title-text text-white">Find your specialize doctor</h2>
+        <p class="mb-0 sub-title-text" style="color: rgba(255,255,255,0.8);">It's easier to ask doctors for the latest info about your case</p>
+      </div>
+      <button class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm text-primary-theme" (click)="goBack()">
+        <i class="fa-solid fa-arrow-left me-1"></i> Dashboard
+      </button>
+    </div>
+  </div>
+
+  <div class="container-fluid px-4 pb-5 content-wrapper">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary-theme" role="status"></div>
+      <p class="text-muted mt-2">Loading doctors...</p>
+    </div>
+
+    <!-- Doctor Grid -->
+    <div class="row g-4" *ngIf="!isLoading">
+      <div class="col-12 col-md-6 col-lg-4" *ngFor="let doc of doctors">
+        <div class="doctor-card card border-0 shadow-sm">
+          <div class="card-body p-4 position-relative">
+            <!-- Heart icon -->
+            <div class="heart-icon position-absolute top-0 end-0 mt-3 me-3 text-muted">
+              <i class="fa-regular fa-heart fa-lg"></i>
+            </div>
+            
+            <div class="d-flex flex-column align-items-center mt-3 text-center">
+              <div class="avatar-container position-relative mb-3">
+                <img [src]="doc.profileImageUrl || 'assets/default-avatar.png'"
+                     (error)="$event.target.src='https://ui-avatars.com/api/?name=' + doc.firstName + '+' + doc.lastName + '&background=random'"
+                     class="rounded-circle shadow-sm profile-img" alt="Doctor Photo">
+                <span class="status-dot online"></span>
+              </div>
+              <h5 class="fw-bold mb-1 doc-name">Dr. {{ doc.firstName }} {{ doc.lastName }}</h5>
+              <p class="mb-1 text-muted small"><i class="fa-solid fa-hospital me-1"></i>{{ doc.specialite || 'Neurologist' }} - Clinic</p>
+              
+              <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+                <div class="stars text-warning" style="font-size: 0.85rem;">
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star-half-stroke"></i>
+                </div>
+                <span class="small fw-bold text-dark">4.5</span>
+                <span class="text-muted small border-start ps-2 ms-1"><i class="fa-regular fa-clock me-1"></i>From 09:00 AM</span>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+              <div class="price-tag fw-bold theme-text">$50.00</div>
+              <button class="btn btn-theme-primary rounded-pill px-4 py-2 fw-bold" (click)="viewDoctorDetail(doc.id)">Appointment</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Empty state -->
+      <div *ngIf="doctors.length === 0" class="col-12 py-5 text-center text-muted">
+        <i class="fa-solid fa-user-doctor fa-3x mb-3 opacity-50"></i>
+        <p>No doctors currently available.</p>
+      </div>
+    </div>
+  </div>
+</div>
