@@ -31,6 +31,7 @@
               "public/template/assets/plugins/fontawesome/css/all.min.css",
               "public/template/assets/plugins/themify-icons/themify-icons.css",
               "public/template/assets/css/style.css",
+              "node_modules/leaflet/dist/leaflet.css",
               "src/styles.css"
             ],
             "scripts": []

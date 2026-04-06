@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
+import { PatientProgressionService } from '../services/patient-progression.service';
 
 @Component({
   selector: 'app-medecin-dashboard',
@@ -24,9 +25,19 @@ export class MedecinDashboardComponent implements OnInit {
   isSavingObservation = false;
   successMessage = '';
 
+  progressionScoreQuiz: number = 0;
+  progressionStadeQuiz: string = 'LEGER';
+  progressionScoreGame: number = 0;
+  progressionStadeGame: string = 'LEGER';
+  progressionScoreFinal: number = 0;
+  progressionHistory: any[] = [];
+  isLoadingProgression = false;
+  isResetting = false;
+
   constructor(
     private patientService: PatientService,
-    private analyseService: AnalyseService
+    private analyseService: AnalyseService,
+    private progressionService: PatientProgressionService
   ) { }
 
   ngOnInit(): void {
@@ -59,6 +70,55 @@ export class MedecinDashboardComponent implements OnInit {
         this.isLoadingAnalyses = false;
       },
       error: () => this.isLoadingAnalyses = false
+    });
+    
+    // Load progression
+    const userId = patient.user ? patient.user.id : patient.id; // fallback if user logic differs
+    if (userId) {
+      this.loadProgression(userId);
+    }
+  }
+
+  loadProgression(userId: number) {
+    this.isLoadingProgression = true;
+    this.progressionService.getScoreAndStade(userId).subscribe({
+      next: (data) => {
+        this.progressionScoreQuiz = data.scoreQuiz;
+        this.progressionStadeQuiz = data.stadeQuiz;
+        this.progressionScoreGame = data.scoreGame;
+        this.progressionStadeGame = data.stadeGame;
+        this.progressionScoreFinal = (this.progressionScoreQuiz + this.progressionScoreGame) / 2;
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.progressionService.getHistory(userId).subscribe({
+      next: (data) => {
+        this.progressionHistory = data || [];
+        this.isLoadingProgression = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoadingProgression = false;
+      }
+    });
+  }
+
+  resetPatientProgression(type: string = 'ALL') {
+    if (!this.selectedPatient || !confirm(`Êtes-vous sûr de vouloir réinitialiser la progression de ce patient pour la catégorie ${type} ?`)) return;
+    
+    const userId = this.selectedPatient.user ? this.selectedPatient.user.id : this.selectedPatient.id;
+    this.isResetting = true;
+    this.progressionService.resetPatient(userId, type).subscribe({
+      next: () => {
+        this.showSuccess("Progression réinitialisée avec succès.");
+        this.loadProgression(userId);
+        this.isResetting = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isResetting = false;
+      }
     });
   }
 

@@ -1,8 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
-
-// ===== EXISTANT =====
 import { RendezVousListComponent } from './components/rendezvous-list/rendezvous-list.component';
 import { RendezVousFormComponent } from './components/rendezvous-form/rendezvous-form.component';
 import { RendezVousDetailComponent } from './components/rendezvous-detail/rendezvous-detail.component';
@@ -18,8 +16,14 @@ import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard
 import { MedecinDashboardComponent } from './medecin-dashboard/medecin-dashboard.component';
 import { HomeComponent } from './components/home/home.component';
 
-export const routes: Routes = [
+// Donation
+import { DonationListComponent } from './components/donation/donation-list/donation-list.component';
+import { DonationFormComponent } from './components/donation/donation-form/donation-form.component';
+import { DonationSuccessComponent } from './components/donation/donation-success/donation-success.component';
+import { DonationCancelComponent } from './components/donation/donation-cancel/donation-cancel.component';
+import { MyDonationsComponent } from './components/donation/my-donations/my-donations.component';
 
+export const routes: Routes = [
   // ===== AUTH AlzCare =====
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
@@ -62,8 +66,22 @@ export const routes: Routes = [
     data: { roles: ['ADMIN'] }
   },
 
+  {
+  path: 'map',
+  loadComponent: () =>
+    import('./components/map/doctor-map/doctor-map.component')
+      .then(m => m.DoctorMapComponent),
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['DOCTOR', 'ADMIN'] }
+},
+
 
   // ===== COLLABORATION (Avec sous-routes lazy-loadées) =====
+
+
+
+  // ===== COLLABORATION (Avec sous-routes lazy-loadées) =====
+
   {
     path: 'collaboration',
     component: CommunicationTestComponent,
@@ -114,6 +132,10 @@ export const routes: Routes = [
       {
         path: 'rendezvous',
         loadComponent: () => import('./components/dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+      },
+      {
+        path: 'donations',
+        loadComponent: () => import('./components/donation/admin-donation/admin-donation.component').then(m => m.AdminDonationComponent)
       }
     ]
   },
@@ -136,11 +158,22 @@ export const routes: Routes = [
   },
   // ===== EXISTANT =====
 
+
+  // ===== EXISTANT (inchangé) =====
+
+  // --- Tes Routes (Gestion Patient) ---
+  { path: 'patients', component: GestionPatientRoleComponent },
+  { path: 'patient-dashboard', component: PatientDashboardComponent },
+  { path: 'medecin-dashboard', component: MedecinDashboardComponent },
+
+  { path: 'collaboration', component: CommunicationTestComponent },
+
   // ===== RENDEZ-VOUS =====
   { path: 'rendezvous', component: RendezVousListComponent, canActivate: [authGuard] },
   { path: 'rendezvous/new', component: RendezVousFormComponent, canActivate: [authGuard] },
   { path: 'rendezvous/:id', component: RendezVousDetailComponent, canActivate: [authGuard] },
   { path: 'rendezvous/:id/edit', component: RendezVousFormComponent, canActivate: [authGuard] },
+
 
   // ===== EDUCATION =====
   { path: 'events', component: EventListComponent, canActivate: [authGuard] },
@@ -148,6 +181,20 @@ export const routes: Routes = [
   { path: 'education', component: EducationComponent, canActivate: [authGuard] },
   { path: 'eventfront', component: EventFrontComponent, canActivate: [authGuard] },
 
-  // Page 404 / Redirection par défaut
+  // ===== DONATIONS =====
+  { path: 'donations', component: DonationListComponent },
+  { path: 'donations/success', component: DonationSuccessComponent },
+  { path: 'donations/cancel', component: DonationCancelComponent },
+  { path: 'my-donations', component: MyDonationsComponent, canActivate: [authGuard] },
+  { path: 'donations/:campaignId', component: DonationFormComponent },
+
+
+  // --- Routes Education ---
+  { path: 'events', component: EventListComponent },
+  { path: 'activities', component: ActivityListComponent },
+  { path: 'education', component: EducationComponent },
+  { path: 'eventfront', component: EventFrontComponent },
+
+
   { path: '**', redirectTo: 'auth/login' }
 ];
