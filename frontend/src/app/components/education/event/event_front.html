@@ -1,49 +1,76 @@
 <div class="events-page">
 
-  <!-- STATS BAR -->
-  <div class="stats-bar">
-    <div class="stat">
-      <div class="stat-icon total">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2"/>
-          <line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/>
-          <line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-      </div>
-      <div class="stat-info">
-        <span class="stat-number">{{ events.length }}</span>
-        <span class="stat-label">Total</span>
-      </div>
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="title-container">
+      <div class="header-badge">Agenda & Activités</div>
+      <h1 class="page-title">Découvrez Nos Événements</h1>
+      <p class="page-subtitle">Participez à nos activités éducatives et interactives conçues pour vous.</p>
+    </div>
+  </div>
+
+  <!-- CONTROLS ROW -->
+  <div class="controls-row">
+    <!-- SEARCH -->
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Rechercher un événement…"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+      />
     </div>
 
-    <div class="stat-divider"></div>
-
-    <div class="stat">
-      <div class="stat-icon upcoming">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
-        </svg>
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-icon total">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ events.length }}</span>
+          <span class="stat-label">Total</span>
+        </div>
       </div>
-      <div class="stat-info">
-        <span class="stat-number">{{ getUpcomingCount() }}</span>
-        <span class="stat-label">À venir</span>
-      </div>
-    </div>
 
-    <div class="stat-divider"></div>
+      <div class="stat-divider"></div>
 
-    <div class="stat">
-      <div class="stat-icon past">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M9 12l2 2 4-4"/>
-        </svg>
+      <div class="stat">
+        <div class="stat-icon upcoming">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ getUpcomingCount() }}</span>
+          <span class="stat-label">À venir</span>
+        </div>
       </div>
-      <div class="stat-info">
-        <span class="stat-number">{{ events.length - getUpcomingCount() }}</span>
-        <span class="stat-label">Passés</span>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat">
+        <div class="stat-icon past">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ events.length - getUpcomingCount() }}</span>
+          <span class="stat-label">Passés</span>
+        </div>
       </div>
     </div>
   </div>

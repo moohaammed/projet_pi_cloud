@@ -43,39 +43,123 @@ import { CalendarEvent } from '../../../models/education/event.model';
     
 
  
+    .page-header {
+      position: relative;
+      background: linear-gradient(135deg, rgba(128,0,128,0.06) 0%, rgba(128,0,128,0.01) 100%) !important;
+      border: 1px solid rgba(128,0,128,0.08);
+      border-radius: var(--radius);
+      padding: 45px 30px !important;
+      margin-bottom: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -50px; left: -50px;
+      width: 150px; height: 150px;
+      background: var(--primary-light);
+      filter: blur(40px);
+      border-radius: 50%;
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    .page-header::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; right: 10%;
+      width: 120px; height: 120px;
+      background: var(--primary-mid);
+      filter: blur(40px);
+      border-radius: 50%;
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    .title-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--white);
+      color: var(--primary-dark);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 50px;
+      border: 1px solid var(--primary-light);
+      box-shadow: 0 4px 12px rgba(128,0,128,0.05);
+      margin-bottom: 4px;
+    }
+
     .page-title {
       font-family: 'Fraunces', serif;
-      font-size: 2.8rem;
+      font-size: 3.2rem;
       font-weight: 800;
       color: var(--text-dark);
+      background: linear-gradient(to right, var(--text-dark), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin: 0;
-      line-height: 1;
+      line-height: 1.1;
       letter-spacing: -.02em;
     }
 
-    .header-right {
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-mid);
+      margin: 0;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    .controls-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+      min-height: 50px;
     }
 
     .search-box {
       background: var(--white);
       border: 1.5px solid var(--border);
       border-radius: 50px;
-      padding: 10px 18px 10px 40px;
-      box-shadow: var(--shadow);
-      transition: border-color 0.2s;
-      position: relative;
+      padding: 12px 20px 12px 42px;
+      box-shadow: 0 8px 30px rgba(128, 0, 128, 0.06);
+      transition: all 0.3s ease;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       align-items: center;
+      width: 100%;
+      max-width: 450px;
     }
-    .search-box:focus-within { border-color: var(--primary); }
+    .search-box:focus-within { 
+      border-color: var(--primary);
+      box-shadow: 0 8px 30px rgba(128, 0, 128, 0.12);
+      transform: translateX(-50%) translateY(-2px);
+    }
 
     .search-icon {
-      position: absolute; left: 14px;
-      width: 15px; height: 15px;
+      position: absolute; left: 16px;
+      width: 18px; height: 18px;
       color: var(--text-light);
       pointer-events: none;
     }
@@ -84,10 +168,10 @@ import { CalendarEvent } from '../../../models/education/event.model';
       background: transparent;
       border: none;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: .875rem;
+      font-size: .95rem;
       color: var(--text-dark);
       outline: none;
-      width: 250px;
+      width: 100%;
     }
     .search-input::placeholder { color: var(--text-light); }
 
@@ -335,6 +419,21 @@ import { CalendarEvent } from '../../../models/education/event.model';
 
     @media (max-width: 1100px) {
       .events-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .controls-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        min-height: auto;
+      }
+      .search-box {
+        position: relative;
+        left: 0;
+        transform: none;
+        max-width: 100%;
+      }
+      .search-box:focus-within { transform: translateY(-2px); }
     }
     @media (max-width: 640px) {
       .events-page { padding: 24px 18px 56px; }
