@@ -27,6 +27,17 @@ export class AlzUserService {
     });
   }
 
+  updateUserLiveStatus(id: number, isLive: boolean) {
+    this.users.update(currentUsers => {
+      const copy = [...currentUsers];
+      const index = copy.findIndex(u => u.id === id);
+      if (index !== -1) {
+        copy[index] = { ...copy[index], isLive: isLive };
+      }
+      return copy;
+    });
+  }
+
   getAll(): Observable<User[]> {
     return this.http.get<User[]>(this.apiUrl);
   }
@@ -44,6 +55,9 @@ export class AlzUserService {
   }
   toggleActif(id: number): Observable<User> {
     return this.http.patch<User>(`${this.apiUrl}/${id}/toggle`, {});
+  }
+  toggleLive(id: number): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/${id}/toggle-live`, {});
   }
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

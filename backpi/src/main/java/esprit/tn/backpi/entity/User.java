@@ -31,6 +31,9 @@ public class User {
     private String telephone;
     private String image;
     private boolean actif = true;
+    
+    @com.fasterxml.jackson.annotation.JsonProperty("isLive")
+    private boolean isLive = false;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -50,6 +53,10 @@ public class User {
     public void setActif(boolean actif) { this.actif = actif; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    @com.fasterxml.jackson.annotation.JsonProperty("isLive")
+    public boolean isLive() { return isLive; }
+    public void setLive(boolean live) { isLive = live; }
     public String getTelephone() { return telephone; }
     public void setTelephone(String telephone) { this.telephone = telephone; }
     public String getImage() { return image; }

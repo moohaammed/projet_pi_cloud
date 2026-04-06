@@ -15,5 +15,6 @@ export interface User {
   image?: string;
   role: Role;
   actif: boolean;
+  isLive?: boolean;
   createdAt?: string;
 }

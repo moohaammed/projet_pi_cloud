@@ -124,6 +124,16 @@
                 <i *ngIf="!medReminderLoading()" class="fa-solid fa-pills me-1"></i>
                 Test medication reminder
               </button>
+              <button *ngIf="activeGroup()" type="button"
+                class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm text-dark fw-bold"
+                (click)="fetchHandoverSummary()"
+                [disabled]="isGeneratingSummary()"
+                title="✨ Generate AI Handover Summary">
+                <span *ngIf="isGeneratingSummary()" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                <i *ngIf="!isGeneratingSummary()" class="fa-solid fa-sparkles me-1"></i>
+                {{ isGeneratingSummary() ? 'Summarizing...' : 'AI Summary' }}
+              </button>
+
               <button class="btn btn-soft-primary btn-sm rounded-circle p-2 shadow-none border-0" [class.active]="showInfoSidebar()" (click)="toggleInfoSidebar()" title="Conversation Info">
                  <i class="fa-solid fa-circle-info fs-18"></i>
               </button>
@@ -134,6 +144,20 @@
           <div class="flex-grow-1 bg-social-light position-relative overflow-hidden d-flex flex-column">
              <div class="flex-grow-1 p-4 overflow-auto d-flex flex-column-reverse comm-scroll-lg" id="messageFeed">
                 <div class="messages-stack w-100">
+                   
+                   <!-- AI Handover Summary Display -->
+                   <div *ngIf="currentSummary()" class="ai-summary-banner p-3 mb-4 rounded-4 shadow-sm border-start border-4 border-primary animate-fade-in" 
+                        style="background: linear-gradient(to right, #eff6ff, #ffffff);">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0 fw-bold fs-13 text-primary"><i class="fa-solid fa-sparkles me-2"></i>✨ AI Handover Summary</h6>
+                        <button class="btn btn-link btn-sm p-0 text-muted" (click)="currentSummary.set(null)"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+                      <div class="fs-13 text-dark whitespace-pre-line lh-base">{{ currentSummary() }}</div>
+                      <div class="mt-2 pt-2 border-top border-soft-primary d-flex justify-content-between align-items-center">
+                        <small class="text-muted fs-11 italic">Generated just now based on recent care logs</small>
+                        <button class="btn btn-link btn-sm p-0 fs-11 fw-bold text-primary text-decoration-none" (click)="fetchHandoverSummary()">Regenerate</button>
+                      </div>
+                   </div>
                    <div *ngFor="let msg of filteredMessages()" class="d-flex mb-3" [class.justify-content-end]="!msg.fromBot && msg.senderId === currentUserId()">
                       <div class="message-wrapper d-flex flex-column" [class.align-items-end]="!msg.fromBot && msg.senderId === currentUserId()" style="max-width: 75%;">
                             

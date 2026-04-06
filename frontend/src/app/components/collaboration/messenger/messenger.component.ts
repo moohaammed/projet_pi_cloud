@@ -46,7 +46,11 @@ export class MessengerComponent implements OnInit, OnDestroy {
   medReminderLoading = signal(false);
   /** Hide Yes/No after the user answered (session only; reload may show again). */
   medicationReminderAnsweredIds = signal<Set<number>>(new Set());
-  medReminderAckLoading = signal(false);
+  medReminderAckLoading = signal<boolean>(false);
+
+  // AI Handover State
+  currentSummary = signal<string | null>(null);
+  isGeneratingSummary = signal<boolean>(false);
 
   openMedia(url: string | undefined) {
     if (url) window.open(url, '_blank');
@@ -387,6 +391,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
     this.chatGroupService.activeGroup.set(grp);
     this.messageService.fetchMessagesByGroup(grp.id!);
     this.webSocketService.subscribeToGroup(grp.id!);
+    this.currentSummary.set(null);
   }
 
   openDmChat(userId: number) {
@@ -396,6 +401,27 @@ export class MessengerComponent implements OnInit, OnDestroy {
     this.chatGroupService.activeGroup.set(null);
     this.messageService.fetchDirectMessages(this.currentUserId(), userId).subscribe(msgs => {
       this.dmMessages.set(msgs);
+    });
+    this.currentSummary.set(null);
+  }
+
+  fetchHandoverSummary() {
+    const grp = this.activeGroup();
+    if (!grp?.id) return;
+
+    this.isGeneratingSummary.set(true);
+    this.currentSummary.set(null);
+
+    this.messageService.getAiHandoverSummary(grp.id).subscribe({
+      next: (res) => {
+        this.currentSummary.set(res.summary);
+        this.isGeneratingSummary.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching AI summary:', err);
+        this.currentSummary.set('Failed to generate AI summary. Please try again.');
+        this.isGeneratingSummary.set(false);
+      }
     });
   }
 

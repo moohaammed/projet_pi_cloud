@@ -112,4 +112,8 @@ export class MessageService {
   togglePin(messageId: number) {
     return this.http.post<MessageDto>(`${this.baseUrl}/${messageId}/pin`, {});
   }
+
+  getAiHandoverSummary(groupId: number) {
+    return this.http.get<{summary: string}>(`http://localhost:8080/api/handover/group/${groupId}`);
+  }
 }

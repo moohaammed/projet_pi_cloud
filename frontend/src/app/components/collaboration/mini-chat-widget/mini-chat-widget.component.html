@@ -96,6 +96,7 @@
         </div>
         
         <div class="card-body p-2 bg-light d-flex flex-column-reverse overflow-auto comm-scroll-sm" style="height: 320px;">
+          <div class="flex-grow-1"></div> <!-- Spacer to push messages to bottom if few -->
           <div *ngFor="let msg of miniChatMessages()" class="mb-3">
              <div class="d-flex flex-column" [class.align-items-end]="msg.senderId === currentUserId()">
                
@@ -167,6 +168,7 @@
                </div>
              </div>
           </div>
+
           <div *ngIf="miniChatMessages().length === 0" class="text-center text-muted fs-12 mt-4">
             No messages yet. Say hi!
           </div>

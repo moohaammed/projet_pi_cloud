@@ -9,10 +9,92 @@
         <span *ngIf="groupId()"><i class="fa-solid fa-users text-purple me-2"></i> {{ currentGroup()?.name }}</span>
       </h4>
       <p class="fs-13 text-muted mb-0" *ngIf="groupId()">{{ currentGroup()?.description }}</p>
-    </div>
+</div>
+
+<div class="share-popup" id="sharePopup">
+  <div class="share-popup-header">
+    <div class="share-popup-title">Share Post</div>
+    <div class="share-popup-close" onclick="closeSharePopup()">×</div>
+  </div>
+  <div class="share-popup-body">
+    <div class="share-popup-message">Copy the link below to share this post:</div>
+    <input type="text" class="share-popup-input" id="shareLink" value="https://example.com/post/123" readonly>
+  </div>
+  <div class="share-popup-actions">
+    <button class="btn share-popup-action-button share-popup-cancel" onclick="closeSharePopup()">Cancel</button>
+    <button class="btn share-popup-action-button share-popup-share" onclick="copyLink()">Copy Link</button>
+  </div>
+</div>
     <div class="d-flex align-items-center gap-2">
+      <!-- Go Live Button -->
+      <button (click)="toggleGoLive()" 
+              class="btn btn-sm rounded-pill px-3 text-white fw-bold transition-all border-0 shadow-sm"
+              [ngClass]="isLiveNow() ? 'bg-red-600 bg-danger' : 'bg-gray-500 bg-secondary'">
+        <i class="fa-solid fa-video me-1" [class.fa-beat-fade]="isLiveNow()"></i> 
+        {{ isLiveNow() ? 'End Live' : 'Go Live' }}
+      </button>
+
       <button type="button" class="btn btn-soft-primary btn-sm rounded-pill px-3" (click)="refreshData()">
         <i class="fa-solid fa-rotate-right me-1"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Remote WebRTC Streams -->
+  <div *ngFor="let item of webRtcService.remoteStreamStatus() | keyvalue" class="card border-0 shadow-sm mb-4 bg-dark text-white rounded-4 overflow-hidden position-relative animate-fade-in">
+    <div class="position-absolute top-0 start-0 m-3 z-3">
+      <span class="badge" [ngClass]="item.value === 'CONNECTING' ? 'bg-warning text-dark' : 'bg-danger animate-pulse shadow'">
+        <i class="fa-solid fa-circle-dot me-1"></i> 
+        {{ item.value === 'CONNECTING' ? 'Connecting to ' + getUserName(+item.key) + '...' : 'Watching ' + getUserName(+item.key) }}
+      </span>
+    </div>
+    
+    <!-- Loading Spinner when connecting -->
+    <div *ngIf="item.value === 'CONNECTING'" class="w-100 d-flex flex-column align-items-center justify-content-center bg-dark" style="height: 300px;">
+      <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-white-50 small mb-0">Establishing secure P2P connection...</p>
+    </div>
+
+    <video *ngIf="webRtcService.remoteStreams()[+item.key]" [srcObject]="webRtcService.remoteStreams()[+item.key]" autoplay playsinline class="w-100 object-fit-cover" style="max-height: 400px; background: #000;"></video>
+    <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-3 z-3 py-1 px-3 fw-bold rounded-pill shadow-sm" (click)="webRtcService.endWatch(+item.key)">
+      <i class="fa-solid fa-xmark me-1"></i> Close Stream
+    </button>
+  </div>
+
+  <!-- Live Community Members Banner -->
+  <div *ngIf="liveCommunityMembers().length > 0" class="live-community-banner mb-4 p-3 bg-white rounded-4 shadow-sm border border-danger border-opacity-25">
+    <h6 class="fw-bold mb-3 d-flex align-items-center"><i class="fa-solid fa-tower-broadcast text-danger animate-pulse me-2"></i> Live in Community</h6>
+    <div class="d-flex gap-2 flex-wrap">
+      <div *ngFor="let m of liveCommunityMembers()" class="badge bg-soft-danger text-dark p-2 pe-3 rounded-pill cursor-pointer d-flex align-items-center gap-2 hover-bg-danger transition-all border" (click)="watchCommunityStream(m.id!)">
+        <div class="avatar-xs rounded-circle overflow-hidden shadow-sm">
+          <img *ngIf="getUserImage(m.id!)" [src]="getUserImage(m.id!)" class="w-100 h-100 object-fit-cover">
+          <span *ngIf="!getUserImage(m.id!)" class="text-white bg-danger w-100 h-100 d-flex align-items-center justify-content-center fs-10">{{ getUserInitials(m.id!) }}</span>
+        </div>
+        <span class="fw-semibold">{{ m.prenom }} {{ m.nom }}</span>
+        <div class="btn btn-danger btn-xs rounded-circle d-flex align-items-center justify-content-center ms-1" style="width: 20px; height: 20px;">
+          <i class="fa-solid fa-play fs-10" style="margin-left: 2px;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Stream Preview -->
+  <div *ngIf="isLiveNow()" class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden position-relative animate-fade-in bg-dark">
+    <div class="position-absolute top-0 start-0 m-3 z-3">
+      <span class="badge bg-danger animate-pulse px-3 py-2 fs-12 fw-bold text-uppercase shadow">
+        <i class="fa-solid fa-circle-dot me-1"></i> YOU ARE LIVE
+      </span>
+    </div>
+    <video #liveVideo class="w-100 object-fit-cover" style="max-height: 400px; background: #000; display: block;" autoplay muted playsinline></video>
+    <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-gradient-dark text-white z-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);">
+      <div>
+        <h6 class="mb-0 fw-bold">{{ currentUser()?.prenom }} {{ currentUser()?.nom }}</h6>
+        <span class="fs-12 text-light opacity-75">Broadcasting to community...</span>
+      </div>
+      <button class="btn btn-sm btn-danger rounded-pill px-3 fw-bold shadow-sm border-0" (click)="toggleGoLive()">
+        <i class="fa-solid fa-phone-slash me-1"></i> End Stream
       </button>
     </div>
   </div>
