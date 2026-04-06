@@ -6,10 +6,10 @@ export class UserService {
 
   users = signal<any[]>([]);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   fetchUsers(): void {
-    this.http.get<any[]>('http://localhost:8089/api/users').subscribe({
+    this.http.get<any[]>('http://localhost:8080/api/users').subscribe({
       next: (data) => this.users.set(data)
     });
   }

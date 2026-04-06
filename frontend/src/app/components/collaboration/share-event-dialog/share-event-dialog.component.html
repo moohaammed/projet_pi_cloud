@@ -1,0 +1,59 @@
+<div
+  class="sed-backdrop"
+  *ngIf="open && event"
+  (click)="close()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="sed-title"
+>
+  <div class="sed-card card border-0 shadow-lg rounded-4" (click)="$event.stopPropagation()">
+    <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-start">
+      <div>
+        <h2 id="sed-title" class="h5 fw-bold mb-1">Share to collaboration feed</h2>
+        <p class="text-muted small mb-0">Posts an event card on the feed that opens this event on the Events page.</p>
+      </div>
+      <button type="button" class="btn btn-light rounded-circle p-2" (click)="close()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="card-body px-4">
+      <div class="rounded-3 border bg-light p-3 mb-3 small">
+        <div class="fw-bold text-dark">{{ event.title }}</div>
+        <div class="text-muted mt-1" *ngIf="event.startDateTime">{{ event.startDateTime | date : 'medium' }}</div>
+        <div class="text-muted" *ngIf="event.location">{{ event.location }}</div>
+      </div>
+
+      <label class="form-label small fw-semibold">Add a note (optional)</label>
+      <textarea
+        class="form-control rounded-3"
+        rows="3"
+        [(ngModel)]="note"
+        placeholder="Why you're sharing this, or extra details…"
+        [disabled]="submitting() || success()"
+      ></textarea>
+
+      <div class="alert alert-danger mt-3 mb-0 py-2 small" *ngIf="error()">{{ error() }}</div>
+      <div class="alert alert-success mt-3 mb-0 py-2 small" *ngIf="success()">
+        Published. You can
+        <a routerLink="/collaboration/feed" (click)="close()">open the feed</a>
+        to see it.
+      </div>
+    </div>
+
+    <div class="card-footer bg-white border-0 px-4 pb-4 d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-light rounded-pill px-3" (click)="close()" [disabled]="submitting()">
+        {{ success() ? 'Close' : 'Cancel' }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary rounded-pill px-4"
+        (click)="submit()"
+        [disabled]="submitting() || success() || !(event.title ?? '').trim()"
+      >
+        <span *ngIf="submitting()" class="spinner-border spinner-border-sm me-1" role="status"></span>
+        Post to feed
+      </button>
+    </div>
+  </div>
+</div>

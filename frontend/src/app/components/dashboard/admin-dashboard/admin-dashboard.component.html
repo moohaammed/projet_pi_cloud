@@ -1,1 +1,300 @@
-<p>admin-dashboard works!</p>
+<div class="row mb-4">
+  <div class="col-12 px-3 pb-2">
+    <div class="section-header text-start mb-4">
+      <h2 class="fw-bold mb-2 section-header__title text-capitalize fs-28">
+        Rendez-Vous <span class="underline position-relative text-primary">Dashboard</span>
+      </h2>
+      <div class="sub-title fs-15 text-muted">
+        Gérez tous les rendez-vous, visualisez les statistiques et effectuez des actions rapides.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alertes Intelligentes -->
+<div class="row mb-4" *ngIf="unconfirmedTodayAlerts > 0 || upcomingIn30MinsAlerts > 0 || absentPatientsAlerts.length > 0">
+  <div class="col-12">
+    <div class="d-flex flex-column gap-3">
+      <!-- 3 rendez-vous aujourd'hui non confirmés -->
+      <div class="alert alert-warning mb-0 d-flex align-items-center shadow-sm rounded-4 border-0 w-100" *ngIf="unconfirmedTodayAlerts > 0">
+        <i class="fa-solid fa-triangle-exclamation fs-3 me-3 text-warning"></i>
+        <div>
+          <h6 class="fw-bold mb-0 text-dark">Action Requise</h6>
+          <span class="small text-muted">{{ unconfirmedTodayAlerts }} rendez-vous aujourd'hui non confirmés !</span>
+        </div>
+      </div>
+      
+      <!-- Prochain RDV dans 30 min -->
+      <div class="alert alert-info mb-0 d-flex align-items-center shadow-sm rounded-4 border-0 w-100" *ngIf="upcomingIn30MinsAlerts > 0">
+        <i class="fa-solid fa-clock fs-3 me-3 text-info"></i>
+        <div>
+          <h6 class="fw-bold mb-0 text-dark">Imminent</h6>
+          <span class="small text-muted">{{ upcomingIn30MinsAlerts }} prochain(s) RDV dans moins de 30 min !</span>
+        </div>
+      </div>
+
+      <!-- Patient absent 2 fois -->
+      <div class="alert alert-danger mb-0 d-flex align-items-center shadow-sm rounded-4 border-0 w-100" *ngIf="absentPatientsAlerts.length > 0">
+        <i class="fa-solid fa-user-xmark fs-3 me-3 text-danger"></i>
+        <div>
+          <h6 class="fw-bold mb-0 text-dark">Attention Absences</h6>
+          <span class="small text-muted">{{ absentPatientsAlerts.length }} patient(s) absent(s) au moins 2 fois (IDs: <span *ngFor="let pid of absentPatientsAlerts">{{ pid }} </span>).</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card border-0 shadow rounded-4 p-4 h-100 transition-hover">
+      <div class="d-flex align-items-center">
+        <div class="bg-soft-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+          <i class="fa-solid fa-calendar-days fs-24 text-primary"></i>
+        </div>
+        <div>
+          <h6 class="text-muted fw-semibold mb-1 text-uppercase small" style="letter-spacing: 0.5px;">Total RDV</h6>
+          <h3 class="fw-bold mb-0 text-dark">{{ totalRv }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card border-0 shadow rounded-4 p-4 h-100 transition-hover">
+      <div class="d-flex align-items-center">
+        <div class="bg-soft-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+          <i class="fa-solid fa-calendar-check fs-24 text-success"></i>
+        </div>
+        <div>
+          <h6 class="text-muted fw-semibold mb-1 text-uppercase small" style="letter-spacing: 0.5px;">Aujourd'hui</h6>
+          <h3 class="fw-bold mb-0 text-dark">{{ todayRv }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card border-0 shadow rounded-4 p-4 h-100 transition-hover">
+      <div class="d-flex align-items-center">
+        <div class="bg-soft-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+          <i class="fa-solid fa-clock position-absolute fs-24 text-warning"></i>
+        </div>
+        <div>
+          <h6 class="text-muted fw-semibold mb-1 text-uppercase small" style="letter-spacing: 0.5px;">Planifiés</h6>
+          <h3 class="fw-bold mb-0 text-dark">{{ planifie }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="card border-0 shadow rounded-4 p-4 h-100 transition-hover">
+      <div class="d-flex align-items-center">
+        <div class="bg-soft-danger rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+          <i class="fa-solid fa-ban fs-24 text-danger"></i>
+        </div>
+        <div>
+          <h6 class="text-muted fw-semibold mb-1 text-uppercase small" style="letter-spacing: 0.5px;">Annulés</h6>
+          <h3 class="fw-bold mb-0 text-dark">{{ annule }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHARTS ROW -->
+<div class="row g-4 mb-5">
+  <div class="col-lg-4">
+    <div class="card border-0 shadow rounded-4 p-4 h-100">
+      <h6 class="fw-bold mb-4 text-muted small text-uppercase"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Taux Confirmation / Annulation</h6>
+      <div style="height: 230px; position: relative;">
+        <canvas #chartCanvas></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow rounded-4 p-4 h-100">
+      <h6 class="fw-bold mb-4 text-muted small text-uppercase"><i class="fa-solid fa-chart-line me-2 text-primary"></i>Nbr Rendez-Vous par Jour</h6>
+      <div style="height: 230px; position: relative;">
+        <canvas #chartCanvas></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow rounded-4 p-4 h-100">
+      <h6 class="fw-bold mb-4 text-muted small text-uppercase"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Heures les plus chargées</h6>
+      <div style="height: 230px; position: relative;">
+        <canvas #chartCanvas></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow rounded-4 mb-5">
+  <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <h5 class="fw-bold mb-0">Gestion globale des Rendez-Vous</h5>
+    
+    <div class="d-flex gap-3 align-items-center flex-wrap">
+      <!-- Toggle mode -->
+      <div class="btn-group shadow-sm" role="group">
+        <input type="radio" class="btn-check" name="adminViewMode" id="adminViewList" [checked]="viewMode === 'list'" (click)="viewMode = 'list'">
+        <label class="btn btn-outline-primary btn-sm px-3" for="adminViewList"><i class="fa-solid fa-list me-1"></i> Liste</label>
+        <input type="radio" class="btn-check" name="adminViewMode" id="adminViewCalendar" [checked]="viewMode === 'calendar'" (click)="viewMode = 'calendar'">
+        <label class="btn btn-outline-primary btn-sm px-3" for="adminViewCalendar"><i class="fa-solid fa-calendar-alt me-1"></i> Calendrier</label>
+      </div>
+
+      <select class="form-select form-select-sm border-0 bg-light" [(ngModel)]="filterStatut" (ngModelChange)="applyFilters()" style="width: 140px;" *ngIf="viewMode === 'list'">
+        <option value="">Tous les statuts</option>
+        <option *ngFor="let s of statutOptions" [value]="s">{{ statutLabels[s] }}</option>
+      </select>
+      
+      <a routerLink="/rendezvous/new" class="btn btn-primary btn-sm d-flex align-items-center gap-2 rounded-pill px-3 shadow-sm">
+        <i class="fa-solid fa-plus"></i> Nouveau RDV
+      </a>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <div *ngIf="loading" class="text-center p-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger mx-4 mt-3">
+      {{ error }}
+    </div>
+
+    <!-- List View -->
+    <div class="table-responsive" *ngIf="!loading && filteredList.length > 0 && viewMode === 'list'">
+      <table class="table table-hover align-middle mb-0 custom-admin-table border-top">
+        <thead class="bg-light text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Date & Heure</th>
+            <th>Patient ID</th>
+            <th>Médecin ID</th>
+            <th>Motif</th>
+            <th>Statut</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let rv of filteredList">
+            <td class="ps-4 fw-bold text-dark">#{{ rv.id }}</td>
+            <td class="text-muted"><i class="fa-regular fa-clock me-1"></i> {{ rv.dateHeure | date:'short' }}</td>
+            <td>
+              <button class="btn btn-sm btn-light rounded-pill fw-bold text-primary shadow-sm" (click)="openPatientProfile(rv.patientId)" title="Voir la fiche patient">
+                <i class="fa-solid fa-user me-1"></i> #{{ rv.patientId }}
+              </button>
+            </td>
+            <td><span class="fw-medium text-dark">#{{ rv.medecinId }}</span></td>
+            <td class="text-truncate" style="max-width: 150px;" [title]="rv.motif">{{ rv.motif }}</td>
+            <td>
+              <select class="form-select form-select-sm border-0 d-inline-block w-auto" [ngClass]="getStatutBadge(rv.statut)" [ngModel]="rv.statut" (ngModelChange)="changeStatut(rv.id, $event)">
+                <option *ngFor="let s of statutOptions" [value]="s" class="text-dark bg-white">{{ statutLabels[s] }}</option>
+              </select>
+            </td>
+            <td class="text-end pe-4">
+              <a [routerLink]="['/rendezvous', rv.id, 'edit']" class="btn btn-sm btn-soft-warning rounded-circle me-2" title="Modifier">
+                <i class="fa-solid fa-pen"></i>
+              </a>
+              <button (click)="deleteRv(rv.id)" class="btn btn-sm btn-soft-danger rounded-circle" title="Supprimer">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!loading && filteredList.length === 0 && viewMode === 'list'" class="text-center p-5 text-muted">
+      <i class="fa-regular fa-folder-open fs-1 mb-3"></i>
+      <p>Aucun rendez-vous trouvé.</p>
+    </div>
+
+    <!-- Calendar View -->
+    <div class="p-4" *ngIf="viewMode === 'calendar'">
+      <div style="min-height: 600px;">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Patient Profile -->
+<div class="modal fade show" tabindex="-1" *ngIf="selectedPatientId !== null" style="display: block; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999;">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+      <!-- Header -->
+      <div class="modal-header border-0 bg-primary bg-gradient text-white p-4">
+        <div class="d-flex align-items-center">
+          <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-3 shadow-sm me-3" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-user-injured"></i>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-bold">Dossier Patient</h4>
+            <div class="text-white-50 small mt-1">Identifiant Unique : #{{ selectedPatientId }}</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-light rounded-circle shadow-sm" style="width: 40px; height: 40px;" (click)="closePatientProfile()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body p-4 bg-light">
+        <div class="row g-4">
+          <!-- Statut Card -->
+          <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-3">
+              <span class="small text-uppercase text-muted fw-bold mb-2">Comportement Patient</span>
+              <h4 class="mb-0 fw-bold text-{{ patientStatus.color }}">
+                {{ patientStatus.label }}
+              </h4>
+            </div>
+          </div>
+
+          <!-- Notes Médicales -->
+          <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+              <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-notes-medical text-primary me-2"></i>Notes Médicales</h6>
+              </div>
+              <div class="card-body p-4">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item px-0 border-0 text-muted small py-2 d-flex align-items-start" *ngFor="let note of patientNotes">
+                    <i class="fa-solid fa-check text-success mt-1 me-2"></i> {{ note }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Historique -->
+          <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+              <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Historique des RDV</h6>
+              </div>
+              <div class="card-body p-4">
+                <div class="timeline-container" style="max-height: 250px; overflow-y: auto;">
+                  <div class="d-flex align-items-start mb-3" *ngFor="let h of patientHistory">
+                    <span [ngClass]="getStatutBadge(h.statut)" style="min-width: 80px;" class="text-center">{{ h.statut ? statutLabels[h.statut] : 'N/A' }}</span>
+                    <div class="ms-3 mb-2 px-3 py-2 bg-light rounded-3 flex-grow-1">
+                      <div class="small fw-bold text-dark">{{ h.dateHeure | date:'dd MMM yyyy à HH:mm' }}</div>
+                      <div class="small text-muted text-truncate" style="max-width: 150px;" [title]="h.motif || 'Aucun motif'">{{ h.motif || '—' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -12,6 +12,7 @@ export interface User {
   email: string;
   password?: string;
   telephone?: string;
+  image?: string;
   role: Role;
   actif: boolean;
   createdAt?: string;

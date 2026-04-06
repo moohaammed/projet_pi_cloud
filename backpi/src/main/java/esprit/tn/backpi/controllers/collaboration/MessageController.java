@@ -42,6 +42,11 @@ public class MessageController {
         return messageService.getDirectMessages(u1, u2);
     }
 
+    @GetMapping("/bot/{userId}")
+    public List<MessageResponseDto> getBotMessages(@PathVariable("userId") Long userId) {
+        return messageService.getBotMessages(userId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<MessageResponseDto> getMessageById(@PathVariable("id") Long id) {
         MessageResponseDto message = messageService.getMessageById(id);

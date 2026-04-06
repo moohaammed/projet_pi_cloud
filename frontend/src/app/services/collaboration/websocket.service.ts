@@ -36,7 +36,8 @@ export class WebSocketService {
     this.stompClient.onConnect = () => {
       console.log('Connected to WS as User', userId);
       this.connected$.next(true);
-      this.subscribeToUser(userId);
+      // Subscribe here while the session is definitely connected (avoid relying on connected$ ordering).
+      this.subscribeToUserQueues();
     };
 
     this.stompClient.onDisconnect = () => {
@@ -67,16 +68,22 @@ export class WebSocketService {
   }
 
   subscribeToUser(uid: number) {
-    if (this.connected$.value && this.stompClient) {
-      this.stompClient.subscribe(`/user/queue/direct`, (msg: any) => {
-        this.realtimeMessage.set(JSON.parse(msg.body));
-      });
-      this.stompClient.subscribe(`/user/queue/notifications`, (msg: any) => {
-        this.notificationMessage.set(JSON.parse(msg.body));
-      });
-      this.stompClient.subscribe(`/user/queue/carebot`, (msg: any) => {
-        this.carebotMessage.set(JSON.parse(msg.body));
-      });
+    if (this.stompClient?.connected) {
+      this.subscribeToUserQueues();
     }
+  }
+
+  /** Private/direct + notifications (+ carebot if backend uses it). Call from onConnect or when already connected. */
+  private subscribeToUserQueues() {
+    if (!this.stompClient?.connected) return;
+    this.stompClient.subscribe(`/user/queue/direct`, (msg: any) => {
+      this.realtimeMessage.set(JSON.parse(msg.body));
+    });
+    this.stompClient.subscribe(`/user/queue/notifications`, (msg: any) => {
+      this.notificationMessage.set(JSON.parse(msg.body));
+    });
+    this.stompClient.subscribe(`/user/queue/carebot`, (msg: any) => {
+      this.carebotMessage.set(JSON.parse(msg.body));
+    });
   }
 }

@@ -1,7 +1,6 @@
 package esprit.tn.backpi.dto.collaboration;
  
 import esprit.tn.backpi.entities.collaboration.PublicationType;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
  
@@ -9,7 +8,6 @@ import java.util.List;
  
 public class PublicationCreateDto {
  
-    @NotBlank(message = "Publication content cannot be empty")
     @Size(max = 5000, message = "Publication content is too long")
     private String content;
  
@@ -22,6 +20,10 @@ public class PublicationCreateDto {
  
     private String pollQuestion;
     private List<String> pollOptions;
+    private Long groupId;
+
+    /** Required when type is EVENT (education calendar). */
+    private Long linkedEventId;
  
     public PublicationCreateDto() {}
  
@@ -42,4 +44,10 @@ public class PublicationCreateDto {
  
     public List<String> getPollOptions() { return pollOptions; }
     public void setPollOptions(List<String> pollOptions) { this.pollOptions = pollOptions; }
+
+    public Long getGroupId() { return groupId; }
+    public void setGroupId(Long groupId) { this.groupId = groupId; }
+
+    public Long getLinkedEventId() { return linkedEventId; }
+    public void setLinkedEventId(Long linkedEventId) { this.linkedEventId = linkedEventId; }
 }

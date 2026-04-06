@@ -4,5 +4,8 @@ public enum PublicationType {
     EXPERIENCE,
     TEMOIGNAGE,
     ANNOUNCEMENT,
-    VOTE
+    VOTE,
+    MEMORY_ANCHOR,
+    /** Education calendar event shared to the collaboration feed */
+    EVENT
 }

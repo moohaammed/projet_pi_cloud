@@ -3,17 +3,20 @@ package esprit.tn.backpi.services.collaboration;
 import esprit.tn.backpi.dto.collaboration.MessageCreateDto;
 import esprit.tn.backpi.dto.collaboration.MessageResponseDto;
 import esprit.tn.backpi.dto.collaboration.PollOptionResponseDto;
+import esprit.tn.backpi.dto.collaboration.PublicationResponseDto;
 import esprit.tn.backpi.entities.collaboration.ChatGroup;
 import esprit.tn.backpi.entities.collaboration.Message;
 import esprit.tn.backpi.entities.collaboration.MessagePollOption;
 import esprit.tn.backpi.entities.collaboration.MessageType;
 import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repositories.collaboration.ChatGroupRepository;
-import esprit.tn.backpi.repositories.collaboration.MessagePollOptionRepository;
 import esprit.tn.backpi.repositories.collaboration.MessageRepository;
+import esprit.tn.backpi.repositories.collaboration.PublicationRepository;
 import esprit.tn.backpi.repository.UserRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -32,17 +35,18 @@ public class MessageService {
     private final NotificationService notificationService;
     private final UserRepository userRepository;
     private final ChatGroupRepository chatGroupRepository;
-
-    private final MessagePollOptionRepository pollOptionRepository;
+    private final PublicationRepository publicationRepository;
+    private final PublicationService publicationService;
 
     public MessageService(MessageRepository messageRepository,
                           SimpMessagingTemplate messagingTemplate,
                           SentimentAnalysisService sentimentAnalysisService,
-                          CareBotService careBotService,
+                          @Lazy CareBotService careBotService,
                           NotificationService notificationService,
                           UserRepository userRepository,
                           ChatGroupRepository chatGroupRepository,
-                          MessagePollOptionRepository pollOptionRepository) {
+                          PublicationRepository publicationRepository,
+                          PublicationService publicationService) {
         this.messageRepository = messageRepository;
         this.messagingTemplate = messagingTemplate;
         this.sentimentAnalysisService = sentimentAnalysisService;
@@ -50,7 +54,8 @@ public class MessageService {
         this.notificationService = notificationService;
         this.userRepository = userRepository;
         this.chatGroupRepository = chatGroupRepository;
-        this.pollOptionRepository = pollOptionRepository;
+        this.publicationRepository = publicationRepository;
+        this.publicationService = publicationService;
     }
 
     public List<MessageResponseDto> getAllMessages() {
@@ -73,104 +78,126 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
+    public List<MessageResponseDto> getBotMessages(Long userId) {
+        List<Message> msgs = messageRepository.findBotMessages(userId);
+        return msgs.stream()
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
+    }
+
     public MessageResponseDto getMessageById(Long id) {
         return messageRepository.findById(id)
                 .map(this::mapToResponseDto)
                 .orElse(null);
     }
 
+    @Transactional
     public MessageResponseDto createMessage(MessageCreateDto dto, String mediaUrl, String mimeType) {
-        User sender = userRepository.findById(dto.getSenderId())
-                .orElseThrow(() -> new RuntimeException("Sender not found: " + dto.getSenderId()));
-                
-        ChatGroup group = null;
-        if (dto.getChatGroupId() != null) {
-            group = chatGroupRepository.findById(dto.getChatGroupId())
-                    .orElseThrow(() -> new RuntimeException("ChatGroup not found: " + dto.getChatGroupId()));
-        }
-
-        User receiver = null;
-        if (dto.getReceiverId() != null) {
-            receiver = userRepository.findById(dto.getReceiverId())
-                    .orElseThrow(() -> new RuntimeException("Receiver not found: " + dto.getReceiverId()));
-        }
-
-        Message message = new Message();
-        message.setContent(dto.getContent());
-        message.setSender(sender);
-        message.setChatGroup(group);
-        message.setReceiver(receiver);
-        message.setSentAt(Instant.now());
-        message.setMediaUrl(mediaUrl);
-        message.setMimeType(mimeType);
-        
-        if (dto.getType() != null) {
-            message.setType(dto.getType());
-            if (dto.getType() == MessageType.POLL) {
-                message.setPollQuestion(dto.getPollQuestion());
-                if (dto.getPollOptions() != null) {
-                    for (String optionContent : dto.getPollOptions()) {
-                        MessagePollOption opt = new MessagePollOption();
-                        opt.setText(optionContent);
-                        opt.setMessage(message);
-                        message.getPollOptions().add(opt);
-                    }
-                }
-            }
-        }
- 
-        if (dto.getParentMessageId() != null) {
-            Message parent = messageRepository.findById(dto.getParentMessageId())
-                    .orElseThrow(() -> new RuntimeException("Parent message not found: " + dto.getParentMessageId()));
-            message.setParentMessage(parent);
-        }
-
-        Double score = sentimentAnalysisService.calculateSentimentScore(message.getContent());
-        message.setSentimentScore(score);
-        message.setDistressed(score <= -0.5);
-
-        Message savedObj = messageRepository.save(message);
-        MessageResponseDto responseDto = mapToResponseDto(savedObj);
-
-        // ── @mention detection ─────────────────────────────────────────────
-        processMentions(savedObj.getContent(), sender);
-
-        // Broadcast to group WebSocket topic
-        if (savedObj.getChatGroup() != null) {
-            messagingTemplate.convertAndSend("/topic/group/" + savedObj.getChatGroup().getId(), responseDto);
-
-            // Notify every group member except the sender
-            String groupName = savedObj.getChatGroup().getName();
-            String senderLabel = "User " + sender.getId();
-
-            if (savedObj.getChatGroup().getMembers() != null) {
-                for (User member : savedObj.getChatGroup().getMembers()) {
-                    if (member.getId() != null && !member.getId().equals(sender.getId())) {
-                        notificationService.createAndSend(
-                            member.getId(),
-                            senderLabel + " sent a message in \"" + groupName + "\"",
-                            "GROUP_MESSAGE"
-                        );
-                    }
-                }
-            }
-        } else if (savedObj.getReceiver() != null) {
-            // Private Message Broadcasting
-            messagingTemplate.convertAndSendToUser(savedObj.getReceiver().getId().toString(), "/queue/direct", responseDto);
-            messagingTemplate.convertAndSendToUser(savedObj.getSender().getId().toString(), "/queue/direct", responseDto);
+        try {
+            User sender = userRepository.findById(dto.getSenderId())
+                    .orElseThrow(() -> new RuntimeException("Sender not found: " + dto.getSenderId()));
             
-            // Notify Receiver
-            notificationService.createAndSend(
-                savedObj.getReceiver().getId(),
-                "New private message from User " + sender.getId(),
-                "PRIVATE_MESSAGE"
-            );
+            ChatGroup group = null;
+            if (dto.getChatGroupId() != null) {
+                group = chatGroupRepository.findById(dto.getChatGroupId())
+                        .orElseThrow(() -> new RuntimeException("ChatGroup not found: " + dto.getChatGroupId()));
+            }
+
+            User receiver = null;
+            if (dto.getReceiverId() != null) {
+                receiver = userRepository.findById(dto.getReceiverId())
+                        .orElseThrow(() -> new RuntimeException("Receiver not found: " + dto.getReceiverId()));
+            }
+
+            Message message = new Message();
+            message.setContent(dto.getContent());
+            message.setSender(sender);
+            message.setChatGroup(group);
+            message.setReceiver(receiver);
+            message.setSentAt(Instant.now());
+            message.setMediaUrl(mediaUrl);
+            message.setMimeType(mimeType);
+            
+            if (dto.getType() != null) {
+                message.setType(dto.getType());
+                if (dto.getType() == MessageType.POLL) {
+                    message.setPollQuestion(dto.getPollQuestion());
+                    if (dto.getPollOptions() != null) {
+                        for (String optionContent : dto.getPollOptions()) {
+                            MessagePollOption opt = new MessagePollOption();
+                            opt.setText(optionContent);
+                            opt.setMessage(message);
+                            message.getPollOptions().add(opt);
+                        }
+                    }
+                }
+            }
+    
+            if (dto.getParentMessageId() != null) {
+                Message parent = messageRepository.findById(dto.getParentMessageId())
+                        .orElseThrow(() -> new RuntimeException("Parent message not found: " + dto.getParentMessageId()));
+                message.setParentMessage(parent);
+            }
+
+            if (dto.getSharedPublicationId() != null) {
+                publicationRepository.findById(dto.getSharedPublicationId()).ifPresent(message::setSharedPublication);
+            }
+
+            Double score = sentimentAnalysisService.calculateSentimentScore(message.getContent());
+            message.setSentimentScore(score);
+            message.setDistressed(score <= -0.5);
+
+            Message savedObj = messageRepository.save(message);
+            MessageResponseDto responseDto = mapToResponseDto(savedObj);
+
+            // ── @mention detection ─────────────────────────────────────────────
+            processMentions(savedObj.getContent(), sender);
+
+            // Broadcast to group WebSocket topic
+            if (savedObj.getChatGroup() != null) {
+                messagingTemplate.convertAndSend("/topic/group/" + savedObj.getChatGroup().getId(), responseDto);
+
+                // Notify every group member except the sender
+                String groupName = savedObj.getChatGroup().getName();
+                String senderLabel = (sender.getPrenom() + " " + sender.getNom()).trim();
+                if (senderLabel.isEmpty()) senderLabel = "User " + sender.getId();
+
+                if (savedObj.getChatGroup().getMembers() != null) {
+                    for (User member : savedObj.getChatGroup().getMembers()) {
+                        if (member.getId() != null && !member.getId().equals(sender.getId())) {
+                            notificationService.createAndSend(
+                                member.getId(),
+                                senderLabel + " sent a message in \"" + groupName + "\"",
+                                "GROUP_MESSAGE"
+                            );
+                        }
+                    }
+                }
+            } else if (savedObj.getReceiver() != null) {
+                // Private Message Broadcasting
+                messagingTemplate.convertAndSendToUser(savedObj.getReceiver().getId().toString(), "/queue/direct", responseDto);
+                messagingTemplate.convertAndSendToUser(savedObj.getSender().getId().toString(), "/queue/direct", responseDto);
+                
+                // Notify Receiver
+                notificationService.createAndSend(
+                    savedObj.getReceiver().getId(),
+                    "New private message from " + (sender.getPrenom() != null ? sender.getPrenom() : "User " + sender.getId()),
+                    "PRIVATE_MESSAGE"
+                );
+            } else if (savedObj.getType() == MessageType.BOT_MESSAGE) {
+                // Bot Message Broadcasting (to the sender's private bot queue)
+                messagingTemplate.convertAndSendToUser(savedObj.getSender().getId().toString(), "/queue/direct", responseDto);
+            }
+
+            // Trigger CareBot logic if necessary
+            careBotService.processMessageForSupport(savedObj);
+
+            return responseDto;
+        } catch (Exception e) {
+            System.err.println("Error in createMessage: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-
-        // Trigger CareBot logic if necessary
-        careBotService.processMessageForSupport(savedObj);
-
-        return responseDto;
     }
 
     public MessageResponseDto updateMessage(Long id, MessageCreateDto dto, String mediaUrl, String mimeType) {
@@ -213,7 +240,8 @@ public class MessageService {
         });
     }
 
-    private MessageResponseDto mapToResponseDto(Message message) {
+    // Helper Mapping Method
+    public MessageResponseDto mapToResponseDto(Message message) {
         MessageResponseDto dto = new MessageResponseDto();
         dto.setId(message.getId());
         dto.setContent(message.getContent());
@@ -227,7 +255,8 @@ public class MessageService {
 
         if (message.getSender() != null) {
             dto.setSenderId(message.getSender().getId());
-            dto.setSenderName(message.getSender().getNom());
+            String senderFullName = (message.getSender().getPrenom() + " " + message.getSender().getNom()).trim();
+            dto.setSenderName(senderFullName.isEmpty() ? "User " + message.getSender().getId() : senderFullName);
         }
 
         if (message.getReceiver() != null) {
@@ -242,11 +271,29 @@ public class MessageService {
             dto.setParentMessageId(message.getParentMessage().getId());
             dto.setParentMessageContent(message.getParentMessage().getContent());
             if (message.getParentMessage().getSender() != null) {
-                dto.setParentMessageSenderName(message.getParentMessage().getSender().getNom());
+                String parentName = (message.getParentMessage().getSender().getPrenom() + " " + message.getParentMessage().getSender().getNom()).trim();
+                dto.setParentMessageSenderName(parentName.isEmpty() ? "User " + message.getParentMessage().getSender().getId() : parentName);
+            }
+        }
+ 
+        if (message.getSharedPublication() != null) {
+            try {
+                dto.setSharedPublication(publicationService.mapToResponseDto(message.getSharedPublication()));
+            } catch (Exception e) {
+                System.err.println("Error mapping shared publication in message " + message.getId() + ": " + e.getMessage());
+                // Fallback to minimal info if mapping fails
+                PublicationResponseDto minimalPub = new PublicationResponseDto();
+                minimalPub.setId(message.getSharedPublication().getId());
+                minimalPub.setContent("[Post Preview Unavailable]");
+                dto.setSharedPublication(minimalPub);
             }
         }
 
         dto.setType(message.getType());
+        // Assistant-authored lines have no sender (BOT_MESSAGE or MEDICATION_REMINDER)
+        dto.setFromBot(message.getSender() == null
+                && (message.getType() == MessageType.BOT_MESSAGE
+                    || message.getType() == MessageType.MEDICATION_REMINDER));
         dto.setPollQuestion(message.getPollQuestion());
         if (message.getPollOptions() != null) {
             dto.setPollOptions(message.getPollOptions().stream()
