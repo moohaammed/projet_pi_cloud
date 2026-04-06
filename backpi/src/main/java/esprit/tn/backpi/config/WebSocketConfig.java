@@ -26,6 +26,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Native WebSocket endpoint (used by STOMPJS Client directly)
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:4200")
+                .setHandshakeHandler(new UserHandshakeHandler());
+                
+        // SockJS fallback endpoint
         registry.addEndpoint("/ws")
                 .setAllowedOrigins("http://localhost:4200")
                 .setHandshakeHandler(new UserHandshakeHandler())

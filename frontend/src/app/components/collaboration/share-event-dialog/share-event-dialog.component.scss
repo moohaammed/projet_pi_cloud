@@ -2,8 +2,8 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(22, 46, 36, 0.4);
-  backdrop-filter: blur(3px);
+  background: linear-gradient(135deg, rgba(128, 0, 128, 0.15) 0%, rgba(44, 48, 56, 0.4) 100%);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,17 +12,254 @@
 
 .sed-card {
   width: 100%;
-  max-width: 440px;
-  animation: sed-in 0.22s ease-out;
+  max-width: 480px;
+  background: #ffffff;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 20px 60px rgba(128, 0, 128, 0.15), 0 8px 25px rgba(0, 0, 0, 0.1);
+  animation: sed-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.sed-card .card-header {
+  background: linear-gradient(135deg, #fff 0%, #faf5fa 100%);
+  border-bottom: 1px solid rgba(128, 0, 128, 0.08);
+  padding: 1.5rem 1.75rem 1rem;
+}
+
+.sed-card .card-body {
+  padding: 1.25rem 1.75rem;
+}
+
+.sed-card .card-footer {
+  background: #fff;
+  border-top: 1px solid rgba(128, 0, 128, 0.06);
+  padding: 1rem 1.75rem 1.5rem;
+}
+
+.sed-title-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, rgba(128, 0, 128, 0.1) 0%, rgba(128, 0, 128, 0.05) 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #800080;
+  font-size: 1.25rem;
+  margin-right: 0.875rem;
+  flex-shrink: 0;
+}
+
+.sed-event-preview {
+  background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+  border: 1px solid rgba(128, 0, 128, 0.1);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.sed-event-preview::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #800080 0%, rgba(128, 0, 128, 0.3) 100%);
+  border-radius: 2px 0 0 2px;
+}
+
+.sed-event-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(128, 0, 128, 0.08);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #800080;
+  font-size: 0.875rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.sed-event-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6c757d;
+}
+
+.sed-event-meta i {
+  font-size: 0.75rem;
+  color: #800080;
+  opacity: 0.7;
+}
+
+.sed-textarea-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.sed-textarea {
+  border: 1px solid #e9ecef;
+  border-radius: 0.625rem;
+  padding: 0.875rem 1rem;
+  font-size: 0.9375rem;
+  resize: none;
+  transition: all 0.2s ease;
+  background: #fafbfc;
+}
+
+.sed-textarea:focus {
+  outline: none;
+  border-color: rgba(128, 0, 128, 0.4);
+  box-shadow: 0 0 0 3px rgba(128, 0, 128, 0.08);
+  background: #fff;
+}
+
+.sed-textarea::placeholder {
+  color: #adb5bd;
+  font-size: 0.875rem;
+}
+
+.sed-btn-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.sed-btn-close:hover {
+  background: rgba(128, 0, 128, 0.08);
+  color: #800080;
+}
+
+.sed-btn-secondary {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.625rem;
+  border: 1px solid #e9ecef;
+  background: #fff;
+  color: #495057;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sed-btn-secondary:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #2c3038;
+}
+
+.sed-btn-primary {
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.625rem;
+  border: none;
+  background: linear-gradient(135deg, #800080 0%, #660066 100%);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(128, 0, 128, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sed-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #660066 0%, #4d004d 100%);
+  box-shadow: 0 6px 16px rgba(128, 0, 128, 0.35);
+  transform: translateY(-1px);
+}
+
+.sed-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.sed-alert {
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sed-alert-danger {
+  background: rgba(220, 53, 69, 0.08);
+  border: 1px solid rgba(220, 53, 69, 0.15);
+  color: #dc3545;
+}
+
+.sed-alert-success {
+  background: rgba(25, 135, 84, 0.08);
+  border: 1px solid rgba(25, 135, 84, 0.15);
+  color: #198754;
+}
+
+.sed-alert a {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.sed-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: sed-spin 0.8s linear infinite;
 }
 
 @keyframes sed-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(20px) scale(0.96);
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sed-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 576px) {
+  .sed-card {
+    margin: 0.5rem;
+    max-width: 100%;
+  }
+
+  .sed-card .card-header,
+  .sed-card .card-body,
+  .sed-card .card-footer {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
 }

@@ -14,6 +14,8 @@ export class WebSocketService {
   public realtimeMessage = signal<MessageDto | null>(null);
   public carebotMessage = signal<any>(null);
   public notificationMessage = signal<Notification | null>(null);
+  public liveStatusMessage = signal<any>(null);
+  public webrtcSignal = signal<any>(null);
   public connected$ = new BehaviorSubject<boolean>(false);
 
   constructor() { }
@@ -53,9 +55,19 @@ export class WebSocketService {
   }
 
   unsubscribe() {
-    // Method to unsubscribe from all subscriptions
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.deactivate();
+    }
+  }
+
+  sendWebRtcSignal(payload: any) {
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.publish({
+        destination: '/app/webrtc.signal',
+        body: JSON.stringify(payload)
+      });
+    } else {
+      console.warn('Cannot send WebRTC signal: Stomp client not connected.');
     }
   }
 
@@ -84,6 +96,12 @@ export class WebSocketService {
     });
     this.stompClient.subscribe(`/user/queue/carebot`, (msg: any) => {
       this.carebotMessage.set(JSON.parse(msg.body));
+    });
+    this.stompClient.subscribe(`/topic/live-status`, (msg: any) => {
+      this.liveStatusMessage.set(JSON.parse(msg.body));
+    });
+    this.stompClient.subscribe(`/user/queue/webrtc`, (msg: any) => {
+      this.webrtcSignal.set(JSON.parse(msg.body));
     });
   }
 }

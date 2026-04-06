@@ -216,7 +216,6 @@ export class MiniChatWidgetComponent implements OnInit {
   }
 
   openMiniChatGroup(groupId: number) {
-    this.activeMiniChatGroupId.set(groupId);
     this.activeMiniChatUserId.set(null);
     this.messageService.fetchMessagesByGroup(groupId);
   }
