@@ -25,8 +25,8 @@ public class NotificationService {
  
         NotificationResponseDto dto = mapToResponseDto(saved);
  
-        // Broadcast via WebSocket
-        messagingTemplate.convertAndSend("/topic/notifications/" + userId, dto);
+        // Broadcast via WebSocket using convertAndSendToUser so it matches the frontend subscription to /user/queue/notifications
+        messagingTemplate.convertAndSendToUser(userId.toString(), "/queue/notifications", dto);
  
         System.out.println("DEBUG [NotificationService]: Sent " + type + " to User " + userId);
         return dto;

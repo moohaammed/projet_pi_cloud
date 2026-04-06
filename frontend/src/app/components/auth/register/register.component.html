@@ -33,6 +33,24 @@
             </div>
 
             <div class="row g-3">
+              <div class="col-12 text-center mb-3">
+                <div class="avatar-upload position-relative d-inline-block">
+                  <div class="avatar-preview rounded-circle border overflow-hidden bg-light" 
+                       style="width: 100px; height: 100px; margin: 0 auto;">
+                    <img *ngIf="imagePreview" [src]="imagePreview" class="w-100 h-100 object-fit-cover">
+                    <div *ngIf="!imagePreview" class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                      <i class="fa-solid fa-camera fs-2"></i>
+                    </div>
+                  </div>
+                  <label for="avatar-input" class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0 shadow-sm" 
+                         style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                    <i class="fa-solid fa-plus fs-12"></i>
+                  </label>
+                  <input id="avatar-input" type="file" (change)="onFileSelected($event)" accept="image/*" class="d-none">
+                </div>
+                <div class="small text-muted mt-2">Photo de profil (optionnelle)</div>
+              </div>
+
               <div class="col-6">
                 <label class="form-label fw-medium">Nom</label>
                 <input [(ngModel)]="data.nom" name="nom"

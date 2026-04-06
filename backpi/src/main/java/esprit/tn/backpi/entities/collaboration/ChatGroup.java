@@ -35,13 +35,18 @@ public class ChatGroup {
     )
     private Set<User> members = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
     public ChatGroup() {}
 
-    public ChatGroup(Long id, String name, String description, Instant createdAt) {
+    public ChatGroup(Long id, String name, String description, Instant createdAt, User owner) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.createdAt = createdAt;
+        this.owner = owner;
     }
 
     public Long getId() { return id; }
@@ -49,6 +54,9 @@ public class ChatGroup {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public GroupCategory getCategory() { return category; }
+    public void setCategory(GroupCategory category) { this.category = category; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
@@ -61,4 +69,7 @@ public class ChatGroup {
 
     public Set<User> getMembers() { return members; }
     public void setMembers(Set<User> members) { this.members = members; }
+
+    public User getOwner() { return owner; }
+    public void setOwner(User owner) { this.owner = owner; }
 }

@@ -1,0 +1,237 @@
+/* Social Media Dashboard Shell Styles */
+.social-shell {
+  min-height: calc(100vh - 150px);
+  background-color: #f0f2f5; /* Classic FB Background */
+}
+
+/* 2-Column Layout Grid */
+.social-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 25px;
+  padding-top: 20px;
+
+  /* Admin mode: no sidebar — content fills full width */
+  &.no-sidebar {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar - Sticky behavior */
+.sidebar-left {
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* Nav Menu Items */
+.nav-card {
+  border: none;
+  background: transparent;
+}
+
+.nav-item-social {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #050505;
+  font-weight: 500;
+  transition: background 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &.active {
+    background-color: rgba(128, 0, 128, 0.08); /* Primary soft */
+    color: var(--bs-primary);
+    
+    i { color: var(--bs-primary); }
+  }
+
+  i {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e4e6eb;
+    border-radius: 50%;
+    font-size: 18px;
+    color: #050505;
+  }
+}
+
+/* Section Titles */
+.social-section-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #65676b;
+  margin: 20px 12px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Group & Contact Items */
+.social-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    position: relative;
+
+    &.online::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 10px;
+      height: 10px;
+      background-color: #31a24c;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+  }
+
+  span {
+    font-weight: 500;
+    color: #050505;
+    font-size: 15px;
+  }
+}
+
+/* Care Board (Pinned Messages) */
+.care-board-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.pinned-item {
+  padding: 12px;
+  border-bottom: 1px solid #f0f2f5;
+  transition: background 0.2s;
+  
+  &:last-child { border-bottom: none; }
+  &:hover { background: #f8f9fa; }
+
+  p { margin-bottom: 4px; font-size: 14px; }
+  small { color: #65676b; font-size: 12px; }
+}
+
+/* Profile Summary */
+.profile-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  margin-bottom: 10px;
+  
+  &:hover { background: rgba(0,0,0,0.05); }
+  
+  img, .avatar-placeholder {
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%;
+  }
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Search Input */
+.sidebar-search {
+  margin: 0 12px 15px;
+  .input-group-text {
+    background: #f0f2f5;
+    border: none;
+    border-radius: 20px 0 0 20px;
+  }
+  .form-control {
+    background: #f0f2f5;
+    border: none;
+    border-radius: 0 20px 20px 0;
+    padding-left: 0;
+    font-size: 14px;
+    &:focus { box-shadow: none; }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .social-grid {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-left { display: none; }
+}
+
+/* Sidebar Notifications Dropdown */
+.hover-notification:hover {
+  background-color: var(--bs-light) !important;
+  cursor: pointer;
+  /* NO TRANSFORM SCALE HERE to prevent jitter/expansion */
+}
+
+.notification-list {
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 10px;
+  }
+}
+
+.bg-soft-primary {
+  background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
+}
+
+.btn-xs {
+  padding: 0.1rem 0.25rem;
+  font-size: 0.75rem;
+}
+
+.fs-10 { font-size: 10px; }
+.fs-11 { font-size: 11px; }
+.fs-12 { font-size: 12px; }
+.fs-13 { font-size: 13px; }
+.fs-32 { font-size: 32px; }
+.h-fit { height: fit-content; }

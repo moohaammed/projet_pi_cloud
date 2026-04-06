@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractContro
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { RendezVousService } from '../../services/rendezvous.service';
 import { StatutRendezVous } from '../../models/rendezvous.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-rendezvous-form',
@@ -20,6 +21,7 @@ export class RendezVousFormComponent implements OnInit {
   submitting = false;
   success = '';
   error = '';
+  currentUser: any = null;
 
   statutOptions: StatutRendezVous[] = ['PLANIFIE', 'CONFIRME', 'ANNULE', 'TERMINE'];
   statutLabels: Record<StatutRendezVous, string> = {
@@ -40,8 +42,11 @@ export class RendezVousFormComponent implements OnInit {
     private fb: FormBuilder,
     private service: RendezVousService,
     private router: Router,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private authService: AuthService
+  ) {
+    this.currentUser = this.authService.getCurrentUser();
+  }
 
   ngOnInit(): void {
     this.buildForm();
@@ -55,9 +60,12 @@ export class RendezVousFormComponent implements OnInit {
   }
 
   buildForm(): void {
+    const initialPatientId = this.currentUser?.role === 'PATIENT' ? this.currentUser.id : null;
+    const initialMedecinId = this.currentUser?.role === 'DOCTOR' ? this.currentUser.id : null;
+
     this.form = this.fb.group({
-      patientId: [null, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]],
-      medecinId: [null, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]],
+      patientId: [initialPatientId, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]],
+      medecinId: [initialMedecinId, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]],
       dateHeure: ['', [Validators.required, this.futureDateValidator.bind(this)]],
       motif: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
       observations: ['', [Validators.maxLength(500)]],
@@ -81,6 +89,24 @@ export class RendezVousFormComponent implements OnInit {
     this.loading = true;
     this.service.getById(id).subscribe({
       next: (rv) => {
+        // Check access
+        if (this.currentUser) {
+          if (this.currentUser.role === 'DOCTOR' && rv.medecinId !== this.currentUser.id) {
+            this.error = 'Accès refusé. Ce rendez-vous ne vous est pas assigné.';
+            this.loading = false;
+            // Disable form to prevent modifications
+            this.form.disable();
+            return;
+          }
+          if (this.currentUser.role === 'PATIENT' && rv.patientId !== this.currentUser.id) {
+            this.error = 'Accès refusé. Ce rendez-vous ne vous est pas assigné.';
+            this.loading = false;
+            // Disable form to prevent modifications
+            this.form.disable();
+            return;
+          }
+        }
+
         const dateStr = rv.dateHeure
           ? new Date(rv.dateHeure).toISOString().slice(0, 16)
           : '';

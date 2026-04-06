@@ -1,0 +1,32 @@
+package esprit.tn.backpi.dto.collaboration;
+
+/**
+ * Snapshot of an education {@link esprit.tn.backpi.entities.education.Event} for feed cards.
+ */
+public class SharedEventPreviewDto {
+
+    private Long id;
+    private String title;
+    private String startDateTime;
+    private String location;
+    private String description;
+    private String imageUrl;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getStartDateTime() { return startDateTime; }
+    public void setStartDateTime(String startDateTime) { this.startDateTime = startDateTime; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+}

@@ -1,16 +1,31 @@
 <!doctype html>
 <html lang="fr">
+
 <head>
+  <script>
+    window.global = window;
+  </script>
   <meta charset="utf-8">
   <title>MediSync – Gestion des Rendez-vous</title>
-  <meta name="description" content="MediSync – Application de gestion des rendez-vous médicaux. Créez, modifiez et suivez les rendez-vous patients/médecins.">
+  <meta name="description"
+    content="MediSync – Application de gestion des rendez-vous médicaux. Créez, modifiez et suivez les rendez-vous patients/médecins.">
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    if (typeof global === 'undefined') {
+      var global = window;
+    }
+  </script>
 
   <!-- Template Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap"
+    rel="stylesheet">
+    
+  <!-- Google reCAPTCHA v2 & Google Identity Services (GSI) -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <!-- Template CSS -->
   <link rel="shortcut icon" href="template/assets/img/favicon.png">
   <link href="template/assets/plugins/aos/aos.min.css" rel="stylesheet">
@@ -31,19 +46,9 @@
   <link href="template/assets/plugins/magnific-popup/magnific-popup.min.css" rel="stylesheet">
   <link href="template/assets/css/style.css" rel="stylesheet">
 </head>
+
 <body>
-  <!-- Page Loader -->
-  <div class="page-loader-wrapper flex-column align-items-center justify-content-center" style="display: none;">
-    <div class="loader">
-      <div class="preloader">
-        <div class="spinner-layer pl-green">
-          <div class="circle-clipper left"><div class="circle"></div></div>
-          <div class="circle-clipper right"><div class="circle"></div></div>
-        </div>
-      </div>
-      <p class="fs-12 fw-semibold mb-0 mt-3 text-uppercase">Please wait...</p>
-    </div>
-  </div>
+  <!-- Page Loader supprimé pour débogage -->
 
   <app-root></app-root>
 
@@ -69,4 +74,5 @@
   <script src="template/assets/plugins/aos/aos.min.js"></script>
   <script src="template/assets/js/custom.js"></script>
 </body>
+
 </html>

@@ -23,8 +23,16 @@ public class PublicationResponseDto {
     
     private String pollQuestion;
     private List<PollOptionResponseDto> pollOptions;
+    private Long groupId;
+    private String groupName;
+
+    private Long linkedEventId;
+    private SharedEventPreviewDto linkedEvent;
     
     private List<CommentResponseDto> comments;
+
+    private int commentCount;
+    private int shareCount;
  
     public PublicationResponseDto() {}
  
@@ -70,4 +78,22 @@ public class PublicationResponseDto {
  
     public List<CommentResponseDto> getComments() { return comments; }
     public void setComments(List<CommentResponseDto> comments) { this.comments = comments; }
+
+    public int getCommentCount() { return commentCount; }
+    public void setCommentCount(int commentCount) { this.commentCount = commentCount; }
+
+    public int getShareCount() { return shareCount; }
+    public void setShareCount(int shareCount) { this.shareCount = shareCount; }
+
+    public Long getGroupId() { return groupId; }
+    public void setGroupId(Long groupId) { this.groupId = groupId; }
+
+    public String getGroupName() { return groupName; }
+    public void setGroupName(String groupName) { this.groupName = groupName; }
+
+    public Long getLinkedEventId() { return linkedEventId; }
+    public void setLinkedEventId(Long linkedEventId) { this.linkedEventId = linkedEventId; }
+
+    public SharedEventPreviewDto getLinkedEvent() { return linkedEvent; }
+    public void setLinkedEvent(SharedEventPreviewDto linkedEvent) { this.linkedEvent = linkedEvent; }
 }

@@ -35,7 +35,11 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Message parentMessage;
- 
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "shared_publication_id")
+    private Publication sharedPublication;
+
     private boolean isDistressed;
  
     private Double sentimentScore = 0.0;
@@ -46,6 +50,7 @@ public class Message {
     private java.util.List<Long> viewedByUserIds = new java.util.ArrayList<>();
  
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", columnDefinition = "VARCHAR(255)")
     private MessageType type = MessageType.TEXT;
  
     private String pollQuestion;
@@ -93,6 +98,9 @@ public class Message {
  
     public Message getParentMessage() { return parentMessage; }
     public void setParentMessage(Message parentMessage) { this.parentMessage = parentMessage; }
+ 
+    public Publication getSharedPublication() { return sharedPublication; }
+    public void setSharedPublication(Publication sharedPublication) { this.sharedPublication = sharedPublication; }
  
     public MessageType getType() { return type; }
     public void setType(MessageType type) { this.type = type; }

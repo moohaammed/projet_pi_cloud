@@ -1,296 +1,451 @@
-<main class="main-content bg-white py-5">
-  <div class="container py-3">
-    <!-- Header with Navigation Buttons -->
-    <div class="row justify-content-center mb-5">
-      <div class="col-lg-10">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-          <div>
-            <h1 class="display-6 fw-bold mb-2">
-              Community <span class="underline position-relative text-primary">Feed</span>
-            </h1>
-            <p class="fs-16 text-muted mb-0">Stay connected with your community updates.</p>
+<div class="feed-container animate-fade-in">
+
+  <!-- Group/Feed Header (Context Aware) -->
+  <div
+    class="feed-header mb-4 p-3 bg-white rounded-3 shadow-sm border-0 d-flex justify-content-between align-items-center">
+    <div>
+      <h4 class="fw-bold mb-0">
+        <span *ngIf="!groupId()">Community <span class="text-primary">Feed</span></span>
+        <span *ngIf="groupId()"><i class="fa-solid fa-users text-purple me-2"></i> {{ currentGroup()?.name }}</span>
+      </h4>
+      <p class="fs-13 text-muted mb-0" *ngIf="groupId()">{{ currentGroup()?.description }}</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="btn btn-soft-primary btn-sm rounded-pill px-3" (click)="refreshData()">
+        <i class="fa-solid fa-rotate-right me-1"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Publication Composer -->
+  <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+    <div class="card-body p-4">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div *ngIf="getUserImage(currentUserId())" class="avatar-sm rounded-circle overflow-hidden shadow-sm">
+          <img [src]="getUserImage(currentUserId())" class="w-100 h-100 object-fit-cover" alt="User Image">
+        </div>
+        <div *ngIf="!getUserImage(currentUserId())"
+          class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
+          {{ getUserInitials(currentUserId()) }}
+        </div>
+        <h6 class="fw-bold mb-0">Share an update...</h6>
+      </div>
+
+      <div class="row g-3 align-items-end mb-3">
+        <div class="col-md-5">
+          <label class="form-label small text-muted">Post Type</label>
+          <select class="form-select form-select-sm rounded-pill bg-light border-0 px-3" [(ngModel)]="newPubType">
+            <option value="EXPERIENCE">💡 Experience</option>
+            <option value="TEMOIGNAGE">🗣️ Témoignage</option>
+            <option value="ANNOUNCEMENT">📢 Announcement</option>
+            <option value="VOTE">📊 Poll/Vote</option>
+            <option value="MEMORY_ANCHOR">🧠 Memory Anchor (Family Only)</option>
+          </select>
+        </div>
+        <div class="col-md-7 text-end">
+          <div class="form-check d-inline-block">
+            <input class="form-check-input" type="checkbox" id="anonPub" [(ngModel)]="newPubAnonymous" />
+            <label class="form-check-label small" for="anonPub">Post anonymously</label>
           </div>
-          <div class="d-flex gap-2">
-            <a routerLink="/collaboration/messenger" class="btn btn-primary">
-              <i class="fa-solid fa-paper-plane me-2"></i> Messenger
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <textarea class="form-control bg-light border-0 rounded-4 p-3" rows="3" [(ngModel)]="newPubContent"
+          [placeholder]="newPubType === 'VOTE' ? 'Add context to your poll (optional)...' : 'What\'s on your mind, ' + (currentUser()?.prenom || 'there') + '?'"></textarea>
+      </div>
+
+      <!-- Poll Creation UI -->
+      <div *ngIf="newPubType === 'VOTE'" class="bg-light p-3 rounded-4 mb-3 border border-dashed">
+        <div class="form-group mb-3">
+          <label class="form-label small fw-bold">Poll Question</label>
+          <input type="text" class="form-control form-control-sm rounded-pill" [(ngModel)]="newPollQuestion"
+            placeholder="What are you asking?" />
+        </div>
+        <div class="form-group mb-2">
+          <label class="form-label small fw-bold">Answers</label>
+          <div *ngFor="let option of newPollOptions; let i = index; trackBy: trackByOption"
+            class="input-group input-group-sm mb-2">
+            <input type="text" class="form-control rounded-pill-start" [(ngModel)]="option.text"
+              [placeholder]="'Option ' + (i + 1)" />
+            <button *ngIf="newPollOptions.length > 2" class="btn btn-outline-danger" (click)="removePollOption(i)">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+          </div>
+          <button class="btn btn-soft-primary btn-xs mt-1 rounded-pill" (click)="addPollOption()">
+            <i class="fa-solid fa-plus me-1"></i> Add Alternative
+          </button>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 border-top">
+        <div class="d-flex align-items-center gap-3 position-relative">
+          <label for="feed-file" class="btn btn-light-hover btn-sm mb-0 rounded-pill px-3">
+            <i class="fa-solid fa-image text-success me-1"></i> Media
+          </label>
+          <input id="feed-file" type="file" class="d-none" (change)="onFileSelected($event)"
+            accept="image/*,video/*,application/pdf" />
+
+          <button type="button" class="btn btn-light-hover btn-sm btn-emoji-toggle rounded-pill px-3"
+            (click)="toggleEmojiPicker('POST')">
+            😊 Mood
+          </button>
+
+          <!-- Emoji Picker for Post -->
+          <div *ngIf="showPostEmojiPicker()"
+            class="emoji-picker-container shadow border-0 rounded-4 bg-white p-3 position-absolute"
+            style="z-index: 1000; bottom: 50px; left: 0;">
+            <div class="emoji-grid d-flex flex-wrap gap-2"
+              style="max-width: 280px; max-height: 250px; overflow-y: auto;">
+              <span *ngFor="let emoji of EMOJI_LIST" (click)="addEmoji(emoji, 'POST')"
+                class="cursor-pointer fs-20 p-2 hover-bg-light rounded-circle transition-all">{{ emoji }}</span>
+            </div>
+          </div>
+
+          <span class="small text-muted fw-medium" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+        </div>
+        <button type="button" class="btn btn-primary px-5 py-2 rounded-pill fw-bold" (click)="submitPublication()"
+          [disabled]="!newPubContent.trim() && (newPubType !== 'VOTE' || !newPollQuestion.trim())">
+          Post Community
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Publications List -->
+  <div *ngIf="publications().length === 0" class="text-center py-5">
+    <div class="empty-state-icon mb-3">
+      <i class="fa-solid fa-newspaper fs-48 text-muted opacity-25"></i>
+    </div>
+    <h5 class="text-muted">Silence is gold, but sharing helps.</h5>
+    <p class="text-muted small">Try following more groups or being the first to post!</p>
+  </div>
+
+  <article [id]="'pub-' + pub.id" class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden"
+    *ngFor="let pub of publications(); trackBy: trackByPub">
+    <div class="card-body p-4">
+      <!-- Author Info -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-3">
+          <!-- AVATAR -->
+          <div *ngIf="!pub.anonymous && getUserImage(pub.authorId)" class="avatar-md rounded-circle overflow-hidden shadow-sm">
+            <img [src]="getUserImage(pub.authorId)" class="w-100 h-100 object-fit-cover" alt="Author Image">
+          </div>
+          <div *ngIf="pub.anonymous || !getUserImage(pub.authorId)"
+            class="avatar-md bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-15">
+            <ng-container *ngIf="pub.type === 'ANNOUNCEMENT'; else normalInitials">
+              <i class="fa-solid fa-bullhorn"></i>
+            </ng-container>
+            <ng-template #normalInitials>
+              {{ pub.anonymous ? 'A' : (pub.authorName || 'U').substring(0, 1).toUpperCase() }}
+            </ng-template>
+          </div>
+          <!-- AUTHOR NAME / TYPE -->
+          <div>
+            <h6 class="mb-0 fw-bold">
+              <ng-container *ngIf="pub.type === 'ANNOUNCEMENT'; else normalAuthor">
+                <span class="text-danger">Admin</span> <span class="fs-14 fw-normal"> posted a new announcement</span>
+              </ng-container>
+              <ng-template #normalAuthor>
+                {{ pub.anonymous ? 'Anonymous Member' : (pub.authorName || ('User ' + pub.authorId)) }}
+                <span class="fs-12 text-muted fw-medium ms-1" *ngIf="pub.groupName && !groupId()">
+                  in <span class="text-primary hover-underline">{{ pub.groupName }}</span>
+                </span>
+              </ng-template>
+            </h6>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-12 text-muted fw-medium">{{ pub.createdAt | date: 'medium' }}</span>
+              <span class="dot-separator text-muted">·</span>
+              <i class="fa-solid fa-earth-americas text-muted fs-11"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown" *ngIf="pub.authorId === currentUserId()">
+          <button class="btn btn-light btn-sm rounded-circle p-2" type="button"
+            (click)="toggleDropdown(pub.id!); $event.stopPropagation()">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2"
+            [class.show]="openDropdownId === pub.id">
+            <li *ngIf="pub.type !== 'EVENT'"><button class="dropdown-item rounded-2 py-2"
+                (click)="startEdit(pub.id!, 'PUBLICATION', pub.content, pub)"><i
+                  class="fa-solid fa-pen-to-square me-2"></i> Edit Post</button></li>
+            <li *ngIf="pub.type !== 'EVENT'">
+              <hr class="dropdown-divider">
+            </li>
+            <li><button class="dropdown-item rounded-2 py-2 text-danger" (click)="deleteItem(pub.id!, 'PUBLICATION')"><i
+                  class="fa-solid fa-trash-can me-2"></i> Delete Post</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Memory Anchor Highlight -->
+      <div *ngIf="pub.type === 'MEMORY_ANCHOR'"
+        class="memory-anchor-banner p-4 mb-3 rounded-4 d-flex align-items-center gap-4 bg-soft-info border-info border shadow-sm animate-pulse-slow">
+        <div class="flex-shrink-0 bg-white rounded-circle p-3 shadow-sm border border-info">
+          <i class="fa-solid fa-brain text-info fs-32"></i>
+        </div>
+        <div class="flex-grow-1">
+          <h5 class="fw-bold text-dark mb-1">CareBot: Memory of the Day 🧠</h5>
+          <p class="mb-0 fs-15 text-dark opacity-90">Hello! Take a moment to look at this special memory shared by your
+            family. It's important to remember these beautiful moments.</p>
+        </div>
+      </div>
+
+      <!-- Distress Alert (AI AI AI) -->
+      <div *ngIf="pub.distressed" class="distress-alert p-3 mb-3 d-flex gap-3">
+        <div class="flex-shrink-0">
+          <i class="fa-solid fa-hand-holding-heart text-danger fs-24"></i>
+        </div>
+        <div class="flex-grow-1">
+          <p class="small mb-0">Our AI assistant noticed this member might need extra support. <strong>Let's reach out
+              with kindness.</strong></p>
+        </div>
+      </div>
+
+      <!-- Publication Content -->
+      <div class="post-text-content mb-3" *ngIf="editingItemId !== pub.id || editingItemType !== 'PUBLICATION'">
+
+        <!-- Shared education event (card + link to /eventfront) -->
+        <ng-container *ngIf="pub.type === 'EVENT'">
+          <p class="fs-16 leading-relaxed mb-3" *ngIf="pub.content?.trim()">{{ pub.content }}</p>
+
+          <a *ngIf="pub.linkedEvent as ev" routerLink="/eventfront" [queryParams]="{ highlight: ev.id }"
+            class="feed-event-link text-decoration-none d-block">
+            <div class="feed-event-card rounded-4 overflow-hidden border shadow-sm">
+              <div class="row g-0 align-items-stretch">
+                <div class="col-md-4 feed-event-card-media">
+                  <img [src]="sharedEventImageUrl(ev)" [alt]="ev.title || 'Event'" class="feed-event-card-img w-100"
+                    loading="lazy" (error)="onSharedEventImageError($event)" />
+                </div>
+                <div class="col-md-8 p-3 p-md-4 d-flex flex-column bg-white">
+                  <span class="badge bg-soft-primary text-primary rounded-pill align-self-start mb-2 small fw-semibold">
+                    <i class="fa-regular fa-calendar-check me-1"></i> Event
+                  </span>
+                  <h5 class="fw-bold text-dark mb-2 mb-md-3">{{ ev.title || 'Event' }}</h5>
+                  <p class="small text-muted mb-1" *ngIf="ev.startDateTime">
+                    <i class="fa-regular fa-clock me-1"></i>{{ formatSharedEventDate(ev.startDateTime) }}
+                  </p>
+                  <p class="small text-muted mb-2" *ngIf="ev.location">
+                    <i class="fa-solid fa-location-dot me-1 text-primary"></i>{{ ev.location }}
+                  </p>
+                  <p class="small text-secondary mb-3 feed-event-desc" *ngIf="ev.description">{{ ev.description }}</p>
+                  <span class="text-primary fw-semibold small mt-auto d-inline-flex align-items-center gap-1">
+                    Open in Events <i class="fa-solid fa-arrow-right-long"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <div *ngIf="!pub.linkedEvent && pub.linkedEventId"
+            class="alert alert-light border rounded-4 mb-0 small text-muted">
+            This event is no longer available.
+          </div>
+        </ng-container>
+
+        <p *ngIf="pub.type !== 'EVENT'" class="fs-16 leading-relaxed mb-0"
+          [class.mb-3]="!!(pub.pollQuestion && (pub.type === 'VOTE' || pub.type === 'vote')) || !!pub.mediaUrl">{{
+          pub.content }}</p>
+
+        <!-- Poll Widget - Transformed for Social -->
+        <div *ngIf="pub.type !== 'EVENT' && (pub.type === 'VOTE' || pub.type === 'vote') && pub.pollQuestion"
+          class="social-poll-widget p-4 rounded-4 mt-3 bg-light border-0">
+          <h6 class="fw-bold mb-4"><i class="fa-solid fa-chart-simple text-primary me-2"></i> {{ pub.pollQuestion }}
+          </h6>
+          <div class="poll-options-grid">
+            <div *ngFor="let option of pub.pollOptions; let idx = index" class="poll-option-row mb-3">
+              <button class="btn btn-white w-100 border-0 shadow-sm text-start p-3 rounded-3 position-relative"
+                (click)="vote(pub.id!, idx)" [class.active-vote]="option.voterIds?.includes(currentUserId())">
+                <div class="poll-progress-bar h-100 bg-soft-primary opacity-25 position-absolute top-0 start-0"
+                  [style.width.%]="getVotePercentage(pub, option)"></div>
+                <div class="d-flex justify-content-between align-items-center position-relative" style="z-index: 1;">
+                  <span class="fs-14 fw-bold">{{ option.text }}</span>
+                  <span class="fs-12 text-primary fw-bold">{{ getVotePercentage(pub, option) }}%</span>
+                </div>
+              </button>
+            </div>
+          </div>
+          <div class="text-center mt-2">
+            <small class="text-muted fw-medium">{{ pub.pollOptions?.length || 0 }} participants in this community
+              poll</small>
+          </div>
+        </div>
+
+        <div *ngIf="pub.type !== 'EVENT' && pub.mediaUrl"
+          class="post-media-container rounded-4 overflow-hidden shadow-sm mt-3 border">
+          <img *ngIf="pub.mimeType?.startsWith('image/')" class="img-fluid w-100"
+            [src]="'http://localhost:8080' + pub.mediaUrl" alt="Media" />
+          <video *ngIf="pub.mimeType?.startsWith('video/')" class="w-100" [src]="'http://localhost:8080' + pub.mediaUrl"
+            controls></video>
+          <div *ngIf="!pub.mimeType?.startsWith('image/') && !pub.mimeType?.startsWith('video/')"
+            class="p-4 bg-light d-flex align-items-center justify-content-center">
+            <a class="btn btn-soft-primary rounded-pill py-2 px-4 fw-bold shadow-sm"
+              [href]="'http://localhost:8080' + pub.mediaUrl" target="_blank">
+              <i class="fa-solid fa-file-arrow-down me-2"></i> Download Document
             </a>
-            <a routerLink="/collaboration/groups" class="btn btn-outline-primary">
-              <i class="fa-solid fa-users me-2"></i> Discover Groups
-            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Mode UI -->
+      <div *ngIf="editingItemId === pub.id && editingItemType === 'PUBLICATION'"
+        class="p-3 bg-light rounded-4 mb-3 border-0">
+        <textarea class="form-control border-0 rounded-3 mb-3 bg-white" rows="3"
+          [(ngModel)]="editingContent"></textarea>
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-secondary btn-sm px-4 rounded-pill" (click)="cancelEdit()">Cancel</button>
+          <button class="btn btn-primary btn-sm px-4 rounded-pill fw-bold" (click)="saveEdit()">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- Social Interactions Bar -->
+      <div class="social-actions d-flex py-2 border-top border-bottom mb-3">
+        <button class="btn btn-light-hover flex-grow-1 py-2 rounded-2 text-muted fw-semibold">
+          <i class="fa-regular fa-thumbs-up me-2"></i> Like
+        </button>
+        <button class="btn btn-light-hover flex-grow-1 py-2 rounded-2 text-muted fw-semibold">
+          <i class="fa-regular fa-comment me-2"></i> Comment
+          <span class="ms-1 badge bg-soft-secondary text-muted" *ngIf="pub.commentCount">{{ pub.commentCount }}</span>
+        </button>
+        <button class="btn btn-light-hover flex-grow-1 py-2 rounded-2 text-muted fw-semibold"
+          (click)="openShareModal(pub)">
+          <i class="fa-regular fa-share-from-square me-2"></i> Share
+          <span class="ms-1 badge bg-soft-primary text-primary" *ngIf="pub.shareCount">{{ pub.shareCount }}</span>
+        </button>
+      </div>
+
+      <!-- Comments List -->
+      <div class="comments-section mt-4">
+        <div *ngFor="let comment of pub.comments" class="social-comment d-flex gap-3 mb-3">
+          <div *ngIf="getUserImage(comment.authorId)" class="avatar-sm flex-shrink-0 rounded-circle overflow-hidden shadow-sm">
+            <img [src]="getUserImage(comment.authorId)" class="w-100 h-100 object-fit-cover" alt="Commenter Image">
+          </div>
+          <div *ngIf="!getUserImage(comment.authorId)"
+            class="avatar-sm flex-shrink-0 bg-soft-secondary rounded-circle d-flex align-items-center justify-content-center text-dark fw-bold fs-11">
+            {{ (comment.authorName || 'U').substring(0,1).toUpperCase() }}
+          </div>
+          <div class="comment-bubble flex-grow-1 p-3 rounded-4 bg-light">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <strong class="small fw-bold text-dark">{{ comment.authorName || ('Member ' + comment.authorId)
+                }}</strong>
+              <div *ngIf="comment.authorId === currentUserId()" class="d-flex gap-2">
+                <button class="btn btn-link btn-xs p-0 text-muted"
+                  (click)="startEdit(comment.id, 'COMMENT', comment.content)"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-link btn-xs p-0 text-danger" (click)="deleteItem(comment.id, 'COMMENT')"><i
+                    class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+
+            <div *ngIf="editingItemId !== comment.id || editingItemType !== 'COMMENT'">
+              <p class="small mb-0 text-dark opacity-90">{{ comment.content }}</p>
+            </div>
+
+            <div *ngIf="editingItemId === comment.id && editingItemType === 'COMMENT'" class="edit-mode-comment mt-2">
+              <input class="form-control form-control-sm border-0 rounded-3 mb-2 px-3" [(ngModel)]="editingContent" />
+              <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-link btn-xs text-muted" (click)="cancelEdit()">Cancel</button>
+                <button class="btn btn-primary btn-xs px-3 rounded-pill fw-bold shadow-sm"
+                  (click)="saveEdit()">Save</button>
+              </div>
+            </div>
+            <div class="fs-10 text-muted mt-2 fw-semibold">{{ comment.createdAt | date: 'shortTime' }} · Like · Reply
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW Comment Input with Avatar -->
+        <div class="new-comment-social d-flex gap-3 mt-4 align-items-start">
+          <div *ngIf="getUserImage(currentUserId())" class="avatar-sm flex-shrink-0 rounded-circle overflow-hidden shadow-sm">
+            <img [src]="getUserImage(currentUserId())" class="w-100 h-100 object-fit-cover" alt="User Image">
+          </div>
+          <div *ngIf="!getUserImage(currentUserId())"
+            class="avatar-sm flex-shrink-0 bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-11">
+            {{ getUserInitials(currentUserId()) }}
+          </div>
+          <div class="input-group rounded-4 overflow-hidden border-0 bg-light flex-grow-1 align-items-center px-3">
+            <button class="btn btn-sm btn-emoji-toggle border-0"
+              (click)="toggleEmojiPicker('COMMENT', pub.id!)">😊</button>
+
+            <!-- Emoji Picker - Positioned Relative to Input -->
+            <div *ngIf="showCommentEmojiPicker()[pub.id!]"
+              class="emoji-picker-container shadow-lg border-0 rounded-4 bg-white p-3 position-absolute"
+              style="z-index: 1000; bottom: 50px; left: 0;">
+              <div class="emoji-grid d-flex flex-wrap gap-2"
+                style="max-width: 280px; max-height: 200px; overflow-y: auto;">
+                <span *ngFor="let emoji of EMOJI_LIST" (click)="addEmoji(emoji, 'COMMENT', pub.id!)"
+                  class="cursor-pointer fs-20 p-2 hover-bg-light rounded-circle transition-all">{{ emoji }}</span>
+              </div>
+            </div>
+
+            <input type="text" class="form-control bg-transparent border-0 py-2 fs-14"
+              [(ngModel)]="newCommentContent[pub.id!]" placeholder="Write a supportive comment..."
+              (keyup.enter)="submitComment(pub.id!)" />
+
+            <button class="btn btn-link btn-sm text-primary p-0 border-0 ms-2" (click)="submitComment(pub.id!)"
+              [disabled]="!newCommentContent[pub.id!] || !newCommentContent[pub.id!].trim()">
+              <i class="fa-solid fa-paper-plane fs-16"></i>
+            </button>
           </div>
         </div>
       </div>
     </div>
+  </article>
 
-    <div class="row g-4 justify-content-center">
-      <!-- Main Feed Column -->
-      <div class="col-lg-8">
-        <!-- Publication Composer -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-body">
-            <h5 class="fw-semibold mb-3">Share something...</h5>
-            <div class="row g-3 align-items-end mb-3">
-              <div class="col-md-4">
-                <label class="form-label small">Type</label>
-                <select class="form-select" [(ngModel)]="newPubType">
-                  <option value="EXPERIENCE">Experience</option>
-                  <option value="TEMOIGNAGE">Témoignage</option>
-                  <option value="ANNOUNCEMENT">Announcement</option>
-                  <option value="VOTE">Poll/Vote</option>
-                </select>
-              </div>
-              <div class="col-md-8">
-                <div class="form-check mt-4">
-                  <input class="form-check-input" type="checkbox" id="anonPub" [(ngModel)]="newPubAnonymous" />
-                  <label class="form-check-label" for="anonPub">Post anonymously</label>
-                </div>
-              </div>
-            </div>
-            <div class="form-group mb-3">
-              <textarea
-                class="form-control"
-                rows="4"
-                [(ngModel)]="newPubContent"
-                [placeholder]="newPubType === 'VOTE' ? 'Add context to your poll (optional)...' : 'What\'s on your mind? Share an update, experience or testimony...'"
-              ></textarea>
-            </div>
-
-            <!-- Poll Creation UI -->
-            <div *ngIf="newPubType === 'VOTE'" class="bg-light p-3 rounded-3 mb-3 border border-dashed">
-              <div class="form-group mb-3">
-                <label class="form-label small fw-bold">Question</label>
-                <input type="text" class="form-control" [(ngModel)]="newPollQuestion" placeholder="Enter your question here..." />
-              </div>
-              <div class="form-group mb-2">
-                <label class="form-label small fw-bold">Options</label>
-                <div *ngFor="let option of newPollOptions; let i = index; trackBy: trackByOption" class="input-group mb-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="option.text" [placeholder]="'Option ' + (i + 1)" />
-                  <button *ngIf="newPollOptions.length > 2" class="btn btn-outline-danger btn-sm" (click)="removePollOption(i)">
-                    <i class="fa-solid fa-minus"></i>
-                  </button>
-                </div>
-                <button class="btn btn-outline-primary btn-sm mt-1" (click)="addPollOption()">
-                  <i class="fa-solid fa-plus me-1"></i> Add Option
-                </button>
-              </div>
-            </div>
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-              <div class="d-flex align-items-center gap-2">
-                <label for="feed-file" class="btn btn-light btn-sm mb-0">
-                  <i class="fa-solid fa-image me-1"></i> Media
-                </label>
-                <input id="feed-file" type="file" class="d-none" (change)="onFileSelected($event)" accept="image/*,video/*,application/pdf" />
-                <span class="small text-muted" *ngIf="selectedFile">{{ selectedFile.name }}</span>
-              </div>
-              <button
-                type="button"
-                class="btn btn-primary px-4"
-                (click)="submitPublication()"
-                [disabled]="!newPubContent.trim() && (newPubType !== 'VOTE' || !newPollQuestion.trim())"
-              >
-                Post
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Publications List -->
-        <div *ngIf="publications().length === 0" class="text-center py-5">
-          <i class="fa-solid fa-newspaper fs-48 text-muted mb-3"></i>
-          <p class="text-muted">No publications yet. Be the first to share!</p>
-        </div>
-
-        <article class="card border-0 shadow-sm mb-4" *ngFor="let pub of publications(); trackBy: trackByPub">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div class="d-flex align-items-center gap-2">
-                <div class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
-                  {{ pub.anonymous ? 'A' : (pub.authorId || 'U') }}
-                </div>
-                <div>
-                  <h6 class="mb-0 fw-semibold">{{ pub.anonymous ? 'Anonymous' : 'User ' + pub.authorId }}</h6>
-                  <span class="fs-12 text-muted">{{ pub.createdAt | date: 'medium' }}</span>
-                </div>
-              </div>
-              <div class="d-flex gap-2">
-                <div class="dropdown" *ngIf="pub.authorId === currentUserId()">
-                  <button class="btn btn-link btn-sm text-muted p-2" type="button" (click)="toggleDropdown(pub.id!); $event.stopPropagation()">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-end shadow border-0" 
-                      [class.show]="openDropdownId === pub.id"
-                      style="position: absolute; right: 0; left: auto;">
-                    <li><button class="dropdown-item py-2" type="button" (click)="startEdit(pub.id!, 'PUBLICATION', pub.content, pub)"><i class="fa-solid fa-pen me-2"></i> Edit</button></li>
-                    <li><button class="dropdown-item py-2 text-danger" type="button" (click)="deleteItem(pub.id!, 'PUBLICATION')"><i class="fa-solid fa-trash me-2"></i> Delete</button></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <!-- Distress Alert -->
-            <div *ngIf="pub.distressed" class="alert alert-danger border-0 shadow-sm mb-3">
-              <div class="d-flex gap-2">
-                <i class="fa-solid fa-triangle-exclamation mt-1"></i>
-                <div>
-                  <strong class="d-block">Support Needed</strong>
-                  <span class="small">Our AI detected potential distress in this post. Please be kind and supportive.</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Publication Content -->
-            <div *ngIf="editingItemId !== pub.id || editingItemType !== 'PUBLICATION'">
-              <p class="fs-16 mb-3" *ngIf="pub.content">{{ pub.content }}</p>
-              
-              <!-- Poll Display UI -->
-              <div *ngIf="(pub.type === 'VOTE' || pub.type === 'vote') && pub.pollQuestion" class="poll-container bg-white border rounded-3 p-3 mb-3 shadow-sm">
-                <h6 class="fw-bold mb-3"><i class="fa-solid fa-square-poll-vertical text-primary me-2"></i> {{ pub.pollQuestion }}</h6>
-                <div class="poll-options">
-                  <ng-container *ngIf="pub.pollOptions && pub.pollOptions.length > 0; else noOptions">
-                    <div *ngFor="let option of pub.pollOptions; let idx = index" class="poll-option mb-2">
-                    <button class="btn btn-outline-light text-dark w-100 text-start position-relative overflow-hidden p-2" 
-                            (click)="vote(pub.id!, idx)"
-                            [class.border-primary]="option.voterIds?.includes(currentUserId())">
-                      <div class="poll-progress position-absolute top-0 start-0 h-100 bg-soft-primary" 
-                           [style.width.%]="getVotePercentage(pub, option)"
-                           style="z-index: 0; opacity: 0.3;"></div>
-                      <div class="d-flex justify-content-between align-items-center position-relative" style="z-index: 1;">
-                        <span class="fs-14 fw-medium">{{ option.text }}</span>
-                        <div class="d-flex align-items-center gap-2">
-                          <i *ngIf="option.voterIds?.includes(currentUserId())" class="fa-solid fa-circle-check text-primary"></i>
-                          <span class="fs-12 text-muted">{{ option.votes || 0 }} votes ({{ getVotePercentage(pub, option) }}%)</span>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                  </ng-container>
-                  <ng-template #noOptions>
-                    <div class="text-muted fs-12 italic p-2 bg-light rounded">
-                      <i class="fa-solid fa-circle-info me-1"></i> No options available for poll #{{ pub.id }}.
-                    </div>
-                  </ng-template>
-                </div>
-              </div>
-
-              <div *ngIf="pub.mediaUrl" class="rounded-3 overflow-hidden border mb-3">
-                <img *ngIf="pub.mimeType?.startsWith('image/')" class="img-fluid w-100" [src]="'http://localhost:8080' + pub.mediaUrl" alt="Post media" />
-                <video *ngIf="pub.mimeType?.startsWith('video/')" class="w-100" [src]="'http://localhost:8080' + pub.mediaUrl" controls></video>
-                <div *ngIf="!pub.mimeType?.startsWith('image/') && !pub.mimeType?.startsWith('video/')" class="p-3 bg-light">
-                  <a class="text-primary fw-semibold" [href]="'http://localhost:8080' + pub.mediaUrl" target="_blank">
-                    <i class="fa-solid fa-paperclip me-2"></i> Download Attachment
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Edit Mode -->
-            <div *ngIf="editingItemId === pub.id && editingItemType === 'PUBLICATION'" class="edit-mode-container">
-              <textarea class="form-control mb-2" rows="3" [(ngModel)]="editingContent"></textarea>
-              <div class="d-flex gap-2">
-                <button type="button" class="btn btn-primary btn-sm px-3" (click)="saveEdit()">Save</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm px-3" (click)="cancelEdit()">Cancel</button>
-              </div>
-            </div>
-
-            <!-- Comments Section -->
-            <div class="border-top pt-3">
-              <h6 class="fs-14 fw-semibold mb-3"><i class="fa-regular fa-comment me-2"></i> Comments ({{ pub.comments?.length || 0 }})</h6>
-              
-              <div *ngFor="let comment of pub.comments" class="bg-light rounded-3 p-3 mb-2">
-                <div class="d-flex justify-content-between align-items-start mb-1">
-                  <strong class="small">User {{ comment.authorId }}</strong>
-                  <div *ngIf="comment.authorId === currentUserId()" class="d-flex gap-2">
-                    <button class="btn btn-link btn-sm p-0 text-muted" (click)="startEdit(comment.id, 'COMMENT', comment.content)"><i class="fa-solid fa-pen fs-10"></i></button>
-                    <button class="btn btn-link btn-sm p-0 text-danger" (click)="deleteItem(comment.id, 'COMMENT')"><i class="fa-solid fa-trash fs-10"></i></button>
-                  </div>
-                </div>
-                
-                <div *ngIf="editingItemId !== comment.id || editingItemType !== 'COMMENT'">
-                  <p class="small mb-0">{{ comment.content }}</p>
-                </div>
-                
-                <div *ngIf="editingItemId === comment.id && editingItemType === 'COMMENT'" class="edit-mode-container py-2 px-3">
-                  <input class="form-control form-control-sm mb-2" [(ngModel)]="editingContent" />
-                  <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-primary btn-sm px-3" (click)="saveEdit()">Save</button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm px-3" (click)="cancelEdit()">Cancel</button>
-                  </div>
-                </div>
-                <div class="fs-10 text-muted mt-1">{{ comment.createdAt | date: 'short' }}</div>
-              </div>
-
-              <!-- New Comment Input -->
-              <div class="input-group mt-3">
-                <input
-                  type="text"
-                  class="form-control form-control-sm"
-                  [(ngModel)]="newCommentContent[pub.id!]"
-                  placeholder="Write a comment..."
-                  (keyup.enter)="submitComment(pub.id!)"
-                />
-                <button
-                    type="button"
-                    class="btn btn-primary btn-sm"
-                    (click)="submitComment(pub.id!)"
-                    [disabled]="!newCommentContent[pub.id!] || !newCommentContent[pub.id!].trim()"
-                  >
-                  <i class="fa-solid fa-paper-plane me-1"></i>
-                  Post
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
+  <!-- Share Post Modal -->
+  <div *ngIf="showShareModal()" class="modal-overlay d-flex align-items-center justify-content-center">
+    <div class="modal-container bg-white rounded-4 shadow-lg overflow-hidden animate-slide-up"
+      style="width: 450px; max-width: 95vw;">
+      <div class="modal-header p-3 border-bottom d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold">Share Post to Discussion</h6>
+        <button class="btn btn-light btn-sm rounded-circle" (click)="closeShareModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
-      <!-- Sidebar Column -->
-      <div class="col-lg-3">
-        <!-- User Context Card (Simulator) -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-body">
-            <h6 class="fw-semibold mb-3">User Profile</h6>
-            <div class="d-flex align-items-center gap-3 mb-3">
-              <div class="avatar-md bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold">
-                {{ currentUserId() }}
-              </div>
-              <div>
-                <span class="d-block fw-semibold">User #{{ currentUserId() }}</span>
-                <span class="badge bg-soft-primary text-primary">Patient</span>
-              </div>
+      <div class="modal-body p-3">
+        <!-- Preview of the post being shared -->
+        <div class="share-preview p-3 bg-light rounded-3 mb-3 border">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div
+              class="avatar-xs bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-10">
+              {{ (sharingPost()?.authorName || 'U').substring(0,1).toUpperCase() }}
             </div>
+            <span class="small fw-bold">{{ sharingPost()?.authorName }}</span>
+          </div>
+          <p class="small text-muted mb-0 text-truncate">{{ sharingPost()?.content }}</p>
+        </div>
+
+        <div class="search-box mb-3">
+          <div class="input-group input-group-sm rounded-pill border bg-light overflow-hidden px-2 align-items-center">
+            <i class="fa-solid fa-magnifying-glass text-muted ms-1"></i>
+            <input type="text" class="form-control bg-transparent border-0" [ngModel]="shareSearchQuery()"
+              (ngModelChange)="shareSearchQuery.set($event)" placeholder="Search discussions..." />
           </div>
         </div>
 
-        <!-- Notifications Card -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header bg-white border-0 py-3">
-            <h6 class="fw-semibold mb-0">
-              <i class="fa-solid fa-bell text-warning me-2"></i> Notifications
-            </h6>
+        <div class="groups-list-share" style="max-height: 300px; overflow-y: auto;">
+          <div *ngIf="filteredGroups().length === 0" class="text-center py-4 text-muted small">
+            No discussions found.
           </div>
-          <div class="card-body p-0 comm-scroll-sm">
-            <div class="list-group list-group-flush">
-              <div *ngIf="notifications().length === 0" class="p-4 text-center text-muted small">
-                No new notifications.
-              </div>
+          <div *ngFor="let group of filteredGroups()"
+            class="group-item-share d-flex align-items-center justify-content-between p-2 hover-bg-light rounded-3 cursor-pointer transition-all mb-1"
+            (click)="sharePostToGroup(group.id)">
+            <div class="d-flex align-items-center gap-3">
               <div
-                *ngFor="let n of notifications()"
-                class="list-group-item border-0 p-3"
-                [class.bg-light]="!n.isRead"
-              >
-                <div class="d-flex justify-content-between align-items-start mb-1">
-                  <span class="small">{{ n.content }}</span>
-                  <button class="btn btn-link btn-sm p-0 text-muted" (click)="deleteNotification(n.id!)"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <span class="fs-10 text-muted">{{ n.createdAt | date: 'shortTime' }}</span>
+                class="avatar-sm bg-soft-purple rounded-circle d-flex align-items-center justify-content-center text-purple fw-bold fs-12">
+                {{ group.name.substring(0,2).toUpperCase() }}
+              </div>
+              <div>
+                <h6 class="mb-0 fw-bold fs-14">{{ group.name }}</h6>
+                <p class="mb-0 fs-12 text-muted">{{ group.members.length }} members</p>
               </div>
             </div>
+            <button class="btn btn-soft-primary btn-xs rounded-pill px-3">Send</button>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
-  <!-- Floating Mini-Chat Widget (Standalone Component) -->
-  <app-mini-chat-widget></app-mini-chat-widget>
-</main>
+</div>

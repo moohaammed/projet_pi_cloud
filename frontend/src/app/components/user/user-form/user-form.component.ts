@@ -49,7 +49,7 @@ export class UserFormComponent implements OnInit {
     action.subscribe({
       next: () => this.router.navigate(['/users']),
       error: (err: any) => {
-        this.error = err.error || 'Erreur';
+        this.error = err.error?.message || err.error || 'Erreur';
         this.loading = false;
       }
     });

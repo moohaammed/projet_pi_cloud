@@ -1,4 +1,4 @@
-package esprit.tn.backpi.config;
+package esprit.tn.backpi.controller;
 import esprit.tn.backpi.entity.GeoAlert;
 import esprit.tn.backpi.service.GeoAlertService;
 import org.springframework.beans.factory.annotation.Autowired;

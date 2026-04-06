@@ -1,0 +1,232 @@
+<div class="panel">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
+  <div class="panel-header">
+    <div class="header-brand">
+      <span class="brand-dot" [class.dot-active]="isListening"></span>
+      <span class="brand-name">NeuroAssist</span>
+      <span class="brand-pill">IA</span>
+    </div>
+    <div class="header-right">
+      <span class="analysis-count" *ngIf="analysisCount > 0">
+        {{ analysisCount }} analyse{{ analysisCount > 1 ? 's' : '' }}
+      </span>
+      <button class="btn-icon" (click)="clearSession()" title="Réinitialiser session">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10" />
+          <path d="M3.51 15a9 9 0 1 0 .49-4.29" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ ERROR BANNER ════════════════════════════════════════════════════════ -->
+  <div class="error-bar" *ngIf="errorMessage">
+    <span>⚠ {{ errorMessage }}</span>
+    <button (click)="errorMessage = ''">✕</button>
+  </div>
+
+  <!-- ══ RED FLAG ALERT ══════════════════════════════════════════════════════ -->
+  <div class="red-flag-banner" *ngIf="analysis?.redFlag">
+    <span class="red-flag-icon">🚨</span>
+    <span>{{ analysis!.redFlag }}</span>
+  </div>
+
+  <!-- ══ MIC CONTROLS ════════════════════════════════════════════════════════ -->
+  <div class="mic-section">
+    <!-- Speaker toggle -->
+    <div class="speaker-row">
+      <button class="speaker-btn" [class.active]="activeSpeaker === 'doctor'" (click)="activeSpeaker = 'doctor'">
+        <span class="speaker-icon">👨‍⚕️</span>
+        <span>{{ doctorName }}</span>
+      </button>
+      <div class="speaker-divider">·</div>
+      <button class="speaker-btn" [class.active]="activeSpeaker === 'patient'" (click)="activeSpeaker = 'patient'">
+        <span class="speaker-icon">🧓</span>
+        <span>{{ patientName }}</span>
+      </button>
+    </div>
+
+    <!-- Mic button + interim text -->
+    <button class="btn-mic" [class.mic-on]="isListening" (click)="isListening ? stopListening() : startListening()">
+      <span class="mic-ripple" *ngIf="isListening"></span>
+      <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="9" y="2" width="6" height="12" rx="3" />
+        <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+      </svg>
+      <span>{{ isListening ? 'En écoute…' : 'Démarrer l\'écoute' }}</span>
+    </button>
+
+    <!-- Interim text display -->
+    <div class="interim-bar" *ngIf="interimText">
+      <span class="interim-speaker">{{ activeSpeaker === 'doctor' ? '👨‍⚕️' : '🧓' }}</span>
+      <span class="interim-text">{{ interimText }}</span>
+    </div>
+
+    <!-- Manual input -->
+    <div class="manual-row">
+      <input class="manual-input" [(ngModel)]="manualText" placeholder="Ajouter manuellement…"
+        (keydown.enter)="addManualLine()" />
+      <button class="btn-add" (click)="addManualLine()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ ANALYSIS RESULTS ════════════════════════════════════════════════════ -->
+  <div class="results-area">
+
+    <!-- Loading state -->
+    <div class="analyzing-state" *ngIf="isAnalyzing">
+      <div class="pulse-ring"></div>
+      <span>Analyse en cours…</span>
+    </div>
+
+    <!-- No data yet -->
+    <div class="empty-state" *ngIf="!isAnalyzing && !analysis && transcript.length === 0">
+      <div class="empty-visual">
+        <svg viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="38" stroke="rgba(99,147,218,0.15)" stroke-width="2" />
+          <path d="M28 40 Q34 28 40 40 Q46 52 52 40" stroke="rgba(99,147,218,0.4)" stroke-width="2" fill="none"
+            stroke-linecap="round" />
+          <circle cx="40" cy="40" r="4" fill="rgba(99,147,218,0.4)" />
+        </svg>
+      </div>
+      <p>Activez l'écoute pour que l'agent analyse la conversation en temps réel.</p>
+    </div>
+
+    <!-- Has transcript but no analysis yet -->
+    <div class="waiting-state" *ngIf="!isAnalyzing && !analysis && transcript.length > 0">
+      <div class="waiting-dots"><span></span><span></span><span></span></div>
+      <span>{{ transcript.length }} ligne(s) enregistrée(s)</span>
+      <button class="btn-force-analyze prominent" (click)="analyzeNow()">
+        🔍 Lancer l'analyse maintenant
+      </button>
+    </div>
+
+    <!-- Quick test phrases shown before first analysis -->
+    <div class="test-phrases" *ngIf="!analysis && !isAnalyzing">
+      <div class="test-phrases-label">💡 Phrases de test — cliquez pour ajouter</div>
+      <button class="test-phrase-btn"
+        (click)="addTestPhrase('Je ne me souviens plus du tout de ce que j\'ai mangé ce matin.')">
+        "Je ne me souviens plus de ce matin…"
+      </button>
+      <button class="test-phrase-btn"
+        (click)="addTestPhrase('Parfois je me sens très perdu, je ne sais plus où je suis.')">
+        "Je me sens très perdu parfois…"
+      </button>
+      <button class="test-phrase-btn"
+        (click)="addTestPhrase('Ma fille est venue me voir hier, enfin je crois que c\'était hier.')">
+        "Ma fille est venue, je crois…"
+      </button>
+    </div>
+
+    <!-- ── RESULTS ──────────────────────────────────────────────────────── -->
+    <ng-container *ngIf="analysis && !isAnalyzing">
+
+      <!-- 1. Emotion Card -->
+      <div class="card emotion-card">
+        <div class="card-label">État émotionnel</div>
+        <div class="emotion-main">
+          <span class="emotion-emoji">{{ analysis.emotion.icon }}</span>
+          <div class="emotion-details">
+            <div class="emotion-name-row">
+              <span class="emotion-name">{{ analysis.emotion.label }}</span>
+              <span class="trend-badge" [class]="getTrendClass(analysis.emotion.trend)">
+                {{ getTrendIcon(analysis.emotion.trend) }}
+                {{ analysis.emotion.trend === 'stable' ? 'Stable' : analysis.emotion.trend === 'improving' ?
+                'Amélioration' : 'Dégradation' }}
+              </span>
+            </div>
+            <div class="emotion-bar-track">
+              <div class="emotion-bar-fill" [style.width.%]="analysis.emotion.intensity"
+                [style.background]="analysis.emotion.color">
+              </div>
+            </div>
+            <div class="emotion-meta">
+              Intensité {{ analysis.emotion.intensity }}/100
+              <span *ngIf="lastAnalysisAt"> · {{ formatTime(lastAnalysisAt) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Patient Summary -->
+      <div class="card summary-card">
+        <div class="card-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          Ce que dit le patient
+        </div>
+        <p class="summary-text">{{ analysis.patientSummary }}</p>
+      </div>
+
+      <!-- 3. Suggested Questions -->
+      <div class="card questions-card">
+        <div class="card-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" />
+          </svg>
+          Questions suggérées pour le médecin
+        </div>
+        <div class="questions-list">
+          <div class="question-item" *ngFor="let q of analysis.suggestedQuestions; let i = index">
+            <span class="q-num">{{ i + 1 }}</span>
+            <span class="q-text">{{ q }}</span>
+            <button class="btn-copy" (click)="copyQuestion(q, i)" [class.copied]="copiedIndex === i"
+              title="Copier dans le presse-papier">
+              <svg *ngIf="copiedIndex !== i" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <svg *ngIf="copiedIndex === i" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Force re-analyse button -->
+      <button class="btn-reanalyze" (click)="analyzeNow()" [disabled]="isAnalyzing">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10" />
+          <path d="M3.51 15a9 9 0 1 0 .49-4.29" />
+        </svg>
+        Rafraîchir l'analyse
+      </button>
+
+    </ng-container>
+  </div>
+
+  <!-- ══ TRANSCRIPT DRAWER ════════════════════════════════════════════════════ -->
+  <div class="transcript-toggle" (click)="showTranscript = !showTranscript">
+    <span>📝 Transcription ({{ transcript.length }})</span>
+    <svg [class.rotated]="showTranscript" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
+
+  <div class="transcript-drawer" [class.open]="showTranscript">
+    <div class="transcript-inner">
+      <div *ngFor="let line of transcript" class="t-line" [class.t-doctor]="line.speaker === 'doctor'"
+        [class.t-patient]="line.speaker === 'patient'">
+        <span class="t-who">{{ line.speaker === 'doctor' ? '👨‍⚕️' : '🧓' }}</span>
+        <div class="t-content">
+          <span class="t-text">{{ line.text }}</span>
+          <span class="t-time">{{ formatTime(line.timestamp) }}</span>
+        </div>
+      </div>
+      <div class="t-empty" *ngIf="transcript.length === 0">Aucune ligne enregistrée.</div>
+    </div>
+  </div>
+
+</div>

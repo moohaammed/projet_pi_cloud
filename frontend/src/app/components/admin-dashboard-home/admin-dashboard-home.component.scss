@@ -1,0 +1,31 @@
+.transition-hover {
+  transition: all 0.3s ease;
+  border: 1px solid transparent !important;
+}
+
+.transition-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(128, 0, 128, 0.1) !important;
+  border-color: rgba(128, 0, 128, 0.1) !important;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background-color: #fff !important;
+}
+
+.section-header__title .underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 4px;
+  background-color: var(--docwala-purple, #800080);
+  border-radius: 2px;
+  opacity: 0.3;
+}
+
+.fs-28 { font-size: 28px; }
+.fs-24 { font-size: 24px; }
+.fs-15 { font-size: 15px; }

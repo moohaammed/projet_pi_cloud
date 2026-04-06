@@ -32,6 +32,16 @@ public class PublicationController {
         return publicationService.getAllPublications();
     }
 
+    @GetMapping("/feed/{userId}")
+    public List<PublicationResponseDto> getPersonalizedFeed(@PathVariable("userId") Long userId) {
+        return publicationService.getPersonalizedFeed(userId);
+    }
+
+    @GetMapping("/group/{groupId}")
+    public List<PublicationResponseDto> getGroupFeed(@PathVariable("groupId") Long groupId) {
+        return publicationService.getGroupFeed(groupId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PublicationResponseDto> getPublicationById(@PathVariable("id") Long id) {
         PublicationResponseDto publication = publicationService.getPublicationById(id);
@@ -44,7 +54,12 @@ public class PublicationController {
             @RequestParam(value = "type", required = false) String typeStr,
             @RequestParam(value = "pollOptions", required = false) List<String> pollOptions,
             @RequestParam(value = "pollQuestion", required = false) String pollQuestion,
+            @RequestParam(value = "linkedEventId", required = false) Long linkedEventId,
             @RequestParam(value = "file", required = false) MultipartFile file) {
+
+        if (linkedEventId != null) {
+            dto.setLinkedEventId(linkedEventId);
+        }
 
         // Log incoming poll options
         if (typeStr != null && dto.getType() == null) {
