@@ -1,6 +1,6 @@
 package esprit.tn.backpi.entities.gestion_patient;
 
-import esprit.tn.backpi.entities.User;
+import esprit.tn.backpi.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
