@@ -1,68 +1,132 @@
 <div class="doctor-page-container">
+  <!-- ══ Header ══ -->
   <div class="header-section py-4 px-4 mb-4">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div>
-        <h2 class="fw-bold mb-1 title-text text-white">Find your specialize doctor</h2>
-        <p class="mb-0 sub-title-text" style="color: rgba(255,255,255,0.8);">It's easier to ask doctors for the latest info about your case</p>
+        <h2 class="fw-bold mb-1 title-text text-white">
+          <i class="fa-solid fa-stethoscope me-2"></i>Find Your Specialist
+        </h2>
+        <p class="mb-0" style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
+          Connect with expert doctors in the AlzCare network
+        </p>
       </div>
-      <button class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm text-primary-theme" (click)="goBack()">
-        <i class="fa-solid fa-arrow-left me-1"></i> Dashboard
+      <button class="btn btn-light btn-sm fw-bold rounded-pill px-4 py-2 shadow-sm" style="color: #8b5cf6;" (click)="goBack()">
+        <i class="fa-solid fa-arrow-left me-2"></i>Dashboard
       </button>
+    </div>
+
+    <!-- Search bar inside header -->
+    <div class="mt-3">
+      <div class="input-group search-bar-group">
+        <span class="input-group-text bg-white border-0 shadow-sm">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+        <input type="text" class="form-control border-0 shadow-sm"
+               placeholder="Search by name or specialty..."
+               [(ngModel)]="searchQuery" (input)="filterDoctors()"
+               style="border-radius: 0px 12px 12px 0px; font-size: 0.9rem;">
+      </div>
     </div>
   </div>
 
   <div class="container-fluid px-4 pb-5 content-wrapper">
+
+    <!-- Stats ribbon -->
+    <div class="d-flex gap-3 mb-4 flex-wrap">
+      <div class="stat-pill">
+        <i class="fa-solid fa-user-doctor me-2"></i>
+        <span class="fw-semibold">{{ filteredDoctors.length }}</span> Doctors Available
+      </div>
+      <div class="stat-pill">
+        <i class="fa-solid fa-circle text-success me-2" style="font-size: 0.6rem;"></i>
+        All Online Now
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div *ngIf="isLoading" class="text-center py-5">
-      <div class="spinner-border text-primary-theme" role="status"></div>
-      <p class="text-muted mt-2">Loading doctors...</p>
+      <div class="loading-container">
+        <div class="spinner-grow text-purple me-2" role="status" style="width:1rem;height:1rem;"></div>
+        <div class="spinner-grow text-teal me-2" role="status" style="width:1.2rem;height:1.2rem; animation-delay: 0.1s;"></div>
+        <div class="spinner-grow text-purple" role="status" style="width:1rem;height:1rem; animation-delay: 0.2s;"></div>
+      </div>
+      <p class="text-muted mt-3 fw-semibold">Finding the best doctors for you...</p>
     </div>
 
     <!-- Doctor Grid -->
     <div class="row g-4" *ngIf="!isLoading">
-      <div class="col-12 col-md-6 col-lg-4" *ngFor="let doc of doctors">
-        <div class="doctor-card card border-0 shadow-sm">
-          <div class="card-body p-4 position-relative">
-            <!-- Heart icon -->
-            <div class="heart-icon position-absolute top-0 end-0 mt-3 me-3 text-muted">
-              <i class="fa-regular fa-heart fa-lg"></i>
-            </div>
-            
-            <div class="d-flex flex-column align-items-center mt-3 text-center">
-              <div class="avatar-container position-relative mb-3">
-                <img [src]="doc.profileImageUrl || 'assets/default-avatar.png'"
-                     (error)="$event.target.src='https://ui-avatars.com/api/?name=' + doc.firstName + '+' + doc.lastName + '&background=random'"
-                     class="rounded-circle shadow-sm profile-img" alt="Doctor Photo">
-                <span class="status-dot online"></span>
-              </div>
-              <h5 class="fw-bold mb-1 doc-name">Dr. {{ doc.firstName }} {{ doc.lastName }}</h5>
-              <p class="mb-1 text-muted small"><i class="fa-solid fa-hospital me-1"></i>{{ doc.specialite || 'Neurologist' }} - Clinic</p>
-              
-              <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
-                <div class="stars text-warning" style="font-size: 0.85rem;">
-                  <i class="fa-solid fa-star"></i>
-                  <i class="fa-solid fa-star"></i>
-                  <i class="fa-solid fa-star"></i>
-                  <i class="fa-solid fa-star"></i>
-                  <i class="fa-solid fa-star-half-stroke"></i>
+      <div class="col-12 col-sm-6 col-xl-4" *ngFor="let doc of filteredDoctors; let i = index"
+           [style.animation-delay]="i * 0.05 + 's'" class="fade-in-card">
+        <div class="doctor-card card border-0 h-100">
+          <div class="card-body p-4 position-relative d-flex flex-column">
+
+            <!-- Fav icon -->
+            <button class="heart-btn position-absolute top-0 end-0 mt-3 me-3"
+                    [class.active]="favoriteDoctors.has(doc.id)"
+                    (click)="toggleFavorite(doc.id)">
+              <i [class]="favoriteDoctors.has(doc.id) ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+            </button>
+
+            <!-- Avatar + name -->
+            <div class="d-flex flex-column align-items-center mt-2 text-center flex-grow-1">
+              <div class="avatar-wrapper position-relative mb-3">
+                <div class="avatar-ring">
+                  <img [src]="getAvatarUrl(doc)"
+                       class="doctor-avatar" alt="Dr. {{ doc.firstName }} {{ doc.lastName }}">
                 </div>
-                <span class="small fw-bold text-dark">4.5</span>
-                <span class="text-muted small border-start ps-2 ms-1"><i class="fa-regular fa-clock me-1"></i>From 09:00 AM</span>
+                <span class="online-dot"></span>
               </div>
+
+              <h5 class="fw-bold mb-1 doc-name">Dr. {{ doc.firstName }} {{ doc.lastName }}</h5>
+              <span class="specialty-badge mb-2">
+                <i class="fa-solid fa-brain me-1"></i>{{ doc.specialite || 'Neurologist' }}
+              </span>
+              <p class="text-muted small mb-0">
+                <i class="fa-solid fa-hospital me-1 text-teal"></i>AlzCare Clinic
+              </p>
             </div>
 
-            <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
-              <div class="price-tag fw-bold theme-text">$50.00</div>
-              <button class="btn btn-theme-primary rounded-pill px-4 py-2 fw-bold" (click)="viewDoctorDetail(doc.id)">Appointment</button>
+            <!-- Stars -->
+            <div class="d-flex justify-content-center align-items-center gap-2 my-3">
+              <div class="stars-row">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star-half-stroke"></i>
+              </div>
+              <span class="small fw-bold text-dark">4.5</span>
+              <span class="avail-chip">
+                <i class="fa-regular fa-clock me-1"></i>09:00 AM
+              </span>
+            </div>
+
+            <!-- Footer -->
+            <div class="pt-3 border-top d-flex justify-content-between align-items-center mt-auto">
+              <div class="consult-price">
+                <span class="small text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;">Consultation</span>
+                <span class="fw-bold theme-text fs-5">$50.00</span>
+              </div>
+              <button class="btn-appoint fw-bold" (click)="viewDoctorDetail(doc.id)">
+                <i class="fa-solid fa-calendar-check me-1"></i> Appointment
+              </button>
             </div>
           </div>
         </div>
       </div>
-      
+
       <!-- Empty state -->
-      <div *ngIf="doctors.length === 0" class="col-12 py-5 text-center text-muted">
-        <i class="fa-solid fa-user-doctor fa-3x mb-3 opacity-50"></i>
-        <p>No doctors currently available.</p>
+      <div *ngIf="filteredDoctors.length === 0 && !isLoading" class="col-12">
+        <div class="empty-state text-center py-5">
+          <div class="empty-icon mb-3">
+            <i class="fa-solid fa-user-doctor fa-3x"></i>
+          </div>
+          <h5 class="fw-semibold text-muted">No doctors found</h5>
+          <p class="text-muted small">Try a different search term or check back later.</p>
+          <button class="btn btn-outline-secondary rounded-pill px-4" (click)="searchQuery=''; filterDoctors()">
+            <i class="fa-solid fa-rotate-right me-2"></i>Reset Search
+          </button>
+        </div>
       </div>
     </div>
   </div>
