@@ -5,6 +5,8 @@ import { RouterModule, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivityService } from '../../../services/education/activity.service';
 import { ActivityModel } from '../../../models/education/activity.model';
+import { AuthService } from '../../../services/auth.service';
+import { PatientProgressionService } from '../../../services/patient-progression.service';
 
 @Component({
   selector: 'app-activity-player-page',
@@ -13,12 +15,6 @@ import { ActivityModel } from '../../../models/education/activity.model';
   template: `
     <div class="container">
 
-      <!-- Barre supérieure avec bouton Créer activité -->
-      <div class="top-bar">
-        <button class="btn-create" (click)="goToCreateActivity()">
-  Créer activité
-</button>
-      </div>
 
       <!-- Indicateur de chargement -->
       <div class="loading" *ngIf="isLoading">
@@ -34,30 +30,63 @@ import { ActivityModel } from '../../../models/education/activity.model';
 
       <!-- Menu de sélection -->
       <div class="selection-menu" *ngIf="!selectedType && !playingActivity && !isLoading">
-        <h1 class="main-title">Choisissez une activité</h1>
+
+        <!-- Hero Banner -->
+        <div class="edu-hero">
+          <div class="edu-hero-glow"></div>
+          <div class="edu-hero-content">
+            <div class="edu-hero-icon">🧠</div>
+            <h1 class="edu-hero-title">Espace Thérapeutique</h1>
+            <p class="edu-hero-sub">Choisissez une activité pour progresser à votre rythme</p>
+          </div>
+          <!-- Progression chips for patients -->
+          <div class="prog-chips" *ngIf="authService.getRole() === 'PATIENT'">
+            <div class="prog-chip">
+              <span class="chip-label">📝 Quiz</span>
+              <span class="chip-value">{{ patientStadeQuiz }}</span>
+            </div>
+            <div class="prog-chip">
+              <span class="chip-label">🎮 Jeux</span>
+              <span class="chip-value">{{ patientStadeGame }}</span>
+            </div>
+            <div class="prog-chip score-chip">
+              <span class="chip-label">⭐ Score</span>
+              <span class="chip-value">{{ ((patientScoreQuiz + patientScoreGame) / 2).toFixed(0) }} pts</span>
+            </div>
+          </div>
+        </div>
+
         <div class="type-buttons">
           <button class="type-btn quiz" (click)="selectType('QUIZ')">
+            <div class="type-btn-glow"></div>
             <div class="icon">📝</div>
             <div class="type-name">Quiz</div>
             <div class="type-desc">Testez vos connaissances</div>
+            <div class="type-arrow">→</div>
           </button>
 
           <button class="type-btn game" (click)="selectType('GAME')">
+            <div class="type-btn-glow"></div>
             <div class="icon">🎮</div>
             <div class="type-name">Jeux</div>
             <div class="type-desc">Memory et puzzles</div>
+            <div class="type-arrow">→</div>
           </button>
 
           <button class="type-btn content" (click)="selectType('CONTENT')">
+            <div class="type-btn-glow"></div>
             <div class="icon">📺</div>
             <div class="type-name">Contenu</div>
             <div class="type-desc">Vidéos et articles</div>
+            <div class="type-arrow">→</div>
           </button>
 
           <button class="type-btn exercice" (click)="selectType('EXERCICE')">
+            <div class="type-btn-glow"></div>
             <div class="icon">🧘</div>
             <div class="type-name">Exercices</div>
             <div class="type-desc">Respiration et méditation</div>
+            <div class="type-arrow">→</div>
           </button>
         </div>
       </div>
@@ -69,29 +98,147 @@ import { ActivityModel } from '../../../models/education/activity.model';
           <h2 class="list-title">{{ getTypeLabel(selectedType) }}</h2>
         </div>
 
-        <div class="activities-grid">
-          <div class="activity-card"
-               *ngFor="let activity of filteredActivities"
-               (click)="playActivity(activity)">
-            <div class="activity-header">
-              <span class="activity-type" [class]="selectedType.toLowerCase()">
-                {{ selectedType }}
-              </span>
-              <span class="activity-stade">{{ activity.stade }}</span>
-            </div>
-            <h3 class="activity-title">{{ activity.title }}</h3>
-            <p class="activity-desc">{{ activity.description }}</p>
-            <div class="activity-footer">
-              <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
-              <button class="btn-play">Jouer →</button>
-            </div>
-          </div>
+        <!-- Stage sections (for QUIZ and GAME with patient role) -->
+        <ng-container *ngIf="(selectedType === 'QUIZ' || selectedType === 'GAME') && authService.getRole() === 'PATIENT'; else normalList">
+          <div class="stages-container">
 
-          <div class="empty-state" *ngIf="filteredActivities.length === 0">
-            <p>Aucune activité disponible pour ce type</p>
-            <button class="btn-primary" (click)="backToMenu()">Retour au menu</button>
+            <!-- LEGER -->
+            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'LEGER'" [class.stage-completed]="isStageCompleted('LEGER')" [class.stage-locked]="isStageLockedFuture('LEGER')">
+              <div class="stage-header">
+                <div class="stage-title-row">
+                  <span class="stage-icon">🌱</span>
+                  <h3 class="stage-name">Stade Léger</h3>
+                  <span class="stage-badge badge-leger" *ngIf="getPatientStade() === 'LEGER'">✅ Votre niveau actuel</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('LEGER')">🏅 Déjà complété</span>
+                </div>
+                <div class="stage-lock" *ngIf="isStageLockedFuture('LEGER')">🔒 Verrouillé</div>
+              </div>
+              <div class="activities-grid">
+                <div class="activity-card" [class.card-locked]="isStageLockedFuture('LEGER') || isStageCompleted('LEGER')"
+                     *ngFor="let activity of getActivitiesForStage('LEGER')"
+                     (click)="onActivityClick(activity, 'LEGER')">
+                  <div class="activity-header">
+                    <span class="activity-type" [class]="selectedType!.toLowerCase()">{{ selectedType }}</span>
+                    <span class="activity-stade">{{ activity.stade }}</span>
+                  </div>
+                  <h3 class="activity-title">{{ activity.title }}</h3>
+                  <p class="activity-desc">{{ activity.description }}</p>
+                  <div class="activity-footer">
+                    <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
+                    <button class="btn-play" [class.btn-locked]="isStageLockedFuture('LEGER') || isStageCompleted('LEGER')">
+                      <ng-container *ngIf="isStageCompleted('LEGER')">✔ Fait</ng-container>
+                      <ng-container *ngIf="isStageLockedFuture('LEGER')">🔒</ng-container>
+                      <ng-container *ngIf="!isStageCompleted('LEGER') && !isStageLockedFuture('LEGER')">Jouer →</ng-container>
+                    </button>
+                  </div>
+                </div>
+                <div class="empty-stage" *ngIf="getActivitiesForStage('LEGER').length === 0">
+                  <p>Aucune activité pour ce stade</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- MODERE -->
+            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'MODERE'" [class.stage-completed]="isStageCompleted('MODERE')" [class.stage-locked]="isStageLockedFuture('MODERE')">
+              <div class="stage-header">
+                <div class="stage-title-row">
+                  <span class="stage-icon">⚡</span>
+                  <h3 class="stage-name">Stade Modéré</h3>
+                  <span class="stage-badge badge-modere" *ngIf="getPatientStade() === 'MODERE'">✅ Votre niveau actuel</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('MODERE')">🏅 Déjà complété</span>
+                </div>
+                <div class="stage-lock" *ngIf="isStageLockedFuture('MODERE')">🔒 Verrouillé</div>
+              </div>
+              <div class="activities-grid">
+                <div class="activity-card" [class.card-locked]="isStageLockedFuture('MODERE') || isStageCompleted('MODERE')"
+                     *ngFor="let activity of getActivitiesForStage('MODERE')"
+                     (click)="onActivityClick(activity, 'MODERE')">
+                  <div class="activity-header">
+                    <span class="activity-type" [class]="selectedType!.toLowerCase()">{{ selectedType }}</span>
+                    <span class="activity-stade">{{ activity.stade }}</span>
+                  </div>
+                  <h3 class="activity-title">{{ activity.title }}</h3>
+                  <p class="activity-desc">{{ activity.description }}</p>
+                  <div class="activity-footer">
+                    <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
+                    <button class="btn-play" [class.btn-locked]="isStageLockedFuture('MODERE') || isStageCompleted('MODERE')">
+                      <ng-container *ngIf="isStageCompleted('MODERE')">✔ Fait</ng-container>
+                      <ng-container *ngIf="isStageLockedFuture('MODERE')">🔒</ng-container>
+                      <ng-container *ngIf="!isStageCompleted('MODERE') && !isStageLockedFuture('MODERE')">Jouer →</ng-container>
+                    </button>
+                  </div>
+                </div>
+                <div class="empty-stage" *ngIf="getActivitiesForStage('MODERE').length === 0">
+                  <p>Aucune activité pour ce stade</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- SEVERE -->
+            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'SEVERE'" [class.stage-completed]="isStageCompleted('SEVERE')" [class.stage-locked]="isStageLockedFuture('SEVERE')">
+              <div class="stage-header">
+                <div class="stage-title-row">
+                  <span class="stage-icon">🔥</span>
+                  <h3 class="stage-name">Stade Sévère</h3>
+                  <span class="stage-badge badge-severe" *ngIf="getPatientStade() === 'SEVERE'">✅ Votre niveau actuel</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('SEVERE')">🏅 Déjà complété</span>
+                </div>
+                <div class="stage-lock" *ngIf="isStageLockedFuture('SEVERE')">🔒 Verrouillé</div>
+              </div>
+              <div class="activities-grid">
+                <div class="activity-card" [class.card-locked]="isStageLockedFuture('SEVERE') || isStageCompleted('SEVERE')"
+                     *ngFor="let activity of getActivitiesForStage('SEVERE')"
+                     (click)="onActivityClick(activity, 'SEVERE')">
+                  <div class="activity-header">
+                    <span class="activity-type" [class]="selectedType!.toLowerCase()">{{ selectedType }}</span>
+                    <span class="activity-stade">{{ activity.stade }}</span>
+                  </div>
+                  <h3 class="activity-title">{{ activity.title }}</h3>
+                  <p class="activity-desc">{{ activity.description }}</p>
+                  <div class="activity-footer">
+                    <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
+                    <button class="btn-play" [class.btn-locked]="isStageLockedFuture('SEVERE') || isStageCompleted('SEVERE')">
+                      <ng-container *ngIf="isStageCompleted('SEVERE')">✔ Fait</ng-container>
+                      <ng-container *ngIf="isStageLockedFuture('SEVERE')">🔒</ng-container>
+                      <ng-container *ngIf="!isStageCompleted('SEVERE') && !isStageLockedFuture('SEVERE')">Jouer →</ng-container>
+                    </button>
+                  </div>
+                </div>
+                <div class="empty-stage" *ngIf="getActivitiesForStage('SEVERE').length === 0">
+                  <p>Aucune activité pour ce stade</p>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </div>
+        </ng-container>
+
+        <!-- Normal list for non-patients or CONTENT/EXERCICE -->
+        <ng-template #normalList>
+          <div class="activities-grid">
+            <div class="activity-card"
+                 *ngFor="let activity of filteredActivities"
+                 (click)="playActivity(activity)">
+              <div class="activity-header">
+                <span class="activity-type" [class]="selectedType!.toLowerCase()">
+                  {{ selectedType }}
+                </span>
+                <span class="activity-stade">{{ activity.stade }}</span>
+              </div>
+              <h3 class="activity-title">{{ activity.title }}</h3>
+              <p class="activity-desc">{{ activity.description }}</p>
+              <div class="activity-footer">
+                <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
+                <button class="btn-play">Jouer →</button>
+              </div>
+            </div>
+
+            <div class="empty-state" *ngIf="filteredActivities.length === 0">
+              <p>Aucune activité disponible pour ce type</p>
+              <button class="btn-primary" (click)="backToMenu()">Retour au menu</button>
+            </div>
+          </div>
+        </ng-template>
       </div>
 
       <!-- Player de l'activité sélectionnée -->
@@ -103,8 +250,14 @@ import { ActivityModel } from '../../../models/education/activity.model';
 
         <!-- QUIZ Player -->
         <div class="quiz-player" *ngIf="playingActivity.type === 'QUIZ'">
-          <div class="quiz-progress">
-            Question {{ currentQuestionIndex + 1 }} / {{ quizQuestions.length }}
+          <div class="quiz-status-bar d-flex justify-content-between align-items-center mb-4 px-3 py-2 bg-light rounded-3 shadow-sm border border-secondary border-opacity-10">
+            <div class="quiz-progress fw-bold text-primary">
+              <span class="badge bg-primary me-2">Q{{ currentQuestionIndex + 1 }}</span> Question {{ currentQuestionIndex + 1 }} / {{ quizQuestions.length }}
+            </div>
+            <div class="timer-badge" [class.danger]="timerRemaining < 10">
+              <span class="timer-icon">⏱️</span>
+              <span class="timer-text fw-bold">{{ getFormattedTime() }}</span>
+            </div>
           </div>
 
           <div class="question-card" *ngIf="currentQuestion">
@@ -133,19 +286,46 @@ import { ActivityModel } from '../../../models/education/activity.model';
           </div>
 
           <div class="quiz-result" *ngIf="quizFinished">
-            <h2>Quiz terminé !</h2>
-            <div class="score">{{ quizScore }} / {{ quizQuestions.length }}</div>
-            <p class="score-message">{{ getScoreMessage() }}</p>
-            <button class="btn-primary" (click)="restartQuiz()">Recommencer</button>
-            <button class="btn-secondary" (click)="stopActivity()">Choisir une autre activité</button>
+            <!-- Échec / Timeout -->
+            <ng-container *ngIf="isTimeout || isQuizFailed()">
+              <div class="result-icon fail-icon">😔</div>
+              <h2 class="result-title fail-title" *ngIf="isTimeout">⏰ Temps écoulé !</h2>
+              <h2 class="result-title fail-title" *ngIf="!isTimeout">Quiz échoué</h2>
+              <div class="score score-fail">{{ quizScore }} / {{ quizQuestions.length }}</div>
+              <p class="score-message" *ngIf="isTimeout">Le temps imparti est dépassé.</p>
+              <p class="score-message" *ngIf="!isTimeout">Vous n'avez pas atteint le score requis.</p>
+              <div class="result-actions">
+                <!-- Bouton passer au stade suivant (masqué si dernier stade) -->
+                <button class="btn-purple" (click)="goToNextStade()" *ngIf="!isLastStade()">
+                  ⏩ Passer au stade suivant
+                </button>
+                <button class="btn-outline-purple" (click)="stopActivity()">📚 Choisir une autre activité</button>
+              </div>
+            </ng-container>
+            <!-- Succès -->
+            <ng-container *ngIf="!isTimeout && !isQuizFailed()">
+              <div class="result-icon success-icon">🎉</div>
+              <h2 class="result-title success-title">Bravo !</h2>
+              <div class="score score-success">{{ quizScore }} / {{ quizQuestions.length }}</div>
+              <p class="score-message">{{ getScoreMessage() }}</p>
+              <div class="result-actions">
+                <button class="btn-outline-purple" (click)="stopActivity()">📚 Choisir une autre activité</button>
+              </div>
+            </ng-container>
           </div>
         </div>
 
         <!-- GAME Player (Memory) -->
         <div class="game-player" *ngIf="playingActivity.type === 'GAME'">
           <div class="game-info">
-            <div class="timer">⏱ {{ gameTimer }}s</div>
-            <div class="moves">Coups : {{ gameMoves }}</div>
+            <div class="timer-badge" [class.danger]="timerRemaining < 10">
+              <span class="timer-icon">⏱️</span>
+              <span class="timer-text">{{ getFormattedTime() }}</span>
+            </div>
+            <div class="moves-badge">
+              <span class="moves-icon">🎮</span>
+              <span class="moves-text">Coups : {{ gameMoves }}</span>
+            </div>
           </div>
 
           <div class="memory-grid">
@@ -160,10 +340,29 @@ import { ActivityModel } from '../../../models/education/activity.model';
           </div>
 
           <div class="game-result" *ngIf="gameFinished">
-            <h2>🎉 Gagné !</h2>
-            <p>Coups : {{ gameMoves }}</p>
-            <button class="btn-primary" (click)="restartGame()">Rejouer</button>
-            <button class="btn-secondary" (click)="stopActivity()">Choisir une autre activité</button>
+            <!-- Échec -->
+            <ng-container *ngIf="isTimeout || !gameSuccess">
+              <div class="result-icon fail-icon">😔</div>
+              <h2 class="result-title fail-title" *ngIf="isTimeout">⏰ Temps écoulé !</h2>
+              <h2 class="result-title fail-title" *ngIf="!isTimeout">😕 Dommage !</h2>
+              <p class="score-message" *ngIf="isTimeout">La limite de temps est dépassée.</p>
+              <p class="score-message" *ngIf="!isTimeout">Trop d'essais pour ce niveau ({{ gameMoves }} coups).</p>
+              <div class="result-actions">
+                <button class="btn-purple" (click)="goToNextStade()" *ngIf="!isLastStade()">
+                  ⏩ Passer au stade suivant
+                </button>
+                <button class="btn-outline-purple" (click)="stopActivity()">📚 Choisir une autre activité</button>
+              </div>
+            </ng-container>
+            <!-- Succès -->
+            <ng-container *ngIf="!isTimeout && gameSuccess">
+              <div class="result-icon success-icon">🎉</div>
+              <h2 class="result-title success-title">Bravo !</h2>
+              <p class="score-message">Félicitations, vous avez trouvé toutes les paires en {{ gameMoves }} coups !</p>
+              <div class="result-actions">
+                <button class="btn-outline-purple" (click)="stopActivity()">📚 Choisir une autre activité</button>
+              </div>
+            </ng-container>
           </div>
         </div>
 
@@ -239,38 +438,55 @@ import { ActivityModel } from '../../../models/education/activity.model';
       margin: 0 auto;
       padding: 20px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #faf8ff;
+      min-height: 100vh;
     }
 
-    /* ═══ Top Bar ═══ */
-    .top-bar {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 16px;
+    /* ═══ Hero Banner ═══ */
+    .edu-hero {
+      position: relative;
+      background: linear-gradient(135deg, #800080, #5c0057, #3d0040);
+      border-radius: 24px;
+      padding: 48px 40px 36px;
+      margin-bottom: 40px;
+      overflow: hidden;
+      color: white;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(128,0,128,0.35);
     }
+    .edu-hero-glow {
+      position: absolute; top: -60px; right: -60px;
+      width: 260px; height: 260px; border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      pointer-events: none;
+    }
+    .edu-hero-content { position: relative; z-index: 1; }
+    .edu-hero-icon { font-size: 56px; margin-bottom: 12px; }
+    .edu-hero-title { font-size: 34px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.5px; }
+    .edu-hero-sub { font-size: 16px; opacity: 0.8; margin: 0 0 28px; }
 
-   .btn-create {
-  background: #2d3748;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 15px;
-  transition: background 0.2s, transform 0.2s;
-}
-
-.btn-create:hover {
-  background: #1a202c;
-  transform: translateY(-2px);
-}
+    .prog-chips {
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .prog-chip {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50px;
+      padding: 8px 20px;
+      display: flex; align-items: center; gap: 10px;
+      backdrop-filter: blur(4px);
+    }
+    .chip-label { font-size: 12px; opacity: 0.8; font-weight: 600; }
+    .chip-value { font-size: 14px; font-weight: 800; background: rgba(255,255,255,0.25); border-radius: 20px; padding: 2px 10px; }
+    .score-chip .chip-value { background: rgba(255,215,0,0.3); color: #ffe57a; }
 
     /* ═══ Loading & Error ═══ */
     .loading { text-align: center; padding: 60px 20px; }
 
     .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3b82f6;
+      border: 4px solid #f3e8ff;
+      border-top: 4px solid #800080;
       border-radius: 50%;
       width: 50px; height: 50px;
       animation: spin 1s linear infinite;
@@ -288,13 +504,13 @@ import { ActivityModel } from '../../../models/education/activity.model';
     }
 
     .btn-retry {
-      background: #ef4444; color: white; border: none;
+      background: #800080; color: white; border: none;
       padding: 10px 24px; border-radius: 8px; cursor: pointer;
       font-weight: 600; margin-top: 16px;
     }
 
     /* ═══ Menu de sélection ═══ */
-    .selection-menu { text-align: center; padding: 40px 20px; }
+    .selection-menu { text-align: center; padding: 0 20px 40px; }
 
     .main-title {
       font-size: 32px; font-weight: 700;
@@ -306,36 +522,52 @@ import { ActivityModel } from '../../../models/education/activity.model';
     .type-buttons {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-      max-width: 600px;
+      gap: 20px;
+      max-width: 640px;
       margin: 0 auto;
     }
 
     .type-btn {
-      background: white; border: 3px solid transparent;
-      border-radius: 16px; padding: 32px 24px; cursor: pointer;
-      transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: relative; overflow: hidden;
+      background: white; border: 2px solid #f0e0f0;
+      border-radius: 20px; padding: 32px 20px 24px; cursor: pointer;
+      transition: all 0.3s; box-shadow: 0 4px 16px rgba(128,0,128,0.08);
+      text-align: center;
     }
-    .type-btn:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-    .type-btn.quiz:hover     { border-color: #10b981; }
-    .type-btn.game:hover     { border-color: #3b82f6; }
-    .type-btn.content:hover  { border-color: #f59e0b; }
-    .type-btn.exercice:hover { border-color: #ef4444; }
+    .type-btn-glow {
+      position: absolute; top: -40px; right: -40px;
+      width: 120px; height: 120px; border-radius: 50%;
+      background: rgba(128,0,128,0.06);
+      transition: all 0.4s;
+      pointer-events: none;
+    }
+    .type-btn:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(128,0,128,0.2);
+      border-color: #800080;
+    }
+    .type-btn:hover .type-btn-glow { width: 200px; height: 200px; top: -60px; right: -60px; background: rgba(128,0,128,0.1); }
+    .type-btn:hover .type-arrow { opacity: 1; transform: translateX(4px); }
 
-    .type-btn .icon { font-size: 48px; margin-bottom: 12px; }
-    .type-btn .type-name { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #1e293b; }
-    .type-btn .type-desc { font-size: 14px; color: #64748b; }
+    .type-btn .icon { font-size: 48px; margin-bottom: 14px; }
+    .type-btn .type-name { font-size: 22px; font-weight: 800; margin-bottom: 6px; color: #3d0040; }
+    .type-btn .type-desc { font-size: 13px; color: #94658a; }
+    .type-btn .type-arrow {
+      font-size: 20px; color: #800080; margin-top: 12px;
+      opacity: 0; transition: all 0.3s; display: block;
+    }
 
     /* ═══ Liste des activités ═══ */
     .header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
 
     .btn-back {
-      background: #f1f5f9; border: none; padding: 10px 16px;
-      border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;
+      background: #f3e8ff; border: none; padding: 10px 18px;
+      border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 700;
+      color: #800080; transition: all 0.2s;
     }
-    .btn-back:hover { background: #e2e8f0; }
+    .btn-back:hover { background: #e9d5ff; transform: translateX(-2px); }
 
-    .list-title { font-size: 28px; font-weight: 700; color: #1e293b; }
+    .list-title { font-size: 26px; font-weight: 800; color: #3d0040; }
 
     .activities-grid {
       display: grid;
@@ -344,11 +576,12 @@ import { ActivityModel } from '../../../models/education/activity.model';
     }
 
     .activity-card {
-      background: white; border-radius: 12px; padding: 20px;
+      background: white; border-radius: 14px; padding: 20px;
       cursor: pointer; transition: all 0.3s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(128,0,128,0.08);
+      border: 2px solid transparent;
     }
-    .activity-card:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+    .activity-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(128,0,128,0.18); border-color: #e9d5ff; }
 
     .activity-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 
@@ -369,20 +602,60 @@ import { ActivityModel } from '../../../models/education/activity.model';
     .duration { font-size: 13px; color: #64748b; }
 
     .btn-play {
-      background: #2563eb; color: white; border: none;
-      padding: 8px 16px; border-radius: 6px; cursor: pointer;
-      font-weight: 600; font-size: 14px;
+      background: linear-gradient(135deg, #800080, #5c0057); color: white; border: none;
+      padding: 8px 18px; border-radius: 8px; cursor: pointer;
+      font-weight: 700; font-size: 14px; transition: all 0.2s;
+      box-shadow: 0 3px 10px rgba(128,0,128,0.3);
     }
+    .btn-play:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(128,0,128,0.4); }
 
     /* ═══ Player header ═══ */
     .player-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
     .player-header h2 { font-size: 24px; font-weight: 700; color: #1e293b; }
 
-    /* ═══ Quiz Player ═══ */
-    .quiz-progress {
-      text-align: center; font-size: 16px; font-weight: 600;
-      margin-bottom: 20px; color: #64748b;
+    /* ═══ Quiz Player Layout ═══ */
+    .quiz-status-bar {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      background: linear-gradient(135deg, #faf8ff, #f3e8ff);
+      border: 1px solid #e9d5ff;
+      padding: 12px 20px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(128,0,128,0.08);
     }
+    .quiz-progress { display: flex; align-items: center; gap: 8px; font-size: 16px; color: #800080; font-weight: 700; }
+
+    /* ═══ Timer & Info Badges ═══ */
+    .timer-badge, .moves-badge {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 10px;
+      padding: 10px 24px;
+      border-radius: 10px;
+      background: white;
+      color: #3d0040;
+      font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+      font-size: 22px;
+      font-weight: 800;
+      border: 2px solid #e9d5ff;
+      box-shadow: 0 2px 4px rgba(128,0,128,0.08);
+      min-width: 120px;
+    }
+    .timer-badge.danger {
+      background: #fee2e2;
+      color: #ef4444;
+      border-color: #fecaca;
+      animation: pulse-red-alert 0.8s infinite;
+    }
+    @keyframes pulse-red-alert {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { transform: scale(1); }
+    }
+    .timer-icon { font-size: 20px; }
 
     .question-card {
       background: white; border-radius: 12px; padding: 32px;
@@ -398,27 +671,41 @@ import { ActivityModel } from '../../../models/education/activity.model';
       padding: 16px 20px; border-radius: 10px; cursor: pointer;
       font-size: 16px; text-align: left; transition: all 0.2s;
     }
-    .option-btn:hover:not(:disabled) { background: #e2e8f0; border-color: #cbd5e1; }
+    .option-btn:hover:not(:disabled) { background: #f3e8ff; border-color: #c084c8; }
     .option-btn.correct { background: #d1fae5; border-color: #10b981; color: #065f46; }
     .option-btn.wrong   { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
 
     .explanation {
-      background: #eff6ff; border-left: 4px solid #3b82f6;
+      background: #faf5ff; border-left: 4px solid #800080;
       padding: 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;
     }
 
     .btn-next {
-      background: #2563eb; color: white; border: none;
-      padding: 12px 24px; border-radius: 8px; cursor: pointer;
-      font-weight: 600; font-size: 16px; width: 100%;
+      background: linear-gradient(135deg, #800080, #5c0057); color: white; border: none;
+      padding: 12px 24px; border-radius: 10px; cursor: pointer;
+      font-weight: 700; font-size: 16px; width: 100%;
+      box-shadow: 0 4px 14px rgba(128,0,128,0.3);
+      transition: all 0.2s;
     }
+    .btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(128,0,128,0.4); }
 
-    .quiz-result {
+    /* ═══ Result Cards ═══ */
+    .quiz-result, .game-result, .exercice-result {
       text-align: center; background: white;
-      border-radius: 12px; padding: 48px;
+      border-radius: 20px; padding: 48px;
+      box-shadow: 0 8px 32px rgba(128,0,128,0.12);
+      border: 1px solid #f0e0f0;
+      margin-top: 24px;
     }
-    .score { font-size: 64px; font-weight: 700; color: #10b981; margin: 20px 0; }
-    .score-message { font-size: 20px; color: #64748b; margin-bottom: 32px; }
+    .result-icon { font-size: 72px; margin-bottom: 12px; }
+    .result-title { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+    .fail-title   { color: #800080; }
+    .success-title { color: #059669; }
+    .score { font-size: 64px; font-weight: 800; margin: 16px 0; }
+    .score-success { color: #800080; }
+    .score-fail    { color: #ef4444; }
+    .score-message { font-size: 18px; color: #64748b; margin-bottom: 28px; }
+    .result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
 
     /* ═══ Memory Game ═══ */
     .game-info {
@@ -433,17 +720,17 @@ import { ActivityModel } from '../../../models/education/activity.model';
     }
 
     .memory-card {
-      aspect-ratio: 1; background: #3b82f6;
+      aspect-ratio: 1; background: linear-gradient(135deg, #800080, #5c0057);
       border-radius: 12px; cursor: pointer;
       position: relative; transition: transform 0.3s;
     }
-    .memory-card:hover { transform: scale(1.05); }
+    .memory-card:hover { transform: scale(1.06); }
 
     .memory-card.flipped,
     .memory-card.matched {
-      background: white; border: 3px solid #3b82f6;
+      background: white; border: 3px solid #800080;
     }
-    .memory-card.matched { background: #d1fae5; border-color: #10b981; }
+    .memory-card.matched { background: #f0fdf4; border-color: #10b981; }
 
     .card-front,
     .card-back {
@@ -504,33 +791,52 @@ import { ActivityModel } from '../../../models/education/activity.model';
     }
 
     .etape-number {
-      background: #3b82f6; color: white;
+      background: linear-gradient(135deg, #800080, #5c0057); color: white;
       width: 48px; height: 48px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-weight: 700; margin: 0 auto 16px;
     }
 
-    .etape-consigne { font-size: 24px; margin-bottom: 32px; color: #1e293b; }
-    .countdown { font-size: 72px; font-weight: 700; color: #3b82f6; margin-bottom: 24px; }
+    .etape-consigne { font-size: 24px; margin-bottom: 32px; color: #3d0040; }
+    .countdown { font-size: 72px; font-weight: 800; color: #800080; margin-bottom: 24px; }
 
     .progress-bar {
-      background: #e2e8f0; height: 12px;
+      background: #f0e0f0; height: 12px;
       border-radius: 6px; overflow: hidden;
     }
-    .progress { background: #3b82f6; height: 100%; transition: width 0.3s; }
+    .progress { background: linear-gradient(90deg, #800080, #c084c8); height: 100%; transition: width 0.3s; }
 
-    /* ═══ Boutons communs ═══ */
+    /* ═══ Boutons communs Purple ═══ */
     .btn-primary {
-      background: #2563eb; color: white; border: none;
-      padding: 12px 32px; border-radius: 8px; cursor: pointer;
-      font-weight: 600; font-size: 16px; margin: 8px;
+      background: linear-gradient(135deg, #800080, #5c0057); color: white; border: none;
+      padding: 12px 32px; border-radius: 10px; cursor: pointer;
+      font-weight: 700; font-size: 16px; margin: 8px;
+      box-shadow: 0 4px 14px rgba(128,0,128,0.3); transition: all 0.2s;
     }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(128,0,128,0.4); }
 
     .btn-secondary {
-      background: #f1f5f9; color: #1e293b; border: none;
-      padding: 12px 32px; border-radius: 8px; cursor: pointer;
-      font-weight: 600; font-size: 16px; margin: 8px;
+      background: #f3e8ff; color: #5c0057; border: none;
+      padding: 12px 32px; border-radius: 10px; cursor: pointer;
+      font-weight: 700; font-size: 16px; margin: 8px; transition: all 0.2s;
     }
+    .btn-secondary:hover { background: #e9d5ff; }
+
+    .btn-purple {
+      background: linear-gradient(135deg, #800080, #5c0057); color: white; border: none;
+      padding: 13px 32px; border-radius: 12px; cursor: pointer;
+      font-weight: 700; font-size: 15px;
+      box-shadow: 0 4px 14px rgba(128,0,128,0.35); transition: all 0.25s;
+    }
+    .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(128,0,128,0.45); }
+
+    .btn-outline-purple {
+      background: white; color: #800080;
+      border: 2px solid #800080;
+      padding: 12px 28px; border-radius: 12px; cursor: pointer;
+      font-weight: 700; font-size: 15px; transition: all 0.25s;
+    }
+    .btn-outline-purple:hover { background: #faf5ff; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(128,0,128,0.15); }
 
     .empty-state { grid-column: 1 / -1; text-align: center; padding: 48px; color: #64748b; }
 
@@ -538,6 +844,101 @@ import { ActivityModel } from '../../../models/education/activity.model';
     .exercice-result {
       text-align: center; background: white;
       border-radius: 12px; padding: 48px; margin-top: 24px;
+    }
+
+    /* ═══ Stage Sections ═══ */
+    .stages-container {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .stage-section {
+      border: 2px solid #f0e0f0;
+      border-radius: 18px;
+      padding: 24px;
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .stage-section.stage-accessible {
+      border-color: #800080;
+      box-shadow: 0 6px 24px rgba(128,0,128,0.18);
+      background: linear-gradient(to bottom right, #faf5ff, #ffffff);
+    }
+
+    .stage-section.stage-completed {
+      border-color: #10b981;
+      background: linear-gradient(to bottom right, #f0fdf4, #ffffff);
+      opacity: 0.85;
+    }
+
+    .stage-section.stage-locked {
+      border-color: #e2e8f0;
+      background: #f8fafc;
+      opacity: 0.55;
+    }
+
+    .stage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .stage-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stage-icon { font-size: 28px; }
+
+    .stage-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #3d0040;
+      margin: 0;
+    }
+
+    .stage-badge {
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-leger  { background: #f3e8ff; color: #800080; }
+    .badge-modere { background: #ede9fe; color: #5b21b6; }
+    .badge-severe { background: #fce7f3; color: #9d174d; }
+    .badge-done   { background: #d1fae5; color: #065f46; }
+
+    .stage-lock {
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      background: #f1f5f9;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    .card-locked {
+      opacity: 0.55;
+      cursor: not-allowed !important;
+      pointer-events: none;
+    }
+
+    .btn-locked {
+      background: #c4a0c4 !important;
+      cursor: not-allowed;
+    }
+
+    .empty-state, .empty-stage {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 28px;
+      color: #c084c8;
+      font-size: 14px;
     }
   `]
 })
@@ -550,6 +951,16 @@ export class EducationComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
 
+  patientScoreQuiz: number = 0;
+  patientStadeQuiz: string = 'LEGER';
+  patientScoreGame: number = 0;
+  patientStadeGame: string = 'LEGER';
+
+  // Timer state
+  timerRemaining: number = 0;
+  activeInterval: any = null;
+  startTime: number = 0;
+
   // Quiz state
   quizQuestions: any[] = [];
   currentQuestionIndex = 0;
@@ -558,12 +969,13 @@ export class EducationComponent implements OnInit {
   selectedAnswer: number | null = null;
   quizScore = 0;
   quizFinished = false;
+  isTimeout: boolean = false;
 
   // Game state
   memoryCards: any[] = [];
-  gameTimer = 60;
   gameMoves = 0;
   gameFinished = false;
+  gameSuccess: boolean = true;
   gameElapsed = 0;
   flippedCards: number[] = [];
 
@@ -617,11 +1029,32 @@ export class EducationComponent implements OnInit {
   constructor(
     private activityService: ActivityService,
     private sanitizer: DomSanitizer,
-    private router: Router
-  ) {}
+    private router: Router,
+    public authService: AuthService,
+    private progressionService: PatientProgressionService
+  ) { }
 
   ngOnInit(): void {
     this.loadActivities();
+    this.loadPatientProgression();
+  }
+
+  loadPatientProgression(): void {
+    const user = this.authService.getCurrentUser();
+    if (user && user.id && this.authService.getRole() === 'PATIENT') {
+      this.progressionService.getScoreAndStade(user.id).subscribe({
+        next: (data) => {
+          this.patientScoreQuiz = data.scoreQuiz;
+          this.patientStadeQuiz = data.stadeQuiz;
+          this.patientScoreGame = data.scoreGame;
+          this.patientStadeGame = data.stadeGame;
+          if (this.selectedType) {
+            this.selectType(this.selectedType);
+          }
+        },
+        error: (err) => console.error('Erreur chargement progression:', err)
+      });
+    }
   }
 
   // ─── Navigation vers la page de création ───────────────────────────────────
@@ -648,7 +1081,103 @@ export class EducationComponent implements OnInit {
 
   selectType(type: 'QUIZ' | 'GAME' | 'CONTENT' | 'EXERCICE'): void {
     this.selectedType = type;
+    // Show all activities of the selected type (stage filtering is handled in the template for patients)
     this.filteredActivities = this.activities.filter(a => a.type === type);
+  }
+
+  /** Returns the patient's current stage for the selected type */
+  getPatientStade(): string {
+    if (this.selectedType === 'QUIZ') return this.patientStadeQuiz;
+    if (this.selectedType === 'GAME') return this.patientStadeGame;
+    return 'LEGER';
+  }
+
+  /** Returns all activities from the full list for a given stage */
+  getActivitiesForStage(stade: string): ActivityModel[] {
+    return this.activities.filter(a => a.type === this.selectedType && a.stade === stade);
+  }
+
+  private readonly STAGE_ORDER = ['LEGER', 'MODERE', 'SEVERE'];
+
+  /** True if the patient has already passed this stage (it's behind their current stage) */
+  isStageCompleted(stade: string): boolean {
+    const currentIndex = this.STAGE_ORDER.indexOf(this.getPatientStade());
+    const stadeIndex = this.STAGE_ORDER.indexOf(stade);
+    return stadeIndex < currentIndex;
+  }
+
+  /** True if the stage is ahead of the patient's current stage (not yet unlocked) */
+  isStageLockedFuture(stade: string): boolean {
+    const currentIndex = this.STAGE_ORDER.indexOf(this.getPatientStade());
+    const stadeIndex = this.STAGE_ORDER.indexOf(stade);
+    return stadeIndex > currentIndex;
+  }
+
+  /** Click handler that respects stage access */
+  onActivityClick(activity: ActivityModel, stade: string): void {
+    if (this.isStageLockedFuture(stade) || this.isStageCompleted(stade)) return;
+    this.playActivity(activity);
+  }
+
+  submitProgression(bonnesReponses: number, mauvaisesReponses: number): void {
+    if (this.activeInterval) {
+      clearInterval(this.activeInterval);
+      this.activeInterval = null;
+    }
+
+    const elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+
+    const user = this.authService.getCurrentUser();
+    if (user && user.id && this.playingActivity && this.playingActivity.id) {
+      const payload = {
+        userId: user.id,
+        activityId: this.playingActivity.id,
+        bonnesReponses: bonnesReponses,
+        mauvaisesReponses: mauvaisesReponses,
+        dureeSecondes: elapsedSeconds
+      };
+
+      this.progressionService.submitSession(payload).subscribe({
+        next: (res) => {
+          console.log('Session enregistrée ! Nouveau stade:', res.currentStade);
+          this.loadPatientProgression(); // Recharge le nouveau stade
+        },
+        error: (err) => console.error('Erreur de soumission:', err)
+      });
+    }
+  }
+
+  startActivityTimer(seconds: number): void {
+    if (this.activeInterval) clearInterval(this.activeInterval);
+
+    this.timerRemaining = seconds;
+    this.startTime = Date.now();
+
+    this.activeInterval = setInterval(() => {
+      this.timerRemaining--;
+      if (this.timerRemaining <= 0) {
+        this.onTimeout();
+      }
+    }, 1000);
+  }
+
+  onTimeout(): void {
+    if (this.activeInterval) {
+      clearInterval(this.activeInterval);
+      this.activeInterval = null;
+    }
+    this.isTimeout = true;
+
+    if (this.playingActivity?.type === 'QUIZ') {
+      this.quizFinished = true;
+      const total = this.quizQuestions.length;
+      this.submitProgression(0, total);
+    } else if (this.playingActivity?.type === 'GAME') {
+      this.gameFinished = true;
+      this.gameSuccess = false;
+      const totalPaires = this.memoryCards.length / 2;
+      this.submitProgression(0, totalPaires + 1);
+    }
   }
 
   backToMenu(): void {
@@ -669,9 +1198,9 @@ export class EducationComponent implements OnInit {
       }
 
       switch (activity.type) {
-        case 'QUIZ':     this.initQuiz(data);     break;
-        case 'GAME':     this.initGame(data);     break;
-        case 'CONTENT':  this.initContent(data);  break;
+        case 'QUIZ': this.initQuiz(data); break;
+        case 'GAME': this.initGame(data); break;
+        case 'CONTENT': this.initContent(data); break;
         case 'EXERCICE': this.initExercice(data); break;
       }
     } catch (e) {
@@ -681,22 +1210,62 @@ export class EducationComponent implements OnInit {
     }
   }
 
+  getFormattedTime(): string {
+    const minutes = Math.floor(this.timerRemaining / 60);
+    const seconds = this.timerRemaining % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
   stopActivity(): void {
     this.playingActivity = null;
     this.selectedType = null;
     this.resetAllStates();
   }
 
+  /** Revient à la liste du type actuel (QUIZ ou GAME) avec le nouveau stade débloqué */
+  goToNextStade(): void {
+    const currentType = this.selectedType; // garde le type (QUIZ ou GAME)
+    this.playingActivity = null;
+    this.resetAllStates();
+    // Recharge la progression depuis le backend (le stade a changé après la session)
+    const user = this.authService.getCurrentUser();
+    if (user && user.id && this.authService.getRole() === 'PATIENT') {
+      this.progressionService.getScoreAndStade(user.id).subscribe({
+        next: (data) => {
+          this.patientScoreQuiz = data.scoreQuiz;
+          this.patientStadeQuiz = data.stadeQuiz;
+          this.patientScoreGame = data.scoreGame;
+          this.patientStadeGame = data.stadeGame;
+          // Remet le type sélectionné pour afficher la liste avec le nouveau stade
+          if (currentType) {
+            this.selectType(currentType);
+          }
+        },
+        error: () => {
+          if (currentType) this.selectType(currentType);
+        }
+      });
+    } else {
+      if (currentType) this.selectType(currentType);
+    }
+  }
+
   resetAllStates(): void {
+    if (this.activeInterval) {
+      clearInterval(this.activeInterval);
+      this.activeInterval = null;
+    }
     this.quizQuestions = [];
     this.currentQuestionIndex = 0;
     this.answered = false;
     this.quizScore = 0;
     this.quizFinished = false;
+    this.isTimeout = false;
 
     this.memoryCards = [];
-    this.gameFinished = false;
     this.gameMoves = 0;
+    this.gameFinished = false;
+    this.gameSuccess = true;
 
     if (this.exerciceInterval) clearInterval(this.exerciceInterval);
     this.exerciceFinished = false;
@@ -714,7 +1283,17 @@ export class EducationComponent implements OnInit {
     this.currentQuestionIndex = 0;
     this.quizScore = 0;
     this.quizFinished = false;
+    this.isTimeout = false;
     this.loadQuestion();
+
+    // Use activity.estimatedMinutes as the ONLY source of truth for duration
+    // This resolves all discrepancies between the list view and the player
+    let durationSeconds = 120; // Default fallback
+    if (this.playingActivity && this.playingActivity.estimatedMinutes) {
+      durationSeconds = this.playingActivity.estimatedMinutes * 60;
+    }
+    
+    this.startActivityTimer(durationSeconds);
   }
 
   loadQuestion(): void {
@@ -736,6 +1315,8 @@ export class EducationComponent implements OnInit {
     this.currentQuestionIndex++;
     if (this.currentQuestionIndex >= this.quizQuestions.length) {
       this.quizFinished = true;
+      const mauvaisesReponses = this.quizQuestions.length - this.quizScore;
+      this.submitProgression(this.quizScore, mauvaisesReponses);
     } else {
       this.loadQuestion();
     }
@@ -748,9 +1329,25 @@ export class EducationComponent implements OnInit {
   getScoreMessage(): string {
     const p = (this.quizScore / this.quizQuestions.length) * 100;
     if (p === 100) return 'Parfait ! 🎉';
-    if (p >= 75)   return 'Très bien ! 👏';
-    if (p >= 50)   return 'Bon travail ! 👍';
+    if (p >= 75) return 'Très bien ! 👏';
+    if (p >= 50) return 'Bon travail ! 👍';
     return 'Continuez à vous entraîner ! 💪';
+  }
+
+  /** True if the quiz is finished and the score is below 50% */
+  isQuizFailed(): boolean {
+    if (!this.quizFinished || this.quizQuestions.length === 0) return false;
+    return (this.quizScore / this.quizQuestions.length) < 0.5;
+  }
+
+  /** True if the activity being played is at the last stage (SEVERE) — no next stage to go to */
+  isLastStade(): boolean {
+    // Use the stade of the activity being played, not the patient's current stade
+    // (patientStade can be updated async after session submission)
+    if (this.playingActivity) {
+      return this.playingActivity.stade === 'SEVERE';
+    }
+    return this.getPatientStade() === 'SEVERE';
   }
 
   restartQuiz(): void {
@@ -765,8 +1362,15 @@ export class EducationComponent implements OnInit {
   initGame(data: any): void {
     this.gameFinished = false;
     this.gameMoves = 0;
-    this.gameTimer = data.timer || 60;
     this.flippedCards = [];
+
+    // Use activity.estimatedMinutes as the ONLY source of truth for duration
+    let durationSeconds = 60; // Default fallback
+    if (this.playingActivity && this.playingActivity.estimatedMinutes) {
+      durationSeconds = this.playingActivity.estimatedMinutes * 60;
+    }
+
+    this.startActivityTimer(durationSeconds);
 
     let paires = data.paires || [];
 
@@ -808,7 +1412,22 @@ export class EducationComponent implements OnInit {
     if (card1.id === card2.id) {
       card1.matched = true;
       card2.matched = true;
-      if (this.memoryCards.every(c => c.matched)) this.gameFinished = true;
+      if (this.memoryCards.every(c => c.matched)) {
+        this.gameFinished = true;
+
+        const totalPaires = this.memoryCards.length / 2;
+
+        // --- FAIR LOGIC ---
+        // Success if Moves <= 3 * totalPaires
+        this.gameSuccess = (this.gameMoves <= totalPaires * 3);
+
+        let finalMauvaises = 0;
+        if (!this.gameSuccess) {
+          finalMauvaises = totalPaires + 1; // Mark as failure in backend
+        }
+
+        this.submitProgression(totalPaires, finalMauvaises);
+      }
     } else {
       card1.flipped = false;
       card2.flipped = false;

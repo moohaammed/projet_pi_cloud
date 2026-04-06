@@ -11,10 +11,7 @@
         <!-- Titre -->
         <div class="col-md-6">
           <label class="form-label">Titre *</label>
-          <input
-            class="form-control"
-            [class.is-invalid]="errors['title']"
-            [(ngModel)]="newActivity.title"
+          <input class="form-control" [class.is-invalid]="errors['title']" [(ngModel)]="newActivity.title"
             placeholder="ex : Quiz Saisons, Jeu des animaux">
           <div class="invalid-feedback" *ngIf="errors['title']">
             {{ errors['title'] }}
@@ -45,12 +42,8 @@
         <!-- Description -->
         <div class="col-md-8">
           <label class="form-label">Description *</label>
-          <textarea
-            class="form-control"
-            [class.is-invalid]="errors['description']"
-            [(ngModel)]="newActivity.description"
-            placeholder="Décrivez l'activité…"
-            rows="3">
+          <textarea class="form-control" [class.is-invalid]="errors['description']"
+            [(ngModel)]="newActivity.description" placeholder="Décrivez l'activité…" rows="3">
           </textarea>
           <div class="invalid-feedback" *ngIf="errors['description']">
             {{ errors['description'] }}
@@ -63,10 +56,7 @@
         <!-- Durée -->
         <div class="col-md-2">
           <label class="form-label">Durée (min)</label>
-          <input
-            class="form-control"
-            type="number"
-            [class.is-invalid]="errors['estimatedMinutes']"
+          <input class="form-control" type="number" [class.is-invalid]="errors['estimatedMinutes']"
             [(ngModel)]="newActivity.estimatedMinutes">
           <div class="invalid-feedback" *ngIf="errors['estimatedMinutes']">
             {{ errors['estimatedMinutes'] }}
@@ -76,11 +66,7 @@
         <!-- Active -->
         <div class="col-md-2 d-flex align-items-end pb-2">
           <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              [(ngModel)]="newActivity.active"
-              id="active">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="newActivity.active" id="active">
             <label class="form-check-label" for="active">Active</label>
           </div>
         </div>
@@ -93,10 +79,9 @@
           </label>
 
           <div class="border rounded p-3 bg-light">
-            <app-activity-data-form
-              [activityType]="newActivity.type"
-              [initialData]="newActivity.data || '{}'"
-              (dataChange)="onDataChange($event)">
+            <app-activity-data-form [activityType]="newActivity.type" [initialData]="newActivity.data || '{}'"
+              [globalTimerMinutes]="newActivity.estimatedMinutes" (dataChange)="onDataChange($event)"
+              (timerChange)="onTimerChange($event)">
             </app-activity-data-form>
           </div>
         </div>
@@ -111,10 +96,7 @@
         <button class="btn btn-primary" (click)="save()">
           {{ isEditing ? 'Sauvegarder' : 'Créer' }}
         </button>
-        <button
-          class="btn btn-secondary"
-          (click)="reset()"
-          *ngIf="isEditing">
+        <button class="btn btn-secondary" (click)="reset()" *ngIf="isEditing">
           Annuler
         </button>
       </div>
@@ -123,29 +105,19 @@
 
   <!-- Filtres -->
   <div class="d-flex gap-2 mb-3">
-    <button
-      class="btn btn-sm btn-outline-secondary"
-      (click)="loadByType('')">
+    <button class="btn btn-sm btn-outline-secondary" (click)="loadByType('')">
       Tous
     </button>
-    <button
-      class="btn btn-sm btn-outline-success"
-      (click)="loadByType('QUIZ')">
+    <button class="btn btn-sm btn-outline-success" (click)="loadByType('QUIZ')">
       QUIZ
     </button>
-    <button
-      class="btn btn-sm btn-outline-primary"
-      (click)="loadByType('GAME')">
+    <button class="btn btn-sm btn-outline-primary" (click)="loadByType('GAME')">
       GAME
     </button>
-    <button
-      class="btn btn-sm btn-outline-warning"
-      (click)="loadByType('CONTENT')">
+    <button class="btn btn-sm btn-outline-warning" (click)="loadByType('CONTENT')">
       CONTENT
     </button>
-    <button
-      class="btn btn-sm btn-outline-danger"
-      (click)="loadByType('EXERCICE')">
+    <button class="btn btn-sm btn-outline-danger" (click)="loadByType('EXERCICE')">
       EXERCICE
     </button>
   </div>
@@ -175,22 +147,15 @@
             <td>{{ a.stade }}</td>
             <td>{{ a.estimatedMinutes }}</td>
             <td>
-              <span
-                class="badge"
-                [class.bg-success]="a.active"
-                [class.bg-secondary]="!a.active">
+              <span class="badge" [class.bg-success]="a.active" [class.bg-secondary]="!a.active">
                 {{ a.active ? 'Oui' : 'Non' }}
               </span>
             </td>
             <td>
-              <button
-                class="btn btn-sm btn-warning me-1"
-                (click)="edit(a)">
+              <button class="btn btn-sm btn-warning me-1" (click)="edit(a)">
                 Modifier
               </button>
-              <button
-                class="btn btn-sm btn-danger"
-                (click)="delete(a.id!)">
+              <button class="btn btn-sm btn-danger" (click)="delete(a.id!)">
                 Supprimer
               </button>
             </td>

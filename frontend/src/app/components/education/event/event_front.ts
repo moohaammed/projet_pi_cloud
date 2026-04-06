@@ -32,10 +32,10 @@ import { CalendarEvent } from '../../../models/education/event.model';
       --radius-lg:  22px;
       display: block;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: var(--bg);
+      background: transparent;
+      padding-top: 20px; /* Ajouté pour séparer du header commun si besoin */
     }
 
-    /* ── PAGE ── */
     .events-page {
       min-height: 100vh;
       background: linear-gradient(145deg, #dde4f4 0%, #eef1f8 40%, #e8ecf7 100%);
@@ -64,8 +64,49 @@ import { CalendarEvent } from '../../../models/education/event.model';
       bottom: 0; left: -80px;
     }
 
-    /* ── HEADER ── */
+    
+
+ 
     .page-header {
+      position: relative;
+      background: linear-gradient(135deg, rgba(128,0,128,0.06) 0%, rgba(128,0,128,0.01) 100%) !important;
+      border: 1px solid rgba(128,0,128,0.08);
+      border-radius: var(--radius);
+      padding: 45px 30px !important;
+      margin-bottom: 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -50px; left: -50px;
+      width: 150px; height: 150px;
+      background: var(--primary-light);
+      filter: blur(40px);
+      border-radius: 50%;
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    .page-header::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; right: 10%;
+      width: 120px; height: 120px;
+      background: var(--primary-mid);
+      filter: blur(40px);
+      border-radius: 50%;
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    .title-container {
       position: relative;
       z-index: 1;
       display: flex;
@@ -105,7 +146,6 @@ import { CalendarEvent } from '../../../models/education/event.model';
       display: flex;
       align-items: center;
       gap: 12px;
-      flex-wrap: wrap;
     }
 
     /* ── SEARCH ── */
@@ -115,6 +155,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
       width: 15px; height: 15px;
       color: var(--muted); pointer-events: none;
     }
+
     .search-input {
       background: var(--glass-bg);
       backdrop-filter: blur(12px);
@@ -163,8 +204,6 @@ import { CalendarEvent } from '../../../models/education/event.model';
 
     /* ── STATS BAR ── */
     .stats-bar {
-      position: relative;
-      z-index: 1;
       display: inline-flex;
       align-items: center;
       gap: 0;
@@ -177,12 +216,14 @@ import { CalendarEvent } from '../../../models/education/event.model';
       margin-bottom: 36px;
       box-shadow: 0 4px 24px rgba(26,39,68,.10), inset 0 1px 0 rgba(255,255,255,.9);
     }
+
     .stat {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 20px;
+      padding: 5px 20px;
     }
+
     .stat-icon {
       width: 32px; height: 32px;
       border-radius: 10px;
@@ -207,16 +248,12 @@ import { CalendarEvent } from '../../../models/education/event.model';
     .stat-label { font-size: .72rem; color: var(--muted); font-weight: 500; margin-top: 1px; }
     .stat-divider { width: 1px; height: 28px; background: rgba(26,39,68,.1); }
 
-    /* ── GRID ── */
     .events-grid {
-      position: relative;
-      z-index: 1;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 22px;
     }
 
-    /* ── CARD ── */
     .event-card {
       background: var(--glass-bg);
       backdrop-filter: blur(16px);
@@ -233,14 +270,13 @@ import { CalendarEvent } from '../../../models/education/event.model';
       transform: translateY(-6px) scale(1.01);
       box-shadow: 0 16px 48px rgba(26,39,68,.16), inset 0 1px 0 rgba(255,255,255,.9);
     }
-    .event-card:hover .card-actions-overlay { opacity: 1; }
     .event-card:hover .card-image { transform: scale(1.06); }
 
     .card-image-wrapper {
       position: relative;
       height: 195px;
       overflow: hidden;
-      background: #d8dff0;
+      background: var(--primary-mid);
     }
     .card-image {
       width: 100%; height: 100%;
@@ -263,7 +299,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
       z-index: 1;
       padding: 4px 12px;
       border-radius: 50px;
-      font-size: .67rem;
+      font-size: .65rem;
       font-weight: 700;
       letter-spacing: .1em;
       text-transform: uppercase;
@@ -313,12 +349,14 @@ import { CalendarEvent } from '../../../models/education/event.model';
       gap: 11px;
       flex: 1;
     }
+
     .card-date-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
     .date-pill, .time-pill {
       display: flex;
       align-items: center;
       gap: 5px;
-      font-size: .7rem;
+      font-size: .68rem;
       font-weight: 600;
       color: var(--sub);
       background: rgba(26,39,68,.06);
@@ -338,6 +376,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
       word-break: break-word;
       letter-spacing: -.01em;
     }
+
     .card-description {
       font-size: .81rem;
       color: var(--muted);
@@ -363,6 +402,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
       gap: 8px;
       flex-wrap: wrap;
     }
+
     .card-location {
       display: flex;
       align-items: center;
@@ -389,19 +429,16 @@ import { CalendarEvent } from '../../../models/education/event.model';
     }
     .card-remind svg { width: 11px; height: 11px; }
 
-    /* ── PAGINATION ── */
     .pagination {
-      position: relative;
-      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
       margin-top: 44px;
     }
+
     .page-btn {
-      min-width: 40px;
-      height: 40px;
+      min-width: 40px; height: 40px;
       padding: 0 12px;
       border-radius: 12px;
       border: 1.5px solid var(--glass-border);
@@ -434,9 +471,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
     }
     .page-btn:disabled { opacity: .3; cursor: not-allowed; }
 
-    /* ── EMPTY STATE ── */
     .empty-state {
-      position: relative; z-index: 1;
       display: flex; flex-direction: column;
       align-items: center;
       padding: 90px 20px;
@@ -590,7 +625,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
     }
     @media (max-width: 640px) {
       .events-page { padding: 24px 18px 56px; }
-      .page-title { font-size: 2rem; }
+      .page-title  { font-size: 2rem; }
       .events-grid { grid-template-columns: 1fr; }
       .header-right { width: 100%; }
       .search-input { width: 100%; }
@@ -602,16 +637,16 @@ import { CalendarEvent } from '../../../models/education/event.model';
 export class EventFrontComponent implements OnInit {
 
   events: CalendarEvent[] = [];
-  selected: CalendarEvent | null = null;
-  isEditing = false;
-  selectedFile: File | null = null;
-  showForm = false;
   searchQuery = '';
 
   currentPage = 1;
   pageSize = 6;
 
-  errors: { [key: string]: string } = {};
+  selectedFile: File | null = null;
+  errors: any = {};
+  showForm: boolean = false;
+  isEditing: boolean = false;
+  selected: CalendarEvent | null = null;
 
   newEvent: CalendarEvent = {
     title: '',
@@ -658,53 +693,6 @@ export class EventFrontComponent implements OnInit {
 
   onSearchChange() { this.currentPage = 1; }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files?.[0] ?? null;
-    this.errors['image'] = '';
-    if (file) {
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        this.errors['image'] = 'Format invalide. Seuls JPG, PNG et WEBP sont acceptés.';
-        this.selectedFile = null; return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        this.errors['image'] = "L'image ne doit pas dépasser 5 MB.";
-        this.selectedFile = null; return;
-      }
-      this.selectedFile = file;
-    }
-  }
-
-  validate(): boolean {
-    this.errors = {};
-    const title = this.newEvent.title?.trim();
-    if (!title) this.errors['title'] = 'Le titre est obligatoire.';
-    else if (title.length < 3) this.errors['title'] = 'Le titre doit contenir au moins 3 caractères.';
-    else if (title.length > 100) this.errors['title'] = 'Le titre ne doit pas dépasser 100 caractères.';
-
-    const dateValue = this.newEvent.startDateTime?.trim();
-    if (!dateValue) {
-      this.errors['startDateTime'] = "La date et l'heure sont obligatoires.";
-    } else {
-      const sel = new Date(dateValue);
-      const now = new Date();
-      const oneYear = new Date(); oneYear.setFullYear(now.getFullYear() + 1);
-      if (isNaN(sel.getTime())) this.errors['startDateTime'] = 'La date est invalide.';
-      else if (sel < now) this.errors['startDateTime'] = 'La date ne peut pas être dans le passé.';
-      else if (sel > oneYear) this.errors['startDateTime'] = 'La date ne peut pas dépasser un an dans le futur.';
-    }
-
-    const location = this.newEvent.location?.trim();
-    if (!location) this.errors['location'] = 'Le lieu est obligatoire.';
-    else if (location.length < 2) this.errors['location'] = 'Le lieu doit contenir au moins 2 caractères.';
-
-    const desc = this.newEvent.description?.trim();
-    if (desc && desc.length > 500) this.errors['description'] = 'La description ne doit pas dépasser 500 caractères.';
-
-    if (!this.selectedFile && !this.isEditing) this.errors['image'] = "L'image est obligatoire.";
-    return Object.keys(this.errors).length === 0;
-  }
-
   getImageUrl(imageUrl?: string): string {
     if (!imageUrl) return 'assets/images/event-placeholder.jpg';
     return 'http://localhost:8080' + imageUrl;
@@ -730,6 +718,20 @@ export class EventFrontComponent implements OnInit {
   }
 
   onImgError(event: any) { event.target.src = 'assets/images/event-placeholder.jpg'; }
+
+  validate(): boolean {
+    this.errors = {};
+    if (!this.newEvent.title?.trim()) this.errors.title = 'Le titre est requis';
+    if (!this.newEvent.startDateTime) this.errors.date = 'La date est requise';
+    if (!this.newEvent.location?.trim()) this.errors.location = 'Le lieu est requis';
+    return Object.keys(this.errors).length === 0;
+  }
+
+  onFileSelected(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0];
+    }
+  }
 
   save() {
     if (!this.validate()) return;

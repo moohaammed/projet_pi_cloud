@@ -31,7 +31,7 @@ export class ActivityListComponent implements OnInit {
     active: true
   };
 
-  constructor(private activityService: ActivityService, private cdr: ChangeDetectorRef) {}
+  constructor(private activityService: ActivityService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.load();
@@ -124,6 +124,13 @@ export class ActivityListComponent implements OnInit {
     this.activityService.delete(id).subscribe(() => {
       this.load();
     });
+  }
+
+  onTimerChange(minutes: number): void {
+    if (this.newActivity.estimatedMinutes !== minutes) {
+      this.newActivity = { ...this.newActivity, estimatedMinutes: minutes };
+      this.cdr.markForCheck();
+    }
   }
 
   reset(): void {
