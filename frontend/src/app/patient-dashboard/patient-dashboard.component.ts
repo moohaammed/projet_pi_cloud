@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
 import { PatientProgressionService } from '../services/patient-progression.service';
@@ -44,7 +44,8 @@ export class PatientDashboardComponent implements OnInit {
     private patientService: PatientService,
     private analyseService: AnalyseService,
     private progressionService: PatientProgressionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -57,6 +58,10 @@ export class PatientDashboardComponent implements OnInit {
       this.loadPatientProfile();
       this.loadAnalyses();
     }
+  }
+
+  goToContactDoctor() {
+    this.router.navigate(['/contact-doctor']);
   }
 
   loadProgression(userId: number) {

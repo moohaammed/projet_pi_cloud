@@ -12,6 +12,10 @@ export class AnalyseService {
 
     constructor(private http: HttpClient) { }
 
+    getAllAnalyses(): Observable<any[]> {
+        return this.http.get<any[]>(this.apiUrl);
+    }
+
     getAnalysesByPatient(patientId: number): Observable<any[]> {
         console.log(`[AnalyseService] GET ${this.apiUrl}/patient/${patientId}`);
         return this.http.get<any[]>(`${this.apiUrl}/patient/${patientId}`).pipe(

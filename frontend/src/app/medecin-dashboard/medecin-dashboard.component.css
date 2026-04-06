@@ -6,19 +6,20 @@
 
 /* ── Page Header ─────────────────────────────────── */
 .medecin-header {
-  background: linear-gradient(135deg, rgba(25, 135, 84, 0.06) 0%, rgba(255,255,255,0) 60%);
-  border-bottom: 1px solid rgba(25, 135, 84, 0.12);
+  background: linear-gradient(135deg, rgba(128, 0, 128, 0.06) 0%, rgba(255,255,255,0) 60%);
+  border-bottom: 1px solid rgba(128, 0, 128, 0.12);
 }
 
 .medecin-header__avatar {
   width: 52px;
   height: 52px;
-  background: rgba(25, 135, 84, 0.1);
+  background: rgba(128, 0, 128, 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: #800080;
 }
 
 /* ── Stat icons ──────────────────────────────────── */
@@ -39,41 +40,165 @@
   letter-spacing: 0.04em;
 }
 
-/* ── Patient avatars ─────────────────────────────── */
-.patient-avatar {
-  width: 38px;
-  height: 38px;
+/* ── Patient List Cards ──────────────────────────── */
+.patient-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+}
+
+.patient-card {
+  background: #fff;
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-card.active-card {
+  background: rgba(128, 0, 128, 0.04);
+  border: 1px solid rgba(128, 0, 128, 0.5);
+  box-shadow: 0 4px 12px rgba(128, 0, 128, 0.08);
+}
+
+.patient-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #198754, #20c997);
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+.status-dot.active { background-color: #10b981; }
+.status-dot.inactive { background-color: #9ca3af; }
+
+.patient-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #c084fc);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
   letter-spacing: 0.02em;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(168, 85, 247, 0.3);
 }
 
-.patient-avatar--active {
-  background: linear-gradient(135deg, #800080, #b000b0);
+.active-card .patient-avatar {
+  background: linear-gradient(135deg, #7e22ce, #a855f7);
+  box-shadow: 0 3px 8px rgba(126, 34, 206, 0.4);
 }
 
 .patient-avatar--lg {
-  width: 56px;
-  height: 56px;
-  font-size: 1rem;
-  background: linear-gradient(135deg, #800080, #b000b0);
+  width: 72px;
+  height: 72px;
+  font-size: 1.3rem;
 }
 
-/* ── List group overrides ─────────────────────────── */
-.list-group-item.active {
-  background-color: rgba(128, 0, 128, 0.06) !important;
-  border-left: 3px solid #800080 !important;
-  color: inherit !important;
+/* ── Info Chips ────────────────────────────── */
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: #f3f4f6;
+  color: #4b5563;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
-.list-group-item:hover {
-  background-color: #f8f9fa;
+.info-chip i { margin-right: 6px; }
+
+/* ── Progress Bar Risque IA ────────────────── */
+.progress-container {
+  width: 100%;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.progress-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+  display: block;
+}
+
+/* ── Buttons Theme ──────────────────────────── */
+.btn-purple-outline {
+  color: #8b5cf6;
+  border: 1px solid #8b5cf6;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.btn-purple-outline:hover {
+  background: #8b5cf6;
+  color: #fff;
+}
+
+/* ── Modern Table ───────────────────────────── */
+.modern-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+.modern-table th {
+  background: #f9fafb;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.modern-table td {
+  padding: 16px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f3f4f6;
+}
+.modern-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Textarea Modern ────────────────────────── */
+.modern-textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #fcfcfc;
+}
+
+.modern-textarea:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  background-color: #ffffff;
 }

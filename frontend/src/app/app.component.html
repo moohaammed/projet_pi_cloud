@@ -89,6 +89,28 @@
               </a>
             </li>
 
+            <!-- Gestion Patient -->
+            <li class="nav-item w-100">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/admin/patients" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Gestion Patient' : ''">
+                <i class="fa-solid fa-user-injured fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Gestion Patient</span>
+              </a>
+            </li>
+
+            <!-- Gestion Médecin -->
+            <li class="nav-item w-100">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/admin/medecins" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Gestion Médecin' : ''">
+                <i class="fa-solid fa-user-doctor fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Gestion Médecin</span>
+              </a>
+            </li>
+
           </ul>
         </div>
 
