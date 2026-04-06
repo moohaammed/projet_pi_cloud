@@ -74,6 +74,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Pour l'envoi d'emails (Réinitialisation mot de passe) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -29,6 +29,7 @@ public class User {
     private Role role;
 
     private String telephone;
+    private String image;
     private boolean actif = true;
 
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -51,6 +52,8 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public String getTelephone() { return telephone; }
     public void setTelephone(String telephone) { this.telephone = telephone; }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 
     @Override
     public boolean equals(Object o) {
