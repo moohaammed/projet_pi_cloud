@@ -4,11 +4,13 @@ import { RouterModule } from '@angular/router';
 import {
   AdminCollaborationService,
   ChatGroupAdmin,
+  ClinicalPulse,
   DirectMessageMetadata,
   ModerationQueueItem,
   SafetyAlertLogRow,
   SystemHealthKpis
 } from '../../../services/collaboration/admin-collaboration.service';
+import { PublicationDto } from '../../../services/collaboration/publication.service';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 import { FormsModule } from '@angular/forms';
@@ -27,6 +29,8 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   private readonly adminApi = inject(AdminCollaborationService);
 
   @ViewChild('complianceCanvas') complianceCanvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('sentimentCanvas') sentimentCanvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('activityCanvas') activityCanvas?: ElementRef<HTMLCanvasElement>;
 
   kpis: SystemHealthKpis = { unresolvedSafetyAlerts: 0, pendingModeration: 0 };
   safetyLogs: SafetyAlertLogRow[] = [];
@@ -34,13 +38,28 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   dmMeta: DirectMessageMetadata[] = [];
   groups: ChatGroupAdmin[] = [];
   
+  // Analytics State
+  engagementMix: any = null;
+  sentimentDist: any = null;
+  aiImpact: any = null;
+  clinicalPulse: ClinicalPulse | null = null;
+  
   // Community Manager State
-  currentView: 'health' | 'groups' | 'moderation' | 'announcements' = 'health';
-  dropdownOpen = false;
+  currentView: 'health' | 'groups' | 'moderation' | 'announcements' | 'ai' = 'health';
+  // Announcement State
   announcementText = '';
+  announcementTargetGroupId: number | null = null;
+  announcementScheduledAt: string = '';
+  scheduledAnnouncements: PublicationDto[] = [];
+  dropdownOpen = false;
   searchUserId?: number;
   searchResultGroups: ChatGroupAdmin[] = [];
   editingGroup: ChatGroupAdmin | null = null;
+
+  // Retrospective State
+  activeRetrospective: any = null;
+  retroLoading = false;
+  retroGroupId?: number;
 
   error = '';
   loading = true;
@@ -93,6 +112,11 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
       next: (r) => (this.dmMeta = r),
       error: (e) => this.fail(e)
     });
+
+    this.adminApi.getEngagementMix().subscribe({ next: (r) => (this.engagementMix = r) });
+    this.adminApi.getSentimentDistribution().subscribe({ next: (r) => (this.sentimentDist = r) });
+    this.adminApi.getAiImpact().subscribe({ next: (r) => (this.aiImpact = r) });
+    this.adminApi.getPulse().subscribe({ next: (r) => (this.clinicalPulse = r) });
   }
 
   private fail(e: unknown): void {
@@ -154,12 +178,32 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   // --- Community Manager Actions ---
 
 
-  switchView(v: 'health' | 'groups' | 'moderation' | 'announcements'): void {
+  switchView(v: 'health' | 'groups' | 'moderation' | 'announcements' | 'ai'): void {
     this.currentView = v;
     this.error = '';
     if (v === 'groups') this.loadGroups();
     if (v === 'moderation') this.reload(); 
+    if (v === 'ai') {
+      this.loadGroups();
+      this.activeRetrospective = null;
+    }
     if (v === 'health') setTimeout(() => this.loadChart(), 0);
+    if (v === 'announcements') this.loadScheduledAnnouncements();
+  }
+
+  loadScheduledAnnouncements(): void {
+    this.adminApi.getScheduledAnnouncements().subscribe({
+      next: (res) => this.scheduledAnnouncements = res,
+      error: (e) => this.fail(e)
+    });
+  }
+
+  cancelAnnouncement(id: number): void {
+    if (!confirm('Cancel this scheduled announcement?')) return;
+    this.adminApi.deletePost(id).subscribe({
+      next: () => this.loadScheduledAnnouncements(),
+      error: (e) => this.fail(e)
+    });
   }
 
   viewLabel(v: string): string {
@@ -168,6 +212,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
       case 'groups': return 'Community Groups';
       case 'moderation': return 'Moderation Queue';
       case 'announcements': return 'Announcement Form';
+      case 'ai': return 'Clinical Intelligence';
       case 'search': return 'Member Lookup';
       default: return v;
     }
@@ -181,6 +226,14 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
       case 'MIXED': return 'bg-soft-warning text-warning';
       default: return 'bg-soft-secondary text-secondary';
     }
+  }
+
+  getVelocityColor(v: string | undefined): string {
+    if (!v) return 'text-muted';
+    const low = v.toLowerCase();
+    if (low.includes('improving')) return 'text-success';
+    if (low.includes('degrading')) return 'text-danger';
+    return 'text-primary';
   }
 
   loadGroups(): void {
@@ -220,10 +273,22 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
 
   sendAnnouncement(): void {
     if (!this.announcementText.trim()) return;
-    this.adminApi.postAnnouncement(this.announcementText).subscribe({
+    
+    // Convert local datetime to ISO if exists
+    let scheduleIso: string | undefined = undefined;
+    if (this.announcementScheduledAt) {
+      scheduleIso = new Date(this.announcementScheduledAt).toISOString();
+    }
+
+    const gid = this.announcementTargetGroupId || undefined;
+
+    this.adminApi.postAnnouncement(this.announcementText, gid, scheduleIso).subscribe({
       next: () => {
-        alert('Global announcement broadcasted successfully.');
+        alert(scheduleIso ? 'Announcement scheduled successfully.' : 'Global announcement broadcasted successfully.');
         this.announcementText = '';
+        this.announcementTargetGroupId = null;
+        this.announcementScheduledAt = '';
+        this.loadScheduledAnnouncements();
       },
       error: (e) => this.fail(e)
     });
@@ -253,6 +318,25 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     this.adminApi.banUser(userId).subscribe({
       next: () => this.reload(),
       error: (e) => this.fail(e)
+    });
+  }
+
+  fetchRetrospective(hours: number): void {
+    if (!this.retroGroupId) {
+      alert('Please select a clinical group to analyze first.');
+      return;
+    }
+    this.retroLoading = true;
+    this.activeRetrospective = null;
+    this.adminApi.getRetrospective(this.retroGroupId, hours).subscribe({
+      next: (res) => {
+        this.activeRetrospective = { ...res, window: hours };
+        this.retroLoading = false;
+      },
+      error: (e) => {
+        this.fail(e);
+        this.retroLoading = false;
+      }
     });
   }
 
@@ -301,8 +385,55 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
           }
         };
         this.chart = new Chart(canvas, cfg);
+        this.loadAdditionalCharts();
       },
       error: (e) => this.fail(e)
     });
+  }
+
+  private loadAdditionalCharts(): void {
+    if (this.sentimentDist) {
+      const canvas = this.sentimentCanvas?.nativeElement;
+      if (canvas) {
+        new Chart(canvas, {
+          type: 'doughnut',
+          data: {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+              data: [this.sentimentDist.positive, this.sentimentDist.neutral, this.sentimentDist.negative],
+              backgroundColor: ['#10b981', '#94a3b8', '#ef4444'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+          }
+        });
+      }
+    }
+
+    if (this.engagementMix) {
+      const canvas = this.activityCanvas?.nativeElement;
+      if (canvas) {
+        new Chart(canvas, {
+          type: 'pie',
+          data: {
+            labels: ['Posts', 'Comments', 'Direct Msg', 'Shared'],
+            datasets: [{
+              data: [this.engagementMix.publications, this.engagementMix.comments, this.engagementMix.messages, this.engagementMix.shares],
+              backgroundColor: ['#6366f1', '#a855f7', '#ec4899', '#f59e0b'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+          }
+        });
+      }
+    }
   }
 }

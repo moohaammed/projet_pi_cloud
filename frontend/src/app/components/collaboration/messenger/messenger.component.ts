@@ -46,7 +46,11 @@ export class MessengerComponent implements OnInit, OnDestroy {
   medReminderLoading = signal(false);
   /** Hide Yes/No after the user answered (session only; reload may show again). */
   medicationReminderAnsweredIds = signal<Set<number>>(new Set());
-  medReminderAckLoading = signal(false);
+  medReminderAckLoading = signal<boolean>(false);
+
+  // AI Handover State
+  currentSummary = signal<string | null>(null);
+  isGeneratingSummary = signal<boolean>(false);
 
   openMedia(url: string | undefined) {
     if (url) window.open(url, '_blank');
@@ -387,6 +391,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
     this.chatGroupService.activeGroup.set(grp);
     this.messageService.fetchMessagesByGroup(grp.id!);
     this.webSocketService.subscribeToGroup(grp.id!);
+    this.currentSummary.set(null);
   }
 
   openDmChat(userId: number) {
@@ -397,6 +402,17 @@ export class MessengerComponent implements OnInit, OnDestroy {
     this.messageService.fetchDirectMessages(this.currentUserId(), userId).subscribe(msgs => {
       this.dmMessages.set(msgs);
     });
+    this.currentSummary.set(null);
+  }
+
+  fetchHandoverSummary() {
+    this.showInfoSidebar.set(true);
+    if (!this.showHandoverPanel()) {
+      this.toggleHandoverPanel();
+    } else {
+      const grp = this.activeGroup();
+      if (grp) this.careRelayService.loadHandover(grp.id!);
+    }
   }
 
   openBotChat() {
@@ -550,11 +566,14 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   sendDmMessage() {
-    if (!this.dmContent.trim() || !this.activeDmUserId()) return;
+    const trimmed = this.dmContent.trim();
+    if (!trimmed || !this.activeDmUserId()) return;
+    
     this.messageService.createMessage({
-      content: this.dmContent,
+      content: trimmed,
       senderId: this.currentUserId(),
-      receiverId: this.activeDmUserId()!
+      receiverId: this.activeDmUserId()!,
+      type: 'TEXT'
     }).subscribe(() => {
       this.dmContent = '';
       this.refreshData();

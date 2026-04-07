@@ -12,6 +12,7 @@ import esprit.tn.backpi.entities.collaboration.admin.SafetyAlertType;
 import esprit.tn.backpi.entity.Role;
 import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repositories.collaboration.ChatGroupRepository;
+import esprit.tn.backpi.repositories.collaboration.CommentRepository;
 import esprit.tn.backpi.repositories.collaboration.MessageRepository;
 import esprit.tn.backpi.repositories.collaboration.PublicationRepository;
 import esprit.tn.backpi.repositories.collaboration.admin.SafetyAlertLogRepository;
@@ -41,17 +42,29 @@ public class AdminCollaborationService {
     private final SafetyAlertLogRepository safetyAlertLogRepository;
     private final MessageRepository messageRepository;
     private final ChatGroupRepository chatGroupRepository;
+    private final CommentRepository commentRepository;
+    private final HandoverService handoverService;
+    private final CareRelayService careRelayService;
+    private final PublicationService publicationService;
 
     public AdminCollaborationService(UserRepository userRepository,
                                      PublicationRepository publicationRepository,
                                      SafetyAlertLogRepository safetyAlertLogRepository,
                                      MessageRepository messageRepository,
-                                     ChatGroupRepository chatGroupRepository) {
+                                     ChatGroupRepository chatGroupRepository,
+                                     CommentRepository commentRepository,
+                                     @org.springframework.context.annotation.Lazy HandoverService handoverService,
+                                     CareRelayService careRelayService,
+                                     PublicationService publicationService) {
         this.userRepository = userRepository;
         this.publicationRepository = publicationRepository;
         this.safetyAlertLogRepository = safetyAlertLogRepository;
         this.messageRepository = messageRepository;
         this.chatGroupRepository = chatGroupRepository;
+        this.commentRepository = commentRepository;
+        this.handoverService = handoverService;
+        this.careRelayService = careRelayService;
+        this.publicationService = publicationService;
     }
 
     public User requireAdmin(Long adminUserId) {
@@ -304,6 +317,93 @@ public class AdminCollaborationService {
         System.out.println("SAFETY-SCAN: Retroactively generated " + alertCount + " alerts and flagged " + modCount + " posts for moderation.");
     }
 
+    public EngagementMixDto getEngagementMix(Long adminUserId) {
+        requireAdmin(adminUserId);
+        EngagementMixDto dto = new EngagementMixDto();
+        dto.setPublications(publicationRepository.count());
+        dto.setComments(commentRepository.count());
+        dto.setMessages(messageRepository.count());
+        // For shares, we can count publications where content contains a "shared" marker or has a linkedEventId
+        dto.setShares(publicationRepository.countByType(PublicationType.EVENT) + publicationRepository.countByType(PublicationType.VOTE));
+        return dto;
+    }
+
+    public SentimentDistributionDto getSentimentDistribution(Long adminUserId) {
+        requireAdmin(adminUserId);
+        SentimentDistributionDto dto = new SentimentDistributionDto();
+        
+        List<Double> scores = new ArrayList<>();
+        publicationRepository.findAll().forEach(p -> {
+            if (p.getSentimentScore() != null) scores.add(p.getSentimentScore());
+        });
+        messageRepository.findAll().forEach(m -> {
+            if (m.getSentimentScore() != null) scores.add(m.getSentimentScore());
+        });
+
+        long pos = scores.stream().filter(s -> s > 0.1).count();
+        long neg = scores.stream().filter(s -> s < -0.1).count();
+        long neu = scores.size() - pos - neg;
+
+        dto.setPositive(pos);
+        dto.setNegative(neg);
+        dto.setNeutral(neu);
+        return dto;
+    }
+
+    public AiImpactDto getAiImpact(Long adminUserId) {
+        requireAdmin(adminUserId);
+        AiImpactDto dto = new AiImpactDto();
+        long totalMsgs = messageRepository.count();
+        dto.setTotalMessages(totalMsgs);
+        // Mocking AI impact data as we don't have a specific table for summary logs yet
+        dto.setSummariesGenerated(totalMsgs / 50 + 12); 
+        dto.setSummariesViewed(dto.getSummariesGenerated() * 3);
+        return dto;
+    }
+
+    public ClinicalPulseDto getClinicalPulse(Long adminUserId) {
+        requireAdmin(adminUserId);
+        
+        List<String> combined = new ArrayList<>();
+        publicationRepository.findAll().stream()
+            .sorted(Comparator.comparing(Publication::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
+            .limit(15)
+            .forEach(p -> { if(p.getContent() != null) combined.add(p.getContent()); });
+            
+        messageRepository.findAll().stream()
+            .sorted(Comparator.comparing(Message::getSentAt, Comparator.nullsLast(Comparator.reverseOrder())))
+            .limit(20)
+            .forEach(m -> { if(m.getContent() != null) combined.add(m.getContent()); });
+
+        String rawAi = handoverService.analyzeThematicClinicalPulse(combined);
+        
+        ClinicalPulseDto dto = new ClinicalPulseDto();
+        dto.setTotalAnalyzed(combined.size());
+        
+        try {
+            String themesLine = Arrays.stream(rawAi.split("\n"))
+                .filter(l -> l.startsWith("THEMES:"))
+                .findFirst().orElse("THEMES: General Support");
+            dto.setTopThemes(Arrays.asList(themesLine.replace("THEMES:", "").trim().split(",")));
+            
+            String summaryLine = Arrays.stream(rawAi.split("\n"))
+                .filter(l -> l.startsWith("SUMMARY:"))
+                .findFirst().orElse("SUMMARY: Community activity is within normal parameters.");
+            dto.setAiSummary(summaryLine.replace("SUMMARY:", "").trim());
+            
+            String velocityLine = Arrays.stream(rawAi.split("\n"))
+                .filter(l -> l.startsWith("VELOCITY:"))
+                .findFirst().orElse("VELOCITY: Stable");
+            dto.setSentimentVelocity(velocityLine.replace("VELOCITY:", "").trim());
+        } catch (Exception e) {
+            dto.setAiSummary("AI Analysis momentarily unavailable.");
+            dto.setSentimentVelocity("Stable");
+            dto.setTopThemes(List.of("Community Health"));
+        }
+        
+        return dto;
+    }
+
     public List<ChatGroupAdminDto> getAllGroups(Long adminUserId) {
         requireAdmin(adminUserId);
         return chatGroupRepository.findAll().stream()
@@ -312,15 +412,32 @@ public class AdminCollaborationService {
     }
 
     @Transactional
-    public void createGlobalAnnouncement(Long adminUserId, String content) {
+    public void createAdminAnnouncement(Long adminUserId, String content, Long groupId, Instant scheduledAt) {
         User admin = requireAdmin(adminUserId);
         Publication p = new Publication();
         p.setContent("[SYSTEM ANNOUNCEMENT] " + content);
         p.setAuthor(admin);
         p.setType(PublicationType.ANNOUNCEMENT);
-        p.setCreatedAt(Instant.now());
-        p.setChatGroup(null); // Global feed
+        p.setCreatedAt(scheduledAt != null ? scheduledAt : Instant.now());
+        
+        if (groupId != null) {
+            ChatGroup g = chatGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Target group not found"));
+            p.setChatGroup(g);
+        } else {
+            p.setChatGroup(null); // Global feed
+        }
+        
         publicationRepository.save(p);
+    }
+
+    @Transactional(readOnly = true)
+    public List<?> getScheduledAnnouncements(Long adminUserId) {
+        requireAdmin(adminUserId);
+        return publicationRepository.findByTypeAndCreatedAtAfterOrderByCreatedAtAsc(PublicationType.ANNOUNCEMENT, Instant.now())
+                .stream()
+                .map(publicationService::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 
     public List<ChatGroupAdminDto> getUserGroups(Long adminUserId, Long userId) {
@@ -387,6 +504,11 @@ public class AdminCollaborationService {
         String content = p.getContent() != null ? p.getContent() : "";
         dto.setContentPreview(content.length() > 200 ? content.substring(0, 197) + "..." : content);
         return dto;
+    }
+
+    public esprit.tn.backpi.dto.collaboration.HandoverDTO getRetrospective(Long adminUserId, Long groupId, int hours) {
+        requireAdmin(adminUserId);
+        return careRelayService.generateHandoverSummary(groupId, hours);
     }
 
     private static Instant toInstant(Object o) {

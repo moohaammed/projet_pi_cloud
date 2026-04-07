@@ -12,9 +12,14 @@
           <p class="text-muted mb-0 small">Gérez votre profil et suivez vos analyses IRM</p>
         </div>
       </div>
-      <a routerLink="/patients" class="btn btn-outline-secondary btn-sm">
-        <i class="fa-solid fa-arrow-left me-1"></i>Retour
-      </a>
+      <div class="d-flex gap-2">
+        <a routerLink="/patients" class="btn btn-outline-secondary btn-sm">
+          <i class="fa-solid fa-arrow-left me-1"></i>Retour
+        </a>
+        <button class="btn btn-primary btn-sm" (click)="goToContactDoctor()">
+          <i class="fa-solid fa-stethoscope me-2"></i>Contact Doctor
+        </button>
+      </div>
     </div>
   </div>
 
@@ -143,7 +148,7 @@
                 <!-- Âge -->
                 <div class="col-md-4">
                   <div class="form-group mt-3">
-                    <input type="number" class="form-control" [(ngModel)]="patient.age" name="age" required placeholder="65">
+                    <input type="number" class="form-control" [(ngModel)]="patient.age" name="age" required min="0" max="150" placeholder="65">
                     <label class="required">Âge</label>
                   </div>
                 </div>
@@ -219,6 +224,14 @@
                 <input type="file" class="form-control" accept="image/*"
                        (change)="onFileSelected($event, 'image_irm')">
                 <small class="text-muted">Formats acceptés : JPG, PNG, DCM</small>
+                
+                <div *ngIf="newAnalyse.interpretation" class="alert alert-success mt-3 mb-0 border-0 p-3 shadow-sm d-flex align-items-center gap-3">
+                  <i class="fa-solid fa-robot fa-2x"></i>
+                  <div>
+                    <h6 class="fw-bold mb-1">Résultat IA Immédiat : {{ newAnalyse.interpretation }}</h6>
+                    <span class="small opacity-75">Confiance : {{ newAnalyse.pourcentage_risque }}%</span>
+                  </div>
+                </div>
               </div>
 
               <!-- Score jeu cognitif -->
@@ -336,7 +349,37 @@
               <strong>Score Cognitif :</strong>
               <span class="badge bg-secondary ms-1">{{ selectedAnalyse.scoreJeu || 'N/A' }}</span>
             </p>
-            <div *ngIf="selectedAnalyse.observationMedicale" class="alert alert-warning border-0 mt-3">
+            <div *ngIf="selectedAnalyse.geminiData" class="mt-4">
+              <h6 class="fw-bold text-success border-bottom pb-2">
+                <i class="fa-solid fa-robot me-2"></i>Analyse détaillée du Rapport (IA Gemini)
+              </h6>
+              <div class="mb-3">
+                <strong>Résumé :</strong>
+                <p class="text-muted small mb-0">{{ selectedAnalyse.geminiData.summary }}</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <strong>Points Clés :</strong>
+                  <ul class="text-muted small mb-0 ps-3">
+                    <li *ngFor="let f of selectedAnalyse.geminiData.key_findings">{{ f }}</li>
+                  </ul>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <strong>Recommandations :</strong>
+                  <ul class="text-muted small mb-0 ps-3">
+                    <li *ngFor="let r of selectedAnalyse.geminiData.recommendations">{{ r }}</li>
+                  </ul>
+                </div>
+              </div>
+              <div *ngIf="selectedAnalyse.geminiData.alerts && selectedAnalyse.geminiData.alerts.length > 0" class="alert alert-danger px-3 py-2 small border-0">
+                <strong class="d-block mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i>Alertes :</strong>
+                <ul class="mb-0 ps-3">
+                  <li *ngFor="let al of selectedAnalyse.geminiData.alerts">{{ al }}</li>
+                </ul>
+              </div>
+            </div>
+
+            <div *ngIf="!selectedAnalyse.geminiData && selectedAnalyse.observationMedicale" class="alert alert-warning border-0 mt-3">
               <h6 class="fw-bold">
                 <i class="fa-solid fa-user-doctor me-1"></i>Observation du Médecin
               </h6>
@@ -354,6 +397,39 @@
             </div>
           </div>
         </div>
+
+        <!-- Chat Area -->
+        <hr class="mt-4">
+        <h6 class="fw-bold text-primary mb-3">
+          <i class="fa-solid fa-comment-medical me-2"></i>Assistant Médical IA (Questions sur ce rapport)
+        </h6>
+        <div class="card bg-light border-0">
+          <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+            <div *ngIf="chatHistory.length === 0" class="text-muted text-center py-3 small">
+              <i class="fa-solid fa-hand-sparkles fa-2x mb-2 text-info"></i><br>
+              Posez une question sur votre rapport médical pour recevoir une réponse rapide et claire.
+            </div>
+            
+            <div *ngFor="let msg of chatHistory" class="mb-3 d-flex" [ngClass]="{'justify-content-end': msg.sender === 'user'}">
+              <div class="rounded p-2 px-3 small shadow-sm" [ngClass]="msg.sender === 'user' ? 'bg-primary text-white' : 'bg-white text-dark border'">
+                <strong class="d-block mb-1 opacity-75" style="font-size: 0.75rem;">{{ msg.sender === 'user' ? 'Vous' : 'IA' }}</strong>
+                <span>{{ msg.text }}</span>
+              </div>
+            </div>
+            
+            <div *ngIf="isChatting" class="text-muted small mt-2 d-flex align-items-center">
+              <div class="spinner-grow spinner-grow-sm text-success me-2" role="status"></div>
+              L'IA analyse le document...
+            </div>
+          </div>
+          <div class="card-footer bg-white border-0 mt-1 pb-3 px-3">
+            <div class="input-group">
+              <input type="text" class="form-control form-control-sm border-secondary shadow-none" [(ngModel)]="chatQuestion" (keyup.enter)="sendMessage()" placeholder="Ex: Que signifie hypertrophie ?" [disabled]="isChatting">
+              <button class="btn btn-primary btn-sm px-3" (click)="sendMessage()" [disabled]="isChatting || !chatQuestion.trim()">Envoyer</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 

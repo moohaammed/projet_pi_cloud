@@ -74,9 +74,14 @@
                 <i class="fa-solid fa-graduation-cap fs-5" [class.me-3]="!isSidebarCollapsed"
                   [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Éducation</span>
+
+                routerLink="/admin/donations" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Donations' : ''">
+                <i class="fa-solid fa-hand-holding-heart fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Donations</span>
               </a>
             </li>
-
             <li class="nav-item w-100 mt-2">
               <span class="text-uppercase text-muted extra-small fw-bold px-2 mb-2 d-block" *ngIf="!isSidebarCollapsed"
                 style="font-size: 10px; opacity: 0.5; letter-spacing: 1px;">Data Management</span>
@@ -86,6 +91,28 @@
                 <i class="fa-solid fa-user-shield fs-5" [class.me-3]="!isSidebarCollapsed"
                   [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">User Access</span>
+              </a>
+            </li>
+
+            <!-- Gestion Patient -->
+            <li class="nav-item w-100">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/admin/patients" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Gestion Patient' : ''">
+                <i class="fa-solid fa-user-injured fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Gestion Patient</span>
+              </a>
+            </li>
+
+            <!-- Gestion Médecin -->
+            <li class="nav-item w-100">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/admin/medecins" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Gestion Médecin' : ''">
+                <i class="fa-solid fa-user-doctor fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Gestion Médecin</span>
               </a>
             </li>
 
@@ -209,7 +236,10 @@
                   </li>
                   <li class="nav-item"><a class="nav-link" routerLink="/collaboration/feed"
                       routerLinkActive="active">Community</a></li>
-                  <li class="nav-item ms-lg-3" *ngIf="auth.isLoggedIn()">
+                  <li class="nav-item"><a class="nav-link" routerLink="/donations"
+                      routerLinkActive="active">Donations</a></li>
+                  <li class="nav-item ms-lg-3 d-flex gap-2" *ngIf="auth.isLoggedIn()">
+                    <a routerLink="/my-donations" class="btn btn-outline-primary btn-sm rounded-pill px-3">Mes Dons</a>
                     <a [routerLink]="getAccountLink()" class="btn btn-primary btn-sm rounded-pill px-4">Compte</a>
                   </li>
                 </ul>
@@ -241,6 +271,7 @@
               <li><a routerLink="/rendezvous" class="text-muted text-decoration-none">Gestion Rendez-vous</a></li>
               <li><a routerLink="/education" class="text-muted text-decoration-none">Espace Education</a></li>
               <li><a routerLink="/collaboration/feed" class="text-muted text-decoration-none">Hub Collaboration</a></li>
+              <li><a routerLink="/donations" class="text-muted text-decoration-none">Soutien & Dons</a></li>
             </ul>
           </div>
         </div>

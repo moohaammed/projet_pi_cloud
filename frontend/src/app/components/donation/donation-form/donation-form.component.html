@@ -1,0 +1,191 @@
+<div class="donation-form-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="title-container">
+      <div class="header-badge">Faire un Don</div>
+      <h1 class="page-title">Soutien aux <span class="highlight">Patients</span> & Familles</h1>
+      <p class="page-subtitle">Votre générosité fait la différence dans la vie des personnes atteintes d'Alzheimer.</p>
+    </div>
+  </div>
+
+  <div class="form-layout" *ngIf="campaign">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="campaign-preview">
+        <div class="preview-image">
+          <img [src]="getImageUrl(campaign.imageUrl)" (error)="onImgError($event)" [alt]="campaign.title">
+        </div>
+        <h4 class="preview-title">{{ campaign.title }}</h4>
+        <p class="preview-desc">{{ campaign.description }}</p>
+
+        <!-- Progress -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-raised">
+              <strong>{{ campaign.currentAmount | number:'1.0-0' }} DT</strong> collectés
+            </span>
+            <span class="progress-goal">sur {{ campaign.goalAmount | number:'1.0-0' }} DT</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" [style.width.%]="getProgress()"></div>
+          </div>
+          <span class="progress-percent">{{ getProgress() | number:'1.0-0' }}% atteint</span>
+        </div>
+      </div>
+
+      <!-- My Donations Lookup -->
+      <div class="my-donations-card">
+        <h4 class="section-title">Mes <span class="highlight">Dons</span></h4>
+        <p class="section-desc">Vérifiez votre email pour consulter votre historique de dons.</p>
+        <div class="lookup-form">
+          <input type="email" class="form-input" placeholder="votre@email.com" [(ngModel)]="lookupEmail">
+          <button class="btn-lookup" (click)="lookupDonations()">Vérifier</button>
+        </div>
+        <div class="lookup-results" *ngIf="lookupResults.length > 0">
+          <div class="lookup-item" *ngFor="let d of lookupResults">
+            <span class="lookup-amount">{{ d.amount | number:'1.2-2' }} DT</span>
+            <span class="lookup-date">{{ d.createdAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <div class="main-form">
+
+      <!-- SUCCESS MESSAGE -->
+      <div class="success-banner" *ngIf="showSuccess">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <div>
+          <strong>Merci pour votre don !</strong>
+          <p>Votre contribution de {{ lastDonationAmount | number:'1.2-2' }} DT a été enregistrée avec succès.</p>
+        </div>
+      </div>
+
+      <!-- Amount Section -->
+      <div class="form-section">
+        <h4 class="section-title">Montant du <span class="highlight">Don</span></h4>
+        <div class="form-group">
+          <label class="form-label required">Montant (DT)</label>
+          <input type="number" class="form-input amount-input" placeholder="10.00"
+                 [(ngModel)]="donation.amount" min="1">
+          <div class="error-msg" *ngIf="errors['amount']">{{ errors['amount'] }}</div>
+        </div>
+        <div class="amount-presets">
+          <button class="preset-btn" *ngFor="let amt of presetAmounts"
+                  [class.selected]="donation.amount === amt"
+                  (click)="selectAmount(amt)">{{ amt }} DT</button>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="form-section">
+        <h4 class="section-title">Méthode de <span class="highlight">Paiement</span></h4>
+        <div class="payment-options">
+          <label class="payment-option" [class.selected]="donation.paymentMethod === 'ONLINE'">
+            <input type="radio" name="payment" value="ONLINE" [(ngModel)]="donation.paymentMethod">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            <span>Paiement en ligne</span>
+          </label>
+          <label class="payment-option" [class.selected]="donation.paymentMethod === 'OFFLINE'">
+            <input type="radio" name="payment" value="OFFLINE" [(ngModel)]="donation.paymentMethod">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            <span>Paiement hors ligne</span>
+          </label>
+        </div>
+        <div class="error-msg" *ngIf="errors['paymentMethod']">{{ errors['paymentMethod'] }}</div>
+      </div>
+
+      <!-- Personal Info -->
+      <div class="form-section">
+        <h4 class="section-title">Informations <span class="highlight">Personnelles</span></h4>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label required">Prénom</label>
+            <input type="text" class="form-input" [(ngModel)]="donation.donorFirstName" placeholder="Votre prénom">
+            <div class="error-msg" *ngIf="errors['donorFirstName']">{{ errors['donorFirstName'] }}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Nom</label>
+            <input type="text" class="form-input" [(ngModel)]="donation.donorLastName" placeholder="Votre nom">
+            <div class="error-msg" *ngIf="errors['donorLastName']">{{ errors['donorLastName'] }}</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label required">Email</label>
+            <input type="email" class="form-input" [(ngModel)]="donation.donorEmail" placeholder="votre@email.com">
+            <div class="error-msg" *ngIf="errors['donorEmail']">{{ errors['donorEmail'] }}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-input" [(ngModel)]="donation.donorPhone" placeholder="+216">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Message personnel (optionnel)</label>
+          <textarea class="form-input form-textarea" rows="3" [(ngModel)]="donation.message"
+                    placeholder="Un mot d'encouragement..."></textarea>
+        </div>
+
+        <div class="form-check-row">
+          <label class="custom-checkbox">
+            <input type="checkbox" [(ngModel)]="donation.anonymous">
+            <span class="checkmark"></span>
+            Don anonyme (votre nom ne sera pas affiché publiquement)
+          </label>
+        </div>
+
+        <div class="form-check-row">
+          <label class="custom-checkbox">
+            <input type="checkbox" [(ngModel)]="agreeTerms">
+            <span class="checkmark"></span>
+            J'accepte que mes données soient collectées et stockées.
+          </label>
+          <div class="error-msg" *ngIf="errors['agree']">{{ errors['agree'] }}</div>
+        </div>
+      </div>
+
+      <!-- Total & Submit -->
+      <div class="donation-summary">
+        <div class="summary-row">
+          <span class="summary-label">Total du don :</span>
+          <span class="summary-amount">{{ donation.amount || 0 | number:'1.2-2' }} DT</span>
+        </div>
+        <button class="btn-donate" (click)="submitDonation()" [disabled]="submitting">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!submitting">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          {{ submitting ? 'Traitement en cours...' : 'Confirmer le Don' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div class="empty-state" *ngIf="!campaign">
+    <div class="empty-glass">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+    <h3 class="empty-title">Chargement de la campagne...</h3>
+  </div>
+
+</div>

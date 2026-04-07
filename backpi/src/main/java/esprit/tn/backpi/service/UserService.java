@@ -76,6 +76,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    // TOGGLE LIVE
+    public User toggleLive(Long id) {
+        User user = findById(id);
+        user.setLive(!user.isLive());
+        return userRepository.save(user);
+    }
+
     // DELETE
     public void delete(Long id) {
         User user = findById(id);

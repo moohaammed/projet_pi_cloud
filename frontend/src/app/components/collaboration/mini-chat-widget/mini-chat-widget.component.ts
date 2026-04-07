@@ -8,6 +8,7 @@ import { AlzUserService } from '../../../services/alz-user.service';
 import { WebSocketService } from '../../../services/collaboration/websocket.service';
 import { MessageService, MessageDto } from '../../../services/collaboration/message.service';
 import { AuthService } from '../../../services/auth.service';
+import { CareBotService } from '../../../services/collaboration/care-bot.service';
 
 @Component({
   selector: 'app-mini-chat-widget',
@@ -24,6 +25,7 @@ export class MiniChatWidgetComponent implements OnInit {
   chatGroupService = inject(ChatGroupService);
   router = inject(Router);
   sanitizer = inject(DomSanitizer);
+  careBotApi = inject(CareBotService);
 
   currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1); 
 
@@ -37,6 +39,8 @@ export class MiniChatWidgetComponent implements OnInit {
   
   replyingTo: MessageDto | null = null;
   selectedMessageFile: File | null = null;
+  medicationReminderAnsweredIds = signal<Set<number>>(new Set());
+  medReminderAckLoading = signal<boolean>(false);
 
   // Poll State
   isPollMode = signal<boolean>(false);
@@ -153,6 +157,10 @@ export class MiniChatWidgetComponent implements OnInit {
     }
   }
 
+  get lastMessageContent(): string {
+    return this.replyingTo?.content || '';
+  }
+
   constructor() {
     // Mini-chat WebSocket effect
     effect(() => {
@@ -179,12 +187,31 @@ export class MiniChatWidgetComponent implements OnInit {
           const activeGrp = this.activeMiniChatGroupId();
           const uid = this.currentUserId();
           
+          // --- AUTO-OPEN LOGIC (Facebook Style) ---
+          if (newMsg.senderId !== uid) {
+            const isOnMessenger = this.router.url.includes('/collaboration/messenger');
+            if (!isOnMessenger) {
+              this.isMiniChatOpen.set(true);
+            }
+            
+            if (newMsg.chatGroupId) {
+              if (activeGrp !== newMsg.chatGroupId) {
+                this.openMiniChatGroup(newMsg.chatGroupId);
+              }
+            } else if (newMsg.receiverId === uid) {
+              if (activeDm !== newMsg.senderId) {
+                this.openMiniChatConversation(newMsg.senderId);
+              }
+            }
+          }
+          // ------------------------------------------
+
           let shouldAdd = false;
-          if (activeGrp && newMsg.chatGroupId === activeGrp) {
+          if (this.activeMiniChatGroupId() && newMsg.chatGroupId === this.activeMiniChatGroupId()) {
             shouldAdd = true;
-          } else if (activeDm && !newMsg.chatGroupId && 
-             ((newMsg.senderId === uid && newMsg.receiverId === activeDm) ||
-              (newMsg.senderId === activeDm && newMsg.receiverId === uid))) {
+          } else if (this.activeMiniChatUserId() && !newMsg.chatGroupId && 
+             ((newMsg.senderId === uid && newMsg.receiverId === this.activeMiniChatUserId()) ||
+              (newMsg.senderId === this.activeMiniChatUserId() && newMsg.receiverId === uid))) {
             shouldAdd = true;
           }
           
@@ -212,13 +239,30 @@ export class MiniChatWidgetComponent implements OnInit {
     this.activeMiniChatUserId.set(userId);
     this.activeMiniChatGroupId.set(null);
     this.messageService.fetchDirectMessages(this.currentUserId(), userId)
-      .subscribe(msgs => this.messageService.messages.set(msgs));
+      .subscribe(msgs => {
+        // Ensure the triggering message isn't lost if fetch happens too fast
+        const realtime = this.webSocketService.realtimeMessage() as any;
+        if (realtime && !realtime.chatGroupId && (realtime.senderId === userId || realtime.receiverId === userId)) {
+          if (!msgs.some(m => m.id === realtime.id)) {
+            msgs = [realtime, ...msgs];
+          }
+        }
+        this.messageService.messages.set(msgs);
+      });
   }
 
   openMiniChatGroup(groupId: number) {
-    this.activeMiniChatGroupId.set(groupId);
     this.activeMiniChatUserId.set(null);
-    this.messageService.fetchMessagesByGroup(groupId);
+    this.activeMiniChatGroupId.set(groupId);
+    this.messageService.fetchMessagesByGroupSync(groupId).subscribe(msgs => {
+       const realtime = this.webSocketService.realtimeMessage() as any;
+       if (realtime && realtime.chatGroupId === groupId) {
+         if (!msgs.some(m => m.id === realtime.id)) {
+           msgs = [realtime, ...msgs];
+         }
+       }
+       this.messageService.messages.set(msgs);
+    });
   }
 
   closeMiniChatConversation() {
@@ -345,6 +389,30 @@ export class MiniChatWidgetComponent implements OnInit {
         this.messageService.fetchDirectMessages(this.currentUserId(), activeUserId)
           .subscribe(msgs => this.messageService.messages.set(msgs));
       }
+    });
+  }
+
+  medicationReminderAnswered(messageId: number | undefined): boolean {
+    if (messageId == null) return true;
+    return this.medicationReminderAnsweredIds().has(messageId);
+  }
+
+  answerMedicationReminder(messageId: number, tookMedication: boolean) {
+    this.medReminderAckLoading.set(true);
+    const content = tookMedication ? 'Yes, I took it.' : 'Not yet.';
+    this.messageService.createMessage({
+      content,
+      senderId: this.currentUserId(),
+      type: 'BOT_MESSAGE',
+    }).subscribe({
+      next: () => {
+        this.medicationReminderAnsweredIds.update((s) => new Set(s).add(messageId));
+        this.careBotApi.submitMedicationResponse(this.currentUserId(), tookMedication).subscribe({
+          next: () => this.medReminderAckLoading.set(false),
+          error: () => this.medReminderAckLoading.set(false)
+        });
+      },
+      error: () => this.medReminderAckLoading.set(false)
     });
   }
 

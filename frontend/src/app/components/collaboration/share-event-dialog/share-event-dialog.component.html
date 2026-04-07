@@ -6,53 +6,79 @@
   aria-modal="true"
   aria-labelledby="sed-title"
 >
-  <div class="sed-card card border-0 shadow-lg rounded-4" (click)="$event.stopPropagation()">
-    <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-start">
-      <div>
-        <h2 id="sed-title" class="h5 fw-bold mb-1">Share to collaboration feed</h2>
-        <p class="text-muted small mb-0">Posts an event card on the feed that opens this event on the Events page.</p>
+  <div class="sed-card" (click)="$event.stopPropagation()">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <div class="sed-title-icon shadow-sm">
+          <i class="fa-solid fa-share-nodes"></i>
+        </div>
+        <div>
+          <h4 id="sed-title" class="fw-black mb-1 text-doc-heading ls-n1">Share Clinical Event</h4>
+          <p class="text-doc-secondary mb-0 opacity-75" style="font-size: 0.8125rem;">Propagate event intelligence to collaboration feeds.</p>
+        </div>
       </div>
-      <button type="button" class="btn btn-light rounded-circle p-2" (click)="close()" aria-label="Close">
+      <button type="button" class="sed-btn-close shadow-sm" (click)="close()" aria-label="Close">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-    <div class="card-body px-4">
-      <div class="rounded-3 border bg-light p-3 mb-3 small">
-        <div class="fw-bold text-dark">{{ event.title }}</div>
-        <div class="text-muted mt-1" *ngIf="event.startDateTime">{{ event.startDateTime | date : 'medium' }}</div>
-        <div class="text-muted" *ngIf="event.location">{{ event.location }}</div>
+    <div class="card-body">
+      <div class="sed-event-preview mb-4 animate-fade-in shadow-sm border-0">
+        <div class="d-flex align-items-center">
+          <div class="sed-event-icon shadow-doc border-0">
+            <i class="fa-solid fa-calendar-check text-primary"></i>
+          </div>
+          <div class="flex-grow-1" style="min-width: 0;">
+            <div class="fw-black text-doc-heading text-truncate ls-n1 fs-16 mb-1">{{ event.title }}</div>
+            <div class="d-flex flex-wrap gap-4 mt-1">
+              <div class="sed-event-meta fw-bold text-uppercase fs-10 letter-spacing-1" *ngIf="event.startDateTime">
+                <i class="fa-solid fa-clock-rotate-left me-1"></i>
+                <span>{{ event.startDateTime | date : 'MMM d, HH:mm' }}</span>
+              </div>
+              <div class="sed-event-meta fw-bold text-uppercase fs-10 letter-spacing-1" *ngIf="event.location">
+                <i class="fa-solid fa-map-pin me-1"></i>
+                <span class="text-truncate">{{ event.location }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <label class="form-label small fw-semibold">Add a note (optional)</label>
+      <label class="sed-textarea-label">
+        <i class="fa-regular fa-comment-dots"></i>
+        Add a note <span class="text-muted fw-normal">(optional)</span>
+      </label>
       <textarea
-        class="form-control rounded-3"
+        class="form-control sed-textarea w-100"
         rows="3"
         [(ngModel)]="note"
-        placeholder="Why you're sharing this, or extra details…"
+        placeholder="Why you're sharing this, or any extra details..."
         [disabled]="submitting() || success()"
       ></textarea>
 
-      <div class="alert alert-danger mt-3 mb-0 py-2 small" *ngIf="error()">{{ error() }}</div>
-      <div class="alert alert-success mt-3 mb-0 py-2 small" *ngIf="success()">
-        Published. You can
-        <a routerLink="/collaboration/feed" (click)="close()">open the feed</a>
-        to see it.
+      <div class="sed-alert sed-alert-danger mt-3" *ngIf="error()">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ error() }}</span>
+      </div>
+      <div class="sed-alert sed-alert-success mt-3" *ngIf="success()">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Published! You can <a routerLink="/collaboration/feed" (click)="close()">view the feed</a> to see it.</span>
       </div>
     </div>
 
-    <div class="card-footer bg-white border-0 px-4 pb-4 d-flex justify-content-end gap-2">
-      <button type="button" class="btn btn-light rounded-pill px-3" (click)="close()" [disabled]="submitting()">
-        {{ success() ? 'Close' : 'Cancel' }}
+    <div class="card-footer d-flex justify-content-end align-items-center gap-3">
+      <button type="button" class="sed-btn-secondary px-5" (click)="close()" [disabled]="submitting()">
+        {{ success() ? 'Dismiss' : 'Discard' }}
       </button>
       <button
         type="button"
-        class="btn btn-primary rounded-pill px-4"
+        class="sed-btn-primary px-5 shadow-doc"
         (click)="submit()"
         [disabled]="submitting() || success() || !(event.title ?? '').trim()"
       >
-        <span *ngIf="submitting()" class="spinner-border spinner-border-sm me-1" role="status"></span>
-        Post to feed
+        <span class="spinner-border spinner-border-sm me-2" *ngIf="submitting()"></span>
+        <i class="fa-solid fa-paper-plane-top" *ngIf="!submitting()"></i>
+        <span>Share to Feed</span>
       </button>
     </div>
   </div>

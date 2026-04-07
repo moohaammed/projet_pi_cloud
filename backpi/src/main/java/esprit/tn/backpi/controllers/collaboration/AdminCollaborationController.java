@@ -5,6 +5,7 @@ import esprit.tn.backpi.services.collaboration.AdminCollaborationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -84,9 +85,18 @@ public class AdminCollaborationController {
 
     @PostMapping("/announcement")
     public ResponseEntity<Void> postAnnouncement(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
-                                                 @RequestBody Map<String, String> payload) {
-        adminCollaborationService.createGlobalAnnouncement(adminUserId, payload.get("content"));
+                                                 @RequestBody Map<String, Object> payload) {
+        String content = (String) payload.get("content");
+        Long groupId = payload.get("groupId") != null ? Long.valueOf(payload.get("groupId").toString()) : null;
+        Instant scheduledAt = payload.get("scheduledAt") != null ? Instant.parse(payload.get("scheduledAt").toString()) : null;
+        
+        adminCollaborationService.createAdminAnnouncement(adminUserId, content, groupId, scheduledAt);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/announcements/scheduled")
+    public ResponseEntity<List<?>> getScheduledAnnouncements(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
+        return ResponseEntity.ok(adminCollaborationService.getScheduledAnnouncements(adminUserId));
     }
 
     @GetMapping("/users/{userId}/groups")
@@ -121,5 +131,33 @@ public class AdminCollaborationController {
     @GetMapping("/privacy/direct-messages/metadata")
     public ResponseEntity<List<DirectMessageMetadataDto>> dmMetadata(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
         return ResponseEntity.ok(adminCollaborationService.getDirectMessageMetadata(adminUserId));
+    }
+
+    @GetMapping("/analytics/engagement-mix")
+    public ResponseEntity<EngagementMixDto> getEngagementMix(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
+        return ResponseEntity.ok(adminCollaborationService.getEngagementMix(adminUserId));
+    }
+
+    @GetMapping("/analytics/sentiment-distribution")
+    public ResponseEntity<SentimentDistributionDto> getSentimentDistribution(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
+        return ResponseEntity.ok(adminCollaborationService.getSentimentDistribution(adminUserId));
+    }
+
+    @GetMapping("/analytics/ai-impact")
+    public ResponseEntity<AiImpactDto> getAiImpact(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
+        return ResponseEntity.ok(adminCollaborationService.getAiImpact(adminUserId));
+    }
+
+    @GetMapping("/analytics/clinical-pulse")
+    public ResponseEntity<ClinicalPulseDto> getPulse(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
+        return ResponseEntity.ok(adminCollaborationService.getClinicalPulse(adminUserId));
+    }
+
+    @GetMapping("/analytics/retrospective")
+    public ResponseEntity<esprit.tn.backpi.dto.collaboration.HandoverDTO> getRetrospective(
+            @RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
+            @RequestParam Long groupId,
+            @RequestParam(defaultValue = "24") int hours) {
+        return ResponseEntity.ok(adminCollaborationService.getRetrospective(adminUserId, groupId, hours));
     }
 }

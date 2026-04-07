@@ -1,0 +1,376 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< esprit.tn:backpi >--------------------------
+[INFO] Building backpi 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.0:run (default-cli) > test-compile @ backpi >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backpi ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ backpi ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backpi ---
+[INFO] skip non existing resourceDirectory D:\projet_pi_\projet_pi_cloud\backpi\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ backpi ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:3.3.0:run (default-cli) < test-compile @ backpi <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.0:run (default-cli) @ backpi ---
+[INFO] Attaching agents: []
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.0)
+
+2026-04-06T10:43:42.985+02:00  INFO 24864 --- [backpi] [           main] esprit.tn.backpi.BackpiApplication       : Starting BackpiApplication using Java 17.0.8 with PID 24864 (D:\projet_pi_\projet_pi_cloud\backpi\target\classes started by DELL in D:\projet_pi_\projet_pi_cloud\backpi)
+2026-04-06T10:43:42.996+02:00  INFO 24864 --- [backpi] [           main] esprit.tn.backpi.BackpiApplication       : No active profile set, falling back to 1 default profile: "default"
+2026-04-06T10:43:44.248+02:00  INFO 24864 --- [backpi] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-06T10:43:44.484+02:00  INFO 24864 --- [backpi] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 215 ms. Found 18 JPA repository interfaces.
+2026-04-06T10:43:45.615+02:00  INFO 24864 --- [backpi] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-06T10:43:45.636+02:00  INFO 24864 --- [backpi] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-06T10:43:45.636+02:00  INFO 24864 --- [backpi] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
+2026-04-06T10:43:45.727+02:00  INFO 24864 --- [backpi] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-06T10:43:45.730+02:00  INFO 24864 --- [backpi] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2672 ms
+2026-04-06T10:43:45.980+02:00  INFO 24864 --- [backpi] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-04-06T10:43:46.094+02:00  INFO 24864 --- [backpi] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-04-06T10:43:46.159+02:00  INFO 24864 --- [backpi] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-06T10:43:46.753+02:00  INFO 24864 --- [backpi] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-06T10:43:46.819+02:00  INFO 24864 --- [backpi] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-06T10:43:47.043+02:00  INFO 24864 --- [backpi] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@70f4abc1
+2026-04-06T10:43:47.043+02:00  INFO 24864 --- [backpi] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-06T10:43:47.107+02:00  WARN 24864 --- [backpi] [           main] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-04-06T10:43:47.109+02:00  WARN 24864 --- [backpi] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-06T10:43:49.911+02:00  INFO 24864 --- [backpi] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    alter table activities 
+       modify column data JSON
+Hibernate: 
+    alter table analyse 
+       modify column image_irm LONGTEXT
+Hibernate: 
+    alter table analyse 
+       modify column rapport_medical LONGTEXT
+2026-04-06T10:43:50.493+02:00  INFO 24864 --- [backpi] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-06T10:43:50.930+02:00  INFO 24864 --- [backpi] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-06T10:43:52.183+02:00  WARN 24864 --- [backpi] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-06T10:43:52.223+02:00  WARN 24864 --- [backpi] [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: ce94df64-cf0f-42d9-9d40-d61f5cc538c9
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-04-06T10:43:52.256+02:00  INFO 24864 --- [backpi] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-04-06T10:43:52.434+02:00  INFO 24864 --- [backpi] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@63e17053, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@56569e4f, org.springframework.security.web.context.SecurityContextHolderFilter@7ba4591, org.springframework.security.web.header.HeaderWriterFilter@1af74f3f, org.springframework.web.filter.CorsFilter@3fe94bea, org.springframework.security.web.authentication.logout.LogoutFilter@5b751bab, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2cf065e9, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@1492d58d, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@4dbea3be, org.springframework.security.web.access.ExceptionTranslationFilter@3a9bd6c7, org.springframework.security.web.access.intercept.AuthorizationFilter@206e080]
+2026-04-06T10:43:53.130+02:00  INFO 24864 --- [backpi] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-04-06T10:43:53.131+02:00  INFO 24864 --- [backpi] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-04-06T10:43:53.131+02:00  INFO 24864 --- [backpi] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6f22784d]]
+2026-04-06T10:43:53.131+02:00  INFO 24864 --- [backpi] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-04-06T10:43:53.142+02:00  INFO 24864 --- [backpi] [           main] esprit.tn.backpi.BackpiApplication       : Started BackpiApplication in 10.947 seconds (process running for 11.8)
+2026-04-06T10:44:22.916+02:00  INFO 24864 --- [backpi] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-06T10:44:22.916+02:00  INFO 24864 --- [backpi] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-06T10:44:22.919+02:00  INFO 24864 --- [backpi] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.actif,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.nom,
+        u1_0.password,
+        u1_0.prenom,
+        u1_0.role,
+        u1_0.telephone 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    insert 
+    into
+        analyse
+        (date, image_irm, interpretation, jeu_cognitif_id, observation_medicale, patient_id, pourcentage_risque, rapport_medical, score_jeu, statut) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        a1_0.id,
+        a1_0.date,
+        a1_0.image_irm,
+        a1_0.interpretation,
+        a1_0.jeu_cognitif_id,
+        a1_0.observation_medicale,
+        a1_0.patient_id,
+        a1_0.pourcentage_risque,
+        a1_0.rapport_medical,
+        a1_0.score_jeu,
+        a1_0.statut 
+    from
+        analyse a1_0 
+    where
+        a1_0.patient_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.age,
+        p1_0.nom,
+        p1_0.poids,
+        p1_0.prenom,
+        p1_0.sexe,
+        u1_0.id,
+        u1_0.actif,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.nom,
+        u1_0.password,
+        u1_0.prenom,
+        u1_0.role,
+        u1_0.telephone 
+    from
+        patient p1_0 
+    left join
+        users u1_0 
+            on u1_0.id=p1_0.user_id 
+    where
+        p1_0.id=?
+2026-04-06T10:44:53.116+02:00  INFO 24864 --- [backpi] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2026-04-06T11:14:53.135+02:00  INFO 24864 --- [backpi] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 2, active threads = 1, queued tasks = 0, completed tasks = 1]
+Hibernate: 
+    insert 
+    into
+        analyse
+        (date, image_irm, interpretation, jeu_cognitif_id, observation_medicale, patient_id, pourcentage_risque, rapport_medical, score_jeu, statut) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        a1_0.id,
+        a1_0.date,
+        a1_0.image_irm,
+        a1_0.interpretation,
+        a1_0.jeu_cognitif_id,
+        a1_0.observation_medicale,
+        a1_0.patient_id,
+        a1_0.pourcentage_risque,
+        a1_0.rapport_medical,
+        a1_0.score_jeu,
+        a1_0.statut 
+    from
+        analyse a1_0 
+    where
+        a1_0.patient_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.age,
+        p1_0.nom,
+        p1_0.poids,
+        p1_0.prenom,
+        p1_0.sexe,
+        u1_0.id,
+        u1_0.actif,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.nom,
+        u1_0.password,
+        u1_0.prenom,
+        u1_0.role,
+        u1_0.telephone 
+    from
+        patient p1_0 
+    left join
+        users u1_0 
+            on u1_0.id=p1_0.user_id 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        a1_0.id,
+        a1_0.date,
+        a1_0.image_irm,
+        a1_0.interpretation,
+        a1_0.jeu_cognitif_id,
+        a1_0.observation_medicale,
+        a1_0.patient_id,
+        a1_0.pourcentage_risque,
+        a1_0.rapport_medical,
+        a1_0.score_jeu,
+        a1_0.statut 
+    from
+        analyse a1_0 
+    where
+        a1_0.patient_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.age,
+        p1_0.nom,
+        p1_0.poids,
+        p1_0.prenom,
+        p1_0.sexe,
+        u1_0.id,
+        u1_0.actif,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.nom,
+        u1_0.password,
+        u1_0.prenom,
+        u1_0.role,
+        u1_0.telephone 
+    from
+        patient p1_0 
+    left join
+        users u1_0 
+            on u1_0.id=p1_0.user_id 
+    where
+        p1_0.id=?
+Hibernate: 
+    insert 
+    into
+        analyse
+        (date, image_irm, interpretation, jeu_cognitif_id, observation_medicale, patient_id, pourcentage_risque, rapport_medical, score_jeu, statut) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        a1_0.id,
+        a1_0.date,
+        a1_0.image_irm,
+        a1_0.interpretation,
+        a1_0.jeu_cognitif_id,
+        a1_0.observation_medicale,
+        a1_0.patient_id,
+        a1_0.pourcentage_risque,
+        a1_0.rapport_medical,
+        a1_0.score_jeu,
+        a1_0.statut 
+    from
+        analyse a1_0 
+    where
+        a1_0.patient_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.age,
+        p1_0.nom,
+        p1_0.poids,
+        p1_0.prenom,
+        p1_0.sexe,
+        u1_0.id,
+        u1_0.actif,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.nom,
+        u1_0.password,
+        u1_0.prenom,
+        u1_0.role,
+        u1_0.telephone 
+    from
+        patient p1_0 
+    left join
+        users u1_0 
+            on u1_0.id=p1_0.user_id 
+    where
+        p1_0.id=?
+2026-04-06T11:44:53.151+02:00  INFO 24864 --- [backpi] [MessageBroker-2] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 0, completed tasks = 2]
+2026-04-06T12:14:53.161+02:00  INFO 24864 --- [backpi] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 4, active threads = 1, queued tasks = 0, completed tasks = 3]
+2026-04-06T12:44:53.165+02:00  INFO 24864 --- [backpi] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 4, active threads = 1, queued tasks = 0, completed tasks = 4]
+2026-04-06T13:14:53.195+02:00  INFO 24864 --- [backpi] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 4, active threads = 1, queued tasks = 0, completed tasks = 5]
+2026-04-06T14:47:11.956+02:00  WARN 24864 --- [backpi] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h29m20s577ms879µs500ns).
+2026-04-06T15:13:43.830+02:00  INFO 24864 --- [backpi] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 4, active threads = 1, queued tasks = 0, completed tasks = 6]
+Hibernate: 
+    insert 
+    into
+        patient
+        (age, nom, poids, prenom, sexe, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        a1_0.id,
+        a1_0.date,
+        a1_0.image_irm,
+        a1_0.interpretation,
+        a1_0.jeu_cognitif_id,
+        a1_0.observation_medicale,
+        a1_0.patient_id,
+        a1_0.pourcentage_risque,
+        a1_0.rapport_medical,
+        a1_0.score_jeu,
+        a1_0.statut 
+    from
+        analyse a1_0 
+    where
+        a1_0.patient_id=?
+Hibernate: 
+    insert 
+    into
+        analyse
+        (date, image_irm, interpretation, jeu_cognitif_id, observation_medicale, patient_id, pourcentage_risque, rapport_medical, score_jeu, statut) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        a1_0.id,
+        a1_0.date,
+        a1_0.image_irm,
+        a1_0.interpretation,
+        a1_0.jeu_cognitif_id,
+        a1_0.observation_medicale,
+        a1_0.patient_id,
+        a1_0.pourcentage_risque,
+        a1_0.rapport_medical,
+        a1_0.score_jeu,
+        a1_0.statut 
+    from
+        analyse a1_0 
+    where
+        a1_0.patient_id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.age,
+        p1_0.nom,
+        p1_0.poids,
+        p1_0.prenom,
+        p1_0.sexe,
+        u1_0.id,
+        u1_0.actif,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.nom,
+        u1_0.password,
+        u1_0.prenom,
+        u1_0.role,
+        u1_0.telephone 
+    from
+        patient p1_0 
+    left join
+        users u1_0 
+            on u1_0.id=p1_0.user_id 
+    where
+        p1_0.id=?
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  04:56 h
+[INFO] Finished at: 2026-04-06T15:40:34+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.0:run (default-cli) on project backpi: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
