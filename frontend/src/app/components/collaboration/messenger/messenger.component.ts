@@ -561,6 +561,19 @@ export class MessengerComponent implements OnInit, OnDestroy {
     }
   }
 
+  updatePollOption(index: number, value: string) {
+    this.pollOptions.update(opts => {
+      const copy = [...opts];
+      copy[index] = value;
+      return copy;
+    });
+  }
+
+  getTotalVotes(msg: MessageDto): number {
+    if (!msg.pollOptions) return 0;
+    return msg.pollOptions.reduce((s, o) => s + (o.votes || 0), 0);
+  }
+
   trackByIndex(index: number, obj: any): any {
     return index;
   }
