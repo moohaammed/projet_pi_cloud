@@ -125,6 +125,10 @@ export const routes: Routes = [
       {
         path: 'rendezvous',
         loadComponent: () => import('./components/dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+      },
+      {
+        path: 'education',
+        loadComponent: () => import('./components/education/admin-education-dashboard/admin-education-dashboard.component').then(m => m.AdminEducationDashboardComponent)
       }
     ]
   },

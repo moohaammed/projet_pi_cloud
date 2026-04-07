@@ -95,7 +95,14 @@ public class PatientActivityServiceImpl implements PatientActivityService {
         Long scoreGame = lastGame.map(PatientActivity::getScoreCumule).orElse(0L);
         Activity.Stade stadeGame = lastGame.map(PatientActivity::getCurrentStade).orElse(Activity.Stade.LEGER);
 
-        return new ScoreStadeDto(scoreQuiz, stadeQuiz, scoreGame, stadeGame);
+        // Compute completed stages (successful ones)
+        List<Activity.Stade> completedStagesQuiz = patientActivityRepository.findAllByUserAndActivity_TypeAndReussiTrue(user, Activity.ActivityType.QUIZ)
+                .stream().map(PatientActivity::getCurrentStade).distinct().toList();
+        
+        List<Activity.Stade> completedStagesGame = patientActivityRepository.findAllByUserAndActivity_TypeAndReussiTrue(user, Activity.ActivityType.GAME)
+                .stream().map(PatientActivity::getCurrentStade).distinct().toList();
+
+        return new ScoreStadeDto(scoreQuiz, stadeQuiz, completedStagesQuiz, scoreGame, stadeGame, completedStagesGame);
     }
 
     @Override

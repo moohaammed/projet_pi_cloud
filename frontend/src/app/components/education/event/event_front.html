@@ -136,21 +136,31 @@
 
         <div class="card-separator"></div>
 
-        <div class="card-footer">
-          <div class="card-location">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-            <span>{{ event.location }}</span>
+        <div class="card-footer d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="card-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>{{ event.location }}</span>
+            </div>
+            <span class="card-remind" *ngIf="event.remindEnabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              Rappel
+            </span>
           </div>
-          <span class="card-remind" *ngIf="event.remindEnabled">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            Rappel
-          </span>
+
+          <!-- Participation Button (Moved here) -->
+          <button class="btn w-100 fw-bold shadow-sm text-white py-3 animate-fade-in" 
+                  style="background-color: #800080; border-radius: 12px;"
+                  (click)="openBooking(event)">
+            <i class="fa-solid fa-chair me-2"></i>
+            Participer
+          </button>
         </div>
       </div>
 
@@ -176,5 +186,12 @@
       </svg>
     </button>
   </div>
+
+  <!-- Seat Booking Modal -->
+  <app-event-seat-grid 
+    *ngIf="showBooking" 
+    [event]="selectedEvent" 
+    (closed)="onBookingClosed()">
+  </app-event-seat-grid>
 
 </div>

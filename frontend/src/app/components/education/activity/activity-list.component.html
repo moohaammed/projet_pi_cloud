@@ -1,17 +1,22 @@
-<div class="container mt-4">
+<div class="container-fluid py-4 px-4">
 
   <!-- Formulaire -->
-  <div class="card mb-4">
-    <div class="card-header fw-bold">
-      {{ isEditing ? 'Modifier' : 'Nouvelle activité' }}
+  <div class="card border-0 shadow rounded-4 overflow-hidden bg-white mb-5 animate-fade-in" *ngIf="showForm">
+    <div class="card-header bg-soft-primary border-0 p-4 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-sm btn-white rounded-circle shadow-sm me-3 text-primary bg-white px-2 py-1" (click)="reset()" title="Retour à la liste">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <span class="fw-bold fs-5 text-primary"><i class="fa-solid fa-gamepad me-2"></i> {{ isEditing ? 'Modifier l\'activité' : 'Nouvelle activité' }}</span>
+      </div>
     </div>
-    <div class="card-body">
-      <div class="row g-3">
+    <div class="card-body p-4 pt-4">
+      <div class="row g-4">
 
         <!-- Titre -->
         <div class="col-md-6">
-          <label class="form-label">Titre *</label>
-          <input class="form-control" [class.is-invalid]="errors['title']" [(ngModel)]="newActivity.title"
+          <label class="form-label fw-bold text-muted small text-uppercase">Titre *</label>
+          <input class="form-control form-control-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" [class.is-invalid]="errors['title']" [(ngModel)]="newActivity.title"
             placeholder="ex : Quiz Saisons, Jeu des animaux">
           <div class="invalid-feedback" *ngIf="errors['title']">
             {{ errors['title'] }}
@@ -20,8 +25,8 @@
 
         <!-- Type -->
         <div class="col-md-3">
-          <label class="form-label">Type *</label>
-          <select class="form-select" [(ngModel)]="newActivity.type">
+          <label class="form-label fw-bold text-muted small text-uppercase">Type *</label>
+          <select class="form-select form-select-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" [(ngModel)]="newActivity.type">
             <option value="QUIZ">QUIZ</option>
             <option value="GAME">GAME</option>
             <option value="CONTENT">CONTENT</option>
@@ -31,8 +36,8 @@
 
         <!-- Stade -->
         <div class="col-md-3">
-          <label class="form-label">Stade *</label>
-          <select class="form-select" [(ngModel)]="newActivity.stade">
+          <label class="form-label fw-bold text-muted small text-uppercase">Stade *</label>
+          <select class="form-select form-select-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" [(ngModel)]="newActivity.stade">
             <option value="LEGER">Léger</option>
             <option value="MODERE">Modéré</option>
             <option value="SEVERE">Sévère</option>
@@ -40,10 +45,10 @@
         </div>
 
         <!-- Description -->
-        <div class="col-md-8">
-          <label class="form-label">Description *</label>
-          <textarea class="form-control" [class.is-invalid]="errors['description']"
-            [(ngModel)]="newActivity.description" placeholder="Décrivez l'activité…" rows="3">
+        <div class="col-md-12">
+          <label class="form-label fw-bold text-muted small text-uppercase">Description *</label>
+          <textarea class="form-control form-control-lg bg-light border-0 rounded-4 p-3 shadow-sm fs-15" [class.is-invalid]="errors['description']"
+            [(ngModel)]="newActivity.description" placeholder="Décrivez l'activité…" rows="3" style="resize:none;">
           </textarea>
           <div class="invalid-feedback" *ngIf="errors['description']">
             {{ errors['description'] }}
@@ -53,32 +58,14 @@
           </div>
         </div>
 
-        <!-- Durée -->
-        <div class="col-md-2">
-          <label class="form-label">Durée (min)</label>
-          <input class="form-control" type="number" [class.is-invalid]="errors['estimatedMinutes']"
-            [(ngModel)]="newActivity.estimatedMinutes">
-          <div class="invalid-feedback" *ngIf="errors['estimatedMinutes']">
-            {{ errors['estimatedMinutes'] }}
-          </div>
-        </div>
-
-        <!-- Active -->
-        <div class="col-md-2 d-flex align-items-end pb-2">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" [(ngModel)]="newActivity.active" id="active">
-            <label class="form-check-label" for="active">Active</label>
-          </div>
-        </div>
-
         <!-- Contenu dynamique -->
-        <div class="col-12" *ngIf="newActivity.type">
-          <label class="form-label fw-semibold">
-            Contenu de l'activité
-            <span class="text-muted fw-normal">(généré automatiquement selon le type)</span>
+        <div class="col-12 mt-4" *ngIf="newActivity.type">
+          <label class="form-label fw-bold text-primary small text-uppercase mb-3">
+            <i class="fa-solid fa-code me-2"></i> Contenu de l'activité
+            <span class="text-muted fw-normal text-capitalize ms-2" style="text-transform: none !important;">(généré automatiquement selon le type)</span>
           </label>
 
-          <div class="border rounded p-3 bg-light">
+          <div class="border-0 shadow-sm rounded-4 p-4 bg-light">
             <app-activity-data-form [activityType]="newActivity.type" [initialData]="newActivity.data || '{}'"
               [globalTimerMinutes]="newActivity.estimatedMinutes" (dataChange)="onDataChange($event)"
               (timerChange)="onTimerChange($event)">
@@ -92,78 +79,100 @@
 
       </div>
 
-      <div class="mt-3 d-flex gap-2">
-        <button class="btn btn-primary" (click)="save()">
-          {{ isEditing ? 'Sauvegarder' : 'Créer' }}
+      <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary fw-bold rounded-pill px-4" (click)="save()">
+          <i class="fa-solid fa-check me-2"></i> {{ isEditing ? 'Sauvegarder' : 'Créer l\'activité' }}
         </button>
-        <button class="btn btn-secondary" (click)="reset()" *ngIf="isEditing">
+        <button class="btn btn-soft-secondary fw-bold rounded-pill px-4" (click)="reset()" *ngIf="isEditing">
           Annuler
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Filtres -->
-  <div class="d-flex gap-2 mb-3">
-    <button class="btn btn-sm btn-outline-secondary" (click)="loadByType('')">
-      Tous
+  <!-- Catégories Premium -->
+  <div class="d-flex flex-wrap gap-3 mb-4 animate-fade-in" *ngIf="!showForm">
+    <button class="filter-pill" [class.active]="filterType === ''" (click)="loadByType('')">
+      <i class="fa-solid fa-layer-group me-2"></i> Tous
     </button>
-    <button class="btn btn-sm btn-outline-success" (click)="loadByType('QUIZ')">
-      QUIZ
+    <button class="filter-pill quiz" [class.active]="filterType === 'QUIZ'" (click)="loadByType('QUIZ')">
+      <i class="fa-solid fa-clipboard-question me-2"></i> QUIZ
     </button>
-    <button class="btn btn-sm btn-outline-primary" (click)="loadByType('GAME')">
-      GAME
+    <button class="filter-pill game" [class.active]="filterType === 'GAME'" (click)="loadByType('GAME')">
+      <i class="fa-solid fa-puzzle-piece me-2"></i> GAME
     </button>
-    <button class="btn btn-sm btn-outline-warning" (click)="loadByType('CONTENT')">
-      CONTENT
+    <button class="filter-pill content" [class.active]="filterType === 'CONTENT'" (click)="loadByType('CONTENT')">
+      <i class="fa-solid fa-book-open me-2"></i> CONTENT
     </button>
-    <button class="btn btn-sm btn-outline-danger" (click)="loadByType('EXERCICE')">
-      EXERCICE
+    <button class="filter-pill exercice" [class.active]="filterType === 'EXERCICE'" (click)="loadByType('EXERCICE')">
+      <i class="fa-solid fa-person-running me-2"></i> EXERCICE
     </button>
   </div>
 
   <!-- Table -->
-  <div class="card">
-    <div class="card-body p-0">
-      <table class="table table-bordered table-hover mb-0">
-        <thead class="table-dark">
+  <div class="card border-0 shadow rounded-4 overflow-hidden bg-white animate-fade-in" *ngIf="!showForm">
+    <div class="card-header bg-white border-0 p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div class="d-flex align-items-center flex-grow-1" style="max-width: 400px;">
+        <div class="input-group bg-light rounded-pill px-3 py-1 shadow-sm border">
+          <span class="input-group-text bg-transparent border-0 text-muted">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </span>
+          <input type="text" class="form-control bg-transparent border-0 fs-14" 
+                 placeholder="Rechercher une activité..." 
+                 [(ngModel)]="searchTerm">
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold" *ngIf="allActivities.length > 0">
+           {{ filteredActivities.length }} / {{ allActivities.length }}
+        </span>
+        <button class="btn btn-primary btn-sm fw-bold rounded-pill px-4" (click)="showForm = true">
+          <i class="fa-solid fa-plus me-2"></i> Créer Activité
+        </button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-grey border-bottom border-black border-opacity-10">
           <tr>
-            <th>ID</th>
-            <th>Titre</th>
-            <th>Type</th>
-            <th>Stade</th>
-            <th>Min</th>
-            <th>Active</th>
-            <th>Actions</th>
+            <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">ID / Titre</th>
+            <th class="py-3 text-uppercase small fw-bold text-muted text-center">Type / Stade</th>
+            <th class="text-end pe-4 py-3 text-uppercase small fw-bold text-muted">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let a of activities">
-            <td>{{ a.id }}</td>
-            <td>{{ a.title }}</td>
-            <td>
-              <span [class]="getBadgeClass(a.type)">{{ a.type }}</span>
+          <tr *ngFor="let a of filteredActivities">
+            <td class="ps-4 py-3">
+              <div class="d-flex align-items-center">
+                <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 42px; height: 42px;">
+                  <i class="fa-solid fa-puzzle-piece" *ngIf="a.type === 'GAME'"></i>
+                  <i class="fa-solid fa-question" *ngIf="a.type === 'QUIZ'"></i>
+                  <i class="fa-solid fa-heart-pulse" *ngIf="a.type === 'EXERCICE'"></i>
+                  <i class="fa-solid fa-book" *ngIf="a.type === 'CONTENT'"></i>
+                </div>
+                <div>
+                  <div class="fw-bold text-dark">{{ a.title }}</div>
+                  <div class="text-muted small">ID: #{{ a.id }}</div>
+                </div>
+              </div>
             </td>
-            <td>{{ a.stade }}</td>
-            <td>{{ a.estimatedMinutes }}</td>
-            <td>
-              <span class="badge" [class.bg-success]="a.active" [class.bg-secondary]="!a.active">
-                {{ a.active ? 'Oui' : 'Non' }}
-              </span>
+            <td class="text-center">
+              <span class="badge rounded-pill px-3 py-1 mb-1 fw-bold small text-uppercase" [class]="getBadgeClass(a.type)">{{ a.type }}</span>
+              <div class="text-muted small fw-bold">{{ a.stade }}</div>
             </td>
-            <td>
-              <button class="btn btn-sm btn-warning me-1" (click)="edit(a)">
-                Modifier
+            <td class="text-end pe-4">
+              <button class="btn btn-sm btn-light rounded-circle me-1" (click)="edit(a)" title="Modifier">
+                <i class="fa-solid fa-pen-to-square text-primary"></i>
               </button>
-              <button class="btn btn-sm btn-danger" (click)="delete(a.id!)">
-                Supprimer
+              <button class="btn btn-sm btn-light rounded-circle text-danger" (click)="delete(a.id!)" title="Supprimer">
+                <i class="fa-solid fa-trash-can"></i>
               </button>
             </td>
           </tr>
-
-          <tr *ngIf="activities.length === 0">
-            <td colspan="7" class="text-center text-muted py-3">
-              Aucune activité
+          <tr *ngIf="filteredActivities.length === 0">
+            <td colspan="3" class="text-center py-5 text-muted">
+              <i class="fa-solid fa-folder-open fs-2 opacity-25 mb-2 d-block"></i>
+              Aucune activité ne correspond à votre recherche.
             </td>
           </tr>
         </tbody>
@@ -172,3 +181,42 @@
   </div>
 
 </div>
+
+<style>
+  .filter-pill {
+    background: white;
+    border: 1.5px solid #eee;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #666;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  }
+
+  .filter-pill:hover {
+    background: #f8f9fa;
+    border-color: #ddd;
+    transform: translateY(-2px);
+  }
+
+  .filter-pill.active {
+    background: #212529;
+    color: white;
+    border-color: #212529;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+
+  /* Specific colors for types when active */
+  .filter-pill.quiz.active { background: #198754; border-color: #198754; }
+  .filter-pill.game.active { background: #800080; border-color: #800080; }
+  .filter-pill.content.active { background: #ffc107; border-color: #ffc107; color: #000; }
+  .filter-pill.exercice.active { background: #dc3545; border-color: #dc3545; }
+
+  .fs-14 { font-size: 14px; }
+  .bg-grey { background-color: #fcfcfc; }
+  .transition-all { transition: all 0.2s ease; }
+</style>

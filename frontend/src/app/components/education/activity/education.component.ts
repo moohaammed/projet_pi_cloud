@@ -30,91 +30,111 @@ import { PatientProgressionService } from '../../../services/patient-progression
 
       <!-- Menu de sélection -->
       <div class="selection-menu" *ngIf="!selectedType && !playingActivity && !isLoading">
-
-        <!-- Hero Banner -->
-        <div class="edu-hero">
-          <div class="edu-hero-glow"></div>
-          <div class="edu-hero-content">
-            <div class="edu-hero-icon">🧠</div>
-            <h1 class="edu-hero-title">Espace Thérapeutique</h1>
-            <p class="edu-hero-sub">Choisissez une activité pour progresser à votre rythme</p>
+        <div class="menu-inner">
+          <!-- Hero Banner inside menu-inner -->
+          <div class="edu-hero">
+            <div class="edu-hero-glow"></div>
+            <div class="edu-hero-content">
+              <div class="header-badge">Espace Santé & Cognitive</div>
+              <h1 class="edu-hero-title">Espace Thérapeutique</h1>
+              <p class="edu-hero-sub">Choisissez une activité pour progresser à votre rythme</p>
+            </div>
+            <!-- Progression bar (stats-bar style) -->
+            <div class="stats-bar" *ngIf="authService.getRole() === 'PATIENT'">
+              <div class="stat">
+                <div class="stat-icon upcoming">📝</div>
+                <div class="stat-info">
+                  <span class="stat-number">{{ patientStadeQuiz }}</span>
+                  <span class="stat-label">Quiz</span>
+                </div>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat">
+                <div class="stat-icon upcoming">🎮</div>
+                <div class="stat-info">
+                  <span class="stat-number">{{ patientStadeGame }}</span>
+                  <span class="stat-label">Jeux</span>
+                </div>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat">
+                <div class="stat-icon total">⭐</div>
+                <div class="stat-info">
+                  <span class="stat-number">{{ ((patientScoreQuiz + patientScoreGame) / 2).toFixed(0) }} pts</span>
+                  <span class="stat-label">Score</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <!-- Progression chips for patients -->
-          <div class="prog-chips" *ngIf="authService.getRole() === 'PATIENT'">
-            <div class="prog-chip">
-              <span class="chip-label">📝 Quiz</span>
-              <span class="chip-value">{{ patientStadeQuiz }}</span>
-            </div>
-            <div class="prog-chip">
-              <span class="chip-label">🎮 Jeux</span>
-              <span class="chip-value">{{ patientStadeGame }}</span>
-            </div>
-            <div class="prog-chip score-chip">
-              <span class="chip-label">⭐ Score</span>
-              <span class="chip-value">{{ ((patientScoreQuiz + patientScoreGame) / 2).toFixed(0) }} pts</span>
-            </div>
+          <div class="type-buttons">
+            <button class="type-btn quiz" (click)="selectType('QUIZ')">
+              <div class="type-btn-glow"></div>
+              <div class="icon">📝</div>
+              <div class="type-name">Quiz</div>
+              <div class="type-desc">Testez vos connaissances</div>
+              <div class="type-arrow">→</div>
+            </button>
+
+            <button class="type-btn game" (click)="selectType('GAME')">
+              <div class="type-btn-glow"></div>
+              <div class="icon">🎮</div>
+              <div class="type-name">Jeux</div>
+              <div class="type-desc">Memory et puzzles</div>
+              <div class="type-arrow">→</div>
+            </button>
+
+            <button class="type-btn content" (click)="selectType('CONTENT')">
+              <div class="type-btn-glow"></div>
+              <div class="icon">📺</div>
+              <div class="type-name">Contenu</div>
+              <div class="type-desc">Vidéos et articles</div>
+              <div class="type-arrow">→</div>
+            </button>
+
+            <button class="type-btn exercice" (click)="selectType('EXERCICE')">
+              <div class="type-btn-glow"></div>
+              <div class="icon">🧘</div>
+              <div class="type-name">Exercices</div>
+              <div class="type-desc">Respiration et méditation</div>
+              <div class="type-arrow">→</div>
+            </button>
           </div>
-        </div>
-
-        <div class="type-buttons">
-          <button class="type-btn quiz" (click)="selectType('QUIZ')">
-            <div class="type-btn-glow"></div>
-            <div class="icon">📝</div>
-            <div class="type-name">Quiz</div>
-            <div class="type-desc">Testez vos connaissances</div>
-            <div class="type-arrow">→</div>
-          </button>
-
-          <button class="type-btn game" (click)="selectType('GAME')">
-            <div class="type-btn-glow"></div>
-            <div class="icon">🎮</div>
-            <div class="type-name">Jeux</div>
-            <div class="type-desc">Memory et puzzles</div>
-            <div class="type-arrow">→</div>
-          </button>
-
-          <button class="type-btn content" (click)="selectType('CONTENT')">
-            <div class="type-btn-glow"></div>
-            <div class="icon">📺</div>
-            <div class="type-name">Contenu</div>
-            <div class="type-desc">Vidéos et articles</div>
-            <div class="type-arrow">→</div>
-          </button>
-
-          <button class="type-btn exercice" (click)="selectType('EXERCICE')">
-            <div class="type-btn-glow"></div>
-            <div class="icon">🧘</div>
-            <div class="type-name">Exercices</div>
-            <div class="type-desc">Respiration et méditation</div>
-            <div class="type-arrow">→</div>
-          </button>
         </div>
       </div>
 
       <!-- Liste des activités du type sélectionné -->
       <div class="activities-list" *ngIf="selectedType && !playingActivity">
-        <div class="header">
-          <button class="btn-back" (click)="backToMenu()">← Retour</button>
-          <h2 class="list-title">{{ getTypeLabel(selectedType) }}</h2>
-        </div>
+        <div class="list-inner">
+          <div class="edu-hero list-hero-cadre">
+            <div class="edu-hero-glow"></div>
+            <div class="edu-hero-content">
+              <div class="header-badge">{{ selectedType }}</div>
+              <h1 class="edu-hero-title">{{ getTypeLabel(selectedType) }}</h1>
+              <p class="edu-hero-sub">Parcourez les activités disponibles et progressez étape par étape.</p>
+            </div>
+            <button class="btn-reset" *ngIf="authService.getRole() === 'PATIENT' && (selectedType === 'QUIZ' || selectedType === 'GAME')" (click)="resetLevel()">
+              🔄 Réinitialiser mon niveau
+            </button>
+            <button class="btn-back-floating" (click)="backToMenu()">← Retour</button>
+          </div>
 
-        <!-- Stage sections (for QUIZ and GAME with patient role) -->
-        <ng-container *ngIf="(selectedType === 'QUIZ' || selectedType === 'GAME') && authService.getRole() === 'PATIENT'; else normalList">
-          <div class="stages-container">
+          <!-- Stage sections (for QUIZ and GAME with patient role) -->
+          <ng-container *ngIf="(selectedType === 'QUIZ' || selectedType === 'GAME') && authService.getRole() === 'PATIENT'; else normalList">
+            <div class="stages-container">
 
             <!-- LEGER -->
-            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'LEGER'" [class.stage-completed]="isStageCompleted('LEGER')" [class.stage-locked]="isStageLockedFuture('LEGER')">
+            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'LEGER' || isStageCompleted('LEGER')" [class.stage-completed]="isStageCompleted('LEGER')" [class.stage-locked]="isStageLocked('LEGER')">
               <div class="stage-header">
                 <div class="stage-title-row">
                   <span class="stage-icon">🌱</span>
                   <h3 class="stage-name">Stade Léger</h3>
-                  <span class="stage-badge badge-leger" *ngIf="getPatientStade() === 'LEGER'">✅ Votre niveau actuel</span>
-                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('LEGER')">🏅 Déjà complété</span>
+                  <span class="stage-badge badge-leger" *ngIf="getPatientStade() === 'LEGER' && !isStageCompleted('LEGER')">✅ Votre niveau actuel</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('LEGER')">🏅 Complété</span>
                 </div>
-                <div class="stage-lock" *ngIf="isStageLockedFuture('LEGER')">🔒 Verrouillé</div>
+                <div class="stage-lock" *ngIf="isStageLocked('LEGER')">🔒 Verrouillé</div>
               </div>
               <div class="activities-grid">
-                <div class="activity-card" [class.card-locked]="isStageLockedFuture('LEGER') || isStageCompleted('LEGER')"
+                <div class="activity-card" [class.card-locked]="isStageLocked('LEGER')"
                      *ngFor="let activity of getActivitiesForStage('LEGER')"
                      (click)="onActivityClick(activity, 'LEGER')">
                   <div class="activity-header">
@@ -125,10 +145,10 @@ import { PatientProgressionService } from '../../../services/patient-progression
                   <p class="activity-desc">{{ activity.description }}</p>
                   <div class="activity-footer">
                     <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
-                    <button class="btn-play" [class.btn-locked]="isStageLockedFuture('LEGER') || isStageCompleted('LEGER')">
-                      <ng-container *ngIf="isStageCompleted('LEGER')">✔ Fait</ng-container>
-                      <ng-container *ngIf="isStageLockedFuture('LEGER')">🔒</ng-container>
-                      <ng-container *ngIf="!isStageCompleted('LEGER') && !isStageLockedFuture('LEGER')">Jouer →</ng-container>
+                    <button class="btn-play" [class.btn-locked]="isStageLocked('LEGER')">
+                      <ng-container *ngIf="isStageLocked('LEGER')">🔒</ng-container>
+                      <ng-container *ngIf="!isStageLocked('LEGER') && isStageCompleted('LEGER')">Rejouer →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('LEGER') && !isStageCompleted('LEGER')">Jouer →</ng-container>
                     </button>
                   </div>
                 </div>
@@ -139,18 +159,18 @@ import { PatientProgressionService } from '../../../services/patient-progression
             </div>
 
             <!-- MODERE -->
-            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'MODERE'" [class.stage-completed]="isStageCompleted('MODERE')" [class.stage-locked]="isStageLockedFuture('MODERE')">
+            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'MODERE' || isStageCompleted('MODERE')" [class.stage-completed]="isStageCompleted('MODERE')" [class.stage-locked]="isStageLocked('MODERE')">
               <div class="stage-header">
                 <div class="stage-title-row">
                   <span class="stage-icon">⚡</span>
                   <h3 class="stage-name">Stade Modéré</h3>
-                  <span class="stage-badge badge-modere" *ngIf="getPatientStade() === 'MODERE'">✅ Votre niveau actuel</span>
-                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('MODERE')">🏅 Déjà complété</span>
+                  <span class="stage-badge badge-modere" *ngIf="getPatientStade() === 'MODERE' && !isStageCompleted('MODERE')">✅ Votre niveau actuel</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('MODERE')">🏅 Complété</span>
                 </div>
-                <div class="stage-lock" *ngIf="isStageLockedFuture('MODERE')">🔒 Verrouillé</div>
+                <div class="stage-lock" *ngIf="isStageLocked('MODERE')">🔒 Verrouillé</div>
               </div>
               <div class="activities-grid">
-                <div class="activity-card" [class.card-locked]="isStageLockedFuture('MODERE') || isStageCompleted('MODERE')"
+                <div class="activity-card" [class.card-locked]="isStageLocked('MODERE')"
                      *ngFor="let activity of getActivitiesForStage('MODERE')"
                      (click)="onActivityClick(activity, 'MODERE')">
                   <div class="activity-header">
@@ -161,10 +181,10 @@ import { PatientProgressionService } from '../../../services/patient-progression
                   <p class="activity-desc">{{ activity.description }}</p>
                   <div class="activity-footer">
                     <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
-                    <button class="btn-play" [class.btn-locked]="isStageLockedFuture('MODERE') || isStageCompleted('MODERE')">
-                      <ng-container *ngIf="isStageCompleted('MODERE')">✔ Fait</ng-container>
-                      <ng-container *ngIf="isStageLockedFuture('MODERE')">🔒</ng-container>
-                      <ng-container *ngIf="!isStageCompleted('MODERE') && !isStageLockedFuture('MODERE')">Jouer →</ng-container>
+                    <button class="btn-play" [class.btn-locked]="isStageLocked('MODERE')">
+                      <ng-container *ngIf="isStageLocked('MODERE')">🔒</ng-container>
+                      <ng-container *ngIf="!isStageLocked('MODERE') && isStageCompleted('MODERE')">Rejouer →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('MODERE') && !isStageCompleted('MODERE')">Jouer →</ng-container>
                     </button>
                   </div>
                 </div>
@@ -175,18 +195,18 @@ import { PatientProgressionService } from '../../../services/patient-progression
             </div>
 
             <!-- SEVERE -->
-            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'SEVERE'" [class.stage-completed]="isStageCompleted('SEVERE')" [class.stage-locked]="isStageLockedFuture('SEVERE')">
+            <div class="stage-section" [class.stage-accessible]="getPatientStade() === 'SEVERE' || isStageCompleted('SEVERE')" [class.stage-completed]="isStageCompleted('SEVERE')" [class.stage-locked]="isStageLocked('SEVERE')">
               <div class="stage-header">
                 <div class="stage-title-row">
                   <span class="stage-icon">🔥</span>
                   <h3 class="stage-name">Stade Sévère</h3>
-                  <span class="stage-badge badge-severe" *ngIf="getPatientStade() === 'SEVERE'">✅ Votre niveau actuel</span>
-                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('SEVERE')">🏅 Déjà complété</span>
+                  <span class="stage-badge badge-severe" *ngIf="getPatientStade() === 'SEVERE' && !isStageCompleted('SEVERE')">✅ Votre niveau actuel</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('SEVERE')">🏅 Complété</span>
                 </div>
-                <div class="stage-lock" *ngIf="isStageLockedFuture('SEVERE')">🔒 Verrouillé</div>
+                <div class="stage-lock" *ngIf="isStageLocked('SEVERE')">🔒 Verrouillé</div>
               </div>
               <div class="activities-grid">
-                <div class="activity-card" [class.card-locked]="isStageLockedFuture('SEVERE') || isStageCompleted('SEVERE')"
+                <div class="activity-card" [class.card-locked]="isStageLocked('SEVERE')"
                      *ngFor="let activity of getActivitiesForStage('SEVERE')"
                      (click)="onActivityClick(activity, 'SEVERE')">
                   <div class="activity-header">
@@ -197,10 +217,10 @@ import { PatientProgressionService } from '../../../services/patient-progression
                   <p class="activity-desc">{{ activity.description }}</p>
                   <div class="activity-footer">
                     <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
-                    <button class="btn-play" [class.btn-locked]="isStageLockedFuture('SEVERE') || isStageCompleted('SEVERE')">
-                      <ng-container *ngIf="isStageCompleted('SEVERE')">✔ Fait</ng-container>
-                      <ng-container *ngIf="isStageLockedFuture('SEVERE')">🔒</ng-container>
-                      <ng-container *ngIf="!isStageCompleted('SEVERE') && !isStageLockedFuture('SEVERE')">Jouer →</ng-container>
+                    <button class="btn-play" [class.btn-locked]="isStageLocked('SEVERE')">
+                      <ng-container *ngIf="isStageLocked('SEVERE')">🔒</ng-container>
+                      <ng-container *ngIf="!isStageLocked('SEVERE') && isStageCompleted('SEVERE')">Rejouer →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('SEVERE') && !isStageCompleted('SEVERE')">Jouer →</ng-container>
                     </button>
                   </div>
                 </div>
@@ -239,14 +259,16 @@ import { PatientProgressionService } from '../../../services/patient-progression
             </div>
           </div>
         </ng-template>
-      </div>
+      </div> <!-- Closes list-inner -->
+    </div> <!-- Closes activities-list -->
 
       <!-- Player de l'activité sélectionnée -->
       <div class="activity-player" *ngIf="playingActivity">
-        <div class="player-header">
-          <button class="btn-back" (click)="stopActivity()">← Quitter</button>
-          <h2>{{ playingActivity.title }}</h2>
-        </div>
+        <div class="player-inner">
+          <div class="player-header">
+            <button class="btn-back" (click)="stopActivity()">← Quitter</button>
+            <h2>{{ playingActivity.title }}</h2>
+          </div>
 
         <!-- QUIZ Player -->
         <div class="quiz-player" *ngIf="playingActivity.type === 'QUIZ'">
@@ -285,33 +307,39 @@ import { PatientProgressionService } from '../../../services/patient-progression
             </button>
           </div>
 
-          <div class="quiz-result" *ngIf="quizFinished">
-            <!-- Échec / Timeout -->
-            <ng-container *ngIf="isTimeout || isQuizFailed()">
-              <div class="result-icon fail-icon">😔</div>
-              <h2 class="result-title fail-title" *ngIf="isTimeout">⏰ Temps écoulé !</h2>
-              <h2 class="result-title fail-title" *ngIf="!isTimeout">Quiz échoué</h2>
-              <div class="score score-fail">{{ quizScore }} / {{ quizQuestions.length }}</div>
-              <p class="score-message" *ngIf="isTimeout">Le temps imparti est dépassé.</p>
-              <p class="score-message" *ngIf="!isTimeout">Vous n'avez pas atteint le score requis.</p>
-              <div class="result-actions">
-                <!-- Bouton passer au stade suivant (masqué si dernier stade) -->
-                <button class="btn-purple" (click)="goToNextStade()" *ngIf="!isLastStade()">
-                  ⏩ Passer au stade suivant
-                </button>
-                <button class="btn-outline-purple" (click)="stopActivity()">📚 Choisir une autre activité</button>
-              </div>
-            </ng-container>
-            <!-- Succès -->
-            <ng-container *ngIf="!isTimeout && !isQuizFailed()">
-              <div class="result-icon success-icon">🎉</div>
-              <h2 class="result-title success-title">Bravo !</h2>
-              <div class="score score-success">{{ quizScore }} / {{ quizQuestions.length }}</div>
-              <p class="score-message">{{ getScoreMessage() }}</p>
-              <div class="result-actions">
-                <button class="btn-outline-purple" (click)="stopActivity()">📚 Choisir une autre activité</button>
-              </div>
-            </ng-container>
+          <div class="result-overlay" *ngIf="quizFinished">
+            <div class="result-card">
+              <!-- Échec / Timeout -->
+              <ng-container *ngIf="isTimeout || isQuizFailed()">
+                <div class="result-icon">😔</div>
+                <h2 class="result-title">{{ isTimeout ? 'Temps écoulé !' : 'Essaye encore !' }}</h2>
+                <div class="result-score">{{ quizScore }} / {{ quizQuestions.length }}</div>
+                <p class="result-message">
+                  Vous n’avez pas atteint le score requis cette fois-ci, mais ne vous découragez pas ! Continuez à vous entraîner pour progresser.
+                </p>
+                <div class="result-actions">
+                  <button class="btn-result-primary" (click)="goToNextStade()" *ngIf="!isLastStade()">
+                    Passer au stade suivant ⏩
+                  </button>
+                  <button class="btn-result-secondary" (click)="stopActivity()">
+                    Jouer à une autre activité 📚
+                  </button>
+                </div>
+              </ng-container>
+
+              <!-- Succès -->
+              <ng-container *ngIf="!isTimeout && !isQuizFailed()">
+                <div class="result-icon">🎉</div>
+                <h2 class="result-title">Félicitations !</h2>
+                <div class="result-score">{{ quizScore }} / {{ quizQuestions.length }}</div>
+                <p class="result-message">{{ getScoreMessage() }}</p>
+                <div class="result-actions">
+                  <button class="btn-result-secondary" (click)="stopActivity()">
+                    Jouer à une autre activité 📚
+                  </button>
+                </div>
+              </ng-container>
+            </div>
           </div>
         </div>
 
@@ -339,70 +367,112 @@ import { PatientProgressionService } from '../../../services/patient-progression
             </div>
           </div>
 
-          <div class="game-result" *ngIf="gameFinished">
-            <!-- Échec -->
-            <ng-container *ngIf="isTimeout || !gameSuccess">
-              <div class="result-icon fail-icon">😔</div>
-              <h2 class="result-title fail-title" *ngIf="isTimeout">⏰ Temps écoulé !</h2>
-              <h2 class="result-title fail-title" *ngIf="!isTimeout">😕 Dommage !</h2>
-              <p class="score-message" *ngIf="isTimeout">La limite de temps est dépassée.</p>
-              <p class="score-message" *ngIf="!isTimeout">Trop d'essais pour ce niveau ({{ gameMoves }} coups).</p>
-              <div class="result-actions">
-                <button class="btn-purple" (click)="goToNextStade()" *ngIf="!isLastStade()">
-                  ⏩ Passer au stade suivant
-                </button>
-                <button class="btn-outline-purple" (click)="stopActivity()">📚 Choisir une autre activité</button>
-              </div>
-            </ng-container>
-            <!-- Succès -->
-            <ng-container *ngIf="!isTimeout && gameSuccess">
-              <div class="result-icon success-icon">🎉</div>
-              <h2 class="result-title success-title">Bravo !</h2>
-              <p class="score-message">Félicitations, vous avez trouvé toutes les paires en {{ gameMoves }} coups !</p>
-              <div class="result-actions">
-                <button class="btn-outline-purple" (click)="stopActivity()">📚 Choisir une autre activité</button>
-              </div>
-            </ng-container>
+          <div class="result-overlay" *ngIf="gameFinished">
+            <div class="result-card">
+              <!-- Échec -->
+              <ng-container *ngIf="isTimeout || !gameSuccess">
+                <div class="result-icon">😔</div>
+                <h2 class="result-title">{{ isTimeout ? 'Temps écoulé !' : 'Dommage !' }}</h2>
+                <p class="result-message">
+                  Vous n’avez pas atteint le score requis cette fois-ci, mais ne vous découragez pas ! Continuez à vous entraîner pour progresser.
+                </p>
+                <div class="result-actions">
+                  <button class="btn-result-primary" (click)="goToNextStade()" *ngIf="!isLastStade()">
+                    Passer au stade suivant ⏩
+                  </button>
+                  <button class="btn-result-secondary" (click)="stopActivity()">
+                    Jouer à une autre activité 📚
+                  </button>
+                </div>
+              </ng-container>
+
+              <!-- Succès -->
+              <ng-container *ngIf="!isTimeout && gameSuccess">
+                <div class="result-icon">🎉</div>
+                <h2 class="result-title">Bravo !</h2>
+                <p class="result-message">
+                  Félicitations, vous avez trouvé toutes les paires en {{ gameMoves }} coups !
+                </p>
+                <div class="result-actions">
+                  <button class="btn-result-secondary" (click)="stopActivity()">
+                    Jouer à une autre activité 📚
+                  </button>
+                </div>
+              </ng-container>
+            </div>
           </div>
         </div>
 
         <!-- CONTENT Player -->
         <div class="content-player" *ngIf="playingActivity.type === 'CONTENT'">
-          <div class="content-card">
-            <!-- Vidéo YouTube embedded -->
-            <div class="video-container" *ngIf="contentData.contentType === 'video' && safeVideoUrl">
-              <iframe
-                class="video-iframe"
-                [src]="safeVideoUrl"
-                title="Lecteur vidéo"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
+          <div class="content-view-container">
+            <!-- Header du contenu -->
+            <div class="content-view-header">
+              <div class="content-meta">
+                <span class="content-type-badge" [class.video]="contentData.contentType === 'video'">
+                  {{ contentData.contentType === 'video' ? '📺 Vidéo' : '📄 Article' }}
+                </span>
+                <span class="content-duration">⏱ {{ playingActivity.estimatedMinutes }} min de lecture</span>
+              </div>
+              <h1 class="content-view-title">{{ playingActivity.title }}</h1>
             </div>
 
-            <!-- Placeholder si pas de vidéo -->
-            <div class="video-placeholder" *ngIf="contentData.contentType === 'video' && !safeVideoUrl">
-              <p>❌ URL vidéo invalide</p>
-              <p class="video-url">{{ contentData.videoUrl }}</p>
+            <!-- Lecteur Vidéo -->
+            <div class="content-main-area" *ngIf="contentData.contentType === 'video'">
+              <div class="video-wrapper shadow-lg">
+                <div class="video-container" *ngIf="safeVideoUrl">
+                  <iframe
+                    class="video-iframe"
+                    [src]="safeVideoUrl"
+                    title="Lecteur vidéo"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                  </iframe>
+                </div>
+                <!-- Placeholder vidéo -->
+                <div class="video-placeholder-premium" *ngIf="!safeVideoUrl">
+                  <div class="placeholder-icon">⚠️</div>
+                  <p>Lien vidéo non disponible ou incorrect</p>
+                  <code class="url-hint">{{ contentData.videoUrl }}</code>
+                </div>
+              </div>
             </div>
 
-            <!-- Image de l'article -->
-            <div class="article-image-container" *ngIf="contentData.contentType === 'article' && contentData.imageUrl">
-              <img [src]="contentData.imageUrl" alt="Image de l'article" class="article-image" />
+            <!-- Affichage Article -->
+            <div class="content-main-area" *ngIf="contentData.contentType === 'article'">
+              <div class="article-wrapper">
+                <div class="article-banner" *ngIf="contentData.imageUrl">
+                  <img [src]="contentData.imageUrl" alt="Couverture" class="article-img-fluid" />
+                  <div class="image-overlay"></div>
+                </div>
+                <!-- Placeholder image article -->
+                <div class="article-banner-placeholder" *ngIf="!contentData.imageUrl">
+                  <div class="placeholder-icon">📖</div>
+                  <p>Lecture thématique</p>
+                </div>
+              </div>
             </div>
 
-            <!-- Placeholder si pas d'image -->
-            <div class="image-placeholder" *ngIf="contentData.contentType === 'article' && !contentData.imageUrl">
-              <p>📄 Aucune image fournie</p>
+            <!-- Corps du texte / Description -->
+            <div class="content-body-card">
+              <div class="body-content">
+                <h3 class="section-label">À propos de cette activité</h3>
+                <p class="description-text">{{ playingActivity.description }}</p>
+                
+                <div class="additional-info" *ngIf="contentData.description">
+                  <hr class="content-divider" />
+                  <p class="content-details">{{ contentData.description }}</p>
+                </div>
+              </div>
+              
+              <div class="content-footer-actions">
+                <button class="btn-finish-content" (click)="stopActivity()">
+                  <span>J'ai terminé la séance</span>
+                  <i class="arrow-icon">→</i>
+                </button>
+              </div>
             </div>
-
-            <div class="content-info">
-              <p><strong>Type :</strong> {{ contentData.contentType }}</p>
-              <p><strong>Langue :</strong> {{ contentData.langue }}</p>
-              <p *ngIf="contentData.description"><strong>Description :</strong> {{ contentData.description }}</p>
-            </div>
-            <button class="btn-primary" (click)="stopActivity()">Terminer</button>
           </div>
         </div>
 
@@ -422,64 +492,202 @@ import { PatientProgressionService } from '../../../services/patient-progression
             </div>
           </div>
 
-          <div class="exercice-result" *ngIf="exerciceFinished">
-            <h2>✅ Exercice terminé !</h2>
-            <button class="btn-primary" (click)="stopActivity()">Choisir une autre activité</button>
+          <div class="result-overlay" *ngIf="exerciceFinished">
+            <div class="result-card">
+              <div class="result-icon">🧘</div>
+              <h2 class="result-title">Exercice terminé !</h2>
+              <p class="result-message">
+                Excellent travail ! Cette séance de relaxation est terminée.
+              </p>
+              <div class="result-actions">
+                <button class="btn-result-secondary" (click)="stopActivity()">
+                  Choisir une autre activité 📚
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-
-      </div>
+        </div> <!-- Closes player-inner -->
+      </div> <!-- Closes activity-player -->
 
     </div>
   `,
   styles: [`
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #faf8ff;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #ffffff;
       min-height: 100vh;
     }
 
-    /* ═══ Hero Banner ═══ */
+    .selection-menu, .activities-list, .activity-player {
+      padding: 0 0 60px;
+      width: 100%;
+      margin: 0;
+    }
+
+    /* Inner containers for centered content if needed */
+    .menu-inner, .list-inner, .player-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* ═══ Hero Banner (EventFront Style) ═══ */
     .edu-hero {
       position: relative;
-      background: linear-gradient(135deg, #800080, #5c0057, #3d0040);
-      border-radius: 24px;
-      padding: 48px 40px 36px;
-      margin-bottom: 40px;
+      background: linear-gradient(135deg, rgba(128,0,128,0.06) 0%, rgba(128,0,128,0.01) 100%) !important;
+      border: 1px solid rgba(128,0,128,0.08);
+      border-radius: 16px;
+      padding: 45px 30px !important;
+      margin-bottom: 30px;
       overflow: hidden;
-      color: white;
+      color: #3d0040;
       text-align: center;
-      box-shadow: 0 12px 40px rgba(128,0,128,0.35);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(128,0,128,0.04);
     }
-    .edu-hero-glow {
-      position: absolute; top: -60px; right: -60px;
-      width: 260px; height: 260px; border-radius: 50%;
-      background: rgba(255,255,255,0.07);
-      pointer-events: none;
-    }
-    .edu-hero-content { position: relative; z-index: 1; }
-    .edu-hero-icon { font-size: 56px; margin-bottom: 12px; }
-    .edu-hero-title { font-size: 34px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.5px; }
-    .edu-hero-sub { font-size: 16px; opacity: 0.8; margin: 0 0 28px; }
-
-    .prog-chips {
-      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
-      position: relative; z-index: 1;
-    }
-    .prog-chip {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
+    
+    .header-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: white;
+      color: #3d0040;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
       border-radius: 50px;
-      padding: 8px 20px;
-      display: flex; align-items: center; gap: 10px;
-      backdrop-filter: blur(4px);
+      border: 1px solid rgba(128,0,128,0.1);
+      box-shadow: 0 4px 12px rgba(128,0,128,0.05);
+      margin-bottom: 12px;
     }
-    .chip-label { font-size: 12px; opacity: 0.8; font-weight: 600; }
-    .chip-value { font-size: 14px; font-weight: 800; background: rgba(255,255,255,0.25); border-radius: 20px; padding: 2px 10px; }
-    .score-chip .chip-value { background: rgba(255,215,0,0.3); color: #ffe57a; }
+    
+    .edu-hero::before {
+      content: '';
+      position: absolute;
+      top: -50px; left: -50px;
+      width: 180px; height: 180px;
+      background: #f5e6f5;
+      filter: blur(45px);
+      border-radius: 50%;
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    .edu-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; right: 8%;
+      width: 150px; height: 150px;
+      background: #e8c8e8;
+      filter: blur(40px);
+      border-radius: 50%;
+      opacity: 0.4;
+      z-index: 0;
+    }
+
+    .edu-hero-glow { display: none; } /* Replaced by ::before/::after */
+
+    .edu-hero-content { position: relative; z-index: 1; }
+    .edu-hero-icon { font-size: 56px; margin-bottom: 15px; display: block; }
+    .edu-hero-title { 
+      font-family: 'Fraunces', serif;
+      font-size: 3.2rem; 
+      font-weight: 800; 
+      margin: 0; 
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #3d0040, #800080);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .edu-hero-sub { 
+      font-size: 1.1rem; 
+      color: #6b3e6b; 
+      margin: 8px 0 25px; 
+      max-width: 600px;
+      line-height: 1.5;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ═══ Stats Bar (EventFront Style) ═══ */
+    .stats-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: white;
+      border: 1.5px solid #e0c8e0;
+      border-radius: 50px;
+      padding: 6px 6px;
+      margin-top: 5px;
+      box-shadow: 0 2px 16px rgba(128, 0, 128, 0.08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 22px;
+    }
+
+    .stat-icon {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+    .stat-icon.upcoming { background: #f5e6f5; color: #800080; }
+    .stat-icon.total    { background: #fff9db; color: #92400e; }
+
+    .stat-info { display: flex; flex-direction: column; text-align: left; }
+    .stat-number {
+      font-family: 'Fraunces', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #3d0040;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .7rem;
+      color: #6b3e6b;
+      font-weight: 500;
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .stat-divider { width: 1px; height: 28px; background: #e0c8e0; }
+
+    .list-hero-cadre { margin-bottom: 25px !important; }
+    .btn-back-floating {
+      position: absolute; top: 20px; left: 20px;
+      background: white; border: 1px solid rgba(128,0,128,0.1);
+      padding: 8px 16px; border-radius: 50px; color: #800080;
+      font-weight: 700; font-size: 0.8rem; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); z-index: 10;
+      transition: all 0.2s ease;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-back-floating:hover { transform: translateX(-3px); border-color: #800080; background: #faf8ff; }
+
+    .btn-reset {
+      background: #ffffff; color: #800080; border: 1px solid rgba(128,0,128,0.1);
+      padding: 10px 22px; border-radius: 50px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s ease;
+      margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: inline-block;
+    }
+    .btn-reset:hover { background: #800080; color: white; transform: translateY(-1px); }
 
     /* ═══ Loading & Error ═══ */
     .loading { text-align: center; padding: 60px 20px; }
@@ -510,7 +718,7 @@ import { PatientProgressionService } from '../../../services/patient-progression
     }
 
     /* ═══ Menu de sélection ═══ */
-    .selection-menu { text-align: center; padding: 0 20px 40px; }
+    .selection-menu { text-align: center; padding: 0 0 40px; }
 
     .main-title {
       font-size: 32px; font-weight: 700;
@@ -697,14 +905,18 @@ import { PatientProgressionService } from '../../../services/patient-progression
       border: 1px solid #f0e0f0;
       margin-top: 24px;
     }
-    .result-icon { font-size: 72px; margin-bottom: 12px; }
-    .result-title { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+    .result-icon { font-size: 80px; margin-bottom: 15px; }
+    .result-title { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 800; margin-bottom: 10px; }
     .fail-title   { color: #800080; }
     .success-title { color: #059669; }
-    .score { font-size: 64px; font-weight: 800; margin: 16px 0; }
-    .score-success { color: #800080; }
+    .score { font-family: 'Fraunces', serif; font-size: 72px; font-weight: 800; margin: 20px 0; }
+    .score-success { 
+      background: linear-gradient(to bottom, #800080, #5c0057);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .score-fail    { color: #ef4444; }
-    .score-message { font-size: 18px; color: #64748b; margin-bottom: 28px; }
+    .score-message { font-size: 1.1rem; color: #6b3e6b; margin-bottom: 30px; line-height: 1.6; }
     .result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
 
     /* ═══ Memory Game ═══ */
@@ -744,43 +956,196 @@ import { PatientProgressionService } from '../../../services/patient-progression
     .memory-card.flipped .card-front,
     .memory-card.matched .card-front { display: none; }
 
-    /* ═══ Content Player ═══ */
-    .content-card {
-      background: white; border-radius: 12px; padding: 32px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    /* ═══ Content Player Premium ═══ */
+    .content-view-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .content-view-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .content-meta {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .content-type-badge {
+      background: #fdf2f2;
+      color: #991b1b;
+      padding: 5px 14px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1px solid rgba(153, 27, 27, 0.1);
+    }
+    .content-type-badge.video {
+      background: #fffbeb;
+      color: #92400e;
+      border-color: rgba(146, 64, 14, 0.1);
+    }
+
+    .content-duration {
+      font-size: 0.85rem;
+      color: #7f8ea3;
+      font-weight: 600;
+    }
+
+    .content-view-title {
+      font-family: 'Fraunces', serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #3d0040;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .content-main-area {
+      margin-bottom: 30px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .video-wrapper {
+      background: #000;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .video-container {
-      position: relative; width: 100%; padding-bottom: 56.25%;
-      margin-bottom: 20px; height: 0; overflow: hidden; border-radius: 8px;
+      width: 100%;
+      height: 100%;
     }
 
-    .video-iframe {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      border-radius: 8px;
+    .video-placeholder-premium {
+      text-align: center;
+      color: #a0aec0;
+      padding: 40px;
     }
 
-    .video-placeholder {
-      background: #f1f5f9; border-radius: 8px;
-      padding: 40px; text-align: center; margin-bottom: 20px;
-    }
-    .video-url { color: #3b82f6; word-break: break-all; }
-
-    .article-image-container {
-      margin-bottom: 20px; border-radius: 8px; overflow: hidden;
+    .article-banner {
+      position: relative;
+      width: 100%;
+      max-height: 450px;
+      overflow: hidden;
     }
 
-    .article-image {
-      width: 100%; height: auto; display: block; border-radius: 8px;
-      max-height: 500px; object-fit: cover;
+    .article-img-fluid {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
-    .image-placeholder {
-      background: #f1f5f9; border-radius: 8px;
-      padding: 40px; text-align: center; margin-bottom: 20px; color: #64748b;
+    .article-banner-placeholder {
+      background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #800080;
     }
 
-    .content-info p { margin: 12px 0; font-size: 16px; }
+    .placeholder-icon {
+      font-size: 60px;
+      margin-bottom: 15px;
+      opacity: 0.8;
+    }
+
+    .content-body-card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      border: 1px solid rgba(128,0,128,0.08);
+      box-shadow: 0 10px 30px rgba(128,0,128,0.03);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #800080;
+      font-weight: 800;
+      margin-bottom: 15px;
+    }
+
+    .description-text {
+      font-size: 1.2rem;
+      color: #2d3748;
+      line-height: 1.7;
+      margin-bottom: 25px;
+    }
+
+    .content-divider {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(to right, #f3e8ff, transparent);
+      margin: 25px 0;
+    }
+
+    .content-details {
+      font-size: 1.05rem;
+      color: #4a5568;
+      line-height: 1.6;
+    }
+
+    .content-footer-actions {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-finish-content {
+      background: linear-gradient(135deg, #800080, #5c0057);
+      color: white;
+      border: none;
+      padding: 18px 40px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 25px rgba(128, 0, 128, 0.3);
+    }
+
+    .btn-finish-content:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(128, 0, 128, 0.4);
+    }
+
+    .arrow-icon {
+      font-style: normal;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-finish-content:hover .arrow-icon {
+      transform: translateX(5px);
+    }
+
+    .url-hint {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      background: #2d3748;
+      color: #a0aec0;
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
 
     /* ═══ Exercice Player ═══ */
     .exercice-info { text-align: center; margin-bottom: 24px; }
@@ -801,10 +1166,17 @@ import { PatientProgressionService } from '../../../services/patient-progression
     .countdown { font-size: 72px; font-weight: 800; color: #800080; margin-bottom: 24px; }
 
     .progress-bar {
-      background: #f0e0f0; height: 12px;
-      border-radius: 6px; overflow: hidden;
+      background: #f5f0f5; height: 16px;
+      border-radius: 50px; overflow: hidden;
+      border: 1px solid rgba(128,0,128,0.1);
+      box-shadow: inset 0 2px 4px rgba(128,0,128,0.05);
     }
-    .progress { background: linear-gradient(90deg, #800080, #c084c8); height: 100%; transition: width 0.3s; }
+    .progress { 
+      background: linear-gradient(90deg, #b07ab0, #800080); 
+      height: 100%; 
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 12px rgba(128, 0, 128, 0.2);
+    }
 
     /* ═══ Boutons communs Purple ═══ */
     .btn-primary {
@@ -849,16 +1221,22 @@ import { PatientProgressionService } from '../../../services/patient-progression
     /* ═══ Stage Sections ═══ */
     .stages-container {
       display: flex;
-      flex-direction: column;
-      gap: 28px;
+      flex-direction: row;
+      gap: 20px;
+      align-items: flex-start;
+      width: 100%;
     }
 
     .stage-section {
+      flex: 1;
+      min-width: 0;
       border: 2px solid #f0e0f0;
       border-radius: 18px;
-      padding: 24px;
+      padding: 20px;
       background: white;
       transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
     }
 
     .stage-section.stage-accessible {
@@ -881,15 +1259,21 @@ import { PatientProgressionService } from '../../../services/patient-progression
 
     .stage-header {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 12px;
       align-items: center;
       margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px dashed #e0c8e0;
     }
 
     .stage-title-row {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
+      text-align: center;
+      width: 100%;
     }
 
     .stage-icon { font-size: 28px; }
@@ -940,6 +1324,140 @@ import { PatientProgressionService } from '../../../services/patient-progression
       color: #c084c8;
       font-size: 14px;
     }
+
+    .spacer { flex: 1; }
+
+    .btn-reset {
+      position: absolute;
+      bottom: -10px;
+      right: 20px;
+      background: white;
+      color: #800080;
+      border: 1px solid rgba(128,0,128,0.1);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      z-index: 10;
+    }
+    .btn-reset:hover {
+      background: #faf8ff;
+      border-color: #800080;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(128, 0, 128, 0.1);
+    }
+
+    /* ═══ Result Overlay (Modal) ═══ */
+    .result-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .result-card {
+      background: white;
+      border-radius: 30px;
+      padding: 50px 40px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      border: 1px solid rgba(128, 0, 128, 0.1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .result-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .result-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #3d0040;
+    }
+
+    .result-score {
+      font-family: 'Fraunces', serif;
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(to bottom, #800080, #5c0057);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 20px 0;
+    }
+
+    .result-message {
+      font-size: 18px;
+      color: #64748b;
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-result-primary {
+      background: linear-gradient(135deg, #800080, #5c0057);
+      color: white;
+      border: none;
+      padding: 16px 30px;
+      border-radius: 15px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 10px 20px rgba(128, 0, 128, 0.2);
+    }
+
+    .btn-result-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 25px rgba(128, 0, 128, 0.3);
+    }
+
+    .btn-result-secondary {
+      background: #f3e8ff;
+      color: #800080;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 15px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-result-secondary:hover {
+      background: #e9d5ff;
+    }
   `]
 })
 export class EducationComponent implements OnInit {
@@ -953,8 +1471,11 @@ export class EducationComponent implements OnInit {
 
   patientScoreQuiz: number = 0;
   patientStadeQuiz: string = 'LEGER';
+  completedStagesQuiz: string[] = [];
+
   patientScoreGame: number = 0;
   patientStadeGame: string = 'LEGER';
+  completedStagesGame: string[] = [];
 
   // Timer state
   timerRemaining: number = 0;
@@ -1046,13 +1567,41 @@ export class EducationComponent implements OnInit {
         next: (data) => {
           this.patientScoreQuiz = data.scoreQuiz;
           this.patientStadeQuiz = data.stadeQuiz;
+          this.completedStagesQuiz = data.completedStagesQuiz || [];
           this.patientScoreGame = data.scoreGame;
           this.patientStadeGame = data.stadeGame;
+          this.completedStagesGame = data.completedStagesGame || [];
           if (this.selectedType) {
             this.selectType(this.selectedType);
           }
         },
         error: (err) => console.error('Erreur chargement progression:', err)
+      });
+    }
+  }
+
+  /** Resets the patient's level for the currently selected category (QUIZ or GAME) */
+  resetLevel(): void {
+    if (!this.selectedType) return;
+    if (this.selectedType !== 'QUIZ' && this.selectedType !== 'GAME') return;
+
+    const confirmReset = confirm(`Êtes-vous sûr de vouloir réinitialiser votre progression pour les ${this.selectedType === 'QUIZ' ? 'Quiz' : 'Jeux'} ? Cette action est irréversible.`);
+    if (!confirmReset) return;
+
+    const user = this.authService.getCurrentUser();
+    if (user && user.id) {
+      this.isLoading = true;
+      this.progressionService.resetPatient(user.id, this.selectedType).subscribe({
+        next: () => {
+          console.log('Progression réinitialisée !');
+          this.loadPatientProgression(); // Refreshes UI and returns to LEGER
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Erreur lors de la réinitialisation:', err);
+          this.errorMessage = 'Une erreur est survenue lors de la réinitialisation.';
+          this.isLoading = false;
+        }
       });
     }
   }
@@ -1099,14 +1648,30 @@ export class EducationComponent implements OnInit {
 
   private readonly STAGE_ORDER = ['LEGER', 'MODERE', 'SEVERE'];
 
-  /** True if the patient has already passed this stage (it's behind their current stage) */
+  /** True if the patient has successfully finished this stage at least once */
   isStageCompleted(stade: string): boolean {
-    const currentIndex = this.STAGE_ORDER.indexOf(this.getPatientStade());
-    const stadeIndex = this.STAGE_ORDER.indexOf(stade);
-    return stadeIndex < currentIndex;
+    if (this.selectedType === 'QUIZ') return this.completedStagesQuiz.includes(stade);
+    if (this.selectedType === 'GAME') return this.completedStagesGame.includes(stade);
+    return false;
   }
 
-  /** True if the stage is ahead of the patient's current stage (not yet unlocked) */
+  /** True if the stage is ahead of the patient's current stage (not yet unlocked)
+   * OR if it's a past stage that was NOT completed (failed bypassed)
+   */
+  isStageLocked(stade: string): boolean {
+    const currentIndex = this.STAGE_ORDER.indexOf(this.getPatientStade());
+    const stadeIndex = this.STAGE_ORDER.indexOf(stade);
+
+    // Locked if it's a future stage
+    if (stadeIndex > currentIndex) return true;
+
+    // Locked if it's a past stage but was NEVER completed with success
+    if (stadeIndex < currentIndex && !this.isStageCompleted(stade)) return true;
+
+    return false;
+  }
+
+  /** True if the stage is ahead of current (for visual lock icons) */
   isStageLockedFuture(stade: string): boolean {
     const currentIndex = this.STAGE_ORDER.indexOf(this.getPatientStade());
     const stadeIndex = this.STAGE_ORDER.indexOf(stade);
@@ -1115,7 +1680,7 @@ export class EducationComponent implements OnInit {
 
   /** Click handler that respects stage access */
   onActivityClick(activity: ActivityModel, stade: string): void {
-    if (this.isStageLockedFuture(stade) || this.isStageCompleted(stade)) return;
+    if (this.isStageLocked(stade)) return;
     this.playActivity(activity);
   }
 
@@ -1234,8 +1799,10 @@ export class EducationComponent implements OnInit {
         next: (data) => {
           this.patientScoreQuiz = data.scoreQuiz;
           this.patientStadeQuiz = data.stadeQuiz;
+          this.completedStagesQuiz = data.completedStagesQuiz || [];
           this.patientScoreGame = data.scoreGame;
           this.patientStadeGame = data.stadeGame;
+          this.completedStagesGame = data.completedStagesGame || [];
           // Remet le type sélectionné pour afficher la liste avec le nouveau stade
           if (currentType) {
             this.selectType(currentType);
@@ -1292,7 +1859,7 @@ export class EducationComponent implements OnInit {
     if (this.playingActivity && this.playingActivity.estimatedMinutes) {
       durationSeconds = this.playingActivity.estimatedMinutes * 60;
     }
-    
+
     this.startActivityTimer(durationSeconds);
   }
 

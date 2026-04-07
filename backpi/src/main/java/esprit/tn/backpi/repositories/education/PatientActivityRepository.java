@@ -14,6 +14,7 @@ public interface PatientActivityRepository extends JpaRepository<PatientActivity
     Optional<PatientActivity> findFirstByUserOrderByPlayedAtDesc(User user);
     Optional<PatientActivity> findFirstByUserAndActivity_TypeOrderByPlayedAtDesc(User user, Activity.ActivityType type);
     List<PatientActivity> findAllByUserOrderByPlayedAtDesc(User user);
+    List<PatientActivity> findAllByUserAndActivity_TypeAndReussiTrue(User user, Activity.ActivityType type);
     void deleteByUser(User user);
     void deleteByUserAndActivity_Type(User user, Activity.ActivityType type);
 }

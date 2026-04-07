@@ -34,7 +34,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private static class UserHandshakeHandler extends DefaultHandshakeHandler {
         @Override
-        protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
+        protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
+                Map<String, Object> attributes) {
             String query = request.getURI().getQuery();
             if (query != null && query.contains("userId=")) {
                 String userId = query.split("userId=")[1].split("&")[0];
