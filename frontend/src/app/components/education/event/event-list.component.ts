@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EventSeatGridComponent } from './event-seat-grid.component';
 import { EventService } from '../../../services/education/event.service';
 import { CalendarEvent } from '../../../models/education/event.model';
 
@@ -8,14 +9,19 @@ import { CalendarEvent } from '../../../models/education/event.model';
   selector: 'app-event-list',
   templateUrl: './event-list.component.html',
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, EventSeatGridComponent]
 })
 export class EventListComponent implements OnInit {
+  
+  showSeats = false;
+  currentEvent: CalendarEvent | null = null;
 
-  events: CalendarEvent[] = [];
+  allEvents: CalendarEvent[] = [];
   selected: CalendarEvent | null = null;
   isEditing = false;
+  showForm = false;
   selectedFile: File | null = null;
+  searchTerm = '';
 
   // ✅ Objet pour stocker les erreurs
   errors: { [key: string]: string } = {};
@@ -24,8 +30,10 @@ export class EventListComponent implements OnInit {
     title: '',
     startDateTime: '',
     location: '',
+    description: '',
     remindEnabled: false,
-    userId: 1
+    userId: 1,
+    capacity: 0
   };
 
   constructor(private eventService: EventService) {}
@@ -34,7 +42,18 @@ export class EventListComponent implements OnInit {
 
   load() {
     this.eventService.getAll().subscribe((data: CalendarEvent[]) => {
-      this.events = data;
+      this.allEvents = data;
+    });
+  }
+
+  get filteredEvents(): CalendarEvent[] {
+    return this.allEvents.filter(e => {
+      const term = this.searchTerm.toLowerCase().trim();
+      return !term || 
+             e.title?.toLowerCase().includes(term) || 
+             e.description?.toLowerCase().includes(term) ||
+             e.location?.toLowerCase().includes(term) ||
+             e.id?.toString().includes(term);
     });
   }
 
@@ -82,15 +101,17 @@ export class EventListComponent implements OnInit {
     } else {
       const selected = new Date(dateValue);
       const now = new Date();
-      const oneYearLater = new Date();
-      oneYearLater.setFullYear(now.getFullYear() + 1);
+      
+      // On définit une limite raisonnable (ex: 2 ans maximum dans le futur)
+      const maxFutureDate = new Date();
+      maxFutureDate.setFullYear(now.getFullYear() + 2);
 
       if (isNaN(selected.getTime())) {
         this.errors['startDateTime'] = 'La date est invalide.';
       } else if (selected < now) {
         this.errors['startDateTime'] = 'La date ne peut pas être dans le passé.';
-      } else if (selected > oneYearLater) {
-        this.errors['startDateTime'] = 'La date ne peut pas dépasser un an dans le futur.';
+      } else if (selected > maxFutureDate) {
+        this.errors['startDateTime'] = 'La date est trop lointaine (max 2 ans dans le futur).';
       }
     }
 
@@ -102,9 +123,29 @@ export class EventListComponent implements OnInit {
       this.errors['location'] = 'Le lieu doit contenir au moins 2 caractères.';
     }
 
+    // --- Description ---
+    const desc = this.newEvent.description?.trim();
+    if (!desc) {
+      this.errors['description'] = 'La description est obligatoire.';
+    } else if (desc.length < 10) {
+      this.errors['description'] = 'La description doit contenir au moins 10 caractères.';
+    } else if (desc.length > 500) {
+      this.errors['description'] = 'La description ne doit pas dépasser 500 caractères.';
+    }
+
     // --- Image (required) ---
     if (!this.selectedFile && !this.isEditing) {
       this.errors['image'] = 'L\'image est obligatoire.';
+    }
+
+    // --- Capacité ---
+    const capacity = this.newEvent.capacity;
+    if (capacity === null || capacity === undefined) {
+      this.errors['capacity'] = 'La capacité est obligatoire.';
+    } else if (capacity <= 0) {
+      this.errors['capacity'] = 'La capacité doit être supérieure à 0.';
+    } else if (capacity > 500) {
+      this.errors['capacity'] = 'La capacité maximale est de 500 places.';
     }
 
     return Object.keys(this.errors).length === 0;
@@ -148,6 +189,7 @@ export class EventListComponent implements OnInit {
     this.selected = event;
     this.newEvent = { ...event };
     this.isEditing = true;
+    this.showForm = true;
     this.errors = {};
   }
 
@@ -157,6 +199,18 @@ export class EventListComponent implements OnInit {
     }
   }
 
+  viewSeats(event: CalendarEvent) {
+    this.currentEvent = event;
+    this.showSeats = true;
+    this.showForm = false;
+  }
+
+  onSeatsClosed() {
+    this.showSeats = false;
+    this.currentEvent = null;
+    this.load(); // Rafraîchir les places dispo
+  }
+
   reset() {
     this.selectedFile = null;
     this.errors = {};
@@ -164,10 +218,13 @@ export class EventListComponent implements OnInit {
       title: '',
       startDateTime: '',
       location: '',
+      description: '',
       remindEnabled: false,
-      userId: 1
+      userId: 1,
+      capacity: 0
     };
     this.selected = null;
     this.isEditing = false;
+    this.showForm = false;
   }
 }

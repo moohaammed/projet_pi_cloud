@@ -13,6 +13,7 @@ import { UserService } from '../../services/user.service';
 export class DoctorDetailComponent implements OnInit {
   doctor: any = null;
   isLoading = true;
+  isFavorite = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -42,6 +43,24 @@ export class DoctorDetailComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  /**
+   * Returns a null-safe hero banner image URL.
+   * Uses ui-avatars as a beautiful fallback (no template event binding needed).
+   */
+  getHeroImage(): string {
+    if (this.doctor?.profileImageUrl) {
+      return this.doctor.profileImageUrl;
+    }
+    const fn = encodeURIComponent((this.doctor?.firstName || 'D').charAt(0));
+    const ln = encodeURIComponent((this.doctor?.lastName || 'r').charAt(0));
+    // Large, high-quality generated avatar for the banner
+    return `https://ui-avatars.com/api/?name=${fn}+${ln}&background=8b5cf6&color=fff&size=512&bold=true&font-size=0.4`;
+  }
+
+  toggleFav() {
+    this.isFavorite = !this.isFavorite;
   }
 
   makeAppointment() {

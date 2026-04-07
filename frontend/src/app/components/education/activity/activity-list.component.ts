@@ -14,10 +14,12 @@ import { ActivityDataFormComponent } from './activity-data-form.component';
 })
 export class ActivityListComponent implements OnInit {
 
-  activities: ActivityModel[] = [];
+  allActivities: ActivityModel[] = [];
   selected: ActivityModel | null = null;
   isEditing = false;
+  showForm = false;
   filterType = '';
+  searchTerm = '';
 
   errors: { [key: string]: string } = {};
 
@@ -39,23 +41,26 @@ export class ActivityListComponent implements OnInit {
 
   load(): void {
     this.activityService.getAll().subscribe(data => {
-      this.activities = data;
+      this.allActivities = data;
       this.cdr.markForCheck();
+    });
+  }
+
+  get filteredActivities(): ActivityModel[] {
+    return this.allActivities.filter(a => {
+      const matchesType = !this.filterType || a.type === this.filterType;
+      const term = this.searchTerm.toLowerCase().trim();
+      const matchesSearch = !term || 
+                           a.title?.toLowerCase().includes(term) || 
+                           a.description?.toLowerCase().includes(term) ||
+                           a.id?.toString().includes(term);
+      return matchesType && matchesSearch;
     });
   }
 
   loadByType(type: string): void {
     this.filterType = type;
-
-    if (!type) {
-      this.load();
-      return;
-    }
-
-    this.activityService.getByType(type).subscribe(data => {
-      this.activities = data;
-      this.cdr.markForCheck();
-    });
+    this.cdr.markForCheck();
   }
 
   onDataChange(jsonString: string): void {
@@ -80,15 +85,6 @@ export class ActivityListComponent implements OnInit {
       this.errors['description'] = 'La description est obligatoire.';
     } else if (desc.length > 500) {
       this.errors['description'] = 'La description ne doit pas dépasser 500 caractères.';
-    }
-
-    const minutes = this.newActivity.estimatedMinutes;
-    if (minutes === null || minutes === undefined) {
-      this.errors['estimatedMinutes'] = 'La durée est obligatoire.';
-    } else if (minutes < 1) {
-      this.errors['estimatedMinutes'] = 'La durée doit être d\'au moins 1 minute.';
-    } else if (minutes > 300) {
-      this.errors['estimatedMinutes'] = 'La durée ne doit pas dépasser 300 minutes.';
     }
 
     return Object.keys(this.errors).length === 0;
@@ -116,6 +112,7 @@ export class ActivityListComponent implements OnInit {
     this.selected = activity;
     this.newActivity = { ...activity };
     this.isEditing = true;
+    this.showForm = true;
     this.errors = {};
     this.cdr.markForCheck();
   }
@@ -145,6 +142,7 @@ export class ActivityListComponent implements OnInit {
     };
     this.selected = null;
     this.isEditing = false;
+    this.showForm = false;
     this.errors = {};
     this.cdr.markForCheck();
   }

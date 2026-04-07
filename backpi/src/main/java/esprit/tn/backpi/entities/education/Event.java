@@ -1,10 +1,12 @@
 package esprit.tn.backpi.entities.education;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "events")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Event {
 
     @Id
@@ -27,6 +29,10 @@ public class Event {
     private Long activityId;     // FK nullable vers Activity
 
     private String imageUrl;     // URL vers l'image uploadée
+    
+    private Integer capacity = 0;
+    
+    private Integer availablePlaces = 0;
 
     private LocalDateTime createdAt;
 
@@ -107,6 +113,26 @@ public class Event {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+        // Si on change la capacité, on réinitialise les places dispo if null or new
+        if (this.availablePlaces == null || this.availablePlaces == 0) {
+           this.availablePlaces = capacity;
+        }
+    }
+
+    public Integer getAvailablePlaces() {
+        return availablePlaces;
+    }
+
+    public void setAvailablePlaces(Integer availablePlaces) {
+        this.availablePlaces = availablePlaces;
     }
 
     public LocalDateTime getCreatedAt() {

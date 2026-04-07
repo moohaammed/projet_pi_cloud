@@ -13,9 +13,19 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
+    @Autowired
+    private EventSeatService eventSeatService;
+
     // CREATE
     public Event createEvent(Event event) {
-        return eventRepository.save(event);
+        // Initialiser availablePlaces à capacity
+        if (event.getCapacity() != null) {
+            event.setAvailablePlaces(event.getCapacity());
+        }
+        Event saved = eventRepository.save(event);
+        // Générer les sièges
+        eventSeatService.generateSeats(saved);
+        return saved;
     }
 
     // READ ALL
@@ -45,6 +55,16 @@ public class EventService {
         existing.setRemindEnabled(updated.getRemindEnabled());
         existing.setUserId(updated.getUserId());
         existing.setActivityId(updated.getActivityId());
+
+        // Update capacity and availablePlaces if provided
+        if (updated.getCapacity() != null && !updated.getCapacity().equals(existing.getCapacity())) {
+            existing.setCapacity(updated.getCapacity());
+            // Note: In a real app, changing capacity might require deleting/adding seats.
+            // For now, we simple update the value.
+            existing.setAvailablePlaces(updated.getCapacity());
+            // Rétroactivement générer les sièges si nécessaire (simple approche)
+            eventSeatService.generateSeats(existing);
+        }
 
         // Ne pas écraser imageUrl si elle n'est pas fournie
         if (updated.getImageUrl() != null) {

@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/education/event.service';
+import { EventSeatGridComponent } from './event-seat-grid.component';
 import { CalendarEvent } from '../../../models/education/event.model';
 
 @Component({
   selector: 'app-event-front',
   templateUrl: './event_front.html',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EventSeatGridComponent],
   styles: [`
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800&display=swap');
 
@@ -356,6 +357,39 @@ import { CalendarEvent } from '../../../models/education/event.model';
     }
     .card-remind svg { width: 11px; height: 11px; }
 
+    .card-actions {
+      display: flex;
+      margin-top: 10px;
+    }
+
+    .btn-participate {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(128, 0, 128, 0.2);
+    }
+
+    .btn-participate:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(128, 0, 128, 0.3);
+    }
+
+    .btn-participate:active {
+      transform: translateY(0);
+    }
+
     .pagination {
       display: flex;
       align-items: center;
@@ -451,6 +485,8 @@ export class EventFrontComponent implements OnInit {
   currentPage = 1;
   pageSize = 6;
 
+  showBooking = false;
+  selectedEvent: CalendarEvent | null = null;
   constructor(private eventService: EventService) {}
 
   ngOnInit() { this.load(); }
@@ -509,6 +545,17 @@ export class EventFrontComponent implements OnInit {
 
   getUpcomingCount(): number {
     return this.events.filter(e => this.isUpcoming(e.startDateTime)).length;
+  }
+
+  openBooking(event: CalendarEvent) {
+    this.selectedEvent = event;
+    this.showBooking = true;
+  }
+
+  onBookingClosed() {
+    this.showBooking = false;
+    this.selectedEvent = null;
+    this.load(); // Rafraîchir pour voir les places dispo (si affichées un jour sur la card)
   }
 
   onImgError(event: any) { event.target.src = 'assets/images/event-placeholder.jpg'; }
