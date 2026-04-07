@@ -1,0 +1,6 @@
+venv/  
+**/venv/  
+flask_api/venv/  
+backpi/venv/  
+__pycache__/  
+.venv/ 

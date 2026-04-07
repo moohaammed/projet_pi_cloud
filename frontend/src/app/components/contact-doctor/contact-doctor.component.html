@@ -31,7 +31,7 @@
             <div class="d-flex flex-column align-items-center mt-3 text-center">
               <div class="avatar-container position-relative mb-3">
                 <img [src]="doc.profileImageUrl || 'assets/default-avatar.png'"
-                     (error)="$event.target.src='https://ui-avatars.com/api/?name=' + doc.firstName + '+' + doc.lastName + '&background=random'"
+                     (error)="$any($event.target).src='https://ui-avatars.com/api/?name=' + doc.firstName + '+' + doc.lastName + '&background=random'"
                      class="rounded-circle shadow-sm profile-img" alt="Doctor Photo">
                 <span class="status-dot online"></span>
               </div>

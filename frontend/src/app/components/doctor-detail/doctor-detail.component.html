@@ -22,7 +22,7 @@
 
       <!-- Doctor Photo (can be large image) -->
       <img [src]="doctor.profileImageUrl || 'assets/default-large-doc.jpg'" 
-           (error)="$event.target.src='https://ui-avatars.com/api/?name=' + doctor.firstName + '+' + doctor.lastName + '&background=random&size=512'"
+           (error)="$any($event.target).src='https://ui-avatars.com/api/?name=' + doctor.firstName + '+' + doctor.lastName + '&background=random&size=512'"
            class="banner-img w-100" alt="Doctor Hero Image">
       
       <!-- Bottom Info Overlay -->
