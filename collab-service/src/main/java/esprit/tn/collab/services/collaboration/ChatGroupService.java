@@ -11,7 +11,6 @@ import esprit.tn.collab.entities.collaboration.JoinRequestStatus;
 import esprit.tn.collab.repositories.collaboration.ChatGroupRepository;
 import esprit.tn.collab.repositories.collaboration.GroupJoinRequestRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -41,11 +40,10 @@ public class ChatGroupService {
         return chatGroupRepository.findAll().stream().map(this::mapToResponseDto).collect(Collectors.toList());
     }
 
-    public ChatGroupResponseDto getGroupById(Long id) {
+    public ChatGroupResponseDto getGroupById(String id) {
         return chatGroupRepository.findById(id).map(this::mapToResponseDto).orElse(null);
     }
 
-    @Transactional
     public ChatGroupResponseDto createGroup(ChatGroupCreateDto dto) {
         ChatGroup group = new ChatGroup();
         group.setName(dto.getName());
@@ -53,17 +51,12 @@ public class ChatGroupService {
         group.setTheme(dto.getTheme());
         group.setCreatedAt(Instant.now());
         group.setOwnerId(dto.getOwnerId());
-        if (dto.getMemberIds() != null) {
-            group.setMemberIds(new HashSet<>(dto.getMemberIds()));
-        }
-        if (dto.getOwnerId() != null) {
-            group.getMemberIds().add(dto.getOwnerId());
-        }
+        if (dto.getMemberIds() != null) group.setMemberIds(new HashSet<>(dto.getMemberIds()));
+        if (dto.getOwnerId() != null) group.getMemberIds().add(dto.getOwnerId());
         return mapToResponseDto(chatGroupRepository.save(group));
     }
 
-    @Transactional
-    public ChatGroupResponseDto updateGroup(Long id, ChatGroupCreateDto dto) {
+    public ChatGroupResponseDto updateGroup(String id, ChatGroupCreateDto dto) {
         return chatGroupRepository.findById(id).map(group -> {
             group.setName(dto.getName());
             group.setDescription(dto.getDescription());
@@ -72,29 +65,25 @@ public class ChatGroupService {
         }).orElse(null);
     }
 
-    @Transactional
-    public void deleteGroup(Long id) {
+    public void deleteGroup(String id) {
         chatGroupRepository.deleteById(id);
     }
 
-    @Transactional
-    public ChatGroupResponseDto joinGroup(Long groupId, Long userId) {
+    public ChatGroupResponseDto joinGroup(String groupId, Long userId) {
         return chatGroupRepository.findById(groupId).map(group -> {
             group.getMemberIds().add(userId);
             return mapToResponseDto(chatGroupRepository.save(group));
         }).orElse(null);
     }
 
-    @Transactional
-    public ChatGroupResponseDto leaveGroup(Long groupId, Long userId) {
+    public ChatGroupResponseDto leaveGroup(String groupId, Long userId) {
         return chatGroupRepository.findById(groupId).map(group -> {
             group.getMemberIds().remove(userId);
             return mapToResponseDto(chatGroupRepository.save(group));
         }).orElse(null);
     }
 
-    @Transactional
-    public void requestToJoinGroup(Long groupId, Long userId) {
+    public void requestToJoinGroup(String groupId, Long userId) {
         if (groupJoinRequestRepository.existsByGroupIdAndUserIdAndStatus(groupId, userId, JoinRequestStatus.PENDING)) return;
         ChatGroup group = chatGroupRepository.findById(groupId).orElseThrow();
         GroupJoinRequest req = new GroupJoinRequest();
@@ -106,19 +95,19 @@ public class ChatGroupService {
         }
     }
 
-    @Transactional
-    public void approveJoinRequest(Long requestId) {
+    public void approveJoinRequest(String requestId) {
         groupJoinRequestRepository.findById(requestId).ifPresent(req -> {
             req.setStatus(JoinRequestStatus.ACCEPTED);
-            req.getGroup().getMemberIds().add(req.getUserId());
-            chatGroupRepository.save(req.getGroup());
+            chatGroupRepository.findById(req.getGroupId()).ifPresent(group -> {
+                group.getMemberIds().add(req.getUserId());
+                chatGroupRepository.save(group);
+            });
             groupJoinRequestRepository.save(req);
-            notificationService.createAndSend(req.getUserId(), "Your request to join \"" + req.getGroup().getName() + "\" was approved!", "JOIN_APPROVED");
+            notificationService.createAndSend(req.getUserId(), "Your request to join \"" + req.getGroupName() + "\" was approved!", "JOIN_APPROVED");
         });
     }
 
-    @Transactional
-    public void rejectJoinRequest(Long requestId) {
+    public void rejectJoinRequest(String requestId) {
         groupJoinRequestRepository.findById(requestId).ifPresent(req -> {
             req.setStatus(JoinRequestStatus.REJECTED);
             groupJoinRequestRepository.save(req);
@@ -138,18 +127,15 @@ public class ChatGroupService {
         dto.setCategory(group.getCategory() != null ? group.getCategory().name() : GroupCategory.MIXED.name());
         dto.setCreatedAt(group.getCreatedAt());
         dto.setOwnerId(group.getOwnerId());
-
         if (group.getOwnerId() != null) {
             Map<String, Object> owner = userClient.getUserById(group.getOwnerId());
             dto.setOwnerName(userClient.getFullName(owner));
         }
-
         List<MemberDto> members = group.getMemberIds().stream().map(uid -> {
             Map<String, Object> u = userClient.getUserById(uid);
             return new MemberDto(uid, userClient.getFullName(u));
         }).collect(Collectors.toList());
         dto.setMembers(members);
-
         return dto;
     }
 }

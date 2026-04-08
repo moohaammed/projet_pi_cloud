@@ -38,18 +38,21 @@ public class AdminCollaborationController {
     }
 
     @PostMapping("/moderation/{publicationId}/dismiss")
-    public ResponseEntity<Void> dismissFlag(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable Long publicationId) {
-        adminCollaborationService.dismissModerationFlag(adminUserId, publicationId); return ResponseEntity.ok().build();
+    public ResponseEntity<Void> dismissFlag(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable String publicationId) {
+        adminCollaborationService.dismissModerationFlag(adminUserId, publicationId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/moderation/{publicationId}")
-    public ResponseEntity<Void> deletePost(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable Long publicationId) {
-        adminCollaborationService.deleteModeratedPost(adminUserId, publicationId); return ResponseEntity.ok().build();
+    public ResponseEntity<Void> deletePost(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable String publicationId) {
+        adminCollaborationService.deleteModeratedPost(adminUserId, publicationId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/users/{userId}/suspend")
     public ResponseEntity<Void> suspendUser(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable Long userId) {
-        adminCollaborationService.suspendUser(adminUserId, userId); return ResponseEntity.ok().build();
+        adminCollaborationService.suspendUser(adminUserId, userId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/analytics/stress-trend")
@@ -60,7 +63,8 @@ public class AdminCollaborationController {
 
     @PostMapping("/analytics/retroactive-scan")
     public ResponseEntity<Void> retroactiveScan(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
-        adminCollaborationService.retroactiveSafetyScan(adminUserId); return ResponseEntity.ok().build();
+        adminCollaborationService.retroactiveSafetyScan(adminUserId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/groups")
@@ -69,21 +73,23 @@ public class AdminCollaborationController {
     }
 
     @DeleteMapping("/groups/{groupId}")
-    public ResponseEntity<Void> deleteGroup(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable Long groupId) {
-        adminCollaborationService.deleteGroup(adminUserId, groupId); return ResponseEntity.ok().build();
+    public ResponseEntity<Void> deleteGroup(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable String groupId) {
+        adminCollaborationService.deleteGroup(adminUserId, groupId);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/groups/{groupId}")
-    public ResponseEntity<Void> updateGroup(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable Long groupId,
+    public ResponseEntity<Void> updateGroup(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable String groupId,
                                             @RequestBody ChatGroupAdminDto dto) {
-        adminCollaborationService.updateGroup(adminUserId, groupId, dto); return ResponseEntity.ok().build();
+        adminCollaborationService.updateGroup(adminUserId, groupId, dto);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/announcement")
     public ResponseEntity<Void> postAnnouncement(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
                                                  @RequestBody Map<String, Object> payload) {
         String content = (String) payload.get("content");
-        Long groupId = payload.get("groupId") != null ? Long.valueOf(payload.get("groupId").toString()) : null;
+        String groupId = payload.get("groupId") != null ? payload.get("groupId").toString() : null;
         Instant scheduledAt = payload.get("scheduledAt") != null ? Instant.parse(payload.get("scheduledAt").toString()) : null;
         adminCollaborationService.createAdminAnnouncement(adminUserId, content, groupId, scheduledAt);
         return ResponseEntity.ok().build();
@@ -100,13 +106,15 @@ public class AdminCollaborationController {
     }
 
     @PostMapping("/moderation/{publicationId}/approve")
-    public ResponseEntity<Void> approvePost(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable Long publicationId) {
-        adminCollaborationService.dismissModerationFlag(adminUserId, publicationId); return ResponseEntity.ok().build();
+    public ResponseEntity<Void> approvePost(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable String publicationId) {
+        adminCollaborationService.dismissModerationFlag(adminUserId, publicationId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/moderation/users/{userId}/ban")
     public ResponseEntity<Void> banUser(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable Long userId) {
-        adminCollaborationService.suspendUser(adminUserId, userId); return ResponseEntity.ok().build();
+        adminCollaborationService.suspendUser(adminUserId, userId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/privacy/direct-messages/metadata")
@@ -136,7 +144,7 @@ public class AdminCollaborationController {
 
     @GetMapping("/analytics/retrospective")
     public ResponseEntity<HandoverDTO> getRetrospective(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
-                                                         @RequestParam Long groupId,
+                                                         @RequestParam String groupId,
                                                          @RequestParam(defaultValue = "24") int hours) {
         return ResponseEntity.ok(adminCollaborationService.getRetrospective(adminUserId, groupId, hours));
     }

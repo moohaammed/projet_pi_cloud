@@ -5,14 +5,14 @@ import esprit.tn.collab.entities.collaboration.admin.SafetyAlertType;
 import java.time.Instant;
 
 public class SafetyAlertLogAdminDto {
-    private Long id;
+    private String id;
     private String patientName;
     private SafetyAlertType alertType;
     private Instant time;
     private SafetyAlertStatus status;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getPatientName() { return patientName; }
     public void setPatientName(String patientName) { this.patientName = patientName; }
     public SafetyAlertType getAlertType() { return alertType; }

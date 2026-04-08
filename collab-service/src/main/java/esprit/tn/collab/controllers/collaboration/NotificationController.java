@@ -20,8 +20,8 @@ public class NotificationController {
     public List<NotificationResponseDto> getNotifications(@PathVariable Long userId) { return notificationService.getNotificationsForUser(userId); }
 
     @PutMapping("/{id}/read")
-    public void markAsRead(@PathVariable Long id) { notificationService.markAsRead(id); }
+    public void markAsRead(@PathVariable String id) { notificationService.markAsRead(id); }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable Long id) { notificationService.deleteNotification(id); return ResponseEntity.noContent().build(); }
+    public ResponseEntity<Void> deleteNotification(@PathVariable String id) { notificationService.deleteNotification(id); return ResponseEntity.noContent().build(); }
 }

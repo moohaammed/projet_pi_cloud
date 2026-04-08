@@ -35,14 +35,14 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
-    public void markAsRead(Long id) {
+    public void markAsRead(String id) {
         notificationRepository.findById(id).ifPresent(n -> {
             n.setRead(true);
             notificationRepository.save(n);
         });
     }
 
-    public void deleteNotification(Long id) {
+    public void deleteNotification(String id) {
         notificationRepository.deleteById(id);
     }
 

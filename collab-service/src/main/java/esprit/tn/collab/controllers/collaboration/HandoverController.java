@@ -17,7 +17,7 @@ public class HandoverController {
     public HandoverController(HandoverService handoverService) { this.handoverService = handoverService; }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<Map<String, String>> getHandoverSummary(@PathVariable Long groupId,
+    public ResponseEntity<Map<String, String>> getHandoverSummary(@PathVariable String groupId,
                                                                    @RequestParam(defaultValue = "24") int hours) {
         return ResponseEntity.ok(Collections.singletonMap("summary", handoverService.generateHandoverSummary(groupId, hours)));
     }

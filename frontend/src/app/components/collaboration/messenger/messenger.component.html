@@ -172,7 +172,7 @@
                                      <button class="btn btn-sm w-100 text-start rounded-pill px-3 py-1 border position-relative overflow-hidden"
                                              [class.btn-primary]="opt.voterIds.includes(currentUserId())"
                                              [class.btn-light]="!opt.voterIds.includes(currentUserId())"
-                                             (click)="vote(msg.id!, opt.id)">
+                                             (click)="vote(msg.id!, opt.id!)">
                                         <div class="position-absolute top-0 start-0 h-100 bg-primary bg-opacity-10 rounded-pill"
                                              [style.width.%]="getVotePercentage(msg, opt)"></div>
                                         <span class="position-relative d-flex justify-content-between">

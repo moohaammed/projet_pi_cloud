@@ -15,7 +15,7 @@ public class CareRelayController {
     public CareRelayController(CareRelayService careRelayService) { this.careRelayService = careRelayService; }
 
     @GetMapping("/handover")
-    public ResponseEntity<HandoverDTO> getHandoverSummary(@RequestParam Long groupId,
+    public ResponseEntity<HandoverDTO> getHandoverSummary(@RequestParam String groupId,
                                                            @RequestParam(defaultValue = "8") int hours) {
         return ResponseEntity.ok(careRelayService.generateHandoverSummary(groupId, hours));
     }

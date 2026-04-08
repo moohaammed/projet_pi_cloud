@@ -32,7 +32,7 @@ public class CareRelayService {
         this.handoverService = handoverService;
     }
 
-    public HandoverDTO generateHandoverSummary(Long groupId, int hours) {
+    public HandoverDTO generateHandoverSummary(String groupId, int hours) {
         Instant since = Instant.now().minus(hours, ChronoUnit.HOURS);
         List<Message> messages = messageRepository.findByChatGroupIdAndSentAtAfterOrderBySentAtAsc(groupId, since);
         List<Publication> publications = publicationRepository.findByCreatedAtAfterOrderByCreatedAtDesc(since);
@@ -64,7 +64,7 @@ public class CareRelayService {
         for (Message msg : messages) {
             if (msg.getContent() != null && msg.getContent().trim().endsWith("?")) {
                 boolean hasReply = messages.stream().anyMatch(reply ->
-                        reply.getParentMessage() != null && reply.getParentMessage().getId().equals(msg.getId())
+                        reply.getParentMessageId() != null && reply.getParentMessageId().equals(msg.getId())
                         && !reply.getSenderId().equals(msg.getSenderId()));
                 if (!hasReply) {
                     pendingTasks.add("Unanswered question from User " + msg.getSenderId() + ": \"" + truncate(msg.getContent(), 100) + "\"");

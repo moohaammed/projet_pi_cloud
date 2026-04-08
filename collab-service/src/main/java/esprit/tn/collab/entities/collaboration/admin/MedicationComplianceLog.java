@@ -1,27 +1,21 @@
 package esprit.tn.collab.entities.collaboration.admin;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 
-@Entity
-@Table(name = "medication_compliance_logs")
+@Document(collection = "medication_compliance_logs")
 public class MedicationComplianceLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    /** userId only — no JPA join to User */
-    @Column(name = "patient_id", nullable = false)
     private Long patientId;
-
-    @Column(nullable = false)
     private boolean tookMedication;
-
     private Instant createdAt = Instant.now();
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public Long getPatientId() { return patientId; }
     public void setPatientId(Long patientId) { this.patientId = patientId; }
     public boolean isTookMedication() { return tookMedication; }

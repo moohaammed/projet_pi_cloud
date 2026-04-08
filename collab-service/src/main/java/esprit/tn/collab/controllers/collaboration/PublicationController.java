@@ -30,17 +30,29 @@ public class PublicationController {
     public List<PublicationResponseDto> getAllPublications() { return publicationService.getAllPublications(); }
 
     @GetMapping("/feed/{userId}")
-    public List<PublicationResponseDto> getPersonalizedFeed(@PathVariable Long userId) { return publicationService.getPersonalizedFeed(userId); }
+    public List<PublicationResponseDto> getPersonalizedFeed(@PathVariable Long userId) {
+        return publicationService.getPersonalizedFeed(userId);
+    }
 
     @GetMapping("/group/{groupId}")
-    public List<PublicationResponseDto> getGroupFeed(@PathVariable Long groupId) { return publicationService.getGroupFeed(groupId); }
+    public List<PublicationResponseDto> getGroupFeed(@PathVariable String groupId) {
+        return publicationService.getGroupFeed(groupId);
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PublicationResponseDto> getPublicationById(@PathVariable Long id) {
+    public ResponseEntity<PublicationResponseDto> getPublicationById(@PathVariable String id) {
         PublicationResponseDto p = publicationService.getPublicationById(id);
         return p != null ? ResponseEntity.ok(p) : ResponseEntity.notFound().build();
     }
 
+    // 🔹 NEW: JSON-only endpoint (for simple text posts)
+    @PostMapping(value = "/json", consumes = "application/json")
+    public ResponseEntity<PublicationResponseDto> createPublicationJson(
+            @Valid @RequestBody PublicationCreateDto dto) {
+
+        PublicationResponseDto result = publicationService.createPublication(dto, null, null);
+        return ResponseEntity.ok(result);
+    }
     @PostMapping(consumes = "multipart/form-data")
     public PublicationResponseDto createPublication(@Valid @ModelAttribute PublicationCreateDto dto,
                                                     @RequestParam(value = "type", required = false) String typeStr,
@@ -60,7 +72,8 @@ public class PublicationController {
     }
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<PublicationResponseDto> updatePublication(@PathVariable Long id, @Valid @ModelAttribute PublicationCreateDto dto,
+    public ResponseEntity<PublicationResponseDto> updatePublication(@PathVariable String id,
+                                                                    @Valid @ModelAttribute PublicationCreateDto dto,
                                                                     @RequestParam(value = "file", required = false) MultipartFile file) {
         String mediaUrl = null, mimeType = null;
         if (file != null && !file.isEmpty()) { mediaUrl = fileStorageService.storeFile(file); mimeType = file.getContentType(); }
@@ -69,10 +82,13 @@ public class PublicationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePublication(@PathVariable Long id) { publicationService.deletePublication(id); return ResponseEntity.noContent().build(); }
+    public ResponseEntity<Void> deletePublication(@PathVariable String id) {
+        publicationService.deletePublication(id);
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/{id}/poll/vote")
-    public ResponseEntity<PublicationResponseDto> voteInPoll(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+    public ResponseEntity<PublicationResponseDto> voteInPoll(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         int optionIndex = (int) payload.get("optionIndex");
         Long userId = Long.valueOf(payload.get("userId").toString());
         PublicationResponseDto result = publicationService.voteInPoll(id, optionIndex, userId);
@@ -80,7 +96,7 @@ public class PublicationController {
     }
 
     @PostMapping("/{id}/support")
-    public ResponseEntity<PublicationResponseDto> toggleSupport(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+    public ResponseEntity<PublicationResponseDto> toggleSupport(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         Long userId = Long.valueOf(payload.get("userId").toString());
         PublicationResponseDto result = publicationService.toggleSupport(id, userId);
         return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();

@@ -1,34 +1,25 @@
 package esprit.tn.collab.entities.collaboration;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Document(collection = "publications")
 public class Publication {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Lob
     private String content;
-
     private String mediaUrl;
     private String mimeType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", columnDefinition = "VARCHAR(255)")
     private PublicationType type;
-
     private Instant createdAt;
-
-    /** userId only — no JPA join to User */
-    @Column(name = "author_id", nullable = false)
     private Long authorId;
 
-    @OneToMany(mappedBy = "publication", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    /** Embedded comments */
     private List<Comment> comments = new ArrayList<>();
 
     private boolean isDistressed;
@@ -36,34 +27,23 @@ public class Publication {
     private boolean anonymous;
     private String pollQuestion;
 
-    @OneToMany(mappedBy = "publication", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    /** Embedded poll options */
     private List<PublicationPollOption> pollOptions = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "group_id")
-    private ChatGroup chatGroup;
+    /** Reference to group by String id */
+    private String chatGroupId;
+    private String chatGroupName;
 
-    @Column(name = "linked_event_id")
     private Long linkedEventId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "moderation_status", length = 32)
     private ModerationStatus moderationStatus = ModerationStatus.NONE;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "moderation_reason", length = 32)
     private ModerationReason moderationReason;
-
-    @Column(name = "moderation_flagged_at")
     private Instant moderationFlaggedAt;
-
-    @Lob
     private String supportIds = "";
 
     public Publication() {}
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
     public String getMediaUrl() { return mediaUrl; }
@@ -88,8 +68,13 @@ public class Publication {
     public void setPollQuestion(String pollQuestion) { this.pollQuestion = pollQuestion; }
     public List<PublicationPollOption> getPollOptions() { return pollOptions; }
     public void setPollOptions(List<PublicationPollOption> pollOptions) { this.pollOptions = pollOptions; }
-    public ChatGroup getChatGroup() { return chatGroup; }
-    public void setChatGroup(ChatGroup chatGroup) { this.chatGroup = chatGroup; }
+    public String getChatGroupId() { return chatGroupId; }
+    public void setChatGroupId(String chatGroupId) { this.chatGroupId = chatGroupId; }
+    public String getChatGroupName() { return chatGroupName; }
+    public void setChatGroupName(String chatGroupName) { this.chatGroupName = chatGroupName; }
+    // Compatibility helpers used by services
+    public ChatGroup getChatGroup() { return null; } // not used in MongoDB version
+    public void setChatGroup(ChatGroup g) { if (g != null) { this.chatGroupId = g.getId(); this.chatGroupName = g.getName(); } }
     public Long getLinkedEventId() { return linkedEventId; }
     public void setLinkedEventId(Long linkedEventId) { this.linkedEventId = linkedEventId; }
     public ModerationStatus getModerationStatus() { return moderationStatus; }

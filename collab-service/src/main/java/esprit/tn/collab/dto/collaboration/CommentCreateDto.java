@@ -14,7 +14,7 @@ public class CommentCreateDto {
     private Long authorId;
 
     @NotNull
-    private Long publicationId;
+    private String publicationId; // MongoDB String id
 
     public CommentCreateDto() {}
 
@@ -22,6 +22,6 @@ public class CommentCreateDto {
     public void setContent(String content) { this.content = content; }
     public Long getAuthorId() { return authorId; }
     public void setAuthorId(Long authorId) { this.authorId = authorId; }
-    public Long getPublicationId() { return publicationId; }
-    public void setPublicationId(Long publicationId) { this.publicationId = publicationId; }
+    public String getPublicationId() { return publicationId; }
+    public void setPublicationId(String publicationId) { this.publicationId = publicationId; }
 }

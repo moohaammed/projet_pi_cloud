@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MessageResponseDto {
 
-    private Long id;
+    private String id;
     private String content;
     private String mediaUrl;
     private String mimeType;
@@ -15,8 +15,8 @@ public class MessageResponseDto {
     private Long senderId;
     private String senderName;
     private Long receiverId;
-    private Long chatGroupId;
-    private Long parentMessageId;
+    private String chatGroupId;
+    private String parentMessageId;
     private String parentMessageContent;
     private String parentMessageSenderName;
     private PublicationResponseDto sharedPublication;
@@ -32,8 +32,8 @@ public class MessageResponseDto {
 
     public MessageResponseDto() {}
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
     public String getMediaUrl() { return mediaUrl; }
@@ -48,8 +48,8 @@ public class MessageResponseDto {
     public void setSenderName(String senderName) { this.senderName = senderName; }
     public Long getReceiverId() { return receiverId; }
     public void setReceiverId(Long receiverId) { this.receiverId = receiverId; }
-    public Long getChatGroupId() { return chatGroupId; }
-    public void setChatGroupId(Long chatGroupId) { this.chatGroupId = chatGroupId; }
+    public String getChatGroupId() { return chatGroupId; }
+    public void setChatGroupId(String chatGroupId) { this.chatGroupId = chatGroupId; }
     public boolean isDistressed() { return isDistressed; }
     public void setDistressed(boolean distressed) { isDistressed = distressed; }
     public Double getSentimentScore() { return sentimentScore; }
@@ -58,8 +58,8 @@ public class MessageResponseDto {
     public void setPinned(boolean pinned) { isPinned = pinned; }
     public List<Long> getViewedByUserIds() { return viewedByUserIds; }
     public void setViewedByUserIds(List<Long> viewedByUserIds) { this.viewedByUserIds = viewedByUserIds; }
-    public Long getParentMessageId() { return parentMessageId; }
-    public void setParentMessageId(Long parentMessageId) { this.parentMessageId = parentMessageId; }
+    public String getParentMessageId() { return parentMessageId; }
+    public void setParentMessageId(String parentMessageId) { this.parentMessageId = parentMessageId; }
     public String getParentMessageContent() { return parentMessageContent; }
     public void setParentMessageContent(String parentMessageContent) { this.parentMessageContent = parentMessageContent; }
     public String getParentMessageSenderName() { return parentMessageSenderName; }

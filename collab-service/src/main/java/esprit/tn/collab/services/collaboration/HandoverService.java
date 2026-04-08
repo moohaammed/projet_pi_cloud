@@ -35,7 +35,7 @@ public class HandoverService {
         this.restTemplate = new RestTemplate();
     }
 
-    public String generateHandoverSummary(Long groupId, int hours) {
+    public String generateHandoverSummary(String groupId, int hours) {
         Instant since = Instant.now().minus(hours, java.time.temporal.ChronoUnit.HOURS);
         List<Message> messages = messageRepository.findByChatGroupIdAndSentAtAfterOrderBySentAtAsc(groupId, since);
 

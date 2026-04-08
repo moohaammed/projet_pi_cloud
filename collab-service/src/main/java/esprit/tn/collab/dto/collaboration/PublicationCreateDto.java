@@ -18,7 +18,7 @@ public class PublicationCreateDto {
     private boolean anonymous;
     private String pollQuestion;
     private List<String> pollOptions;
-    private Long groupId;
+    private String groupId;
     private Long linkedEventId;
 
     public PublicationCreateDto() {}
@@ -35,8 +35,8 @@ public class PublicationCreateDto {
     public void setPollQuestion(String pollQuestion) { this.pollQuestion = pollQuestion; }
     public List<String> getPollOptions() { return pollOptions; }
     public void setPollOptions(List<String> pollOptions) { this.pollOptions = pollOptions; }
-    public Long getGroupId() { return groupId; }
-    public void setGroupId(Long groupId) { this.groupId = groupId; }
+    public String getGroupId() { return groupId; }
+    public void setGroupId(String groupId) { this.groupId = groupId; }
     public Long getLinkedEventId() { return linkedEventId; }
     public void setLinkedEventId(Long linkedEventId) { this.linkedEventId = linkedEventId; }
 }

@@ -1,6 +1,7 @@
 package esprit.tn.collab.repositories.collaboration;
 
 import esprit.tn.collab.entities.collaboration.PublicationPollOption;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface PublicationPollOptionRepository extends JpaRepository<PublicationPollOption, Long> {}
+// Poll options are embedded in Publication — stub kept for compatibility
+public interface PublicationPollOptionRepository extends MongoRepository<PublicationPollOption, String> {}

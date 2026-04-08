@@ -10,6 +10,7 @@ import esprit.tn.collab.repositories.collaboration.PublicationRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.util.*;
@@ -24,7 +25,6 @@ public class PublicationService {
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     private final PublicationRepository publicationRepository;
-    private final PublicationPollOptionRepository pollOptionRepository;
     private final SentimentAnalysisService sentimentAnalysisService;
     private final NotificationService notificationService;
     private final UserClient userClient;
@@ -32,6 +32,9 @@ public class PublicationService {
     private final MessageRepository messageRepository;
     private final CareBotService careBotService;
     private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${main.service.url:http://localhost:8082}")
+    private String mainServiceUrl;
 
     public PublicationService(PublicationRepository publicationRepository,
                               PublicationPollOptionRepository pollOptionRepository,
@@ -42,7 +45,6 @@ public class PublicationService {
                               MessageRepository messageRepository,
                               @Lazy CareBotService careBotService) {
         this.publicationRepository = publicationRepository;
-        this.pollOptionRepository = pollOptionRepository;
         this.sentimentAnalysisService = sentimentAnalysisService;
         this.notificationService = notificationService;
         this.userClient = userClient;
@@ -52,21 +54,20 @@ public class PublicationService {
     }
 
     public List<PublicationResponseDto> getAllPublications() {
-        return publicationRepository.findAllByOrderByCreatedAtDesc(Instant.now()).stream()
+        return publicationRepository.findByCreatedAtBeforeOrderByCreatedAtDesc(Instant.now()).stream()
                 .map(this::mapToResponseDto).collect(Collectors.toList());
     }
 
     public List<PublicationResponseDto> getPersonalizedFeed(Long userId) {
-        return publicationRepository.findPersonalizedFeed(Instant.now()).stream()
-                .map(this::mapToResponseDto).collect(Collectors.toList());
+        return getAllPublications();
     }
 
-    public List<PublicationResponseDto> getGroupFeed(Long groupId) {
-        return publicationRepository.findByChatGroupIdOrderByCreatedAtDesc(groupId, Instant.now()).stream()
-                .map(this::mapToResponseDto).collect(Collectors.toList());
+    public List<PublicationResponseDto> getGroupFeed(String groupId) {
+        return publicationRepository.findByChatGroupIdAndCreatedAtBeforeOrderByCreatedAtDesc(groupId, Instant.now())
+                .stream().map(this::mapToResponseDto).collect(Collectors.toList());
     }
 
-    public PublicationResponseDto getPublicationById(Long id) {
+    public PublicationResponseDto getPublicationById(String id) {
         return publicationRepository.findById(id).map(this::mapToResponseDto).orElse(null);
     }
 
@@ -96,7 +97,6 @@ public class PublicationService {
                     if (optionText != null && !optionText.trim().isEmpty()) {
                         PublicationPollOption option = new PublicationPollOption();
                         option.setText(optionText.trim());
-                        option.setPublication(publication);
                         options.add(option);
                     }
                 }
@@ -104,28 +104,24 @@ public class PublicationService {
             }
         }
 
-        String sentimentSource = publication.getContent();
-        Double score = sentimentAnalysisService.calculateSentimentScore(sentimentSource);
+        Double score = sentimentAnalysisService.calculateSentimentScore(publication.getContent());
         publication.setSentimentScore(score);
         publication.setDistressed(score <= -0.5);
 
-        Publication saved = publicationRepository.saveAndFlush(publication);
-        Publication fresh = publicationRepository.findById(saved.getId()).orElse(saved);
-
-        boolean misinfo = MISINFORMATION_PATTERN.matcher(sentimentSource).matches();
+        boolean misinfo = MISINFORMATION_PATTERN.matcher(publication.getContent()).matches();
         if (misinfo) {
-            fresh.setModerationStatus(ModerationStatus.PENDING_REVIEW);
-            fresh.setModerationReason(ModerationReason.MISINFORMATION);
-            fresh.setModerationFlaggedAt(Instant.now());
-            publicationRepository.save(fresh);
-        } else if (fresh.isDistressed()) {
-            fresh.setModerationStatus(ModerationStatus.PENDING_REVIEW);
-            fresh.setModerationReason(ModerationReason.HIGH_DISTRESS);
-            fresh.setModerationFlaggedAt(Instant.now());
-            publicationRepository.save(fresh);
+            publication.setModerationStatus(ModerationStatus.PENDING_REVIEW);
+            publication.setModerationReason(ModerationReason.MISINFORMATION);
+            publication.setModerationFlaggedAt(Instant.now());
+        } else if (publication.isDistressed()) {
+            publication.setModerationStatus(ModerationStatus.PENDING_REVIEW);
+            publication.setModerationReason(ModerationReason.HIGH_DISTRESS);
+            publication.setModerationFlaggedAt(Instant.now());
         }
 
-        if (fresh.isDistressed()) {
+        Publication saved = publicationRepository.save(publication);
+
+        if (saved.isDistressed()) {
             notificationService.createAndSend(dto.getAuthorId(),
                 "CareBot: I noticed your post might reflect some distress. Remember, you're not alone. ❤️", "CAREBOT");
             careBotService.sendReassurance(dto.getAuthorId());
@@ -136,7 +132,7 @@ public class PublicationService {
         return mapToResponseDto(saved);
     }
 
-    public PublicationResponseDto updatePublication(Long id, PublicationCreateDto dto, String mediaUrl, String mimeType) {
+    public PublicationResponseDto updatePublication(String id, PublicationCreateDto dto, String mediaUrl, String mimeType) {
         return publicationRepository.findById(id).map(existing -> {
             existing.setContent(dto.getContent());
             existing.setType(dto.getType());
@@ -146,11 +142,11 @@ public class PublicationService {
         }).orElse(null);
     }
 
-    public void deletePublication(Long id) {
+    public void deletePublication(String id) {
         publicationRepository.deleteById(id);
     }
 
-    public PublicationResponseDto toggleSupport(Long pubId, Long userId) {
+    public PublicationResponseDto toggleSupport(String pubId, Long userId) {
         return publicationRepository.findById(pubId).map(pub -> {
             String currentIds = pub.getSupportIds();
             List<String> idList = (currentIds != null && !currentIds.trim().isEmpty())
@@ -162,7 +158,7 @@ public class PublicationService {
         }).orElse(null);
     }
 
-    public PublicationResponseDto voteInPoll(Long pubId, int optionIndex, Long userId) {
+    public PublicationResponseDto voteInPoll(String pubId, int optionIndex, Long userId) {
         return publicationRepository.findById(pubId).map(pub -> {
             if (pub.getType() == PublicationType.VOTE && pub.getPollOptions() != null && optionIndex < pub.getPollOptions().size()) {
                 for (PublicationPollOption opt : pub.getPollOptions()) {
@@ -194,10 +190,8 @@ public class PublicationService {
         String sIds = publication.getSupportIds();
         dto.setSupportCount(sIds != null && !sIds.isEmpty() ? sIds.split(",").length : 0);
 
-        if (publication.getChatGroup() != null) {
-            dto.setGroupId(publication.getChatGroup().getId());
-            dto.setGroupName(publication.getChatGroup().getName());
-        }
+        dto.setGroupId(publication.getChatGroupId());
+        dto.setGroupName(publication.getChatGroupName());
 
         if (publication.getPollOptions() != null) {
             dto.setPollOptions(publication.getPollOptions().stream().map(opt -> {
@@ -231,7 +225,7 @@ public class PublicationService {
                 cdto.setAuthorId(c.getAuthorId());
                 Map<String, Object> author = userClient.getUserById(c.getAuthorId());
                 cdto.setAuthorName(userClient.getFullName(author));
-                if (c.getPublication() != null) cdto.setPublicationId(c.getPublication().getId());
+                cdto.setPublicationId(publication.getId());
                 return cdto;
             }).collect(Collectors.toList()));
         }
@@ -249,7 +243,7 @@ public class PublicationService {
     @SuppressWarnings("unchecked")
     private SharedEventPreviewDto fetchEventPreview(Long eventId) {
         try {
-            Map<String, Object> ev = restTemplate.getForObject("http://backpi/api/events/" + eventId, Map.class);
+            Map<String, Object> ev = restTemplate.getForObject(mainServiceUrl + "/api/events/" + eventId, Map.class);
             if (ev == null) return null;
             SharedEventPreviewDto p = new SharedEventPreviewDto();
             p.setId(eventId);

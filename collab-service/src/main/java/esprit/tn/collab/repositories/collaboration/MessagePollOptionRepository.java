@@ -1,6 +1,7 @@
 package esprit.tn.collab.repositories.collaboration;
 
 import esprit.tn.collab.entities.collaboration.MessagePollOption;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface MessagePollOptionRepository extends JpaRepository<MessagePollOption, Long> {}
+// Poll options are embedded in Message — this repo is a no-op stub kept for compatibility
+public interface MessagePollOptionRepository extends MongoRepository<MessagePollOption, String> {}

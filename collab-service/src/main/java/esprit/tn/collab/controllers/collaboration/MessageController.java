@@ -28,16 +28,22 @@ public class MessageController {
     public List<MessageResponseDto> getAllMessages() { return messageService.getAllMessages(); }
 
     @GetMapping("/group/{groupId}")
-    public List<MessageResponseDto> getMessagesByGroup(@PathVariable Long groupId) { return messageService.getMessagesByGroup(groupId); }
+    public List<MessageResponseDto> getMessagesByGroup(@PathVariable String groupId) {
+        return messageService.getMessagesByGroup(groupId);
+    }
 
     @GetMapping("/direct/{u1}/{u2}")
-    public List<MessageResponseDto> getDirectMessages(@PathVariable Long u1, @PathVariable Long u2) { return messageService.getDirectMessages(u1, u2); }
+    public List<MessageResponseDto> getDirectMessages(@PathVariable Long u1, @PathVariable Long u2) {
+        return messageService.getDirectMessages(u1, u2);
+    }
 
     @GetMapping("/bot/{userId}")
-    public List<MessageResponseDto> getBotMessages(@PathVariable Long userId) { return messageService.getBotMessages(userId); }
+    public List<MessageResponseDto> getBotMessages(@PathVariable Long userId) {
+        return messageService.getBotMessages(userId);
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MessageResponseDto> getMessageById(@PathVariable Long id) {
+    public ResponseEntity<MessageResponseDto> getMessageById(@PathVariable String id) {
         MessageResponseDto msg = messageService.getMessageById(id);
         return msg != null ? ResponseEntity.ok(msg) : ResponseEntity.notFound().build();
     }
@@ -51,7 +57,8 @@ public class MessageController {
     }
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable Long id, @Valid @ModelAttribute MessageCreateDto dto,
+    public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String id,
+                                                            @Valid @ModelAttribute MessageCreateDto dto,
                                                             @RequestParam(value = "file", required = false) MultipartFile file) {
         String mediaUrl = null, mimeType = null;
         if (file != null && !file.isEmpty()) { mediaUrl = fileStorageService.storeFile(file); mimeType = file.getContentType(); }
@@ -60,13 +67,20 @@ public class MessageController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable Long id) { messageService.deleteMessage(id); return ResponseEntity.noContent().build(); }
+    public ResponseEntity<Void> deleteMessage(@PathVariable String id) {
+        messageService.deleteMessage(id);
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/{id}/vote")
-    public MessageResponseDto voteOnPoll(@PathVariable Long id, @RequestParam Long userId, @RequestParam Long optionId) {
+    public MessageResponseDto voteOnPoll(@PathVariable String id,
+                                         @RequestParam Long userId,
+                                         @RequestParam String optionId) {
         return messageService.voteOnPoll(id, userId, optionId);
     }
 
     @PostMapping("/{id}/pin")
-    public MessageResponseDto togglePin(@PathVariable Long id) { return messageService.togglePin(id); }
+    public MessageResponseDto togglePin(@PathVariable String id) {
+        return messageService.togglePin(id);
+    }
 }

@@ -7,6 +7,7 @@ __pycache__/
 
 # IntelliJ IDEA
 .idea/
+.vscode/
 *.iml
 *.iws
 *.ipr
@@ -23,3 +24,5 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+
+

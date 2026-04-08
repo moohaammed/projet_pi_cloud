@@ -6,7 +6,7 @@ import java.util.List;
 
 public class PublicationResponseDto {
 
-    private Long id;
+    private String id;
     private String content;
     private String mediaUrl;
     private String mimeType;
@@ -19,7 +19,7 @@ public class PublicationResponseDto {
     private boolean anonymous;
     private String pollQuestion;
     private List<PollOptionResponseDto> pollOptions;
-    private Long groupId;
+    private String groupId;
     private String groupName;
     private Long linkedEventId;
     private SharedEventPreviewDto linkedEvent;
@@ -31,8 +31,8 @@ public class PublicationResponseDto {
 
     public PublicationResponseDto() {}
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
     public String getMediaUrl() { return mediaUrl; }
@@ -67,8 +67,8 @@ public class PublicationResponseDto {
     public void setSupportCount(int supportCount) { this.supportCount = supportCount; }
     public String getSupportIds() { return supportIds; }
     public void setSupportIds(String supportIds) { this.supportIds = supportIds; }
-    public Long getGroupId() { return groupId; }
-    public void setGroupId(Long groupId) { this.groupId = groupId; }
+    public String getGroupId() { return groupId; }
+    public void setGroupId(String groupId) { this.groupId = groupId; }
     public String getGroupName() { return groupName; }
     public void setGroupName(String groupName) { this.groupName = groupName; }
     public Long getLinkedEventId() { return linkedEventId; }

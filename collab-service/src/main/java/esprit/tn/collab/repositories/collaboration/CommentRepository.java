@@ -1,9 +1,10 @@
 package esprit.tn.collab.repositories.collaboration;
 
 import esprit.tn.collab.entities.collaboration.Comment;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByPublicationIdOrderByCreatedAtAsc(Long publicationId);
+// Comments are embedded in Publication — this repo is kept for compatibility
+// but most comment operations go through PublicationRepository
+public interface CommentRepository extends MongoRepository<Comment, String> {
 }

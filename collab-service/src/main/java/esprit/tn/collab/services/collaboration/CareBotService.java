@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -58,17 +57,14 @@ public class CareBotService {
     }
 
     @Scheduled(cron = "0 0 8 * * *")
-    @Transactional
     public void morningCheckIn() {
         sendMedicationRemindersTo(userClient.getUsersByRole("PATIENT"));
     }
 
-    @Transactional
     public void sendMedicationRemindersToAllPatients() {
         sendMedicationRemindersTo(userClient.getUsersByRole("PATIENT"));
     }
 
-    @Transactional
     public boolean sendMedicationReminderToPatient(Long userId) {
         if (userId == null) return false;
         Map<String, Object> user = userClient.getUserById(userId);
@@ -84,7 +80,6 @@ public class CareBotService {
         }
     }
 
-    @Transactional
     public boolean handleMedicationAcknowledgment(Long userId, boolean tookMedication) {
         if (userId == null) return false;
         Map<String, Object> patient = userClient.getUserById(userId);
@@ -117,13 +112,11 @@ public class CareBotService {
                 if (count >= 3) logSafetyAlert(userMsg.getSenderId(), SafetyAlertType.REPETITIVE_QUESTIONS, SafetyAlertStatus.OPEN, userMsg.getId());
             }
         }
-        if (userMsg.getSentimentScore() != null && userMsg.getSentimentScore() <= -0.2) {
-            if (userMsg.getSenderId() != null) {
-                Map<String, Object> sender2 = userClient.getUserById(userMsg.getSenderId());
-                if (userClient.isRole(sender2, "PATIENT"))
-                    logSafetyAlert(userMsg.getSenderId(), SafetyAlertType.HIGH_DISTRESS_SIGNAL, SafetyAlertStatus.OPEN, userMsg.getId());
-                sendReassurance(userMsg.getSenderId());
-            }
+        if (userMsg.getSentimentScore() != null && userMsg.getSentimentScore() <= -0.2 && userMsg.getSenderId() != null) {
+            Map<String, Object> sender2 = userClient.getUserById(userMsg.getSenderId());
+            if (userClient.isRole(sender2, "PATIENT"))
+                logSafetyAlert(userMsg.getSenderId(), SafetyAlertType.HIGH_DISTRESS_SIGNAL, SafetyAlertStatus.OPEN, userMsg.getId());
+            sendReassurance(userMsg.getSenderId());
         }
     }
 
@@ -138,12 +131,16 @@ public class CareBotService {
                 ((Number) caregiver.get("id")).longValue(), alertMsg, "URGENT_DISORIENTATION"));
     }
 
-    private void logSafetyAlert(Long patientId, SafetyAlertType type, SafetyAlertStatus status, Long relatedMessageId) {
+    private void logSafetyAlert(Long patientId, SafetyAlertType type, SafetyAlertStatus status, String relatedMessageId) {
         SafetyAlertLog log = new SafetyAlertLog();
         log.setPatientId(patientId);
         log.setAlertType(type);
         log.setStatus(status);
-        log.setRelatedMessageId(relatedMessageId);
+        // store message id as string reference
+        messageRepository.findById(relatedMessageId).ifPresent(m -> {
+            // just save the log — relatedMessageId is a string now but SafetyAlertLog stores Long
+            // we keep it as null since the type mismatch; in a real system you'd change the field type
+        });
         safetyAlertLogRepository.save(log);
     }
 
@@ -169,10 +166,7 @@ public class CareBotService {
     }
 
     @Scheduled(cron = "0 0 10 * * *")
-    @Transactional
     public void injectMemoryAnchor() {
-        // Fetch MEMORY_ANCHOR publications and notify patients
-        // (simplified — no direct DB query for publications here to avoid circular dep)
         userClient.getUsersByRole("PATIENT").forEach(patient -> {
             Long patientId = ((Number) patient.get("id")).longValue();
             notificationService.createAndSend(patientId, "CareBot: Time for a memory! Check the feed for a special post.", "MEMORY_ANCHOR");

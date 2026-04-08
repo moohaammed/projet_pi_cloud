@@ -1,63 +1,49 @@
 package esprit.tn.collab.entities.collaboration;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Document(collection = "messages")
 public class Message {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Lob
     private String content;
-
     private String mediaUrl;
     private String mimeType;
     private Instant sentAt;
-
-    /** userId only — no JPA join to User */
-    @Column(name = "sender_id")
     private Long senderId;
-
-    @Column(name = "receiver_id")
     private Long receiverId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "group_id")
-    private ChatGroup chatGroup;
+    /** Store group id as String reference */
+    private String chatGroupId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Message parentMessage;
+    /** Parent message id for replies */
+    private String parentMessageId;
+    private String parentMessageContent;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "shared_publication_id")
-    private Publication sharedPublication;
+    /** Shared publication id */
+    private String sharedPublicationId;
 
     private boolean isDistressed;
     private Double sentimentScore = 0.0;
     private boolean isPinned = false;
-
-    @ElementCollection
     private List<Long> viewedByUserIds = new ArrayList<>();
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", columnDefinition = "VARCHAR(255)")
     private MessageType type = MessageType.TEXT;
-
     private String pollQuestion;
 
-    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    /** Embedded poll options — no separate collection */
     private List<MessagePollOption> pollOptions = new ArrayList<>();
 
     public Message() {}
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
     public String getMediaUrl() { return mediaUrl; }
@@ -70,8 +56,14 @@ public class Message {
     public void setSenderId(Long senderId) { this.senderId = senderId; }
     public Long getReceiverId() { return receiverId; }
     public void setReceiverId(Long receiverId) { this.receiverId = receiverId; }
-    public ChatGroup getChatGroup() { return chatGroup; }
-    public void setChatGroup(ChatGroup chatGroup) { this.chatGroup = chatGroup; }
+    public String getChatGroupId() { return chatGroupId; }
+    public void setChatGroupId(String chatGroupId) { this.chatGroupId = chatGroupId; }
+    public String getParentMessageId() { return parentMessageId; }
+    public void setParentMessageId(String parentMessageId) { this.parentMessageId = parentMessageId; }
+    public String getParentMessageContent() { return parentMessageContent; }
+    public void setParentMessageContent(String parentMessageContent) { this.parentMessageContent = parentMessageContent; }
+    public String getSharedPublicationId() { return sharedPublicationId; }
+    public void setSharedPublicationId(String sharedPublicationId) { this.sharedPublicationId = sharedPublicationId; }
     public boolean isDistressed() { return isDistressed; }
     public void setDistressed(boolean distressed) { isDistressed = distressed; }
     public Double getSentimentScore() { return sentimentScore; }
@@ -80,10 +72,6 @@ public class Message {
     public void setPinned(boolean pinned) { isPinned = pinned; }
     public List<Long> getViewedByUserIds() { return viewedByUserIds; }
     public void setViewedByUserIds(List<Long> viewedByUserIds) { this.viewedByUserIds = viewedByUserIds; }
-    public Message getParentMessage() { return parentMessage; }
-    public void setParentMessage(Message parentMessage) { this.parentMessage = parentMessage; }
-    public Publication getSharedPublication() { return sharedPublication; }
-    public void setSharedPublication(Publication sharedPublication) { this.sharedPublication = sharedPublication; }
     public MessageType getType() { return type; }
     public void setType(MessageType type) { this.type = type; }
     public String getPollQuestion() { return pollQuestion; }

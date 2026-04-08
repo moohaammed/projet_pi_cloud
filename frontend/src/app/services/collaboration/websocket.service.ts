@@ -71,7 +71,7 @@ export class WebSocketService {
     }
   }
 
-  subscribeToGroup(gid: number) {
+  subscribeToGroup(gid: string) {
     if (this.connected$.value && this.stompClient) {
       this.stompClient.subscribe('/topic/group/' + gid, (msg: any) => {
         this.realtimeMessage.set(JSON.parse(msg.body));

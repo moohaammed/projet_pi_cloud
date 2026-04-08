@@ -10,7 +10,7 @@ export interface SystemHealthKpis {
 }
 
 export interface SafetyAlertLogRow {
-  id: number;
+  id: string;
   patientName: string;
   alertType: string;
   time: string;
@@ -18,7 +18,7 @@ export interface SafetyAlertLogRow {
 }
 
 export interface ModerationQueueItem {
-  publicationId: number;
+  publicationId: string;
   authorName: string;
   authorId: number;
   contentPreview: string;
@@ -43,7 +43,7 @@ export interface DirectMessageMetadata {
 }
 
 export interface ChatGroupAdmin {
-  id: number;
+  id: string;
   name: string;
   description: string;
   category: string;
@@ -87,9 +87,7 @@ export class AdminCollaborationService {
   private headers(): HttpHeaders {
     const u = this.auth.getCurrentUser();
     const id = u?.id;
-    if (id == null) {
-      return new HttpHeaders();
-    }
+    if (id == null) return new HttpHeaders();
     return new HttpHeaders().set('X-Admin-User-Id', String(id));
   }
 
@@ -105,11 +103,11 @@ export class AdminCollaborationService {
     return this.http.get<ModerationQueueItem[]>(`${this.base}/moderation/queue`, { headers: this.headers() });
   }
 
-  dismissFlag(publicationId: number): Observable<void> {
+  dismissFlag(publicationId: string): Observable<void> {
     return this.http.post<void>(`${this.base}/moderation/${publicationId}/dismiss`, {}, { headers: this.headers() });
   }
 
-  deletePost(publicationId: number): Observable<void> {
+  deletePost(publicationId: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/moderation/${publicationId}`, { headers: this.headers() });
   }
 
@@ -119,36 +117,31 @@ export class AdminCollaborationService {
 
   getStressTrend(days = 7): Observable<PlatformStressTrend> {
     return this.http.get<PlatformStressTrend>(`${this.base}/analytics/stress-trend`, {
-      headers: this.headers(),
-      params: { days: String(days) }
+      headers: this.headers(), params: { days: String(days) }
     });
   }
 
   getDirectMessageMetadata(): Observable<DirectMessageMetadata[]> {
-    return this.http.get<DirectMessageMetadata[]>(`${this.base}/privacy/direct-messages/metadata`, {
-      headers: this.headers()
-    });
+    return this.http.get<DirectMessageMetadata[]>(`${this.base}/privacy/direct-messages/metadata`, { headers: this.headers() });
   }
 
   retroactiveScan(): Observable<void> {
-    return this.http.post<void>(`${this.base}/analytics/retroactive-scan`, {}, {
-      headers: this.headers()
-    });
+    return this.http.post<void>(`${this.base}/analytics/retroactive-scan`, {}, { headers: this.headers() });
   }
 
   getAllGroups(): Observable<ChatGroupAdmin[]> {
     return this.http.get<ChatGroupAdmin[]>(`${this.base}/groups`, { headers: this.headers() });
   }
 
-  deleteGroup(groupId: number): Observable<void> {
+  deleteGroup(groupId: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/groups/${groupId}`, { headers: this.headers() });
   }
 
-  updateGroup(groupId: number, dto: ChatGroupAdmin): Observable<void> {
+  updateGroup(groupId: string, dto: ChatGroupAdmin): Observable<void> {
     return this.http.put<void>(`${this.base}/groups/${groupId}`, dto, { headers: this.headers() });
   }
 
-  postAnnouncement(content: string, groupId?: number, scheduledAt?: string): Observable<void> {
+  postAnnouncement(content: string, groupId?: string, scheduledAt?: string): Observable<void> {
     return this.http.post<void>(`${this.base}/announcement`, { content, groupId, scheduledAt }, { headers: this.headers() });
   }
 
@@ -160,7 +153,7 @@ export class AdminCollaborationService {
     return this.http.get<ChatGroupAdmin[]>(`${this.base}/users/${userId}/groups`, { headers: this.headers() });
   }
 
-  approvePost(publicationId: number): Observable<void> {
+  approvePost(publicationId: string): Observable<void> {
     return this.http.post<void>(`${this.base}/moderation/${publicationId}/approve`, {}, { headers: this.headers() });
   }
 
@@ -184,10 +177,10 @@ export class AdminCollaborationService {
     return this.http.get<ClinicalPulse>(`${this.base}/analytics/clinical-pulse`, { headers: this.headers() });
   }
 
-  getRetrospective(groupId: number, hours: number): Observable<any> {
+  getRetrospective(groupId: string, hours: number): Observable<any> {
     return this.http.get<any>(`${this.base}/analytics/retrospective`, {
       headers: this.headers(),
-      params: { groupId: String(groupId), hours: String(hours) }
+      params: { groupId, hours: String(hours) }
     });
   }
 }

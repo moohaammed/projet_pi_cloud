@@ -19,17 +19,24 @@ public class CommentController {
     public CommentController(CommentService commentService) { this.commentService = commentService; }
 
     @GetMapping("/publication/{publicationId}")
-    public List<CommentResponseDto> getCommentsByPublication(@PathVariable Long publicationId) { return commentService.getCommentsByPublication(publicationId); }
+    public List<CommentResponseDto> getCommentsByPublication(@PathVariable String publicationId) {
+        return commentService.getCommentsByPublication(publicationId);
+    }
 
     @PostMapping
-    public CommentResponseDto createComment(@Valid @RequestBody CommentCreateDto dto) { return commentService.createComment(dto); }
+    public CommentResponseDto createComment(@Valid @RequestBody CommentCreateDto dto) {
+        return commentService.createComment(dto);
+    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long id, @Valid @RequestBody CommentCreateDto dto) {
+    public ResponseEntity<CommentResponseDto> updateComment(@PathVariable String id, @Valid @RequestBody CommentCreateDto dto) {
         CommentResponseDto c = commentService.updateComment(id, dto);
         return c != null ? ResponseEntity.ok(c) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long id) { commentService.deleteComment(id); return ResponseEntity.noContent().build(); }
+    public ResponseEntity<Void> deleteComment(@PathVariable String id) {
+        commentService.deleteComment(id);
+        return ResponseEntity.noContent().build();
+    }
 }

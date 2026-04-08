@@ -5,7 +5,7 @@ import esprit.tn.collab.entities.collaboration.PublicationType;
 import java.time.Instant;
 
 public class ModerationQueueItemDto {
-    private Long publicationId;
+    private String publicationId;
     private String authorName;
     private Long authorId;
     private String contentPreview;
@@ -13,8 +13,8 @@ public class ModerationQueueItemDto {
     private Instant flaggedAt;
     private PublicationType type;
 
-    public Long getPublicationId() { return publicationId; }
-    public void setPublicationId(Long publicationId) { this.publicationId = publicationId; }
+    public String getPublicationId() { return publicationId; }
+    public void setPublicationId(String publicationId) { this.publicationId = publicationId; }
     public String getAuthorName() { return authorName; }
     public void setAuthorName(String authorName) { this.authorName = authorName; }
     public Long getAuthorId() { return authorId; }
