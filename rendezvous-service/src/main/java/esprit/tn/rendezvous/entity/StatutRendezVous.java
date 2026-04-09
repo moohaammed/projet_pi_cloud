@@ -1,4 +1,5 @@
-package esprit.tn.backpi.entity;
+package esprit.tn.rendezvous.entity;
+
 public enum StatutRendezVous {
     PLANIFIE,
     CONFIRME,

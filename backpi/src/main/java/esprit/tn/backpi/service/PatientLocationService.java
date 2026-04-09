@@ -1,6 +1,10 @@
 package esprit.tn.backpi.service;
 
 import esprit.tn.backpi.entity.*;
+import esprit.tn.backpi.entity.GeoAlert;
+import esprit.tn.backpi.entity.PatientLocation;
+import esprit.tn.backpi.entity.TypeAlerte;
+import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,7 @@
 package esprit.tn.backpi.controller;
 
 import esprit.tn.backpi.entity.User;
+import esprit.tn.backpi.entity.Role;
 import esprit.tn.backpi.repository.UserRepository;
 import esprit.tn.backpi.services.collaboration.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,7 +118,7 @@ public class AuthController {
                 newUser.setNom(nameParts.length > 1 ? nameParts[1] : nameParts[0]);  // Last name
 
                 newUser.setActif(true);
-                newUser.setRole(esprit.tn.backpi.entity.Role.PATIENT);
+                newUser.setRole(Role.PATIENT);
                 newUser.setPassword(java.util.UUID.randomUUID().toString());
                 return userRepository.save(newUser);
             });

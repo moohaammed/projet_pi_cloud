@@ -27,6 +27,12 @@ spring:
           predicates:
             - Path=/api/messages/**,/api/groups/**,/api/publications/**,/api/comments/**,/api/notifications/**,/api/handover/**,/api/care-relay/**,/api/carebot/**,/api/admin/collaboration/**
 
+        # ── RendezVous service ──────────────────────────────────────────
+        - id: rendezvous-rest
+          uri: lb://rendezvous-service
+          predicates:
+            - Path=/api/rendezvous/**
+
         # ── Main service (backpi) ──────────────────────────────────────────
         - id: main-service
           uri: lb://backpi
