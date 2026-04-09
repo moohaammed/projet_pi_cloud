@@ -20,11 +20,11 @@ export class CareRelayService {
   handover = signal<HandoverDTO | null>(null);
   loading = signal(false);
 
-  fetchHandover(groupId: number, hours: number = 8): Observable<HandoverDTO> {
+  fetchHandover(groupId: string, hours: number = 8): Observable<HandoverDTO> {
     return this.http.get<HandoverDTO>(`${this.apiUrl}/handover?groupId=${groupId}&hours=${hours}`);
   }
 
-  loadHandover(groupId: number, hours: number = 8) {
+  loadHandover(groupId: string, hours: number = 8) {
     this.loading.set(true);
     this.fetchHandover(groupId, hours).subscribe({
       next: (dto) => {

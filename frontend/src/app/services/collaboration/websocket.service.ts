@@ -28,7 +28,7 @@ export class WebSocketService {
     }
 
     this.stompClient = new Client({
-      brokerURL: `ws://localhost:8080/ws?userId=${userId}`,
+      brokerURL: `ws://localhost:8081/ws?userId=${userId}`,
       debug: (str: string) => console.log(str),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
@@ -71,7 +71,7 @@ export class WebSocketService {
     }
   }
 
-  subscribeToGroup(gid: number) {
+  subscribeToGroup(gid: string) {
     if (this.connected$.value && this.stompClient) {
       this.stompClient.subscribe('/topic/group/' + gid, (msg: any) => {
         this.realtimeMessage.set(JSON.parse(msg.body));

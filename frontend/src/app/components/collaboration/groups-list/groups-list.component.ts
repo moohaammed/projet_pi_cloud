@@ -111,7 +111,7 @@ export class GroupsListComponent implements OnInit {
     });
   }
 
-  requestJoin(groupId: number) {
+  requestJoin(groupId: string) {
     this.chatGroupService.requestJoin(groupId, this.currentUserId()).subscribe({
       next: () => {
         alert('Join request sent successfully!');
@@ -121,13 +121,13 @@ export class GroupsListComponent implements OnInit {
     });
   }
 
-  approveRequest(requestId: number) {
+  approveRequest(requestId: string) {
     this.chatGroupService.approveRequest(requestId).subscribe(() => {
       this.refreshData();
     });
   }
 
-  rejectRequest(requestId: number) {
+  rejectRequest(requestId: string) {
     this.chatGroupService.rejectRequest(requestId).subscribe(() => {
       this.refreshData();
     });
@@ -153,7 +153,7 @@ export class GroupsListComponent implements OnInit {
     });
   }
 
-  leaveGroup(groupId: number) {
+  leaveGroup(groupId: string) {
     if (confirm('Are you sure you want to leave this community?')) {
       this.chatGroupService.leaveGroup(groupId, this.currentUserId()).subscribe(() => {
         this.refreshData();

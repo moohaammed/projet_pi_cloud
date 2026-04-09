@@ -73,11 +73,11 @@
         <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-shadow transition-all">
           <div class="d-flex align-items-center gap-3">
             <div class="avatar-request rounded-circle bg-soft-warning text-warning d-flex align-items-center justify-content-center fw-bold fs-16" style="width: 45px; height: 45px;">
-              {{ (req.user.prenom || 'U').substring(0,1).toUpperCase() }}
+              {{ (req.userId || 'U').toString().substring(0,1).toUpperCase() }}
             </div>
             <div class="flex-grow-1 overflow-hidden">
-              <h6 class="mb-0 fw-bold fs-14 text-dark text-truncate">{{ req.user.prenom }} {{ req.user.nom }}</h6>
-              <p class="mb-0 fs-12 text-muted text-truncate">Wants to join <strong>{{ req.group.name }}</strong></p>
+              <h6 class="mb-0 fw-bold fs-14 text-dark text-truncate">User {{ req.userId }}</h6>
+              <p class="mb-0 fs-12 text-muted text-truncate">Wants to join <strong>{{ req.groupName }}</strong></p>
             </div>
           </div>
           <div class="d-flex gap-2 mt-3">
@@ -203,4 +203,4 @@
       </div>
     </div>
   </div>
-</div>
+</div>
