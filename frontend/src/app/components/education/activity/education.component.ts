@@ -314,6 +314,10 @@ import { PatientProgressionService } from '../../../services/patient-progression
                 <div class="result-icon">😔</div>
                 <h2 class="result-title">{{ isTimeout ? 'Temps écoulé !' : 'Essaye encore !' }}</h2>
                 <div class="result-score">{{ quizScore }} / {{ quizQuestions.length }}</div>
+                <div class="points-earned" *ngIf="sessionPointsEarned !== null">
+                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ quizQuestions.length * 10 }} pts gagnés</span>
+                  <span class="pts-total">Score total : {{ sessionTotalPoints }} pts</span>
+                </div>
                 <p class="result-message">
                   Vous n’avez pas atteint le score requis cette fois-ci, mais ne vous découragez pas ! Continuez à vous entraîner pour progresser.
                 </p>
@@ -332,6 +336,10 @@ import { PatientProgressionService } from '../../../services/patient-progression
                 <div class="result-icon">🎉</div>
                 <h2 class="result-title">Félicitations !</h2>
                 <div class="result-score">{{ quizScore }} / {{ quizQuestions.length }}</div>
+                <div class="points-earned" *ngIf="sessionPointsEarned !== null">
+                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ quizQuestions.length * 10 }} pts gagnés</span>
+                  <span class="pts-total">Score total : {{ sessionTotalPoints }} pts</span>
+                </div>
                 <p class="result-message">{{ getScoreMessage() }}</p>
                 <div class="result-actions">
                   <button class="btn-result-secondary" (click)="stopActivity()">
@@ -373,8 +381,13 @@ import { PatientProgressionService } from '../../../services/patient-progression
               <ng-container *ngIf="isTimeout || !gameSuccess">
                 <div class="result-icon">😔</div>
                 <h2 class="result-title">{{ isTimeout ? 'Temps écoulé !' : 'Dommage !' }}</h2>
+                <div class="result-score">{{ gameMoves }} coups</div>
+                <div class="points-earned" *ngIf="sessionPointsEarned !== null">
+                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ (memoryCards.length / 2) * 10 }} pts gagnés</span>
+                  <span class="pts-total">Score total : {{ sessionTotalPoints }} pts</span>
+                </div>
                 <p class="result-message">
-                  Vous n’avez pas atteint le score requis cette fois-ci, mais ne vous découragez pas ! Continuez à vous entraîner pour progresser.
+                  Vous n'avez pas atteint le score requis cette fois-ci (max {{ (memoryCards.length / 2) * 3 }} coups), mais ne vous découragez pas ! Continuez à vous entraîner pour progresser.
                 </p>
                 <div class="result-actions">
                   <button class="btn-result-primary" (click)="goToNextStade()" *ngIf="!isLastStade()">
@@ -390,8 +403,13 @@ import { PatientProgressionService } from '../../../services/patient-progression
               <ng-container *ngIf="!isTimeout && gameSuccess">
                 <div class="result-icon">🎉</div>
                 <h2 class="result-title">Bravo !</h2>
+                <div class="result-score">{{ gameMoves }} coups</div>
+                <div class="points-earned" *ngIf="sessionPointsEarned !== null">
+                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ (memoryCards.length / 2) * 10 }} pts gagnés</span>
+                  <span class="pts-total">Score total : {{ sessionTotalPoints }} pts</span>
+                </div>
                 <p class="result-message">
-                  Félicitations, vous avez trouvé toutes les paires en {{ gameMoves }} coups !
+                  Félicitations, vous avez trouvé toutes les paires avec un excellent score ! (Maximum autorisé : {{ (memoryCards.length / 2) * 3 }} coups)
                 </p>
                 <div class="result-actions">
                   <button class="btn-result-secondary" (click)="stopActivity()">
@@ -1409,7 +1427,35 @@ import { PatientProgressionService } from '../../../services/patient-progression
       background: linear-gradient(to bottom, #800080, #5c0057);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin: 20px 0;
+      margin: 20px 0 5px;
+    }
+
+    .points-earned {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .pts-session {
+      background: #fdf2f8;
+      color: #9d174d;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      border: 1px solid #fbcfe8;
+    }
+
+    .pts-total {
+      background: #f0fdf4;
+      color: #166534;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 1rem;
+      border: 1px solid #bbf7d0;
     }
 
     .result-message {
@@ -1511,6 +1557,9 @@ export class EducationComponent implements OnInit {
   exerciceCurrentRep = 1;
   exerciceFinished = false;
   exerciceInterval: any;
+
+  sessionPointsEarned: number | null = null;
+  sessionTotalPoints: number | null = null;
 
   private readonly THEME_PAIRS: Record<string, { id: number; emoji: string; nom: string }[]> = {
     animaux: [
@@ -1704,6 +1753,8 @@ export class EducationComponent implements OnInit {
 
       this.progressionService.submitSession(payload).subscribe({
         next: (res) => {
+          this.sessionPointsEarned = res.scoreSession;
+          this.sessionTotalPoints = res.scoreCumule;
           console.log('Session enregistrée ! Nouveau stade:', res.currentStade);
           this.loadPatientProgression(); // Recharge le nouveau stade
         },
@@ -1836,6 +1887,9 @@ export class EducationComponent implements OnInit {
 
     if (this.exerciceInterval) clearInterval(this.exerciceInterval);
     this.exerciceFinished = false;
+
+    this.sessionPointsEarned = null;
+    this.sessionTotalPoints = null;
   }
 
   getTypeLabel(type: string): string {

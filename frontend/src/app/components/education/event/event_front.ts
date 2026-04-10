@@ -487,9 +487,21 @@ export class EventFrontComponent implements OnInit {
 
   showBooking = false;
   selectedEvent: CalendarEvent | null = null;
+  todayDateStr: string = '';
+
   constructor(private eventService: EventService) {}
 
-  ngOnInit() { this.load(); }
+  ngOnInit() { 
+    this.updateTodayDate();
+    this.load(); 
+    // Mise à jour de la date chaque minute pour s'assurer qu'elle reste correcte
+    setInterval(() => this.updateTodayDate(), 60000);
+  }
+
+  updateTodayDate() {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    this.todayDateStr = new Date().toLocaleDateString('fr-FR', options);
+  }
 
   load() {
     this.eventService.getAll().subscribe((data: CalendarEvent[]) => {
@@ -541,6 +553,29 @@ export class EventFrontComponent implements OnInit {
   isUpcoming(dateStr?: string): boolean {
     if (!dateStr) return false;
     return new Date(dateStr) > new Date();
+  }
+
+  getTimeRemainingText(dateStr?: string): string {
+    if (!dateStr) return '';
+    const eventDate = new Date(dateStr);
+    const now = new Date();
+    
+    if (eventDate <= now) {
+      return 'L\'événement est déjà passé';
+    }
+
+    const diffMs = eventDate.getTime() - now.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+    if (diffDays === 0) {
+      if (diffHours === 0) return 'Très bientôt (moins d\'une heure)';
+      return `Aujourd'hui, dans ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    } else if (diffDays === 1) {
+      return `Demain, plus que ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    } else {
+      return `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''} et ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    }
   }
 
   getUpcomingCount(): number {
