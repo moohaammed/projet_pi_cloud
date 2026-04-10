@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:4200"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      # Remove duplicate CORS headers coming from upstream services
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+
+      routes:
+
+        # ── Collaboration service ──────────────────────────────────────────
+        - id: collab-rest
+          uri: lb://collab-service
+          predicates:
+            - Path=/api/messages/**,/api/groups/**,/api/publications/**,/api/comments/**,/api/notifications/**,/api/handover/**,/api/care-relay/**,/api/carebot/**,/api/admin/collaboration/**
+
+        # ── RendezVous service ──────────────────────────────────────────
+        - id: rendezvous-rest
+          uri: lb://rendezvous-service
+          predicates:
+            - Path=/api/rendezvous/**
+
+        # ── Main service (backpi) ──────────────────────────────────────────
+        - id: main-service
+          uri: lb://backpi
+          predicates:
+            - Path=/api/**,/ws/**,/uploads/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true

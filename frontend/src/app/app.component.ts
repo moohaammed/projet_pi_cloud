@@ -8,6 +8,7 @@ import { NotificationService } from './services/collaboration/notification.servi
 import { VideoCallService } from './services/videocall.service';
 import { VideoCallComponent } from './components/videocall/videocall.component';
 import { Subscription } from 'rxjs';
+import { AlzheimerAccessibilityService } from './services/alzheimer-accessibility.service';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,7 @@ export class AppComponent implements OnDestroy {
   notificationService = inject(NotificationService);
   videoCallService = inject(VideoCallService);
   platformId = inject(PLATFORM_ID);
+  alzAccessibility = inject(AlzheimerAccessibilityService);
 
   // Video Call State
   showVideoCall = inject(VideoCallService).showCallOverlay;

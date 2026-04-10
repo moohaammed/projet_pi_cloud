@@ -48,7 +48,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   currentView: 'health' | 'groups' | 'moderation' | 'announcements' | 'ai' = 'health';
   // Announcement State
   announcementText = '';
-  announcementTargetGroupId: number | null = null;
+  announcementTargetGroupId: string | null = null;
   announcementScheduledAt: string = '';
   scheduledAnnouncements: PublicationDto[] = [];
   dropdownOpen = false;
@@ -59,7 +59,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   // Retrospective State
   activeRetrospective: any = null;
   retroLoading = false;
-  retroGroupId?: number;
+  retroGroupId?: string;
 
   error = '';
   loading = true;
@@ -150,11 +150,11 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     }
   }
 
-  dismiss(pubId: number): void {
+  dismiss(pubId: string): void {
     this.adminApi.dismissFlag(pubId).subscribe({ next: () => this.reload(), error: (e) => this.fail(e) });
   }
 
-  deletePost(pubId: number): void {
+  deletePost(pubId: string): void {
     if (!confirm('Delete this post permanently?')) return;
     this.adminApi.deletePost(pubId).subscribe({ next: () => this.reload(), error: (e) => this.fail(e) });
   }
@@ -198,7 +198,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     });
   }
 
-  cancelAnnouncement(id: number): void {
+  cancelAnnouncement(id: string): void {
     if (!confirm('Cancel this scheduled announcement?')) return;
     this.adminApi.deletePost(id).subscribe({
       next: () => this.loadScheduledAnnouncements(),
@@ -244,7 +244,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     });
   }
 
-  deleteGroup(id: number): void {
+  deleteGroup(id: string): void {
     if (!confirm('Archive/Delete this community permanently?')) return;
     this.adminApi.deleteGroup(id).subscribe({
       next: () => this.loadGroups(),
@@ -306,7 +306,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     });
   }
 
-  approvePost(id: number): void {
+  approvePost(id: string): void {
     this.adminApi.approvePost(id).subscribe({
       next: () => this.reload(),
       error: (e) => this.fail(e)

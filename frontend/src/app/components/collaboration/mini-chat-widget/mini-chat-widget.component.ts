@@ -33,13 +33,13 @@ export class MiniChatWidgetComponent implements OnInit {
   isMiniChatOpen = signal(false);
   activeMiniChatType = signal<'users' | 'groups'>('users');
   activeMiniChatUserId = signal<number | null>(null);
-  activeMiniChatGroupId = signal<number | null>(null);
+  activeMiniChatGroupId = signal<string | null>(null);
   miniChatSearch = signal('');
   miniChatInput = '';
   
   replyingTo: MessageDto | null = null;
   selectedMessageFile: File | null = null;
-  medicationReminderAnsweredIds = signal<Set<number>>(new Set());
+  medicationReminderAnsweredIds = signal<Set<string>>(new Set());
   medReminderAckLoading = signal<boolean>(false);
 
   // Poll State
@@ -251,7 +251,7 @@ export class MiniChatWidgetComponent implements OnInit {
       });
   }
 
-  openMiniChatGroup(groupId: number) {
+  openMiniChatGroup(groupId: string) {
     this.activeMiniChatUserId.set(null);
     this.activeMiniChatGroupId.set(groupId);
     this.messageService.fetchMessagesByGroupSync(groupId).subscribe(msgs => {
@@ -347,7 +347,7 @@ export class MiniChatWidgetComponent implements OnInit {
     });
   }
 
-  vote(messageId: number, optionId: number) {
+  vote(messageId: string, optionId: string) {
     this.messageService.voteOnPoll(messageId, this.currentUserId(), optionId).subscribe();
   }
 
@@ -392,12 +392,12 @@ export class MiniChatWidgetComponent implements OnInit {
     });
   }
 
-  medicationReminderAnswered(messageId: number | undefined): boolean {
+  medicationReminderAnswered(messageId: string | undefined): boolean {
     if (messageId == null) return true;
     return this.medicationReminderAnsweredIds().has(messageId);
   }
 
-  answerMedicationReminder(messageId: number, tookMedication: boolean) {
+  answerMedicationReminder(messageId: string, tookMedication: boolean) {
     this.medReminderAckLoading.set(true);
     const content = tookMedication ? 'Yes, I took it.' : 'Not yet.';
     this.messageService.createMessage({

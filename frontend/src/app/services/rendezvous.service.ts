@@ -15,7 +15,7 @@ export class RendezVousService {
     return this.http.get<RendezVous[]>(this.apiUrl);
   }
 
-  getById(id: number): Observable<RendezVous> {
+  getById(id: string): Observable<RendezVous> {
     return this.http.get<RendezVous>(`${this.apiUrl}/${id}`);
   }
 
@@ -31,16 +31,16 @@ export class RendezVousService {
     return this.http.post<RendezVous>(this.apiUrl, rv);
   }
 
-  update(id: number, rv: RendezVous): Observable<RendezVous> {
+  update(id: string, rv: RendezVous): Observable<RendezVous> {
     return this.http.put<RendezVous>(`${this.apiUrl}/${id}`, rv);
   }
 
-  updateStatut(id: number, statut: StatutRendezVous): Observable<RendezVous> {
+  updateStatut(id: string, statut: StatutRendezVous): Observable<RendezVous> {
     const params = new HttpParams().set('statut', statut);
     return this.http.patch<RendezVous>(`${this.apiUrl}/${id}/statut`, null, { params });
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
