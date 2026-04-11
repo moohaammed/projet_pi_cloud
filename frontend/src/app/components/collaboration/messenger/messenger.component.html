@@ -3,81 +3,69 @@
     <div class="row g-0 h-100 flex-nowrap">
       
       <!-- 1. CHAT LIST SIDEBAR (Left) -->
-      <aside class="col-auto d-flex flex-column bg-white border-end" style="width: 340px; min-width: 340px;">
-        <div class="p-3 border-bottom">
-          <h5 class="fw-bold mb-3 px-1">Chats</h5>
-          <div class="input-group input-group-sm mb-3">
-            <span class="input-group-text bg-light border-0 rounded-pill-start"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-            <input type="text" class="form-control bg-light border-0 rounded-pill-end" [ngModel]="dmUserSearch()"
-              (ngModelChange)="dmUserSearch.set($event)" placeholder="Search Messenger...">
+      <aside class="col-auto d-flex flex-column chat-list-sidebar">
+        <div class="p-4 border-bottom bg-white">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+             <h4 class="fw-black mb-0 text-doc-heading ls-n1">Discussions</h4>
+             <button class="btn btn-soft-primary btn-sm rounded-circle p-2"><i class="fa-solid fa-plus"></i></button>
+          </div>
+          
+          <div class="search-wrapper d-flex align-items-center gap-2 mb-4">
+            <i class="fa-solid fa-magnifying-glass text-muted fs-13"></i>
+            <input type="text" class="flex-grow-1" [ngModel]="dmUserSearch()"
+              (ngModelChange)="dmUserSearch.set($event)" placeholder="Search collaborators...">
           </div>
 
-          <ul class="nav nav-pills nav-fill bg-light p-1 rounded-pill" id="chat-tabs">
+          <ul class="nav nav-pills nav-fill bg-light p-1 rounded-pill mb-1" id="chat-tabs">
             <li class="nav-item">
-              <button class="nav-link py-1 rounded-pill" [class.active]="activeChatType() === 'GROUP'"
+              <button class="nav-link py-2 rounded-pill fs-11 fw-black text-uppercase letter-spacing-1" [class.active]="activeChatType() === 'GROUP'"
                 (click)="activeChatType.set('GROUP')">Groups</button>
             </li>
             <li class="nav-item">
-              <button class="nav-link py-1 rounded-pill" [class.active]="activeChatType() === 'DM'"
-                (click)="activeChatType.set('DM')">Direct</button>
+              <button class="nav-link py-2 rounded-pill fs-11 fw-black text-uppercase letter-spacing-1" [class.active]="activeChatType() === 'DM'"
+                (click)="activeChatType.set('DM')">Private</button>
             </li>
             <li class="nav-item">
-              <button class="nav-link py-1 rounded-pill" [class.active]="activeChatType() === 'BOT'"
-                (click)="openBotChat()">Bot</button>
+              <button class="nav-link py-2 rounded-pill fs-11 fw-black text-uppercase letter-spacing-1" [class.active]="activeChatType() === 'BOT'"
+                (click)="openBotChat()">AI</button>
             </li>
           </ul>
         </div>
 
-        <div class="flex-grow-1 overflow-auto comm-scroll-lg">
-          <!-- Groups List -->
-          <div *ngIf="activeChatType() === 'GROUP'" class="list-group list-group-flush">
-            <div *ngFor="let grp of groups()" class="list-group-item list-group-item-action border-0 p-3"
+        <div class="flex-grow-1 overflow-auto comm-scroll-lg bg-light bg-opacity-10">
+          <div *ngIf="activeChatType() === 'GROUP'" class="pt-2 animate-fade-in">
+            <div *ngFor="let grp of groups()" class="chat-list-item"
               [class.active-chat]="activeGroup()?.id === grp.id" (click)="enterGroup(grp)">
               <div class="d-flex align-items-center gap-3">
-                <div class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold">
-                  {{ grp.name.substring(0, 1) }}
+                <div class="avatar-sm bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-black border border-2 border-white shadow-sm">
+                  {{ grp.name.substring(0, 2).toUpperCase() }}
                 </div>
                 <div class="flex-grow-1 overflow-hidden">
-                  <h6 class="mb-0 text-truncate fw-bold" [class.text-primary]="activeGroup()?.id === grp.id">{{ grp.name }}</h6>
-                  <span class="fs-12 text-muted text-truncate d-block">{{ grp.description }}</span>
+                  <h6 class="mb-0 text-truncate fw-bold chat-name fs-14 ls-n1">{{ grp.name }}</h6>
+                  <span class="fs-12 text-doc-secondary text-truncate d-block opacity-75">{{ grp.description }}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- DM Users List -->
-          <div *ngIf="activeChatType() === 'DM'" class="list-group list-group-flush">
-            <div *ngFor="let user of filteredDmUsers()" class="list-group-item list-group-item-action border-0 p-3"
+          <div *ngIf="activeChatType() === 'DM'" class="pt-2 animate-fade-in">
+            <div *ngFor="let user of filteredDmUsers()" class="chat-list-item"
               [class.active-chat]="activeDmUserId() === user.id" (click)="openDmChat(userIdNum(user.id))">
               <div class="d-flex align-items-center gap-3">
-                <div *ngIf="getUserImage(userIdNum(user.id))" class="avatar-sm rounded-circle overflow-hidden shadow-sm">
-                  <img [src]="getUserImage(userIdNum(user.id))" class="w-100 h-100 object-fit-cover" alt="User Image">
-                </div>
-                <div *ngIf="!getUserImage(userIdNum(user.id))"
-                  class="avatar-sm bg-soft-info rounded-circle d-flex align-items-center justify-content-center text-info fw-bold">
-                  {{ (user.prenom || 'U').substring(0, 1) }}
-                </div>
-                <div class="flex-grow-1">
-                  <h6 class="mb-0 fw-bold" [class.text-primary]="activeDmUserId() === user.id">{{ user.prenom }} {{ user.nom }}</h6>
-                  <span class="fs-12 text-muted">Active Now</span>
-                </div>
-                <span class="status-indicator online"></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bot Chat Option in Direct List -->
-          <div *ngIf="activeChatType() === 'BOT'" class="list-group list-group-flush">
-            <div class="list-group-item list-group-item-action border-0 p-3 active-chat" (click)="openBotChat()">
-              <div class="d-flex align-items-center gap-3">
-                <div class="avatar-sm bg-soft-info rounded-circle d-flex align-items-center justify-content-center text-info fw-bold">
-                  <i class="fa-solid fa-robot"></i>
+                <div class="position-relative">
+                    <div *ngIf="getUserImage(userIdNum(user.id))" class="avatar-sm rounded-circle overflow-hidden shadow-sm border border-2 border-white">
+                      <img [src]="getUserImage(userIdNum(user.id))" class="w-100 h-100 object-fit-cover" alt="User Image">
+                    </div>
+                    <div *ngIf="!getUserImage(userIdNum(user.id))"
+                      class="avatar-sm bg-soft-info rounded-circle d-flex align-items-center justify-content-center text-info fw-black border border-2 border-white shadow-sm">
+                      {{ (user.prenom || 'U').substring(0, 1) }}
+                    </div>
+                    <span class="status-indicator online position-absolute bottom-0 end-0"></span>
                 </div>
                 <div class="flex-grow-1">
-                  <h6 class="mb-0 fw-bold text-primary">CareBot Assistant</h6>
-                  <span class="fs-12 text-muted">Your cognitive companion</span>
+                  <h6 class="mb-0 fw-bold chat-name fs-14 ls-n1">{{ user.prenom }} {{ user.nom }}</h6>
+                  <span class="fs-12 text-doc-secondary opacity-75">Professional</span>
                 </div>
-                <span class="status-indicator online"></span>
               </div>
             </div>
           </div>
@@ -88,84 +76,85 @@
       <div class="col d-flex flex-column h-100 bg-white shadow-sm" style="z-index: 1;">
         <ng-container *ngIf="activeGroup() || activeDmUserId() || activeChatType() === 'BOT'; else noChat">
           <!-- Header -->
-          <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white" style="z-index: 10;">
+          <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white shadow-sm" style="z-index: 10;">
             <div class="d-flex align-items-center gap-3">
-              <div *ngIf="getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="avatar-md rounded-circle overflow-hidden shadow-sm">
-                <img [src]="getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="w-100 h-100 object-fit-cover" alt="Chat Image">
-              </div>
-              <div *ngIf="!getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="avatar-md bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" [class.bg-info]="activeChatType() === 'BOT'">
-                <ng-container *ngIf="activeChatType() !== 'BOT'">
-                  {{ activeGroup()?.name?.substring(0, 1) || dmUserName.substring(0, 1) }}
-                </ng-container>
-                <i *ngIf="activeChatType() === 'BOT'" class="fa-solid fa-robot fs-24"></i>
+              <div class="position-relative">
+                  <div *ngIf="getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="avatar-md rounded-circle overflow-hidden shadow-doc border border-3 border-white">
+                    <img [src]="getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="w-100 h-100 object-fit-cover" alt="Chat Image">
+                  </div>
+                  <div *ngIf="!getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="avatar-md bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-black shadow-doc border border-3 border-white" [class.bg-info]="activeChatType() === 'BOT'">
+                    <ng-container *ngIf="activeChatType() !== 'BOT'">
+                      {{ (activeGroup()?.name || dmUserName || 'U').substring(0, 2).toUpperCase() }}
+                    </ng-container>
+                    <i *ngIf="activeChatType() === 'BOT'" class="fa-solid fa-robot fs-20"></i>
+                  </div>
+                  <span class="status-indicator online position-absolute bottom-0 end-0 m-1" style="width: 12px; height: 12px;"></span>
               </div>
               <div>
-                <h6 class="mb-0 fw-bold">{{ activeChatType() === 'BOT' ? 'CareBot Assistant' : (activeGroup()?.name || dmUserName) }}</h6>
-                <div class="d-flex align-items-center gap-1">
-                  <span class="status-indicator online m-0" style="width: 8px; height: 8px;"></span>
-                  <span class="fs-12 text-muted fw-medium">Always active</span>
+                <h5 class="mb-0 fw-black text-doc-heading ls-n1">{{ activeChatType() === 'BOT' ? 'CareBot' : (activeGroup()?.name || dmUserName) }}</h5>
+                <div class="d-flex align-items-center gap-2">
+                   <span class="badge bg-soft-success text-success fs-9 fw-black text-uppercase letter-spacing-1">SECURE</span>
+                   <span class="text-muted fs-11 fw-bold opacity-50">Active Now</span>
                 </div>
               </div>
             </div>
+            
             <div class="d-flex align-items-center gap-2">
               <button *ngIf="canStartVideoCall()" type="button"
-                class="btn btn-success btn-sm rounded-pill px-3 shadow-sm"
-                (click)="openMessengerVideoCall()"
-                title="Video call (same system as rendezvous — share this chat and press Démarrer l'appel)">
-                <i class="fa-solid fa-video me-1"></i>
-                Video call
+                class="btn btn-doc-pill primary px-3"
+                (click)="openMessengerVideoCall()">
+                <i class="fa-solid fa-video fs-13"></i>
+                <span class="d-none d-md-inline">Call</span>
               </button>
+              
+              <button *ngIf="activeGroup()" type="button"
+                class="btn btn-doc-pill warning px-3"
+                (click)="fetchHandoverSummary()"
+                [disabled]="handoverLoading()">
+                <span *ngIf="handoverLoading()" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                <i *ngIf="!handoverLoading()" class="fa-solid fa-wand-magic-sparkles fs-13"></i>
+                <span class="d-none d-md-inline">{{ handoverLoading() ? 'Summarizing...' : 'AI Relay' }}</span>
+              </button>
+              
+              <!-- Test Medication Reminder Button (Requested) -->
               <button *ngIf="activeChatType() === 'BOT'" type="button"
-                class="btn btn-outline-secondary btn-sm rounded-pill px-3"
-                [disabled]="medReminderLoading()"
+                class="btn btn-doc-pill warning px-3 border-warning"
                 (click)="triggerMedicationReminderTest()"
-                title="Runs the same CareBot message as the scheduled 8:00 AM reminder (your account must be PATIENT)">
+                [disabled]="medReminderLoading()">
                 <span *ngIf="medReminderLoading()" class="spinner-border spinner-border-sm me-1" role="status"></span>
-                <i *ngIf="!medReminderLoading()" class="fa-solid fa-pills me-1"></i>
-                Test medication reminder
+                <i *ngIf="!medReminderLoading()" class="fa-solid fa-pills fs-13"></i>
+                <span class="d-none d-md-inline">{{ medReminderLoading() ? 'Sending...' : 'Test Meds 💊' }}</span>
               </button>
-              <button class="btn btn-soft-primary btn-sm rounded-circle p-2 shadow-none border-0" [class.active]="showInfoSidebar()" (click)="toggleInfoSidebar()" title="Conversation Info">
-                 <i class="fa-solid fa-circle-info fs-18"></i>
+
+              <button class="btn btn-soft-primary btn-sm rounded-circle p-2 border-0 shadow-none" [class.active-soft]="showInfoSidebar()" (click)="toggleInfoSidebar()">
+                 <i class="fa-solid fa-circle-info fs-16"></i>
               </button>
             </div>
           </div>
 
           <!-- Messages Feed -->
-          <div class="flex-grow-1 bg-social-light position-relative overflow-hidden d-flex flex-column">
+          <div class="flex-grow-1 bg-social-light overflow-hidden d-flex flex-column">
              <div class="flex-grow-1 p-4 overflow-auto d-flex flex-column-reverse comm-scroll-lg" id="messageFeed">
-                <div class="messages-stack w-100">
-                   <div *ngFor="let msg of filteredMessages()" class="d-flex mb-3" [class.justify-content-end]="!msg.fromBot && msg.senderId === currentUserId()">
-                      <div class="message-wrapper d-flex flex-column" [class.align-items-end]="!msg.fromBot && msg.senderId === currentUserId()" style="max-width: 75%;">
+                <div class="messages-stack">
+                    <div *ngFor="let msg of filteredMessages()" class="d-flex mb-4" [class.justify-content-end]="!msg.fromBot && msg.senderId === currentUserId()">
+                      <div class="d-flex flex-column" [class.align-items-end]="!msg.fromBot && msg.senderId === currentUserId()">
                             
-                            <!-- Author name for group chats (incoming) -->
-                            <small class="fs-11 text-muted mb-1 px-2" *ngIf="activeChatType() === 'GROUP' && msg.senderId !== currentUserId()">
+                            <small class="fs-10 text-doc-secondary mb-1 px-2 fw-bold opacity-75" *ngIf="activeChatType() === 'GROUP' && msg.senderId !== currentUserId()">
                               {{ getUserName(msg.senderId) }}
                             </small>
 
-                         <!-- Bubble -->
-                         <div class="bubble-container position-relative group">
-                            <!-- CareBot Avatar for BOT messages -->
-                            <div *ngIf="msg.fromBot" class="bot-avatar-wrapper position-absolute start-0 translate-middle-x me-2" style="z-index: 5; bottom: 0;">
-                               <div class="avatar-xs bg-soft-info rounded-circle d-flex align-items-center justify-content-center text-info shadow-sm border border-white">
-                                  <i class="fa-solid fa-robot fs-10"></i>
-                               </div>
+                         <div class="bubble-container d-flex gap-2 position-relative">
+                            <!-- CareBot Avatar for bot messages -->
+                            <div *ngIf="msg.fromBot || msg.type === 'BOT_MESSAGE' || msg.type === 'MEDICATION_REMINDER'" 
+                                 class="avatar-xs bg-info rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 shadow-sm mt-auto mb-2">
+                               <i class="fa-solid fa-robot fs-10"></i>
                             </div>
 
-                            <div class="bubble p-3 rounded-4 shadow-sm" 
-                                 [class.bg-primary]="!msg.fromBot && msg.senderId === currentUserId()"
-                                 [class.text-white]="!msg.fromBot && msg.senderId === currentUserId()"
-                                 [class.bg-white]="!msg.fromBot && msg.senderId != null && msg.senderId !== currentUserId()"
-                                 [class.bg-soft-info]="msg.fromBot"
-                                 [class.border-info]="msg.fromBot"
-                                 [class.border]="msg.fromBot"
-                                 [class.ms-4]="msg.fromBot">
+                            <div class="bubble p-3 shadow-sm" 
+                                 [class.sent]="!msg.fromBot && msg.senderId === currentUserId()"
+                                 [class.received]="!msg.fromBot && msg.senderId != null && msg.senderId !== currentUserId()"
+                                 [class.bot-bubble]="msg.fromBot || msg.type === 'BOT_MESSAGE' || msg.type === 'MEDICATION_REMINDER'">
                                
-                               <!-- Bot Badge -->
-                               <div *ngIf="msg.fromBot" class="d-flex align-items-center gap-1 mb-1">
-                                  <span class="badge bg-info rounded-pill fs-9 text-uppercase tracking-wider px-2 py-1">CareBot Helper</span>
-                               </div>
-
-                               <!-- Media Attachment -->
                                <div *ngIf="msg.mediaUrl" class="mb-2 rounded overflow-hidden attachment-preview">
                                   <img *ngIf="msg.mimeType?.startsWith('image')" [src]="msg.mediaUrl" class="img-fluid" style="max-height: 250px; cursor: pointer;" (click)="openMedia(msg.mediaUrl)">
                                   <div *ngIf="!msg.mimeType?.startsWith('image')" class="p-2 bg-light text-dark d-flex align-items-center gap-2 rounded">
@@ -176,142 +165,127 @@
                                   </div>
                                </div>
 
-                               <!-- Poll Display -->
-                               <div *ngIf="msg.type === 'POLL'" class="poll-message-widget mb-2">
-                                  <h6 class="fw-bold mb-2">{{ msg.pollQuestion }}</h6>
-                                  <div class="poll-options-stack d-flex flex-column gap-2">
-                                     <div *ngFor="let opt of msg.pollOptions" class="poll-opt-result position-relative rounded-pill overflow-hidden border"
-                                          (click)="vote(msg.id, opt.id)">
-                                        <div class="poll-progress-bg bg-soft-primary h-100 position-absolute start-0 top-0" 
+                               <!-- Poll Message -->
+                               <div *ngIf="msg.type === 'POLL'" class="poll-card">
+                                  <p class="fw-black mb-2 fs-14">📊 {{ msg.pollQuestion }}</p>
+                                  <div *ngFor="let opt of msg.pollOptions" class="mb-2">
+                                     <button class="btn btn-sm w-100 text-start rounded-pill px-3 py-1 border position-relative overflow-hidden"
+                                             [class.btn-primary]="opt.voterIds.includes(currentUserId())"
+                                             [class.btn-light]="!opt.voterIds.includes(currentUserId())"
+                                             (click)="vote(msg.id!, opt.id!)">
+                                        <div class="position-absolute top-0 start-0 h-100 bg-primary bg-opacity-10 rounded-pill"
                                              [style.width.%]="getVotePercentage(msg, opt)"></div>
-                                        <div class="p-2 px-3 position-relative d-flex justify-content-between align-items-center small">
-                                           <span class="fw-bold" [class.text-white]="!msg.fromBot && msg.senderId === currentUserId()">{{ opt.text }}</span>
-                                           <span class="opacity-75" [class.text-white]="!msg.fromBot && msg.senderId === currentUserId()">{{ getVotePercentage(msg, opt) }}%</span>
-                                        </div>
-                                     </div>
+                                        <span class="position-relative d-flex justify-content-between">
+                                           <span>{{ opt.text }}</span>
+                                           <span class="fs-11 opacity-75">{{ getVotePercentage(msg, opt) }}%</span>
+                                        </span>
+                                     </button>
                                   </div>
+                                  <small class="text-muted fs-10">{{ getTotalVotes(msg) }} votes</small>
                                </div>
+                               <p *ngIf="msg.type !== 'POLL'" class="mb-0 fs-14" [innerHTML]="formatMessage(msg.content)"></p>
 
-                               <!-- Shared Publication -->
-                               <div *ngIf="msg.type === 'PUBLICATION' && msg.sharedPublication" class="shared-pub-widget mb-2 p-3 rounded-3 bg-light border shadow-sm cursor-pointer" 
-                                    (click)="navigateToPost(msg.sharedPublication.id)">
-                                  <div class="d-flex align-items-center gap-2 mb-2">
-                                    <div *ngIf="getUserImage(msg.sharedPublication.authorId)" class="avatar-xs rounded-circle overflow-hidden shadow-sm">
-                                      <img [src]="getUserImage(msg.sharedPublication.authorId)" class="w-100 h-100 object-fit-cover" alt="Author Image">
-                                    </div>
-                                    <div *ngIf="!getUserImage(msg.sharedPublication.authorId)" class="avatar-xs bg-soft-primary rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold fs-10">
-                                      {{ (msg.sharedPublication.authorName || 'U').substring(0,1).toUpperCase() }}
-                                    </div>
-                                    <div class="flex-grow-1 overflow-hidden">
-                                      <h6 class="mb-0 fw-bold fs-12 text-dark">{{ msg.sharedPublication.authorName }}</h6>
-                                      <small class="text-muted fs-10">{{ msg.sharedPublication.createdAt | date:'short' }}</small>
-                                    </div>
-                                  </div>
-                                  <p class="mb-2 fs-12 text-dark text-truncate-3">{{ msg.sharedPublication.content }}</p>
-                                  <div *ngIf="msg.sharedPublication.mediaUrl" class="shared-pub-media rounded overflow-hidden">
-                                    <img *ngIf="msg.sharedPublication.mimeType?.startsWith('image')" [src]="'http://localhost:8080' + msg.sharedPublication.mediaUrl" class="img-fluid w-100">
-                                  </div>
-                                  <div class="mt-2 text-primary fw-bold fs-11 text-end">View Post <i class="fa-solid fa-arrow-right-long ms-1"></i></div>
+                               <!-- Medication Reminder Actions (Restored) -->
+                               <div *ngIf="msg.type === 'MEDICATION_REMINDER' && !medicationReminderAnswered(msg.id)" 
+                                    class="mt-3 pt-2 border-top border-soft-light d-flex gap-2">
+                                 <button class="btn btn-xs rounded-pill bg-white text-success fw-black shadow-sm border-0 px-3 py-1 scale-hover"
+                                         (click)="answerMedicationReminder(msg.id!, true)"
+                                         [disabled]="medReminderAckLoading()">
+                                   <i class="fa-solid fa-check me-1"></i> YES
+                                 </button>
+                                 <button class="btn btn-xs rounded-pill bg-white text-danger fw-black shadow-sm border-0 px-3 py-1 scale-hover"
+                                         (click)="answerMedicationReminder(msg.id!, false)"
+                                         [disabled]="medReminderAckLoading()">
+                                   <i class="fa-solid fa-xmark me-1"></i> NO
+                                 </button>
                                </div>
-
-                               <p class="mb-0 fs-14" [innerHTML]="formatMessage(msg.content)"></p>
-
-                               <div *ngIf="activeChatType() === 'BOT' && msg.fromBot && msg.type === 'MEDICATION_REMINDER' && !medicationReminderAnswered(msg.id)"
-                                    class="d-flex flex-wrap gap-2 mt-3 pt-2 border-top border-info border-opacity-25">
-                                 <button type="button" class="btn btn-sm btn-success rounded-pill px-3 flex-grow-1 flex-md-grow-0"
-                                   [disabled]="medReminderAckLoading()"
-                                   (click)="answerMedicationReminder(msg.id, true)">
-                                   Yes, I took it
-                                 </button>
-                                 <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 flex-grow-1 flex-md-grow-0"
-                                   [disabled]="medReminderAckLoading()"
-                                   (click)="answerMedicationReminder(msg.id, false)">
-                                   Not yet
-                                 </button>
+                               <div *ngIf="msg.type === 'MEDICATION_REMINDER' && medicationReminderAnswered(msg.id)"
+                                    class="mt-2 text-white opacity-75 fs-10 fw-bold italic">
+                                 <i class="fa-solid fa-circle-check me-1"></i> Acknowledged
                                </div>
                             </div>
                             
-                            <!-- Internal Actions -->
-                            <div class="bubble-actions position-absolute top-50 translate-middle-y opacity-0 transition-all" 
+                            <div class="bubble-actions position-absolute top-50 translate-middle-y opacity-0 transition-all px-3" 
                                  [class.end-100]="!msg.fromBot && msg.senderId === currentUserId()"
-                                 [class.start-100]="msg.fromBot || msg.senderId !== currentUserId()"
-                                 style="padding: 0 10px;">
-                               <button class="btn btn-sm btn-light rounded-circle shadow-sm" (click)="togglePin(msg)" [title]="(msg.isPinned || msg.pinned) ? 'Unpin' : 'Pin'">
-                                 <i class="fa-solid fa-thumbtack fs-12" [class.text-primary]="(msg.isPinned || msg.pinned)"></i>
+                                 [class.start-100]="msg.fromBot || msg.senderId !== currentUserId()">
+                               <button class="btn btn-sm btn-white rounded-circle shadow-sm border" (click)="togglePin(msg)">
+                                 <i class="fa-solid fa-thumbtack fs-11" [class.text-primary]="msg.isPinned"></i>
                                </button>
                             </div>
                          </div>
-                         <small class="fs-10 text-muted mt-1 px-2 d-flex align-items-center gap-1">
+                         <small class="fs-9 text-muted mt-1 px-2 fw-bold text-uppercase opacity-50">
                             {{ msg.sentAt | date: 'shortTime' }}
-                            <i class="fa-solid fa-check-double text-primary fs-9" *ngIf="!msg.fromBot && msg.senderId === currentUserId()"></i>
+                            <i class="fa-solid fa-check-double text-primary ms-1" *ngIf="!msg.fromBot && msg.senderId === currentUserId()"></i>
                          </small>
                       </div>
                    </div>
                 </div>
              </div>
 
-             <!-- Emoji Picker Container -->
-             <div *ngIf="showEmojiPicker()" class="emoji-picker-container shadow-lg border-0 rounded-4 bg-white p-3 position-absolute" style="z-index: 1000; bottom: 85px; right: 20px;">
-                <div class="emoji-grid d-flex flex-wrap gap-2" style="max-width: 280px; max-height: 250px; overflow-y: auto;">
-                  <span *ngFor="let emoji of EMOJI_LIST" (click)="addEmojiToMessage(emoji)" class="cursor-pointer fs-22 p-2 hover-bg-light rounded-circle transition-all">{{ emoji }}</span>
-                </div>
-             </div>
+             <!-- Mini Chat Input -->
+             <div class="p-3 bg-white border-top">
 
-             <!-- Poll Creation Modal/Overlay -->
-             <div *ngIf="isPollMode()" class="poll-creator-panel bg-white border-top p-4 animate-slide-up shadow" style="position: absolute; bottom: 80px; width: 100%; z-index: 20;">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                   <h6 class="fw-bold mb-0">Create a Poll</h6>
-                   <button class="btn-close btn-sm" (click)="togglePollMode()"></button>
-                </div>
-                <input type="text" class="form-control rounded-pill mb-3" [(ngModel)]="pollQuestion" placeholder="Question...">
-                <div class="poll-options-grid d-flex flex-column gap-2 mb-3 max-vh-25 overflow-auto">
-                   <div *ngFor="let opt of pollOptions(); let i = index; trackBy: trackByIndex" class="input-group input-group-sm">
-                      <input type="text" class="form-control rounded-pill-start" [(ngModel)]="pollOptions()[i]" placeholder="Option {{i+1}}">
-                      <button class="btn btn-outline-danger rounded-pill-end" (click)="removePollOption(i)" *ngIf="pollOptions().length > 2">
-                        <i class="fa-solid fa-minus"></i>
+                <!-- Poll Builder (Group only) -->
+                <div *ngIf="isPollMode() && activeGroup()" class="mb-3 p-3 rounded-4 bg-light border animate-fade-in">
+                   <div class="d-flex align-items-center justify-content-between mb-2">
+                      <span class="fs-12 fw-black text-uppercase letter-spacing-1 text-primary"><i class="fa-solid fa-chart-bar me-1"></i>Create Poll</span>
+                      <button class="btn btn-xs btn-soft-danger rounded-pill px-2 py-0 border-0 fs-11" (click)="togglePollMode()">Cancel</button>
+                   </div>
+                   <input type="text" class="form-control form-control-sm mb-2 rounded-pill" placeholder="Poll question..." [(ngModel)]="pollQuestion">
+                   <div *ngFor="let opt of pollOptions(); let i = index; trackBy: trackByIndex" class="d-flex gap-2 mb-1">
+                      <input type="text" class="form-control form-control-sm rounded-pill flex-grow-1"
+                             [placeholder]="'Option ' + (i + 1)"
+                             [ngModel]="opt"
+                             (ngModelChange)="updatePollOption(i, $event)">
+                      <button *ngIf="pollOptions().length > 2" class="btn btn-xs btn-soft-danger rounded-circle border-0 p-1" (click)="removePollOption(i)">
+                         <i class="fa-solid fa-xmark fs-10"></i>
                       </button>
                    </div>
-                   <button class="btn btn-soft-primary btn-sm rounded-pill w-100" (click)="addPollOption()" *ngIf="pollOptions().length < 6">
-                      <i class="fa-solid fa-plus me-1"></i> Add Option
+                   <button *ngIf="pollOptions().length < 6" class="btn btn-xs btn-soft-primary rounded-pill px-3 py-1 border-0 fs-11 mt-1" (click)="addPollOption()">
+                      <i class="fa-solid fa-plus me-1"></i>Add Option
                    </button>
                 </div>
-                <div class="d-flex gap-2">
-                   <button class="btn btn-primary rounded-pill w-100 fw-bold" (click)="sendGroupMessage(activeGroup()!.id)" [disabled]="!pollQuestion.trim() || pollOptions().length < 2">Post Poll</button>
-                </div>
-             </div>
 
-             <!-- Advanced Chat Input -->
-             <div class="p-3 bg-white border-top">
-                <div class="d-flex align-items-end gap-2">
-                   <div class="input-actions d-flex gap-1 mb-1">
+                <!-- Emoji Picker -->
+                <div *ngIf="showEmojiPicker()" class="emoji-picker-container mb-2 p-2 rounded-4 bg-white border shadow-sm animate-fade-in" style="max-height: 160px; overflow-y: auto;">
+                   <div class="d-flex flex-wrap gap-1">
+                      <button *ngFor="let emoji of EMOJI_LIST" class="btn btn-xs p-1 border-0 bg-transparent fs-18 lh-1 scale-hover" (click)="addEmojiToMessage(emoji)">{{ emoji }}</button>
+                   </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                   <div class="input-actions d-flex gap-1">
                       <input type="file" #fileInput hidden (change)="onMessageFileSelected($event)">
-                      <button class="btn btn-light btn-sm rounded-circle p-2" (click)="fileInput.click()" title="Attach File"><i class="fa-solid fa-paperclip fs-16 text-muted"></i></button>
-                      <button class="btn btn-light btn-sm rounded-circle p-2" (click)="togglePollMode()" title="Create Poll" *ngIf="activeChatType() === 'GROUP'"><i class="fa-solid fa-chart-simple fs-16 text-muted"></i></button>
-                      <button class="btn btn-light btn-sm rounded-circle p-2 btn-emoji-toggle" (click)="toggleEmojiPicker()" title="Emojis"><i class="fa-solid fa-face-smile fs-16 text-muted"></i></button>
+                      <button class="btn btn-soft-secondary btn-sm rounded-pill px-2 border-0" (click)="fileInput.click()"><i class="fa-solid fa-plus fs-14"></i></button>
+                      <!-- Emoji toggle (not in BOT mode) -->
+                      <button *ngIf="activeChatType() !== 'BOT'" class="btn btn-soft-secondary btn-sm rounded-pill px-2 border-0 btn-emoji-toggle"
+                              (click)="toggleEmojiPicker()">
+                         <i class="fa-regular fa-face-smile fs-14"></i>
+                      </button>
+                      <!-- Poll toggle (Group only) -->
+                      <button *ngIf="activeGroup()" class="btn btn-sm rounded-pill px-2 border-0"
+                              [class.btn-soft-primary]="isPollMode()"
+                              [class.btn-soft-secondary]="!isPollMode()"
+                              (click)="togglePollMode()">
+                         <i class="fa-solid fa-chart-bar fs-14"></i>
+                      </button>
                    </div>
                    
-                   <div class="flex-grow-1 position-relative">
-                      <!-- Selected File Preview -->
-                      <div *ngIf="selectedMessageFile" class="file-selection-preview bg-light p-2 rounded-top border border-bottom-0 d-flex justify-content-between align-items-center">
-                         <span class="small text-primary fw-bold text-truncate"><i class="fa-solid fa-file me-2"></i>{{ selectedMessageFile.name }}</span>
-                         <button class="btn-close shadow-none" style="font-size: 10px;" (click)="selectedMessageFile = null"></button>
-                      </div>
-                      <textarea class="form-control bg-light border-0 py-2 fs-14 transition-all" 
-                                [class.rounded-4]="!selectedMessageFile"
-                                [class.rounded-bottom-4]="selectedMessageFile"
+                   <div class="flex-grow-1">
+                      <textarea class="form-control bg-light border-0 py-2 fs-14 rounded-pill px-4" 
                                 rows="1" 
                                 [ngModel]="activeChatType() === 'BOT' ? dmContent : (activeGroup() ? newGroupMessage : dmContent)"
-                                (ngModelChange)="activeChatType() === 'BOT' ? (dmContent = $event) : onGroupMessageInput($event)"
+                                (ngModelChange)="activeChatType() === 'BOT' ? (dmContent = $event) : (activeGroup() ? onGroupMessageInput($event) : (dmContent = $event))"
                                 (keyup.enter)="activeChatType() === 'BOT' ? sendBotMessage() : (activeGroup() ? sendGroupMessage(activeGroup()!.id) : sendDmMessage())"
-                                style="resize: none; max-height: 120px;"
-                                [placeholder]="activeChatType() === 'BOT' ? 'Ask CareBot anything...' : 'Write a message...'"></textarea>
+                                style="resize: none; min-height: 40px;"
+                                [placeholder]="isPollMode() ? 'Poll ready — click send to post' : 'Type a message...'"></textarea>
                    </div>
 
-                   <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center p-0 mb-1" 
-                           style="width: 40px; height: 40px;"
+                   <button class="btn btn-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center p-0" 
+                           style="width: 38px; height: 38px;"
                            (click)="activeChatType() === 'BOT' ? sendBotMessage() : (activeGroup() ? sendGroupMessage(activeGroup()!.id) : sendDmMessage())"
-                           [disabled]="(activeChatType() === 'BOT' ? !dmContent.trim() : (activeGroup() ? (!newGroupMessage.trim() && !selectedMessageFile) : !dmContent.trim()))">
-                     <i class="fa-solid fa-paper-plane fs-16"></i>
+                           [disabled]="(activeChatType() === 'BOT' ? !dmContent.trim() : (activeGroup() ? (!newGroupMessage.trim() && !selectedMessageFile && !(isPollMode() && pollQuestion.trim())) : !dmContent.trim()))">
+                     <i class="fa-solid fa-paper-plane fs-14"></i>
                    </button>
                 </div>
              </div>
@@ -319,117 +293,94 @@
         </ng-container>
 
         <ng-template #noChat>
-          <div class="h-100 d-flex flex-column align-items-center justify-content-center text-center p-5 bg-social-light">
-             <div class="mb-4 d-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm" style="width: 120px; height: 120px;">
-                <i class="fa-solid fa-paper-plane fs-48 text-primary opacity-50"></i>
+          <div class="h-100 d-flex flex-column align-items-center justify-content-center text-center p-5 bg-social-light bg-opacity-50">
+             <div class="intelligence-empty-state opacity-25 mb-4">
+               <i class="fa-solid fa-paper-plane text-doc-secondary" style="font-size: 5rem;"></i>
              </div>
-             <h4 class="fw-bold">Your Messages</h4>
-             <p class="text-muted max-w-300 mx-auto">Send private photos and messages to a teammate or shared community.</p>
-             <button class="btn btn-primary rounded-pill px-5 fw-bold mt-3" (click)="activeChatType.set('DM')">Start Chatting</button>
+             <h5 class="fw-black text-doc-heading mb-1 ls-n1">Your Collaborative Hub</h5>
+             <p class="text-doc-secondary small fw-bold opacity-75 letter-spacing-1 max-w-300 mx-auto">Select a specialty group or teammate to start a secure clinical transition.</p>
           </div>
         </ng-template>
       </div>
 
       <!-- 3. DETAILS SIDEBAR (Right) -->
-      <aside class="col-auto bg-white border-start transition-all overflow-hidden d-flex flex-column" 
-             [style.width]="showInfoSidebar() ? '320px' : '0px'"
+      <aside class="col-auto bg-white transition-all overflow-hidden d-flex flex-column details-sidebar" 
+             [style.width]="showInfoSidebar() ? '300px' : '0px'"
              [style.opacity]="showInfoSidebar() ? '1' : '0'">
         
-        <div class="flex-grow-1 overflow-auto comm-scroll-lg w-320 shadow-sm" style="width: 320px;">
-          <!-- Header info -->
-          <div class="p-4 text-center border-bottom mb-3">
-             <div *ngIf="getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="avatar-xl rounded-circle mx-auto mb-3 overflow-hidden shadow-sm">
+        <div class="flex-grow-1 overflow-auto comm-scroll-lg shadow-sm" style="width: 300px;">
+          <div class="p-5 text-center border-bottom mb-4 bg-light bg-opacity-25">
+             <div *ngIf="getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="avatar-xl rounded-circle mx-auto mb-3 overflow-hidden shadow-doc border border-4 border-white">
                 <img [src]="getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="w-100 h-100 object-fit-cover" alt="Chat Image">
              </div>
-             <div *ngIf="!getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="avatar-xl bg-soft-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center text-primary fw-bold fs-32 shadow-sm">
-                {{ activeGroup()?.name?.substring(0, 1) || dmUserName.substring(0, 1) }}
+             <div *ngIf="!getUserImage(activeChatType() === 'BOT' ? 0 : (activeDmUserId() || 0))" class="avatar-xl bg-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center text-white fw-black fs-2 shadow-doc border border-4 border-white">
+                {{ (activeGroup()?.name || dmUserName || 'U').substring(0, 1).toUpperCase() }}
              </div>
-             <h5 class="fw-bold mb-1">{{ activeGroup()?.name || dmUserName }}</h5>
-             <p class="text-muted small mb-0">{{ activeGroup()?.description || 'Personal Direct Message' }}</p>
+             <h6 class="fw-black mb-1 ls-n1">{{ activeGroup()?.name || dmUserName }}</h6>
+             <p class="text-muted fs-11 fw-bold text-uppercase letter-spacing-1 mb-0">{{ activeGroup() ? 'Department Circle' : 'Direct Channel' }}</p>
           </div>
 
-          <!-- Care Relay / Handover Section -->
-          <div class="px-4 mb-4" *ngIf="activeGroup()">
-             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0 text-uppercase fs-12 tracking-wider text-muted">Special Instructions</h6>
-                <button class="btn btn-soft-warning btn-xs rounded-pill px-2" (click)="toggleHandoverPanel()">
-                   <i class="fa-solid fa-wand-magic-sparkles me-1"></i> AI Relay
+          <!-- Intelligence Relay Card (Unified AI System) -->
+          <div class="px-4 mb-5" *ngIf="activeGroup()">
+             <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2">
+                   <i class="fa-solid fa-wand-magic-sparkles text-warning fs-13"></i>
+                   <h6 class="fw-black mb-0 fs-12 text-uppercase letter-spacing-1">Intelligence Relay</h6>
+                </div>
+                <button class="btn btn-xs p-0 opacity-50" (click)="fetchHandoverSummary()" [disabled]="handoverLoading()">
+                   <i class="fa-solid fa-rotate fs-12" [class.fa-spin]="handoverLoading()"></i>
                 </button>
              </div>
-             
-             <!-- Handover Card Improved -->
-             <div class="handover-sidebar-card p-3 rounded-4 bg-soft-warning border-0 animate-fade-in" *ngIf="showHandoverPanel()">
-                <div class="d-flex align-items-center gap-2 mb-2 text-warning-dark">
-                   <i class="fa-solid fa-clipboard-list fs-18"></i>
-                   <span class="fw-bold fs-13">Care Relay Summary</span>
+
+             <!-- AI Loading State -->
+             <div *ngIf="handoverLoading()" class="text-center py-5 bg-light rounded-4 border-dashed border-2 border-primary border-opacity-10">
+                <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"></div>
+                <p class="text-doc-secondary fs-11 fw-bold text-uppercase letter-spacing-1 opacity-75">Consulting AI Knowledge Base...</p>
+             </div>
+
+             <!-- AI Narrative Result -->
+             <div class="handover-card p-4 rounded-4 bg-soft-warning border-0 animate-fade-in" *ngIf="!handoverLoading() && showHandoverPanel() && handoverData()">
+                <div class="fs-13 text-doc-heading leading-relaxed mb-3 whitespace-pre-line">
+                   {{ handoverData()?.summary }}
                 </div>
-                <div *ngIf="handoverLoading()" class="text-center p-3">
-                   <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
+
+                <!-- Critical Alerts -->
+                <div class="mt-4 pt-3 border-top border-warning border-opacity-25" *ngIf="handoverData()?.criticalAlerts?.length">
+                   <h6 class="fs-11 fw-black text-danger text-uppercase letter-spacing-1 mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i>Risk Signals</h6>
+                   <ul class="list-unstyled mb-0">
+                      <li *ngFor="let alert of handoverData()?.criticalAlerts" class="fs-11 text-doc-secondary mb-1">• {{ alert }}</li>
+                   </ul>
                 </div>
-                <div *ngIf="!handoverLoading() && handoverData()" class="handover-text fs-13 leading-relaxed">
-                   {{ handoverData()!.summary }}
+
+                <!-- Pending Tasks -->
+                <div class="mt-4 pt-3 border-top border-warning border-opacity-25" *ngIf="handoverData()?.pendingTasks?.length">
+                   <h6 class="fs-11 fw-black text-primary text-uppercase letter-spacing-1 mb-2"><i class="fa-solid fa-clipboard-check me-1"></i>Care Actions</h6>
+                   <ul class="list-unstyled mb-0">
+                      <li *ngFor="let task of handoverData()?.pendingTasks" class="fs-11 text-doc-secondary mb-1">• {{ task }}</li>
+                   </ul>
                 </div>
              </div>
-             
-             <div *ngIf="!showHandoverPanel()" class="text-center p-3 rounded-4 border-dashed border-2 opacity-50 bg-light">
-                <p class="small text-muted mb-0">Use Care Relay to generate an AI shift summary.</p>
+
+             <div *ngIf="!showHandoverPanel() && !handoverLoading()" class="p-4 text-center rounded-4 border-dashed border-2 opacity-50 bg-light cursor-pointer" (click)="fetchHandoverSummary()">
+                <i class="fa-solid fa-sparkles text-warning fs-24 mb-2"></i>
+                <p class="small text-muted mb-0 fw-bold">Generate Intelligence Relay</p>
              </div>
           </div>
 
-          <!-- Members List -->
-          <div class="px-4 mb-4" *ngIf="activeGroup()">
-             <h6 class="fw-bold mb-3 text-uppercase fs-12 tracking-wider text-muted">Members ({{ activeGroup()?.members?.length }})</h6>
-             <div class="d-flex flex-column gap-2">
-                <div *ngFor="let member of activeGroup()?.members" class="d-flex align-items-center gap-2">
-                   <div *ngIf="getUserImage(member.id)" class="avatar-xs rounded-circle overflow-hidden shadow-sm" style="width: 32px; height: 32px; border: 2px solid white; box-shadow: 0 0 0 1px #eee;">
-                      <img [src]="getUserImage(member.id)" class="w-100 h-100 object-fit-cover" alt="Member Image">
-                   </div>
-                   <div *ngIf="!getUserImage(member.id)" class="avatar-xs bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 32px; height: 32px; border: 2px solid white; box-shadow: 0 0 0 1px #eee;">
-                      {{ member.name.substring(0, 1) }}
-                   </div>
-                   <div class="flex-grow-1 overflow-hidden">
-                      <div class="d-flex justify-content-between">
-                         <span class="fs-13 fw-bold text-dark text-truncate">{{ member.name }}</span>
-                         <span class="badge bg-soft-primary rounded-pill text-primary fs-9" *ngIf="($any(member)).role === 'ADMIN'">Admin</span>
-                      </div>
-                      <small class="text-muted d-block fs-11" style="margin-top: -3px;">Member</small>
-                   </div>
-                </div>
-             </div>
-          </div>
-
-          <!-- Shared Media Grid -->
           <div class="px-4 mb-4">
-             <h6 class="fw-bold mb-3 text-uppercase fs-12 tracking-wider text-muted">Shared Media</h6>
-             <div class="row gx-2 gy-2" *ngIf="sharedMedia().length > 0">
-                <div *ngFor="let media of sharedMedia().slice(0, 6)" class="col-4">
-                   <div class="media-thumb rounded overflow-hidden aspect-square border" (click)="openMedia(media.mediaUrl)">
-                      <img *ngIf="media.mimeType?.startsWith('image')" [src]="media.mediaUrl" class="w-100 h-100 object-fit-cover">
-                      <div *ngIf="!media.mimeType?.startsWith('image')" class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted">
-                         <i class="fa-solid fa-file-lines fs-18"></i>
-                      </div>
-                   </div>
-                </div>
-             </div>
-             <p *ngIf="sharedMedia().length === 0" class="small text-muted text-center py-3 bg-light rounded-4 opacity-50">No media shared yet.</p>
-          </div>
-
-          <!-- Pinned Messages -->
-          <div class="px-4 mb-5">
-             <h6 class="fw-bold mb-3 text-uppercase fs-12 tracking-wider text-muted">Pinned Messages</h6>
+             <h6 class="fw-black mb-3 fs-11 text-doc-secondary text-uppercase letter-spacing-1 opacity-50">Members & Context</h6>
              <div class="pinned-sidebar-stack d-flex flex-column gap-2">
-                <div *ngFor="let pm of pinnedMessages()" class="p-2 px-3 rounded-4 bg-light border-0 fs-13 transition-all hover-bg-soft-primary" style="cursor: pointer;">
-                   <p class="mb-1 text-dark fw-medium line-clamp-2">{{ pm.content }}</p>
-                   <small class="text-muted fs-11">{{ pm.sentAt | date: 'short' }}</small>
+                <div *ngFor="let pm of pinnedMessages()" class="p-3 rounded-4 bg-light border-0 fs-12 transition-all hover-bg-soft-primary cursor-pointer">
+                   <p class="mb-1 text-doc-heading fw-bold line-clamp-2">{{ pm.content }}</p>
+                   <small class="text-muted fs-10 fw-bold">{{ pm.sentAt | date: 'short' }}</small>
                 </div>
-                <p *ngIf="pinnedMessages().length === 0" class="small text-muted text-center py-3 bg-light rounded-4 opacity-50">No pinned items.</p>
+                <p *ngIf="pinnedMessages().length === 0" class="small text-muted text-center py-4 bg-light bg-opacity-50 rounded-4 border-dashed border-2 border-primary border-opacity-10">No pinned clinical notes.</p>
              </div>
           </div>
 
-          <!-- Destructive Actions -->
           <div class="px-4 pb-4 mt-auto">
-             <button class="btn btn-outline-danger btn-sm rounded-pill w-100 fw-bold" *ngIf="activeGroup()" (click)="leaveGroupAction(activeGroup()!.id!)">
-                Leave Community
+             <button class="btn btn-soft-danger btn-sm rounded-pill w-100 fw-black py-2 fs-10 text-uppercase letter-spacing-1 shadow-none border-0" *ngIf="activeGroup()" (click)="leaveGroupAction(activeGroup()!.id!)">
+                <i class="fa-solid fa-right-from-bracket me-2"></i> LEAVE CIRCLE
              </button>
           </div>
         </div>

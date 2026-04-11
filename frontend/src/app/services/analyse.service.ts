@@ -12,12 +12,26 @@ export class AnalyseService {
 
     constructor(private http: HttpClient) { }
 
+    getAllAnalyses(): Observable<any[]> {
+        return this.http.get<any[]>(this.apiUrl);
+    }
+
     getAnalysesByPatient(patientId: number): Observable<any[]> {
         console.log(`[AnalyseService] GET ${this.apiUrl}/patient/${patientId}`);
         return this.http.get<any[]>(`${this.apiUrl}/patient/${patientId}`).pipe(
             tap(res => console.log(`[AnalyseService] Response getAnalysesByPatient:`, res)),
             catchError(err => {
                 console.error(`[AnalyseService] Error getAnalysesByPatient:`, err);
+                return throwError(() => err);
+            })
+        );
+    }
+
+    predictAlzheimer(imageBase64: string): Observable<{prediction: string, confidence: number}> {
+        return this.http.post<{prediction: string, confidence: number}>('http://localhost:5000/predict', { image: imageBase64 }).pipe(
+            tap(res => console.log(`[AnalyseService] Response predictAlzheimer:`, res)),
+            catchError(err => {
+                console.error(`[AnalyseService] Error in predictAlzheimer:`, err);
                 return throwError(() => err);
             })
         );
@@ -32,7 +46,8 @@ export class AnalyseService {
             image_irm: analyse.image_irm,
             score_jeu: analyse.score_jeu,
             pourcentage_risque: analyse.pourcentage_risque,
-            interpretation: analyse.interpretation
+            interpretation: analyse.interpretation,
+            observation_medicale: analyse.observation_medicale
         };
 
         const springPayload = {
@@ -43,7 +58,8 @@ export class AnalyseService {
             imageIRM: payload.image_irm,
             scoreJeu: payload.score_jeu,
             pourcentageRisque: payload.pourcentage_risque,
-            interpretation: payload.interpretation
+            interpretation: payload.interpretation,
+            observationMedicale: payload.observation_medicale
         };
 
         console.log(`[AnalyseService] POST ${this.apiUrl} Payload:`, payload);
@@ -76,6 +92,35 @@ export class AnalyseService {
             tap(res => console.log(`[AnalyseService] Response updateAnalyse:`, res)),
             catchError(err => {
                 console.error(`[AnalyseService] Error updateAnalyse:`, err);
+                return throwError(() => err);
+            })
+        );
+    }
+
+    analyzeReport(reportText: string, mriResult: string, cognitiveScore: string | null): Observable<any> {
+        const payload = {
+            report_text: reportText,
+            mri_result: mriResult,
+            cognitive_score: cognitiveScore || 'N/A'
+        };
+        return this.http.post<any>('http://localhost:5000/analyze-report', payload).pipe(
+            tap(res => console.log(`[AnalyseService] Response analyzeReport:`, res)),
+            catchError(err => {
+                console.error(`[AnalyseService] Error in analyzeReport:`, err);
+                return throwError(() => err);
+            })
+        );
+    }
+
+    chatWithReport(question: string, reportText: string): Observable<string> {
+        const payload = {
+            question: question,
+            report_text: reportText
+        };
+        return this.http.post('http://localhost:5000/chat', payload, { responseType: 'text' }).pipe(
+            tap(res => console.log(`[AnalyseService] Response chatWithReport:`, res)),
+            catchError(err => {
+                console.error(`[AnalyseService] Error in chatWithReport:`, err);
                 return throwError(() => err);
             })
         );

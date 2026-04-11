@@ -121,22 +121,25 @@
           </div>
 
           <!-- Patient list -->
-          <div class="list-group list-group-flush" *ngIf="!isLoadingPatients">
-            <button *ngFor="let p of patients"
-                    type="button"
-                    class="list-group-item list-group-item-action border-0 px-4 py-3"
-                    [class.active]="selectedPatient?.id === p.id"
-                    (click)="selectPatient(p)">
-              <div class="d-flex align-items-center gap-3">
-                <div class="patient-avatar" [class.patient-avatar--active]="selectedPatient?.id === p.id">
-                  {{ p.nom?.charAt(0) }}{{ p.prenom?.charAt(0) }}
-                </div>
-                <div class="overflow-hidden">
-                  <div class="fw-semibold text-truncate">{{ p.nom }} {{ p.prenom }}</div>
-                  <small class="text-muted">{{ p.age }} ans · {{ p.sexe }}</small>
+          <div class="patient-list-container" *ngIf="!isLoadingPatients">
+            <div *ngFor="let p of patients"
+                 class="patient-card"
+                 [class.active-card]="selectedPatient?.id === p.id"
+                 (click)="selectPatient(p)">
+              <!-- Status Dot -->
+              <div class="status-dot" [ngClass]="(p.user?.actif !== false) ? 'active' : 'inactive'"></div>
+              
+              <div class="patient-avatar">
+                {{ p.nom?.charAt(0) }}{{ p.prenom?.charAt(0) }}
+              </div>
+              <div class="overflow-hidden">
+                <div class="fw-bold text-truncate text-dark mb-1">{{ p.nom }} {{ p.prenom }}</div>
+                <div class="d-flex gap-2">
+                  <span class="info-chip"><i class="fa-solid fa-calendar"></i>{{ p.age }} ans</span>
+                  <span class="info-chip"><i [class]="p.sexe === 'Homme' ? 'fa-solid fa-mars' : 'fa-solid fa-venus'"></i>{{ p.sexe }}</span>
                 </div>
               </div>
-            </button>
+            </div>
 
             <div *ngIf="patients.length === 0"
                  class="text-center py-5 text-muted">
@@ -164,24 +167,84 @@
         <div *ngIf="selectedPatient">
 
           <!-- Patient Summary Card -->
-          <div class="card border-0 shadow-sm mb-4">
+          <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
             <div class="card-body p-4">
-              <div class="d-flex align-items-center gap-3 flex-wrap">
+              <div class="d-flex align-items-center gap-4 flex-wrap">
                 <div class="patient-avatar patient-avatar--lg">
                   {{ selectedPatient.nom?.charAt(0) }}{{ selectedPatient.prenom?.charAt(0) }}
                 </div>
                 <div class="flex-grow-1">
-                  <h5 class="fw-bold mb-1">{{ selectedPatient.nom }} {{ selectedPatient.prenom }}</h5>
-                  <div class="d-flex gap-3 flex-wrap">
-                    <span class="text-muted small"><i class="fa-solid fa-calendar me-1"></i>{{ selectedPatient.age }} ans</span>
-                    <span class="text-muted small"><i class="fa-solid fa-weight-scale me-1"></i>{{ selectedPatient.poids }} kg</span>
-                    <span class="text-muted small">
-                      <i [class]="selectedPatient.sexe === 'Homme' ? 'fa-solid fa-mars me-1' : 'fa-solid fa-venus me-1'"></i>
+                  <h4 class="fw-bold text-dark mb-2">{{ selectedPatient.nom }} {{ selectedPatient.prenom }}</h4>
+                  <div class="d-flex gap-2 flex-wrap mb-2">
+                    <span class="info-chip"><i class="fa-solid fa-calendar text-primary"></i>{{ selectedPatient.age }} ans</span>
+                    <span class="info-chip"><i class="fa-solid fa-weight-scale text-primary"></i>{{ selectedPatient.poids }} kg</span>
+                    <span class="info-chip">
+                      <i [class]="selectedPatient.sexe === 'Homme' ? 'fa-solid fa-mars text-primary' : 'fa-solid fa-venus text-primary'"></i>
                       {{ selectedPatient.sexe }}
                     </span>
                   </div>
                 </div>
+                <div class="text-end" *ngIf="analyses.length > 0">
+                  <div class="small text-muted fw-bold mb-1 text-uppercase">Dernier Statut IRM</div>
+                  <span class="badge px-3 py-2 fs-6 rounded-pill shadow-sm"
+                        [ngClass]="{'bg-danger': analyses[0].pourcentageRisque > 50, 'bg-success': analyses[0].pourcentageRisque <= 50, 'bg-secondary': analyses[0].pourcentageRisque == null}">
+                    <i class="fa-solid fa-brain me-1"></i> {{ analyses[0].interpretation || 'Non évalué' }}
+                  </span>
+                </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Progression Card -->
+          <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="!isLoadingProgression">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-brain text-primary me-2"></i>Progression Cognitive du Patient</h5>
+                <h5 class="fw-bold text-success mb-0">Score Global: {{ progressionScoreFinal }} pts</h5>
+              </div>
+
+              <div class="row g-4">
+                <!-- Quiz Column -->
+                <div class="col-md-6 border-end">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-muted text-uppercase mb-0">Parcours Quiz</h6>
+                    <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold" (click)="resetPatientProgression('QUIZ')" [disabled]="isResetting">
+                      <i class="fa-solid fa-rotate-left me-1"></i>Réinitialiser
+                    </button>
+                  </div>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="text-start">
+                      <div class="small text-muted mb-1">Stade Diagnostiqué</div>
+                      <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill shadow-sm">{{ progressionStadeQuiz }}</span>
+                    </div>
+                    <div class="text-start ms-auto">
+                      <div class="small text-muted mb-1">Score Cumulé</div>
+                      <strong class="text-dark fs-5">{{ progressionScoreQuiz }} pts</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Game Column -->
+                <div class="col-md-6">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-muted text-uppercase mb-0">Parcours Jeux</h6>
+                    <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold" (click)="resetPatientProgression('GAME')" [disabled]="isResetting">
+                      <i class="fa-solid fa-rotate-left me-1"></i>Réinitialiser
+                    </button>
+                  </div>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="text-start">
+                      <div class="small text-muted mb-1">Stade Diagnostiqué</div>
+                      <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill shadow-sm">{{ progressionStadeGame }}</span>
+                    </div>
+                    <div class="text-start ms-auto">
+                      <div class="small text-muted mb-1">Score Cumulé</div>
+                      <strong class="text-dark fs-5">{{ progressionScoreGame }} pts</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -205,35 +268,42 @@
 
               <!-- Table -->
               <div class="table-responsive" *ngIf="!isLoadingAnalyses && analyses.length > 0">
-                <table class="table table-hover align-middle">
-                  <thead class="table-light">
+                <table class="modern-table">
+                  <thead>
                     <tr>
                       <th>Date</th>
                       <th>Statut</th>
-                      <th>Risque IA</th>
+                      <th style="width: 25%;">Risque IA</th>
                       <th>Interprétation</th>
                       <th class="text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let a of analyses">
-                      <td><span class="badge bg-secondary">{{ a.date }}</span></td>
+                      <td><span class="info-chip"><i class="fa-regular fa-clock"></i>{{ a.date }}</span></td>
                       <td>
-                        <span class="badge"
+                        <span class="badge rounded-pill px-3 py-2"
                               [ngClass]="{'bg-warning text-dark': a.statut === 'EN_COURS', 'bg-success': a.statut === 'TERMINÉ', 'bg-secondary': a.statut !== 'EN_COURS' && a.statut !== 'TERMINÉ'}">
-                          {{ a.statut }}
+                          <i class="fa-solid fa-circle-dot me-1" style="font-size:0.6rem;"></i>{{ a.statut }}
                         </span>
                       </td>
                       <td>
-                        <span *ngIf="a.pourcentageRisque != null" class="fw-bold"
-                              [ngClass]="{'text-danger': a.pourcentageRisque > 50, 'text-success': a.pourcentageRisque <= 50}">
-                          {{ a.pourcentageRisque }}%
-                        </span>
-                        <span *ngIf="a.pourcentageRisque == null" class="text-muted">—</span>
+                        <div *ngIf="a.pourcentageRisque != null">
+                          <span class="progress-label" [ngClass]="{'text-danger': a.pourcentageRisque > 50, 'text-success': a.pourcentageRisque <= 50}">
+                            {{ a.pourcentageRisque }}%
+                          </span>
+                          <div class="progress-container">
+                            <div class="progress-bar-fill"
+                                 [style.width.%]="a.pourcentageRisque"
+                                 [ngClass]="a.pourcentageRisque > 50 ? 'bg-danger' : 'bg-success'">
+                            </div>
+                          </div>
+                        </div>
+                        <span *ngIf="a.pourcentageRisque == null" class="text-muted fst-italic">Non évalué</span>
                       </td>
-                      <td class="text-muted fst-italic">{{ a.interpretation || '—' }}</td>
+                      <td class="text-dark fw-bold">{{ a.interpretation || '—' }}</td>
                       <td class="text-center">
-                        <button class="btn btn-sm btn-outline-primary" (click)="viewAnalyseDetails(a)">
+                        <button class="btn btn-sm btn-purple-outline rounded-pill px-3" (click)="viewAnalyseDetails(a)">
                           <i class="fa-solid fa-pen-to-square me-1"></i>Éditer
                         </button>
                       </td>
@@ -260,51 +330,94 @@
               <div class="row g-4">
                 <!-- Data -->
                 <div class="col-md-7">
-                  <div class="mb-3 p-3 bg-grey rounded-3">
-                    <p class="mb-2 small"><strong>Risque IA :</strong>
-                      <span class="badge ms-1"
-                            [ngClass]="selectedAnalyse.pourcentageRisque > 50 ? 'bg-danger' : 'bg-success'">
-                        {{ selectedAnalyse.pourcentageRisque ?? 'N/A' }}%
-                      </span>
-                    </p>
-                    <p class="mb-2 small"><strong>Score Cognitif :</strong>
-                      <span class="badge bg-secondary ms-1">{{ selectedAnalyse.scoreJeu || 'N/A' }}</span>
-                    </p>
-                    <p class="mb-0 small"><strong>Interprétation IA :</strong>
-                      <em class="text-muted ms-1">{{ selectedAnalyse.interpretation || 'Non évalué' }}</em>
-                    </p>
+                  <div class="d-flex gap-2 flex-wrap mb-4">
+                    <span class="info-chip shadow-sm">
+                      <i class="fa-solid fa-chart-line text-primary"></i>
+                      Risque IA: <strong class="ms-1" [ngClass]="selectedAnalyse.pourcentageRisque > 50 ? 'text-danger' : 'text-success'">{{ selectedAnalyse.pourcentageRisque ?? 'N/A' }}%</strong>
+                    </span>
+                    <span class="info-chip shadow-sm">
+                      <i class="fa-solid fa-brain text-primary"></i>
+                      Score Cognitif: <strong class="ms-1">{{ selectedAnalyse.scoreJeu || 'N/A' }}</strong>
+                    </span>
+                    <span class="info-chip shadow-sm">
+                      <i class="fa-solid fa-robot text-primary"></i>
+                      Interprétation: <strong class="ms-1 text-dark">{{ selectedAnalyse.interpretation || 'Non évalué' }}</strong>
+                    </span>
                   </div>
 
                   <!-- Observation textarea -->
-                  <div class="form-group mt-4">
-                    <textarea class="form-control" rows="4"
+                  <div class="form-group mt-2">
+                    <label class="fw-bold text-dark mb-2"><i class="fa-solid fa-user-doctor me-2 text-primary"></i>Avis du Médecin</label>
+                    <textarea class="form-control modern-textarea" rows="4"
                               [(ngModel)]="observationToAdd"
                               name="observation"
-                              placeholder="Rédigez votre observation clinique..."></textarea>
-                    <label>Observation du Médecin</label>
+                              placeholder="Rédigez votre diagnostic, recommandations..."></textarea>
                   </div>
 
                   <button id="btn-save-observation"
-                          class="btn btn-primary mt-3"
+                          class="btn btn-primary mt-3 px-4 fw-bold shadow-sm"
+                          style="background: #8b5cf6; border-color: #8b5cf6;"
                           (click)="saveObservation()"
                           [disabled]="isSavingObservation || !observationToAdd">
                     <span *ngIf="isSavingObservation" class="spinner-border spinner-border-sm me-2"></span>
-                    <i class="fa-solid fa-floppy-disk me-1"></i>Enregistrer l'observation
+                    <i class="fa-solid fa-floppy-disk me-1"></i>Enregistrer
                   </button>
                 </div>
 
                 <!-- IRM Image -->
-                <div class="col-md-5 text-center">
-                  <img *ngIf="selectedAnalyse.imageIRM"
-                       [src]="selectedAnalyse.imageIRM"
-                       class="img-fluid rounded shadow-sm border"
-                       alt="Image IRM">
-                  <div *ngIf="!selectedAnalyse.imageIRM" class="text-muted mt-4">
-                    <i class="fa-solid fa-image fa-3x mb-2"></i>
-                    <p class="small">Aucune image IRM fournie</p>
+                <div class="col-md-5 text-center d-flex align-items-center justify-content-center">
+                  <div class="bg-light w-100 p-2 rounded-4 shadow-sm border border-light">
+                    <img *ngIf="selectedAnalyse.imageIRM"
+                         [src]="selectedAnalyse.imageIRM"
+                         class="img-fluid rounded-3"
+                         alt="Image IRM">
+                    <div *ngIf="!selectedAnalyse.imageIRM" class="text-muted py-5">
+                      <i class="fa-solid fa-image fa-3x mb-3 opacity-50"></i>
+                      <p class="small mb-0">Aucune IRM</p>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Activity History Table -->
+          <div class="card border-0 shadow-sm mb-4 mt-4" *ngIf="!isLoadingProgression && progressionHistory.length > 0">
+            <div class="card-header bg-white border-0 py-3 px-4">
+               <h6 class="fw-bold mb-0">
+                  <i class="fa-solid fa-gamepad me-2 text-primary"></i>Historique des Activités Cognitives
+               </h6>
+            </div>
+            <div class="card-body px-4 pb-4">
+               <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                     <thead class="table-light">
+                        <tr>
+                           <th>Date</th>
+                           <th>Activité</th>
+                           <th>Résultat</th>
+                           <th>Stade Final</th>
+                           <th>Score Gagné</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr *ngFor="let h of progressionHistory">
+                           <td><span class="badge bg-secondary">{{ h.playedAt | date:'short' }}</span></td>
+                           <td>
+                             <span class="fw-semibold">{{ h.activity?.title }}</span>
+                             <span class="badge bg-light text-dark shadow-sm ms-2">{{ h.activity?.type }}</span>
+                           </td>
+                           <td>
+                             <span class="badge" [ngClass]="h.reussi ? 'bg-success' : 'bg-danger'">
+                               {{ h.reussi ? 'Réussi' : 'Échoué' }}
+                             </span>
+                           </td>
+                           <td class="fw-bold text-muted">{{ h.currentStade }}</td>
+                           <td class="text-success fw-bold">+{{ h.scoreSession }}</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
             </div>
           </div>
 

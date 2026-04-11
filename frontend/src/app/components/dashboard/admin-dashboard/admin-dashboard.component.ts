@@ -232,7 +232,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
 
   handleEventDrop(info: any): void {
     const droppedEvent = info.event;
-    const rvId = Number(droppedEvent.id);
+    const rvId = droppedEvent.id;
     const newStart = droppedEvent.start;
 
     const existingRvIndex = this.rendezvousList.findIndex(rv => rv.id === rvId);
@@ -264,7 +264,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     this.router.navigate(['/rendezvous', rvId]);
   }
 
-  deleteRv(id: number): void {
+  deleteRv(id: string): void {
     if (confirm('Voulez-vous vraiment supprimer ce rendez-vous ?')) {
       this.rvService.delete(id).subscribe({
         next: () => {
@@ -280,7 +280,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
-  changeStatut(id: number, statut: StatutRendezVous): void {
+  changeStatut(id: string, statut: StatutRendezVous): void {
     this.rvService.updateStatut(id, statut).subscribe({
       next: (updated) => {
         const idx = this.rendezvousList.findIndex(rv => rv.id === id);

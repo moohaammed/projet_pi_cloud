@@ -35,7 +35,7 @@ public class Analyse {
 
     private String interpretation;
 
-    @Column(name = "observation_medicale")
+    @Column(name = "observation_medicale", columnDefinition = "LONGTEXT")
     private String observationMedicale;
 
     @ManyToOne

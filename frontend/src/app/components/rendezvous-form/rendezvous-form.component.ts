@@ -16,7 +16,7 @@ import { AuthService } from '../../services/auth.service';
 export class RendezVousFormComponent implements OnInit {
   form!: FormGroup;
   isEdit = false;
-  editId: number | null = null;
+  editId: string | null = null;
   loading = false;
   submitting = false;
   success = '';
@@ -54,7 +54,7 @@ export class RendezVousFormComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') {
       this.isEdit = true;
-      this.editId = +id;
+      this.editId = id;
       this.loadExisting(this.editId);
     }
   }
@@ -85,7 +85,7 @@ export class RendezVousFormComponent implements OnInit {
     return null;
   }
 
-  loadExisting(id: number): void {
+  loadExisting(id: string): void {
     this.loading = true;
     this.service.getById(id).subscribe({
       next: (rv) => {

@@ -11,10 +11,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(originPatterns = "*")
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
     // GET ALL
     @GetMapping
@@ -52,6 +56,19 @@ public class UserController {
     @PatchMapping("/{id}/toggle")
     public ResponseEntity<User> toggleActif(@PathVariable Long id) {
         return ResponseEntity.ok(userService.toggleActif(id));
+    }
+
+    // TOGGLE LIVE
+    @PostMapping("/{id}/toggle-live")
+    public ResponseEntity<User> toggleLive(@PathVariable Long id) {
+        User user = userService.toggleLive(id);
+        String status = user.isLive() ? "Live Started" : "Live Ended";
+        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("userId", id);
+        payload.put("userName", user.getNom() + " " + user.getPrenom());
+        payload.put("status", status);
+        messagingTemplate.convertAndSend("/topic/live-status", payload);
+        return ResponseEntity.ok(user);
     }
 
     // DELETE

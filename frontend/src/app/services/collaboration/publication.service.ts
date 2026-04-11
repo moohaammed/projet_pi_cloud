@@ -1,21 +1,22 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
- 
+
 export interface CommentDto {
-  id: number;
+  id: string;
   content: string;
   authorId: number;
   authorName?: string;
   createdAt: string;
+  publicationId?: string;
 }
- 
+
 export interface PollOptionDto {
-  id?: number;
+  id?: string;
   text: string;
   votes?: number;
   voterIds?: number[];
 }
- 
+
 export interface SharedEventPreviewDto {
   id: number;
   title?: string;
@@ -26,7 +27,7 @@ export interface SharedEventPreviewDto {
 }
 
 export interface PublicationDto {
-  id: number;
+  id: string;           // MongoDB ObjectId string
   content: string;
   type: string;
   authorId: number;
@@ -40,34 +41,33 @@ export interface PublicationDto {
   comments?: CommentDto[];
   pollQuestion?: string;
   pollOptions?: PollOptionDto[];
-  groupId?: number;
+  groupId?: string;
   groupName?: string;
   commentCount?: number;
   shareCount?: number;
   linkedEventId?: number;
   linkedEvent?: SharedEventPreviewDto | null;
+  supportCount?: number;
+  supportIds?: string;
 }
- 
+
 export interface PublicationCreateRequest {
   content?: string;
   type: string;
   authorId: number;
   anonymous?: boolean;
   pollQuestion?: string;
-  pollOptions?: string[]; // Simplified for creation
-  groupId?: number;
-  /** Education calendar event id when type is EVENT */
+  pollOptions?: string[];
+  groupId?: string;
   linkedEventId?: number;
 }
- 
-@Injectable({
-  providedIn: 'root'
-})
+
+@Injectable({ providedIn: 'root' })
 export class PublicationService {
   private http = inject(HttpClient);
   private baseUrl = 'http://localhost:8080/api/publications';
   public publications = signal<PublicationDto[]>([]);
- 
+
   fetchPublications() {
     this.http.get<PublicationDto[]>(this.baseUrl).subscribe(data => this.publications.set(data));
   }
@@ -76,10 +76,10 @@ export class PublicationService {
     this.http.get<PublicationDto[]>(`${this.baseUrl}/feed/${userId}`).subscribe(data => this.publications.set(data));
   }
 
-  fetchGroupFeed(groupId: number) {
+  fetchGroupFeed(groupId: string) {
     this.http.get<PublicationDto[]>(`${this.baseUrl}/group/${groupId}`).subscribe(data => this.publications.set(data));
   }
- 
+
   createPublication(req: PublicationCreateRequest, file?: File) {
     const formData = new FormData();
     formData.append('content', req.content ?? '');
@@ -87,20 +87,22 @@ export class PublicationService {
     formData.append('authorId', req.authorId.toString());
     formData.append('anonymous', (req.anonymous || false).toString());
     if (req.pollQuestion) formData.append('pollQuestion', req.pollQuestion);
-    if (req.pollOptions) {
-      req.pollOptions.forEach(opt => formData.append('pollOptions', opt));
-    }
-    if (req.groupId) formData.append('groupId', req.groupId.toString());
+    if (req.pollOptions) req.pollOptions.forEach(opt => formData.append('pollOptions', opt));
+    if (req.groupId) formData.append('groupId', req.groupId);
     if (req.linkedEventId != null) formData.append('linkedEventId', String(req.linkedEventId));
     if (file) formData.append('file', file);
     return this.http.post<PublicationDto>(this.baseUrl, formData);
   }
- 
-  voteInPoll(pubId: number, optionIndex: number, userId: number) {
+
+  voteInPoll(pubId: string, optionIndex: number, userId: number) {
     return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/poll/vote`, { optionIndex, userId });
   }
- 
-  updatePublication(id: number, req: PublicationCreateRequest, file?: File) {
+
+  toggleSupport(pubId: string, userId: number) {
+    return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/support`, { userId });
+  }
+
+  updatePublication(id: string, req: PublicationCreateRequest, file?: File) {
     const formData = new FormData();
     formData.append('content', req.content ?? '');
     formData.append('type', req.type);
@@ -109,9 +111,8 @@ export class PublicationService {
     if (file) formData.append('file', file);
     return this.http.put<PublicationDto>(`${this.baseUrl}/${id}`, formData);
   }
- 
-  deletePublication(id: number) {
-    const url = `${this.baseUrl}/${id}`;
-    return this.http.delete(url);
+
+  deletePublication(id: string) {
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

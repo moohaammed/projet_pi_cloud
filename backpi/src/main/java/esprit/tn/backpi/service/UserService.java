@@ -3,9 +3,7 @@ package esprit.tn.backpi.service;
 import esprit.tn.backpi.entity.Role;
 import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repository.UserRepository;
-import esprit.tn.backpi.services.collaboration.ChatGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -14,10 +12,6 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    @Lazy
-    private ChatGroupService chatGroupService;
 
     // GET ALL
     public List<User> findAll() {
@@ -47,7 +41,6 @@ public class UserService {
             throw new RuntimeException("Email déjà utilisé: " + user.getEmail());
         }
         User saved = userRepository.save(user);
-        chatGroupService.assignUserToDefaultGroup(saved);
         return saved;
     }
 
@@ -61,11 +54,6 @@ public class UserService {
         user.setRole(userDetails.getRole());
         user.setActif(userDetails.isActif());
         User saved = userRepository.save(user);
-        
-        // Re-check group assignment if role changed
-        if (oldRole != saved.getRole()) {
-            chatGroupService.assignUserToDefaultGroup(saved);
-        }
         return saved;
     }
 
@@ -73,6 +61,13 @@ public class UserService {
     public User toggleActif(Long id) {
         User user = findById(id);
         user.setActif(!user.isActif());
+        return userRepository.save(user);
+    }
+
+    // TOGGLE LIVE
+    public User toggleLive(Long id) {
+        User user = findById(id);
+        user.setLive(!user.isLive());
         return userRepository.save(user);
     }
 

@@ -5,6 +5,8 @@ export interface CalendarEvent {
   location?: string;
   description?: string;
   imageUrl?: string;
+  capacity?: number;
+  availablePlaces?: number;
   remindEnabled?: boolean;
   userId?: number;
 }

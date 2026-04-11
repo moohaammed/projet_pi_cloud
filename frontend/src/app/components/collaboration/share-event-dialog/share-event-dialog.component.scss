@@ -1,28 +1,191 @@
 .sed-backdrop {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
   z-index: 2000;
-  background: rgba(22, 46, 36, 0.4);
-  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 1.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .sed-card {
+  background: white;
   width: 100%;
-  max-width: 440px;
-  animation: sed-in 0.22s ease-out;
+  max-width: 500px;
+  border-radius: 1.5rem;
+  box-shadow: var(--doc-shadow-xl);
+  overflow: hidden;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@keyframes sed-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+@keyframes slideUp {
+  from { transform: translateY(30px) scale(0.95); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.card-header {
+  padding: 1.5rem 2rem;
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sed-title-icon {
+  width: 42px;
+  height: 42px;
+  background: var(--doc-primary-soft);
+  color: var(--doc-primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  margin-right: 1.25rem;
+}
+
+.sed-btn-close {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--doc-secondary);
+  transition: var(--doc-transition);
+  
+  &:hover {
+    background: #e2e8f0;
+    color: var(--doc-heading);
+    transform: rotate(90deg);
   }
 }
+
+.sed-event-preview {
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  margin-bottom: 1.5rem;
+}
+
+.sed-event-icon {
+  width: 48px;
+  height: 48px;
+  background: white;
+  color: var(--doc-primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  box-shadow: var(--doc-shadow-sm);
+}
+
+.sed-event-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--doc-secondary);
+  font-weight: 600;
+  
+  i { opacity: 0.5; }
+}
+
+.sed-textarea-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--doc-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.sed-textarea {
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 1rem;
+  font-size: 0.9375rem;
+  transition: var(--doc-transition);
+  
+  &:focus {
+    background: white;
+    border-color: var(--doc-primary);
+    box-shadow: 0 0 0 4px var(--doc-primary-soft);
+  }
+}
+
+.sed-btn-primary {
+  background: var(--doc-primary);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 0.75rem 1.75rem;
+  font-weight: 800;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: var(--doc-shadow);
+  transition: var(--doc-transition);
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--doc-shadow-lg);
+    background: var(--doc-heading);
+  }
+  
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.sed-btn-secondary {
+  background: white;
+  color: var(--doc-secondary);
+  border: 1px solid #e2e8f0;
+  border-radius: 50px;
+  padding: 0.75rem 1.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: var(--doc-transition);
+  
+  &:hover {
+    background: #f8fafc;
+    color: var(--doc-heading);
+  }
+}
+
+.sed-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.sed-alert-danger { background: #fef2f2; color: #dc2626; }
+.sed-alert-success { background: #f0fdf4; color: #16a34a; }
+
+.card-footer { padding: 1.5rem 2rem; background: #f8fafc; border-top: 1px solid rgba(0,0,0,0.03); }
+.card-body { padding: 2rem; }

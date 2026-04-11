@@ -1,0 +1,154 @@
+<div class="doctor-detail-container pb-5">
+
+  <!-- ══ Loading ══ -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="d-flex justify-content-center gap-2 align-items-end" style="height:48px;">
+      <div class="spinner-grow" role="status" style="width:1rem;height:1rem;color:#14b8a6;"></div>
+      <div class="spinner-grow" role="status" style="width:1.3rem;height:1.3rem;color:#8b5cf6;animation-delay:.1s;"></div>
+      <div class="spinner-grow" role="status" style="width:1rem;height:1rem;color:#14b8a6;animation-delay:.2s;"></div>
+    </div>
+    <p class="text-muted mt-3 fw-semibold">Loading doctor profile...</p>
+  </div>
+
+  <!-- ══ Doctor Profile ══ -->
+  <div *ngIf="!isLoading && doctor">
+
+    <!-- Hero Banner -->
+    <div class="header-banner position-relative">
+      <div class="header-overlay"></div>
+
+      <!-- Top navigation -->
+      <div class="top-nav position-absolute w-100 d-flex justify-content-between p-3 p-md-4">
+        <button class="icon-btn" (click)="goBack()" title="Back to doctors">
+          <i class="fa-solid fa-arrow-left" style="color:#8b5cf6;"></i>
+        </button>
+        <button class="icon-btn" [class.active-fav]="isFavorite" (click)="toggleFav()"
+                [title]="isFavorite ? 'Remove from favorites' : 'Add to favorites'">
+          <i [class]="isFavorite ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart text-muted'"></i>
+        </button>
+      </div>
+
+      <!-- Doctor hero image (null-safe) -->
+      <img [src]="getHeroImage()" class="banner-img" alt="Dr. {{ doctor.firstName }} {{ doctor.lastName }}">
+
+      <!-- Name overlay -->
+      <div class="banner-bottom-info position-absolute w-100 p-4 text-white">
+        <div class="d-flex align-items-end gap-3 flex-wrap">
+          <div>
+            <h1 class="fw-bold mb-1">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h1>
+            <p class="mb-0 fs-6 opacity-90">
+              <i class="fa-solid fa-stethoscope me-2"></i>{{ doctor.specialite || 'Neurologist' }}
+              &nbsp;·&nbsp;
+              <i class="fa-solid fa-hospital me-1"></i>AlzCare Network
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Content ══ -->
+    <div class="container mt-n4 position-relative" style="z-index: 20; max-width: 860px;">
+      <div class="card border-0 content-card mb-4">
+        <div class="card-body p-4 p-md-5">
+
+          <!-- Info chips row -->
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            <span class="info-chip">
+              <i class="fa-solid fa-envelope" style="color:#8b5cf6;"></i>
+              {{ doctor.email || 'contact@alzcare.tn' }}
+            </span>
+            <span class="info-chip">
+              <i class="fa-solid fa-star text-warning"></i>
+              4.5 Rating
+            </span>
+            <span class="info-chip">
+              <i class="fa-solid fa-circle text-success" style="font-size:0.55rem;"></i>
+              Available
+            </span>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="row text-center g-3 mb-5 border-bottom pb-4">
+            <div class="col-4">
+              <div class="stat-box">
+                <i class="fa-solid fa-users fa-lg theme-text mb-2 d-block"></i>
+                <h4 class="fw-bold mb-0">320+</h4>
+                <small class="text-muted fw-semibold">Patients</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="stat-box">
+                <i class="fa-solid fa-medal fa-lg theme-text mb-2 d-block"></i>
+                <h4 class="fw-bold mb-0">10+</h4>
+                <small class="text-muted fw-semibold">Years Exp.</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="stat-box">
+                <i class="fa-solid fa-star fa-lg text-warning mb-2 d-block"></i>
+                <h4 class="fw-bold mb-0">520+</h4>
+                <small class="text-muted fw-semibold">Reviews</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- About Doctor -->
+          <h4 class="fw-bold mb-3 heading-text">
+            <i class="fa-solid fa-circle-info me-2" style="color:#8b5cf6; font-size:1rem;"></i>About Doctor
+          </h4>
+          <p class="about-text mb-4">
+            {{ doctor.bio || 'Dr. ' + doctor.firstName + ' ' + doctor.lastName + ' is a valued member of the AlzCare network, specializing in neurological assessment and cognitive behavior evaluation. With a patient-centered approach and extensive expertise in early-stage Alzheimer\'s detection, they provide thorough diagnostic evaluations tailored to each patient\'s unique needs. Their commitment to compassionate care ensures patients and families receive the support they need throughout the treatment journey.' }}
+          </p>
+
+          <!-- Working Time -->
+          <h5 class="fw-bold mb-3 heading-text">
+            <i class="fa-solid fa-clock me-2" style="color:#14b8a6; font-size:0.9rem;"></i>Working Hours
+          </h5>
+          <div class="working-time-card mb-2">
+            <i class="fa-solid fa-sun"></i>
+            <div>
+              <div class="fw-semibold text-dark" style="font-size:0.9rem;">Monday – Friday</div>
+              <div class="text-muted" style="font-size:0.82rem;">08:00 AM – 05:00 PM</div>
+            </div>
+          </div>
+          <div class="working-time-card">
+            <i class="fa-solid fa-moon" style="color:#8b5cf6 !important;"></i>
+            <div>
+              <div class="fw-semibold text-dark" style="font-size:0.9rem;">Saturday</div>
+              <div class="text-muted" style="font-size:0.82rem;">09:00 AM – 01:00 PM (By appointment)</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Book button -->
+      <div class="pb-4 px-1">
+        <button class="btn btn-theme-gradient w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+                (click)="makeAppointment()">
+          <i class="fa-solid fa-calendar-check fa-lg"></i>
+          Make an Appointment
+          <i class="fa-solid fa-arrow-right ms-1"></i>
+        </button>
+      </div>
+
+      <!-- Back link -->
+      <div class="text-center pb-3">
+        <button class="btn-back-list" (click)="goBack()">
+          <i class="fa-solid fa-arrow-left"></i> Back to Doctor List
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Not found ══ -->
+  <div *ngIf="!isLoading && !doctor" class="text-center py-5">
+    <i class="fa-solid fa-user-doctor fa-4x text-muted opacity-50 mb-3 d-block"></i>
+    <h3 class="text-muted fw-semibold">Doctor not found</h3>
+    <p class="text-muted small">This doctor profile may no longer be available.</p>
+    <button class="btn-back-list mt-2" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Back to Doctors
+    </button>
+  </div>
+
+</div>

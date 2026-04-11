@@ -1,0 +1,331 @@
+<!-- ===== ADMIN GESTION PATIENT ===== -->
+<div class="gp-page">
+
+  <!-- Header -->
+  <div class="gp-header">
+    <div>
+      <h2 class="gp-title"><i class="fa-solid fa-users me-2"></i>Gestion Patients</h2>
+      <p class="gp-subtitle">Administration complète des comptes et profils patients</p>
+    </div>
+    <button class="btn-primary-purple" (click)="openCreate()">
+      <i class="fa-solid fa-plus me-2"></i>Nouveau Patient
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="successMsg" class="alert-success-strip">
+    <i class="fa-solid fa-circle-check me-2"></i>{{ successMsg }}
+  </div>
+  <div *ngIf="errorMsg" class="alert-error-strip">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ errorMsg }}
+  </div>
+
+  <!-- Tabs -->
+  <div class="gp-tabs">
+    <button [class.tab-active]="activeTab==='list'"  (click)="setTab('list')">
+      <i class="fa-solid fa-list me-2"></i>Liste des Patients
+    </button>
+    <button [class.tab-active]="activeTab==='stats'" (click)="setTab('stats')">
+      <i class="fa-solid fa-chart-pie me-2"></i>Statistiques
+    </button>
+  </div>
+
+  <!-- ===================== LIST TAB ===================== -->
+  <div *ngIf="activeTab==='list'">
+
+    <!-- KPI row -->
+    <div class="kpi-row">
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+        <div><div class="kpi-val">{{ totalPat }}</div><div class="kpi-lbl">Total Patients</div></div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon"><i class="fa-solid fa-user-plus"></i></div>
+        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Nouveaux ce mois</div></div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div><div class="kpi-val">{{ activeCount }}</div><div class="kpi-lbl">Comptes actifs</div></div>
+      </div>
+      <div class="kpi-card kpi-red">
+        <div class="kpi-icon"><i class="fa-solid fa-ban"></i></div>
+        <div><div class="kpi-val">{{ inactiveCount }}</div><div class="kpi-lbl">Comptes suspendus</div></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="gp-filters">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Rechercher nom, prénom, email…"
+               [(ngModel)]="searchQuery" (ngModelChange)="onFilter()">
+      </div>
+      <select [(ngModel)]="filterSex" (ngModelChange)="onFilter()" class="filter-select">
+        <option value="">Tous les sexes</option>
+        <option value="Homme">Homme</option>
+        <option value="Femme">Femme</option>
+      </select>
+      <select [(ngModel)]="filterActif" (ngModelChange)="onFilter()" class="filter-select">
+        <option value="">Tous statuts</option>
+        <option value="true">Actif</option>
+        <option value="false">Suspendu</option>
+      </select>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div><span>Chargement des patients…</span>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!isLoading" class="table-card">
+      <table class="gp-table">
+        <thead>
+          <tr>
+            <th>Patient</th><th>Email</th><th>Âge / Sexe</th>
+            <th>Analyses</th><th>Statut</th><th>Inscrit le</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of paginated" class="table-row">
+            <td>
+              <div class="patient-cell">
+                <div class="avatar-circle" [class.avatar-inactive]="!p.actif">
+                  {{ (p.prenom||'?')[0] }}{{ (p.nom||'?')[0] }}
+                </div>
+                <div>
+                  <div class="patient-name">{{ p.prenom }} {{ p.nom }}</div>
+                  <div class="patient-sub">{{ p.telephone || 'Pas de tél.' }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="text-muted-sm">{{ p.email || '—' }}</td>
+            <td>
+              <span *ngIf="p.age" class="badge-info">{{ p.age }} ans</span>
+              <span *ngIf="p.sexe" class="badge-sex ms-1">{{ p.sexe }}</span>
+            </td>
+            <td>
+              <span class="badge-count">{{ anCount(p.id) }}</span>
+            </td>
+            <td>
+              <span class="status-badge" [class.status-active]="p.actif" [class.status-inactive]="!p.actif">
+                <i class="fa-solid fa-circle me-1" style="font-size:8px"></i>
+                {{ p.actif ? 'Actif' : 'Suspendu' }}
+              </span>
+            </td>
+            <td class="text-muted-sm">{{ fmt(p.createdAt) }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="act-btn act-view"   title="Voir détails"   (click)="openDetail(p)"><i class="fa-solid fa-eye"></i></button>
+                <button class="act-btn act-edit"   title="Modifier"       (click)="openEdit(p)"><i class="fa-solid fa-pen"></i></button>
+                <button class="act-btn" [class.act-suspend]="p.actif" [class.act-activate]="!p.actif"
+                        [title]="p.actif?'Suspendre':'Activer'" (click)="toggleActif(p)">
+                  <i class="fa-solid" [class.fa-lock]="p.actif" [class.fa-lock-open]="!p.actif"></i>
+                </button>
+                <button class="act-btn act-key"    title="Reset Mot de passe" (click)="resetPassword(p)"><i class="fa-solid fa-key"></i></button>
+                <button class="act-btn act-delete" title="Supprimer"      (click)="openDelete(p)"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="paginated.length===0">
+            <td colspan="7" class="empty-row">
+              <i class="fa-solid fa-inbox me-2"></i>Aucun patient trouvé.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages>1" class="pagination">
+        <button class="pg-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button *ngFor="let pg of pageNums" class="pg-btn" [class.pg-active]="pg===currentPage" (click)="changePage(pg)">
+          {{ pg }}
+        </button>
+        <button class="pg-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div><!-- /list -->
+
+  <!-- ===================== STATS TAB ===================== -->
+  <div *ngIf="activeTab==='stats'">
+    <div class="kpi-row">
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+        <div><div class="kpi-val">{{ totalPat }}</div><div class="kpi-lbl">Total Patients</div></div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon"><i class="fa-solid fa-user-plus"></i></div>
+        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Nouveaux ce mois</div></div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon"><i class="fa-solid fa-microscope"></i></div>
+        <div><div class="kpi-val">{{ allAnalyses.length }}</div><div class="kpi-lbl">Total Analyses</div></div>
+      </div>
+      <div class="kpi-card kpi-violet">
+        <div class="kpi-icon"><i class="fa-solid fa-brain"></i></div>
+        <div>
+          <div class="kpi-val">{{ activeCount>0 ? (activeCount/totalPat*100|number:'1.0-0') : 0 }}%</div>
+          <div class="kpi-lbl">Taux d'activité</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-venus-mars me-2"></i>Distribution par Sexe</div>
+        <canvas id="chartSex" height="220"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-chart-bar me-2"></i>Distribution par Âge</div>
+        <canvas id="chartAge" height="220"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-brain me-2"></i>Classification Alzheimer (IRM)</div>
+        <canvas id="chartAlz" height="220"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title"><i class="fa-solid fa-chart-column me-2"></i>Analyses par Patient (Top 8)</div>
+        <canvas id="chartAnPat" height="220"></canvas>
+      </div>
+    </div>
+  </div><!-- /stats -->
+
+</div><!-- /page -->
+
+<!-- ============ DETAIL MODAL ============ -->
+<div class="modal-backdrop" *ngIf="showDetail" (click)="closeDetail()">
+  <div class="modal-box modal-xl" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <span><i class="fa-solid fa-user me-2"></i>Détails Patient</span>
+      <button class="modal-close" (click)="closeDetail()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" *ngIf="selectedP">
+      <div class="detail-grid">
+        <!-- Profile -->
+        <div class="detail-section">
+          <div class="detail-avatar">{{ (selectedP.prenom||'?')[0] }}{{ (selectedP.nom||'?')[0] }}</div>
+          <h4 class="text-center fw-bold mt-2">{{ selectedP.prenom }} {{ selectedP.nom }}</h4>
+          <span class="status-badge mx-auto d-block text-center mt-1" style="width:fit-content"
+                [class.status-active]="selectedP.actif" [class.status-inactive]="!selectedP.actif">
+            {{ selectedP.actif ? 'Actif' : 'Suspendu' }}
+          </span>
+          <div class="detail-info-grid mt-3">
+            <div><strong>Email:</strong> {{ selectedP.email || '—' }}</div>
+            <div><strong>Tél:</strong> {{ selectedP.telephone || '—' }}</div>
+            <div><strong>Âge:</strong> {{ selectedP.age != null ? selectedP.age + ' ans' : '—' }}</div>
+            <div><strong>Sexe:</strong> {{ selectedP.sexe || '—' }}</div>
+            <div><strong>Poids:</strong> {{ selectedP.poids != null ? selectedP.poids + ' kg' : '—' }}</div>
+            <div><strong>Inscrit le:</strong> {{ fmt(selectedP.createdAt) }}</div>
+          </div>
+        </div>
+
+        <!-- Analyses -->
+        <div class="detail-section flex-grow-1">
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-microscope me-2 text-purple"></i>Analyses & Résultats IRM</h5>
+          <div *ngIf="isLoadingAn" class="loading-state"><div class="spinner"></div></div>
+          <div *ngIf="!isLoadingAn && patientAnalyses.length===0" class="empty-row">Aucune analyse enregistrée.</div>
+          <div *ngFor="let an of patientAnalyses" class="analyse-card">
+            <div class="analyse-header">
+              <span class="badge-info">{{ fmt(an.date) }}</span>
+              <span class="analyse-statut">{{ an.statut }}</span>
+              <span *ngIf="an.interpretation" class="badge-alz">🧠 {{ an.interpretation }}</span>
+              <span *ngIf="an.pourcentageRisque!=null" class="badge-risk">
+                Risque: {{ an.pourcentageRisque }}%
+              </span>
+            </div>
+            <div *ngIf="an.observationMedicale" class="analyse-obs">
+              <i class="fa-solid fa-notes-medical me-1"></i> {{ an.observationMedicale }}
+            </div>
+            <div *ngIf="an.imageIRM" class="irm-thumb-wrap">
+              <img [src]="an.imageIRM" alt="IRM" class="irm-thumb" (click)="$event.stopPropagation()">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CREATE / EDIT MODAL ============ -->
+<div class="modal-backdrop" *ngIf="showForm" (click)="closeForm()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <span><i class="fa-solid fa-pen me-2"></i>{{ isEditMode ? 'Modifier' : 'Nouveau' }} Patient</span>
+      <button class="modal-close" (click)="closeForm()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <h6 class="section-label">Profil Patient</h6>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nom <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="pForm.nom" placeholder="Nom" class="gp-input">
+        </div>
+        <div class="form-group">
+          <label>Prénom <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="pForm.prenom" placeholder="Prénom" class="gp-input">
+        </div>
+        <div class="form-group">
+          <label>Âge</label>
+          <input type="number" [(ngModel)]="pForm.age" placeholder="Âge" class="gp-input" min="0" max="120">
+        </div>
+        <div class="form-group">
+          <label>Poids (kg)</label>
+          <input type="number" [(ngModel)]="pForm.poids" placeholder="Poids" class="gp-input" min="0">
+        </div>
+        <div class="form-group">
+          <label>Sexe</label>
+          <select [(ngModel)]="pForm.sexe" class="gp-input">
+            <option value="Homme">Homme</option>
+            <option value="Femme">Femme</option>
+          </select>
+        </div>
+      </div>
+
+      <h6 class="section-label mt-3">Compte Utilisateur</h6>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" [(ngModel)]="uForm.email" placeholder="email@alzcare.tn" class="gp-input">
+        </div>
+        <div class="form-group">
+          <label>Téléphone</label>
+          <input type="tel" [(ngModel)]="uForm.telephone" placeholder="+216 XX XXX XXX" class="gp-input">
+        </div>
+        <div class="form-group" *ngIf="!isEditMode">
+          <label>Mot de passe initial</label>
+          <input type="password" [(ngModel)]="uForm.password" placeholder="AlzCare2026!" class="gp-input">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeForm()" [disabled]="isSubmitting">Annuler</button>
+      <button class="btn-primary-purple" (click)="save()" [disabled]="isSubmitting">
+        <span *ngIf="isSubmitting"><i class="fa-solid fa-spinner fa-spin me-2"></i></span>
+        {{ isEditMode ? 'Mettre à jour' : 'Créer Patient' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DELETE CONFIRM ============ -->
+<div class="modal-backdrop" *ngIf="showDelConf" (click)="showDelConf=false">
+  <div class="modal-box modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-head danger-head">
+      <span><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmer la suppression</span>
+      <button class="modal-close" (click)="showDelConf=false"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body text-center py-4" *ngIf="deletingP">
+      <div class="delete-icon"><i class="fa-solid fa-trash-can"></i></div>
+      <p class="mt-3">Supprimer le patient <strong>{{ deletingP.prenom }} {{ deletingP.nom }}</strong> ?</p>
+      <p class="text-muted small">Cette action est irréversible. Toutes les analyses associées seront également supprimées.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="showDelConf=false">Annuler</button>
+      <button class="btn-danger" (click)="doDelete()"><i class="fa-solid fa-trash me-2"></i>Supprimer</button>
+    </div>
+  </div>
+</div>

@@ -1,172 +1,200 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/education/event.service';
+import { EventSeatGridComponent } from './event-seat-grid.component';
 import { CalendarEvent } from '../../../models/education/event.model';
-import { ShareEventDialogComponent } from '../../collaboration/share-event-dialog/share-event-dialog.component';
 
 @Component({
   selector: 'app-event-front',
   templateUrl: './event_front.html',
   standalone: true,
-  imports: [CommonModule, FormsModule, ShareEventDialogComponent],
+  imports: [CommonModule, FormsModule, EventSeatGridComponent],
   styles: [`
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800&display=swap');
 
     :host {
-      --green:        #16754D;
-      --green-light:  #e8f5ee;
-      --green-mid:    #c3e6d3;
-      --green-hover:  #125f3e;
+      --primary:      #800080;
+      --primary-light:#f5e6f5;
+      --primary-mid:  #e8c8e8;
+      --primary-hover:#660066;
+      --primary-dark: #4d004d;
       --white:        #ffffff;
-      --bg:           #f2f6f4;
+      --bg:           #fdf5fd;
       --card-bg:      #ffffff;
-      --border:       #d4e6dc;
-      --text-dark:    #1a2e24;
-      --text-mid:     #4a6357;
-      --text-light:   #8aaa98;
-      --shadow:       0 2px 16px rgba(22, 117, 77, 0.08);
-      --shadow-card:  0 4px 24px rgba(22, 117, 77, 0.10);
+      --border:       #e0c8e0;
+      --text-dark:    #2e152e;
+      --text-mid:     #6b3e6b;
+      --text-light:   #b07ab0;
+      --shadow:       0 2px 16px rgba(128, 0, 128, 0.08);
+      --shadow-card:  0 4px 24px rgba(128, 0, 128, 0.10);
       --radius:       16px;
       --radius-sm:    10px;
       display: block;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: var(--bg);
+      background: #ffffff !important;
     }
 
-    /* ── PAGE ── */
     .events-page {
-      background: var(--bg);
+      background: #ffffff !important;
       min-height: 100vh;
-      padding: 40px 32px 60px;
+      padding: 20px 32px 40px;
     }
 
-    /* ── HEADER ── */
+    
+
+ 
     .page-header {
+      position: relative;
+      background: linear-gradient(135deg, rgba(128,0,128,0.06) 0%, rgba(128,0,128,0.01) 100%) !important;
+      border: 1px solid rgba(128,0,128,0.08);
+      border-radius: var(--radius);
+      padding: 45px 30px !important;
+      margin-bottom: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -50px; left: -50px;
+      width: 150px; height: 150px;
+      background: var(--primary-light);
+      filter: blur(40px);
+      border-radius: 50%;
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    .page-header::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; right: 10%;
+      width: 120px; height: 120px;
+      background: var(--primary-mid);
+      filter: blur(40px);
+      border-radius: 50%;
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    .title-container {
       position: relative;
       z-index: 1;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-    }
-    .header-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 6px;
-    }
-    .eyebrow-dot {
-      width: 5px; height: 5px;
-      background: var(--green);
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .page-title {
-      font-family: 'Fraunces', serif;
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: var(--text-dark);
-      margin: 0;
-      line-height: 1;
-      letter-spacing: -.02em;
-    }
-    .header-right {
-      display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 12px;
-      flex-wrap: wrap;
     }
 
-    /* ── SEARCH ── */
+    .header-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--white);
+      color: var(--primary-dark);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 50px;
+      border: 1px solid var(--primary-light);
+      box-shadow: 0 4px 12px rgba(128,0,128,0.05);
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      font-family: 'Fraunces', serif;
+      font-size: 3.2rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      background: linear-gradient(to right, var(--text-dark), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-mid);
+      margin: 0;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+      min-height: 50px;
+    }
+
     .search-box {
       background: var(--white);
       border: 1.5px solid var(--border);
       border-radius: 50px;
-      padding: 10px 18px;
-      box-shadow: var(--shadow);
-      transition: border-color 0.2s;
-      position: relative;
+      padding: 12px 20px 12px 42px;
+      box-shadow: 0 8px 30px rgba(128, 0, 128, 0.06);
+      transition: all 0.3s ease;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       align-items: center;
+      width: 100%;
+      max-width: 450px;
     }
-    .search-box:focus-within {
-      border-color: var(--green);
+    .search-box:focus-within { 
+      border-color: var(--primary);
+      box-shadow: 0 8px 30px rgba(128, 0, 128, 0.12);
+      transform: translateX(-50%) translateY(-2px);
     }
+
     .search-icon {
-      position: absolute; left: 14px;
-      width: 15px; height: 15px;
+      position: absolute; left: 16px;
+      width: 18px; height: 18px;
       color: var(--text-light);
       pointer-events: none;
     }
+
     .search-input {
       background: transparent;
       border: none;
-      padding: 1px 4px 1px 28px;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: .875rem;
+      font-size: .95rem;
       color: var(--text-dark);
       outline: none;
-      width: 250px;
+      width: 100%;
     }
-    .search-input::placeholder {
-      color: var(--text-light);
-    }
+    .search-input::placeholder { color: var(--text-light); }
 
-    /* ── BUTTON ── */
-    .btn-create {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--green);
-      color: var(--white);
-      border: none;
-      padding: 11px 22px;
-      border-radius: 50px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 14px rgba(22, 117, 77, 0.30);
-      letter-spacing: .01em;
-    }
-    .btn-create svg { width: 15px; height: 15px; }
-    .btn-create:hover {
-      background: var(--green-hover);
-      box-shadow: 0 6px 18px rgba(22, 117, 77, 0.38);
-      transform: translateY(-1px);
-    }
-    .btn-create:active { transform: translateY(0); }
-
-    /* ── STATS BAR ── */
     .stats-bar {
-      position: relative;
-      z-index: 1;
       display: inline-flex;
       align-items: center;
       gap: 0;
       background: var(--white);
       border: 1.5px solid var(--border);
       border-radius: 50px;
-      padding: 8px 8px;
-      margin-bottom: 36px;
+      padding: 6px 6px;
+      margin-bottom: 22px;
       box-shadow: var(--shadow);
     }
+
     .stat {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 20px;
+      padding: 5px 20px;
     }
+
     .stat-icon {
       width: 32px; height: 32px;
       border-radius: 10px;
@@ -174,15 +202,10 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       flex-shrink: 0;
     }
     .stat-icon.total,
-    .stat-icon.upcoming {
-      background: var(--green-light);
-      color: var(--green);
-    }
-    .stat-icon.past {
-      background: #f0f4f2;
-      color: var(--text-light);
-    }
-    .stat-icon svg { width: 15px; height: 15px; }
+    .stat-icon.upcoming { background: var(--primary-light); color: var(--primary); }
+    .stat-icon.past     { background: #f0eded; color: var(--text-light); }
+    .stat-icon svg { width: 14px; height: 14px; }
+
     .stat-info { display: flex; flex-direction: column; }
     .stat-number {
       font-family: 'Fraunces', serif;
@@ -192,27 +215,19 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       line-height: 1;
     }
     .stat-label {
-      font-size: .72rem;
+      font-size: .7rem;
       color: var(--text-mid);
       font-weight: 500;
       margin-top: 1px;
     }
-    .stat-divider {
-      width: 1px;
-      height: 28px;
-      background: var(--border);
-    }
+    .stat-divider { width: 1px; height: 28px; background: var(--border); }
 
-    /* ── GRID ── */
     .events-grid {
-      position: relative;
-      z-index: 1;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 22px;
     }
 
-    /* ── CARD ── */
     .event-card {
       background: var(--card-bg);
       border: 1.5px solid var(--border);
@@ -224,17 +239,16 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       flex-direction: column;
     }
     .event-card:hover {
-      box-shadow: 0 12px 36px rgba(22, 117, 77, 0.15);
+      box-shadow: 0 12px 36px rgba(128, 0, 128, 0.15);
       transform: translateY(-4px);
     }
-    .event-card:hover .card-actions-overlay { opacity: 1; }
     .event-card:hover .card-image { transform: scale(1.06); }
 
     .card-image-wrapper {
       position: relative;
       height: 195px;
       overflow: hidden;
-      background: #d8dff0;
+      background: var(--primary-mid);
     }
     .card-image {
       width: 100%; height: 100%;
@@ -243,58 +257,25 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
     }
     .card-image-wrapper::after {
       content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(26,46,36,.35) 0%, transparent 55%);
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(46,21,46,.3) 0%, transparent 55%);
       pointer-events: none;
     }
 
-    /* Badge */
     .card-badge {
       position: absolute;
       top: 12px; left: 12px;
       z-index: 1;
       padding: 4px 12px;
       border-radius: 50px;
-      font-size: .67rem;
+      font-size: .65rem;
       font-weight: 700;
       letter-spacing: .1em;
       text-transform: uppercase;
     }
-    .card-badge.upcoming {
-      background: var(--green);
-      color: var(--white);
-    }
-    .card-badge.past {
-      background: rgba(0, 0, 0, 0.45);
-      color: var(--white);
-    }
+    .card-badge.upcoming { background: var(--primary); color: var(--white); }
+    .card-badge.past     { background: rgba(0,0,0,.42); color: var(--white); }
 
-    /* Action buttons overlay */
-    .card-actions-overlay {
-      position: absolute;
-      top: 10px; right: 10px;
-      z-index: 2;
-      display: flex;
-      gap: 6px;
-      opacity: 0;
-      transition: opacity .2s;
-    }
-    .action-btn {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: transform .15s;
-    }
-    .action-btn svg { width: 14px; height: 14px; }
-    .action-btn:hover { transform: scale(1.12); }
-    .edit-btn   { background: rgba(255, 255, 255, 0.92); color: var(--green); }
-    .delete-btn { background: rgba(255, 255, 255, 0.92); color: #c0392b; }
-    .share-btn  { background: rgba(255, 255, 255, 0.92); color: #5b4cdb; }
-
-    /* ── CARD BODY ── */
     .card-body {
       padding: 18px 20px 22px;
       display: flex;
@@ -302,15 +283,17 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       gap: 11px;
       flex: 1;
     }
+
     .card-date-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
     .date-pill, .time-pill {
       display: flex;
       align-items: center;
       gap: 5px;
-      font-size: .7rem;
+      font-size: .68rem;
       font-weight: 600;
-      background: var(--green-light);
-      color: var(--green);
+      background: var(--primary-light);
+      color: var(--primary-dark);
       border-radius: 50px;
       padding: 4px 10px;
     }
@@ -326,6 +309,7 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       word-break: break-word;
       letter-spacing: -.01em;
     }
+
     .card-description {
       font-size: .81rem;
       color: var(--text-mid);
@@ -337,11 +321,7 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       overflow: hidden;
     }
 
-    .card-separator {
-      height: 1px;
-      background: var(--border);
-      margin-top: auto;
-    }
+    .card-separator { height: 1px; background: var(--border); margin-top: auto; }
 
     .card-footer {
       display: flex;
@@ -350,6 +330,7 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       gap: 8px;
       flex-wrap: wrap;
     }
+
     .card-location {
       display: flex;
       align-items: center;
@@ -359,7 +340,7 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       font-weight: 500;
       min-width: 0;
     }
-    .card-location svg { width: 13px; height: 13px; flex-shrink: 0; color: var(--green); }
+    .card-location svg { width: 13px; height: 13px; flex-shrink: 0; color: var(--primary); }
     .card-location span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .card-remind {
@@ -368,27 +349,57 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
       gap: 5px;
       font-size: .7rem;
       font-weight: 700;
-      color: var(--green);
-      background: var(--green-light);
+      color: var(--primary-dark);
+      background: var(--primary-light);
       padding: 3px 10px;
       border-radius: 50px;
       white-space: nowrap;
     }
     .card-remind svg { width: 11px; height: 11px; }
 
-    /* ── PAGINATION ── */
+    .card-actions {
+      display: flex;
+      margin-top: 10px;
+    }
+
+    .btn-participate {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(128, 0, 128, 0.2);
+    }
+
+    .btn-participate:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(128, 0, 128, 0.3);
+    }
+
+    .btn-participate:active {
+      transform: translateY(0);
+    }
+
     .pagination {
-      position: relative;
-      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
       margin-top: 44px;
     }
+
     .page-btn {
-      min-width: 40px;
-      height: 40px;
+      min-width: 40px; height: 40px;
       padding: 0 12px;
       border-radius: 12px;
       border: 1.5px solid var(--border);
@@ -404,22 +415,19 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
     }
     .page-btn svg { width: 16px; height: 16px; }
     .page-btn:hover:not(:disabled) {
-      border-color: var(--green);
-      color: var(--green);
+      border-color: var(--primary);
+      color: var(--primary);
       transform: translateY(-1px);
     }
     .page-btn.active {
-      background: var(--green);
-      border-color: var(--green);
+      background: var(--primary);
+      border-color: var(--primary);
       color: var(--white);
       font-weight: 700;
-      box-shadow: 0 4px 16px rgba(22, 117, 77, 0.3);
     }
     .page-btn:disabled { opacity: .4; cursor: not-allowed; }
 
-    /* ── EMPTY STATE ── */
     .empty-state {
-      position: relative; z-index: 1;
       display: flex; flex-direction: column;
       align-items: center;
       padding: 90px 20px;
@@ -429,11 +437,11 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
     .empty-glass {
       width: 120px; height: 120px;
       border-radius: 30px;
-      background: var(--green-light);
+      background: var(--primary-light);
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 8px;
     }
-    .empty-glass svg { width: 52px; height: 52px; color: var(--green); }
+    .empty-glass svg { width: 52px; height: 52px; color: var(--primary); }
     .empty-title {
       font-family: 'Fraunces', serif;
       font-size: 1.4rem;
@@ -443,179 +451,27 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
     }
     .empty-sub { font-size: .88rem; color: var(--text-light); margin: 0; }
 
-    /* ── MODAL ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(22, 60, 38, 0.35);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .modal-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      width: 100%; max-width: 520px;
-      box-shadow: 0 24px 60px rgba(22, 117, 77, 0.18);
-      overflow: hidden;
-      animation: slideUp .25s cubic-bezier(.34,1.56,.64,1);
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px) scale(.97); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 24px 28px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-    .modal-title {
-      font-family: 'Fraunces', serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin: 0;
-    }
-    .modal-close {
-      background: var(--green-light);
-      color: var(--green);
-      border: none;
-      cursor: pointer;
-      width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      transition: background .15s;
-    }
-    .modal-close:hover { background: var(--green-mid); }
-    .modal-close svg { width: 18px; height: 18px; }
-
-    /* Form */
-    .form-body { padding: 22px 28px; display: flex; flex-direction: column; gap: 16px; }
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .form-label {
-      font-size: .75rem;
-      font-weight: 700;
-      color: var(--text-mid);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-    }
-    .required { color: var(--green); }
-    .form-input {
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px 14px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: .9rem;
-      color: var(--text-dark);
-      background: var(--white);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .form-input:focus {
-      border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(22, 117, 77, 0.10);
-    }
-    .has-error .form-input { border-color: #e74c3c; }
-    .error-msg { font-size: .75rem; color: #e74c3c; font-weight: 500; }
-    .form-textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
-
-    /* File upload */
-    .file-upload-area {
-      border: 2px dashed var(--green-mid);
-      border-radius: var(--radius-sm);
-      padding: 20px;
-      display: flex; flex-direction: column; align-items: center;
-      gap: 7px; cursor: pointer;
-      transition: border-color .2s, background .2s;
-      color: var(--green);
-      font-size: .83rem;
-      text-align: center;
-      background: var(--green-light);
-    }
-    .file-upload-area:hover {
-      background: var(--green-mid);
-      border-color: var(--green);
-    }
-    .file-upload-area svg { width: 28px; height: 28px; color: var(--green); }
-    .file-name { color: var(--green-hover); font-weight: 600; }
-
-    /* Toggle */
-    .remind-toggle { flex-direction: row; align-items: center; }
-    .toggle-label {
-      display: flex; align-items: center;
-      justify-content: space-between; width: 100%;
-      cursor: pointer;
-      font-size: .9rem;
-      color: var(--text-mid);
-      font-weight: 500;
-    }
-    .toggle-switch {
-      width: 44px; height: 24px;
-      background: var(--border);
-      border-radius: 50px;
-      position: relative;
-      transition: background .2s;
-      flex-shrink: 0;
-    }
-    .toggle-switch.active { background: var(--green); }
-    .toggle-knob {
-      position: absolute; top: 3px; left: 3px;
-      width: 18px; height: 18px;
-      background: var(--white);
-      border-radius: 50%;
-      transition: transform .2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,.15);
-    }
-    .toggle-switch.active .toggle-knob { transform: translateX(20px); }
-
-    /* Modal footer */
-    .modal-footer {
-      display: flex; justify-content: flex-end; gap: 10px;
-      padding: 16px 28px 24px;
-      border-top: 1px solid var(--border);
-    }
-    .btn-cancel {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      color: var(--text-mid);
-      border-radius: 50px;
-      padding: 9px 22px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: .875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: border-color .2s, color .2s;
-    }
-    .btn-cancel:hover {
-      border-color: var(--green);
-      color: var(--green);
-    }
-    .btn-save {
-      background: var(--green);
-      color: var(--white);
-      border: none;
-      border-radius: 50px;
-      padding: 9px 26px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: .875rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(22, 117, 77, 0.28);
-      transition: background .2s, transform .2s, box-shadow .2s;
-    }
-    .btn-save:hover {
-      background: var(--green-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(22, 117, 77, 0.36);
-    }
-
     @media (max-width: 1100px) {
       .events-grid { grid-template-columns: repeat(2, 1fr); }
     }
+    @media (max-width: 900px) {
+      .controls-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        min-height: auto;
+      }
+      .search-box {
+        position: relative;
+        left: 0;
+        transform: none;
+        max-width: 100%;
+      }
+      .search-box:focus-within { transform: translateY(-2px); }
+    }
     @media (max-width: 640px) {
       .events-page { padding: 24px 18px 56px; }
-      .page-title { font-size: 2rem; }
+      .page-title  { font-size: 2rem; }
       .events-grid { grid-template-columns: 1fr; }
       .header-right { width: 100%; }
       .search-input { width: 100%; }
@@ -625,43 +481,26 @@ import { ShareEventDialogComponent } from '../../collaboration/share-event-dialo
 export class EventFrontComponent implements OnInit {
 
   events: CalendarEvent[] = [];
-  selected: CalendarEvent | null = null;
-  isEditing = false;
-  selectedFile: File | null = null;
-  showForm = false;
   searchQuery = '';
-
-  shareDialogOpen = false;
-  shareEvent: CalendarEvent | null = null;
-
   currentPage = 1;
   pageSize = 6;
 
-  errors: { [key: string]: string } = {};
+  showBooking = false;
+  selectedEvent: CalendarEvent | null = null;
+  todayDateStr: string = '';
 
-  newEvent: CalendarEvent = {
-    title: '',
-    startDateTime: '',
-    location: '',
-    description: '',
-    remindEnabled: false,
-    userId: 1
-  };
+  constructor(private eventService: EventService) {}
 
-  constructor(
-    private eventService: EventService,
-    private route: ActivatedRoute
-  ) {}
+  ngOnInit() { 
+    this.updateTodayDate();
+    this.load(); 
+    // Mise à jour de la date chaque minute pour s'assurer qu'elle reste correcte
+    setInterval(() => this.updateTodayDate(), 60000);
+  }
 
-  ngOnInit() {
-    this.load();
-    this.route.queryParamMap.subscribe((params) => {
-      const h = params.get('highlight');
-      if (!h) return;
-      setTimeout(() => {
-        document.getElementById('edu-event-' + h)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 450);
-    });
+  updateTodayDate() {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    this.todayDateStr = new Date().toLocaleDateString('fr-FR', options);
   }
 
   load() {
@@ -696,53 +535,6 @@ export class EventFrontComponent implements OnInit {
 
   onSearchChange() { this.currentPage = 1; }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files?.[0] ?? null;
-    this.errors['image'] = '';
-    if (file) {
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        this.errors['image'] = 'Format invalide. Seuls JPG, PNG et WEBP sont acceptés.';
-        this.selectedFile = null; return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        this.errors['image'] = "L'image ne doit pas dépasser 5 MB.";
-        this.selectedFile = null; return;
-      }
-      this.selectedFile = file;
-    }
-  }
-
-  validate(): boolean {
-    this.errors = {};
-    const title = this.newEvent.title?.trim();
-    if (!title) this.errors['title'] = 'Le titre est obligatoire.';
-    else if (title.length < 3) this.errors['title'] = 'Le titre doit contenir au moins 3 caractères.';
-    else if (title.length > 100) this.errors['title'] = 'Le titre ne doit pas dépasser 100 caractères.';
-
-    const dateValue = this.newEvent.startDateTime?.trim();
-    if (!dateValue) {
-      this.errors['startDateTime'] = "La date et l'heure sont obligatoires.";
-    } else {
-      const sel = new Date(dateValue);
-      const now = new Date();
-      const oneYear = new Date(); oneYear.setFullYear(now.getFullYear() + 1);
-      if (isNaN(sel.getTime())) this.errors['startDateTime'] = 'La date est invalide.';
-      else if (sel < now) this.errors['startDateTime'] = 'La date ne peut pas être dans le passé.';
-      else if (sel > oneYear) this.errors['startDateTime'] = 'La date ne peut pas dépasser un an dans le futur.';
-    }
-
-    const location = this.newEvent.location?.trim();
-    if (!location) this.errors['location'] = 'Le lieu est obligatoire.';
-    else if (location.length < 2) this.errors['location'] = 'Le lieu doit contenir au moins 2 caractères.';
-
-    const desc = this.newEvent.description?.trim();
-    if (desc && desc.length > 500) this.errors['description'] = 'La description ne doit pas dépasser 500 caractères.';
-
-    if (!this.selectedFile && !this.isEditing) this.errors['image'] = "L'image est obligatoire.";
-    return Object.keys(this.errors).length === 0;
-  }
-
   getImageUrl(imageUrl?: string): string {
     if (!imageUrl) return 'assets/images/event-placeholder.jpg';
     return 'http://localhost:8080' + imageUrl;
@@ -763,55 +555,43 @@ export class EventFrontComponent implements OnInit {
     return new Date(dateStr) > new Date();
   }
 
+  getTimeRemainingText(dateStr?: string): string {
+    if (!dateStr) return '';
+    const eventDate = new Date(dateStr);
+    const now = new Date();
+    
+    if (eventDate <= now) {
+      return 'L\'événement est déjà passé';
+    }
+
+    const diffMs = eventDate.getTime() - now.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+    if (diffDays === 0) {
+      if (diffHours === 0) return 'Très bientôt (moins d\'une heure)';
+      return `Aujourd'hui, dans ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    } else if (diffDays === 1) {
+      return `Demain, plus que ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    } else {
+      return `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''} et ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    }
+  }
+
   getUpcomingCount(): number {
     return this.events.filter(e => this.isUpcoming(e.startDateTime)).length;
   }
 
+  openBooking(event: CalendarEvent) {
+    this.selectedEvent = event;
+    this.showBooking = true;
+  }
+
+  onBookingClosed() {
+    this.showBooking = false;
+    this.selectedEvent = null;
+    this.load(); // Rafraîchir pour voir les places dispo (si affichées un jour sur la card)
+  }
+
   onImgError(event: any) { event.target.src = 'assets/images/event-placeholder.jpg'; }
-
-  save() {
-    if (!this.validate()) return;
-    if (this.isEditing && this.selected?.id) {
-      this.eventService.update(this.selected.id, this.newEvent).subscribe((updated) => {
-        if (this.selectedFile) this.eventService.uploadImage(updated.id!, this.selectedFile).subscribe(() => this.load());
-        else this.load();
-        this.reset();
-      });
-    } else {
-      this.eventService.create(this.newEvent).subscribe((created) => {
-        if (this.selectedFile) this.eventService.uploadImage(created.id!, this.selectedFile).subscribe(() => this.load());
-        else this.load();
-        this.reset();
-      });
-    }
-  }
-
-  edit(event: CalendarEvent) {
-    this.selected = event;
-    this.newEvent = { ...event, description: event.description || '' };
-    this.isEditing = true; this.showForm = true; this.errors = {};
-  }
-
-  delete(id: number) {
-    if (confirm('Voulez-vous vraiment supprimer cet événement ?'))
-      this.eventService.delete(id).subscribe(() => this.load());
-  }
-
-  openForm() { this.reset(); this.showForm = true; }
-
-  openShareDialog(ev: CalendarEvent) {
-    this.shareEvent = ev;
-    this.shareDialogOpen = true;
-  }
-
-  onShareDialogChange(open: boolean) {
-    this.shareDialogOpen = open;
-    if (!open) this.shareEvent = null;
-  }
-
-  reset() {
-    this.selectedFile = null; this.errors = {};
-    this.newEvent = { title: '', startDateTime: '', location: '', description: '', remindEnabled: false, userId: 1 };
-    this.selected = null; this.isEditing = false; this.showForm = false;
-  }
 }

@@ -1,5 +1,193 @@
-.chart-wrap {
-  min-height: 280px;
-  position: relative;
+.section-header__title {
+  color: var(--doc-heading);
+  letter-spacing: -0.05em;
+  font-weight: 800;
 }
 
+.underline::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--doc-primary-soft);
+  z-index: -1;
+}
+
+.btn-soft-primary {
+  background: var(--doc-primary-soft);
+  color: var(--doc-primary);
+  border: none !important;
+  transition: var(--doc-transition);
+  
+  &:hover {
+    background: rgba(var(--doc-primary-rgb), 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+.card {
+  transition: var(--doc-transition);
+  border: 1px solid rgba(0,0,0,0.03) !important;
+  box-shadow: var(--doc-shadow-sm) !important;
+  
+  &.transition-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--doc-shadow) !important;
+  }
+}
+
+.table {
+  thead th {
+    background: #f8fafc;
+    color: var(--doc-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  
+  tbody td {
+    padding: 1.25rem;
+    color: var(--doc-heading);
+    font-weight: 500;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+  }
+}
+
+.badge {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.bg-grey {
+  background-color: #f1f5f9 !important;
+}
+
+.dropdown-menu {
+  border: none !important;
+  box-shadow: var(--doc-shadow-lg) !important;
+  padding: 0.75rem !important;
+}
+
+.dropdown-item {
+  color: var(--doc-secondary);
+  font-weight: 600;
+  padding: 0.625rem 1rem !important;
+  transition: var(--doc-transition);
+  
+  &:hover {
+    background: var(--doc-primary-soft);
+    color: var(--doc-primary);
+  }
+  
+  &.active-soft {
+    background: var(--doc-primary-soft);
+    color: var(--doc-primary);
+  }
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+.chart-container-small {
+  position: relative;
+  height: 240px;
+  width: 100%;
+}
+
+.search-form {
+  border: 2px solid transparent;
+  transition: var(--doc-transition);
+  
+  &:focus-within {
+    border-color: var(--doc-primary-soft);
+    background: white !important;
+    box-shadow: var(--doc-shadow-sm);
+  }
+}
+
+.modal-content {
+  border: none !important;
+  box-shadow: var(--doc-shadow-xl) !important;
+  border-radius: 1.5rem !important;
+}
+
+.bg-soft-primary { background-color: var(--doc-primary-soft) !important; }
+.bg-soft-warning { background-color: #fffbeb !important; }
+.bg-soft-danger { background-color: #fef2f2 !important; }
+
+.fs-28 { font-size: 1.75rem; }
+.ls-n1 { letter-spacing: -0.01em; }
+.fw-black { font-weight: 800; }
+
+.ai-output {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+// PREMIUM FORM CONTROLS
+.form-label-doc {
+  font-weight: 800;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.input-container-doc {
+  position: relative;
+  
+  .input-icon-doc {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--doc-primary);
+    pointer-events: none; // CRITICAL: allows clicking through to the input
+    z-index: 10;
+    font-size: 0.9rem;
+  }
+}
+
+.form-control-doc, .form-select-doc {
+  height: 52px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding-left: 3rem !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--doc-heading);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
+  &:focus {
+    background-color: #fff;
+    border-color: var(--doc-primary);
+    box-shadow: 0 0 0 4px rgba(var(--doc-primary-rgb), 0.1);
+    outline: none;
+  }
+}
+
+textarea.form-control-doc {
+  height: auto !important;
+  min-height: 120px;
+}
+
+.form-select-doc {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px 12px;
+}

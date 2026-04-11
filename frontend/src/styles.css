@@ -1,12 +1,29 @@
-/* Minimal global styles to avoid conflict with template */
+/* DocWala Design System Tokens */
+:root {
+  --doc-primary: #800080;
+  --doc-primary-rgb: 128, 0, 128;
+  --doc-primary-soft: rgba(128, 0, 128, 0.08);
+  --doc-secondary: #555a64;
+  --doc-heading: #2c3038;
+  --doc-bg: #f8f9fa;
+  --doc-shadow: 2px 2px 20px 0 rgb(82 66 47 / 12%);
+  --doc-radius: 1rem;
+  --doc-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 body {
   font-family: 'Quicksand', sans-serif !important;
+  color: var(--doc-secondary);
+  background-color: var(--doc-bg);
 }
+
+/* Common Documentation Styles */
+.rounded-4 { border-radius: var(--doc-radius) !important; }
+.shadow-doc { box-shadow: var(--doc-shadow) !important; }
 
 .mt-n5 { margin-top: -3rem !important; }
 .z-1 { z-index: 1; }
 
-/* Status dot for detail view if needed */
 .status-dot {
   width: 8px;
   height: 8px;
@@ -18,12 +35,25 @@ body {
 
 .italic { font-style: italic; }
 
-/* Custom hover for cards */
+/* Custom hover for cards inspired by template */
 .card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: var(--doc-transition);
 }
 .card-hover:hover {
   transform: translateY(-5px);
-  box-shadow: 0 1rem 3rem rgba(0,0,0,0.175) !important;
+  box-shadow: 0 1rem 3rem rgba(var(--doc-primary-rgb), 0.1) !important;
+}
+
+.bg-soft-primary {
+  background-color: var(--doc-primary-soft) !important;
+}
+
+.text-primary {
+  color: var(--doc-primary) !important;
+}
+
+.btn-primary {
+  background-color: var(--doc-primary) !important;
+  border-color: var(--doc-primary) !important;
 }
 

@@ -1,75 +1,62 @@
 <main class="social-shell animate-fade-in">
-  <div class="container">
+  <div class="container-fluid px-4 px-lg-5">
     <div class="social-grid" [class.no-sidebar]="isAdmin()">
       
-      <!-- LEFT SIDEBAR: Navigation & Communities (hidden for ADMIN) -->
+      <!-- LEFT SIDEBAR: Navigation & Communities -->
       <aside class="sidebar-left" *ngIf="!isAdmin()">
         <!-- Profile Summary -->
-        <a routerLink="/collaboration/feed" class="profile-link">
-          <div class="avatar-placeholder bg-soft-primary d-flex align-items-center justify-content-center text-primary fw-bold">
+        <a routerLink="/collaboration/feed" class="profile-link shadow-doc">
+          <div class="avatar-placeholder bg-soft-primary d-flex align-items-center justify-content-center text-primary fw-black">
             {{ currentUser()?.prenom?.substring(0,1) || 'U' }}
           </div>
-          <span class="fw-bold">{{ currentUser()?.prenom }} {{ currentUser()?.nom }}</span>
+          <div class="d-flex flex-column">
+            <span class="text-doc-heading ls-n1">{{ currentUser()?.prenom }} {{ currentUser()?.nom }}</span>
+            <small class="text-doc-secondary fs-11 fw-bold opacity-75">Care Provider</small>
+          </div>
         </a>
 
         <!-- Primary Navigation -->
         <nav class="nav-card">
           <a routerLink="/collaboration/feed" class="nav-item-social" [class.active]="isRouteActive('/collaboration/feed')">
-            <i class="fa-solid fa-house text-primary"></i>
-            <span>Home / Feed</span>
+            <i class="fa-solid fa-house-chimney-medical"></i>
+            <span>Clinical Feed</span>
           </a>
           <a routerLink="/collaboration/messenger" class="nav-item-social" [class.active]="isRouteActive('/collaboration/messenger')">
-            <i class="fa-solid fa-paper-plane text-info"></i>
-            <span>Messenger</span>
+            <i class="fa-solid fa-comments"></i>
+            <span>Direct Messenger</span>
           </a>
           <a routerLink="/collaboration/groups" class="nav-item-social" [class.active]="isRouteActive('/collaboration/groups')">
-            <i class="fa-solid fa-users text-purple"></i>
-            <span>Discover Groups</span>
+            <i class="fa-solid fa-hubspot"></i>
+            <span>Discover Specialties</span>
           </a>
-          
-          <!-- Notifications (Sidebar Integration via Offcanvas) -->
-          <!-- 
-          <a class="nav-item-social text-decoration-none w-100 d-flex justify-content-between align-items-center" 
-             data-bs-toggle="offcanvas" href="#notificationOffcanvas" role="button" aria-controls="notificationOffcanvas">
-            <div>
-              <i class="fa-solid fa-bell text-warning"></i>
-              <span class="ms-2 text-dark">Notifications</span>
-            </div>
-            <span *ngIf="unreadCount() > 0" class="badge rounded-pill bg-danger" style="font-size: 10px;">
-              {{ unreadCount() }}
-            </span>
-          </a>
-          -->
-
-
         </nav>
 
         <!-- My Groups Section -->
         <div class="social-section-title">
-          <span>Joined Groups</span>
-          <a routerLink="/collaboration/groups" class="btn btn-link btn-sm p-0 text-primary text-decoration-none" style="font-size: 13px;">Explore</a>
+          <span>Joined Circles</span>
+          <a routerLink="/collaboration/groups" class="text-primary text-decoration-none fw-black fs-11" style="cursor: pointer;">EXPLORE</a>
         </div>
 
         <div class="sidebar-search">
-          <div class="input-group input-group-sm rounded-pill overflow-hidden">
-            <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-            <input type="text" class="form-control" placeholder="Search groups..." [(ngModel)]="groupSearchQuery">
+          <div class="input-group shadow-sm">
+            <span class="input-group-text"><i class="fa-solid fa-magnifying-glass fs-13"></i></span>
+            <input type="text" class="form-control" placeholder="Search my circles..." [(ngModel)]="groupSearchQuery">
           </div>
         </div>
 
-        <div class="list-groups-social">
+        <div class="list-groups-social animate-fade-in">
           <div *ngFor="let g of joinedGroups()" class="social-list-item" [routerLink]="['/collaboration/groups', g.id, 'feed']">
-            <div class="avatar-circle">
-              {{ g.name.substring(0,1) }}
+            <div class="avatar-circle shadow-sm">
+              {{ g.name.substring(0, 2).toUpperCase() }}
             </div>
-            <span>{{ g.name }}</span>
+            <span class="fs-14 fw-bold ls-n1">{{ g.name }}</span>
           </div>
-          <p *ngIf="joinedGroups().length === 0" class="text-muted fs-12 px-3">No groups joined yet.</p>
+          <p *ngIf="joinedGroups().length === 0" class="text-muted fs-11 fw-bold px-3 opacity-50">No circles joined yet.</p>
         </div>
 
-        <div class="mt-4 pt-3 border-top px-2">
-          <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none" (click)="logout()">
-            <i class="fa-solid fa-right-from-bracket me-2"></i> Log Out
+        <div class="mt-5 pt-3 border-top px-3">
+          <button class="btn btn-link btn-sm text-danger p-0 text-decoration-none fw-black fs-12 text-uppercase letter-spacing-1" (click)="logout()">
+            <i class="fa-solid fa-power-off me-2"></i> Log Out Account
           </button>
         </div>
       </aside>
@@ -99,32 +86,57 @@
 </main>
 
 <!-- Notifications Offcanvas Modal -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="notificationOffcanvas" aria-labelledby="notificationOffcanvasLabel" style="width: 380px;">
-  <div class="offcanvas-header border-bottom bg-light">
-    <h5 class="offcanvas-title fw-bold" id="notificationOffcanvasLabel">Notifications</h5>
-    <span class="badge bg-primary rounded-pill ms-2 fs-12">{{ unreadCount() }} New</span>
-    <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<div class="offcanvas offcanvas-end border-0" tabindex="-1" id="notificationOffcanvas" aria-labelledby="notificationOffcanvasLabel" style="width: 400px;">
+  <div class="offcanvas-header border-bottom py-4 px-4 bg-white">
+    <div class="d-flex align-items-center">
+      <h4 class="offcanvas-title fw-black ls-n1 mb-0" id="notificationOffcanvasLabel">Intelligence Center</h4>
+      <span class="badge bg-primary-soft text-primary rounded-pill ms-3 fs-11 fw-black px-3 py-2 shadow-sm">{{ unreadCount() }} NEW</span>
+    </div>
+    <button type="button" class="btn-close shadow-none opacity-50" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
-  <div class="offcanvas-body p-0 notification-list">
-    <div *ngFor="let n of notifications()" class="p-3 border-bottom position-relative hover-notification" 
-         [class.bg-soft-primary]="!n.isRead" (click)="markAsRead(n.id!)">
+  <div class="offcanvas-body p-0 notification-list bg-light">
+    <div *ngFor="let n of notifications()" class="p-4 mx-2 rounded-4 hover-notification mb-2 position-relative shadow-sm" 
+         [class.bg-white]="n.isRead" [class.bg-soft-primary]="!n.isRead" (click)="markAsRead(n.id!)">
       <div class="d-flex gap-3">
-        <div class="avatar-xs bg-primary rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width: 40px; height: 40px;">
-           <i class="fa-solid fs-14" [class.fa-comment]="n.type.includes('MESSAGE')" [class.fa-heart]="n.type.includes('LIKE')" [class.fa-bullhorn]="!n.type.includes('MESSAGE') && !n.type.includes('LIKE')"></i>
+        <div class="avatar-xs bg-primary text-white flex-shrink-0 d-flex align-items-center justify-content-center">
+           <i class="fa-solid fs-14" [class.fa-message-medical]="n.type.includes('MESSAGE')" [class.fa-heart-pulse]="n.type.includes('LIKE')" [class.fa-tower-broadcast]="!n.type.includes('MESSAGE') && !n.type.includes('LIKE')"></i>
         </div>
         <div class="flex-grow-1 overflow-hidden">
-          <p class="fs-14 mb-1 text-dark" [class.fw-bold]="!n.isRead">{{ n.content }}</p>
-          <small class="text-muted fs-12">{{ n.createdAt | date: 'shortTime' }}</small>
+          <p class="fs-14 mb-1 text-doc-heading ls-n1" [class.fw-black]="!n.isRead" [class.fw-bold]="n.isRead">{{ n.content }}</p>
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-clock-rotate-left fs-10 opacity-50"></i>
+            <small class="text-doc-secondary fs-11 fw-bold opacity-75 letter-spacing-1">{{ n.createdAt | date: 'shortTime' }}</small>
+          </div>
         </div>
-        <button class="btn btn-link btn-xs p-0 text-muted shadow-none h-fit" (click)="$event.stopPropagation(); deleteNotification(n.id!)">
+        <button class="btn btn-xs p-0 text-muted shadow-none h-fit" (click)="$event.stopPropagation(); deleteNotification(n.id!)">
+           <i class="fa-solid fa-xmark fs-14"></i>
+        </button>
+      </div>
+    </div>
+    <div *ngFor="let n of notifications()" class="p-4 mx-2 rounded-4 hover-notification mb-2 position-relative shadow-sm" 
+         [class.bg-white]="n.isRead" [class.bg-soft-primary]="!n.isRead" (click)="markAsRead(n.id!)">
+      <div class="d-flex gap-3">
+        <div class="avatar-xs bg-primary text-white flex-shrink-0 d-flex align-items-center justify-content-center">
+           <i class="fa-solid fs-14" [class.fa-message-medical]="n.type.includes('MESSAGE')" [class.fa-heart-pulse]="n.type.includes('LIKE')" [class.fa-tower-broadcast]="!n.type.includes('MESSAGE') && !n.type.includes('LIKE')"></i>
+        </div>
+        <div class="flex-grow-1 overflow-hidden">
+          <p class="fs-14 mb-1 text-doc-heading ls-n1" [class.fw-black]="!n.isRead" [class.fw-bold]="n.isRead">{{ n.content }}</p>
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-clock-rotate-left fs-10 opacity-50"></i>
+            <small class="text-doc-secondary fs-11 fw-bold opacity-75 letter-spacing-1">{{ n.createdAt | date: 'shortTime' }}</small>
+          </div>
+        </div>
+        <button class="btn btn-xs p-0 text-muted shadow-none h-fit" (click)="$event.stopPropagation(); deleteNotification(n.id!)">
            <i class="fa-solid fa-xmark fs-14"></i>
         </button>
       </div>
     </div>
     <div *ngIf="notifications().length === 0" class="p-5 text-center mt-5">
-       <i class="fa-regular fa-bell-slash text-muted opacity-25 mb-4" style="font-size: 4rem;"></i>
-       <h6 class="fw-bold mb-1">Your notifications are empty</h6>
-       <p class="text-muted small mb-0">When you get pinged, it'll show up here.</p>
+       <div class="intelligence-empty-state opacity-25 mb-4">
+         <i class="fa-solid fa-tower-broadcast text-doc-secondary" style="font-size: 4rem;"></i>
+       </div>
+       <h6 class="fw-black text-doc-heading mb-1 ls-n1">Intelligence Queue Clear</h6>
+       <p class="text-doc-secondary small fw-bold opacity-75 letter-spacing-1">Current system status: Optimal. No new pings detected.</p>
     </div>
   </div>
 </div>

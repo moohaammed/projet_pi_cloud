@@ -1,260 +1,217 @@
-<!-- ===== PAGE ÉVÉNEMENTS ===== -->
 <div class="events-page">
 
-  <!-- ── HEADER ── -->
+  <!-- HEADER -->
   <div class="page-header">
-    <div class="header-left">
+    <div class="title-container">
+      <div class="header-badge">Agenda & Activités</div>
+      <h1 class="page-title">Découvrez Nos Événements</h1>
+      <p class="page-subtitle">Participez à nos activités éducatives et interactives conçues pour vous.</p>
       
-      <h1 class="page-title">Événements</h1>
-    </div>
-    <div class="header-right">
-      <div class="search-box">
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      <!-- Alzheimer Friendly Today Date Panel -->
+      <div class="today-date-panel" style="margin-top: 20px; background: rgba(255, 255, 255, 0.9); padding: 12px 30px; border-radius: 50px; border: 2px solid #800080; box-shadow: 0 4px 15px rgba(128,0,128,0.15); display: inline-flex; align-items: center; gap: 10px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#800080" stroke-width="2" style="width: 24px; height: 24px;">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          (ngModelChange)="onSearchChange()"
-          placeholder="Rechercher un événement…"
-          class="search-input"
-        />
-      </div>
-      <button class="btn-create" (click)="openForm()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
-        Nouvel événement
-      </button>
-    </div>
-  </div>
-
-  <!-- ── STATS BAR ── -->
-  <div class="stats-bar">
-    <div class="stat">
-      <div class="stat-icon total">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-      </div>
-      <div class="stat-info">
-        <span class="stat-number">{{ events.length }}</span>
-        <span class="stat-label">Total</span>
-      </div>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat">
-      <div class="stat-icon upcoming">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-      </div>
-      <div class="stat-info">
-        <span class="stat-number">{{ getUpcomingCount() }}</span>
-        <span class="stat-label">À venir</span>
-      </div>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat">
-      <div class="stat-icon past">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2a10 10 0 1 0 10 10"/><polyline points="12 6 12 12 8 14"/>
-        </svg>
-      </div>
-      <div class="stat-info">
-        <span class="stat-number">{{ events.length - getUpcomingCount() }}</span>
-        <span class="stat-label">Passés</span>
+        <span style="font-size: 1.25rem; font-weight: 700; color: #3d0040;">Aujourd'hui, nous sommes le <span style="text-transform: capitalize; color: #800080;">{{ todayDateStr }}</span></span>
       </div>
     </div>
   </div>
 
-  <!-- ── MODAL ── -->
-  <div class="modal-overlay" *ngIf="showForm" (click)="reset()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 class="modal-title">{{ isEditing ? 'Modifier l\'événement' : 'Nouvel événement' }}</h2>
-        <button class="modal-close" (click)="reset()">
+  <!-- CONTROLS ROW -->
+  <div class="controls-row">
+    <!-- SEARCH -->
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Rechercher un événement…"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-icon total">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6 6 18M6 6l12 12"/>
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
-        </button>
-      </div>
-
-      <div class="form-body">
-        <div class="form-group" [class.has-error]="errors['title']">
-          <label class="form-label">Titre <span class="required">*</span></label>
-          <input type="text" class="form-input" [(ngModel)]="newEvent.title" placeholder="Nom de l'événement"/>
-          <span class="error-msg" *ngIf="errors['title']">{{ errors['title'] }}</span>
         </div>
-
-        <div class="form-group" [class.has-error]="errors['startDateTime']">
-          <label class="form-label">Date & heure <span class="required">*</span></label>
-          <input type="datetime-local" class="form-input" [(ngModel)]="newEvent.startDateTime"/>
-          <span class="error-msg" *ngIf="errors['startDateTime']">{{ errors['startDateTime'] }}</span>
-        </div>
-
-        <div class="form-group" [class.has-error]="errors['location']">
-          <label class="form-label">Lieu <span class="required">*</span></label>
-          <input type="text" class="form-input" [(ngModel)]="newEvent.location" placeholder="Adresse ou nom du lieu"/>
-          <span class="error-msg" *ngIf="errors['location']">{{ errors['location'] }}</span>
-        </div>
-
-        <div class="form-group" [class.has-error]="errors['description']">
-          <label class="form-label">Description</label>
-          <textarea class="form-input form-textarea" [(ngModel)]="newEvent.description" placeholder="Décrivez l'événement…" rows="3"></textarea>
-          <span class="error-msg" *ngIf="errors['description']">{{ errors['description'] }}</span>
-        </div>
-
-        <div class="form-group" [class.has-error]="errors['image']">
-          <label class="form-label">Image <span class="required" *ngIf="!isEditing">*</span></label>
-          <label class="file-upload-area">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>
-            </svg>
-            <span *ngIf="!selectedFile">Cliquez pour uploader une image</span>
-            <span *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</span>
-            <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" hidden/>
-          </label>
-          <span class="error-msg" *ngIf="errors['image']">{{ errors['image'] }}</span>
-        </div>
-
-        <div class="form-group remind-toggle">
-          <label class="toggle-label">
-            <span>Activer le rappel</span>
-            <div class="toggle-switch" [class.active]="newEvent.remindEnabled" (click)="newEvent.remindEnabled = !newEvent.remindEnabled">
-              <div class="toggle-knob"></div>
-            </div>
-          </label>
+        <div class="stat-info">
+          <span class="stat-number">{{ events.length }}</span>
+          <span class="stat-label">Total</span>
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="reset()">Annuler</button>
-        <button class="btn-save" (click)="save()">
-          {{ isEditing ? 'Enregistrer' : 'Créer l\'événement' }}
-        </button>
+      <div class="stat-divider"></div>
+
+      <div class="stat">
+        <div class="stat-icon upcoming">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ getUpcomingCount() }}</span>
+          <span class="stat-label">À venir</span>
+        </div>
+      </div>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat">
+        <div class="stat-icon past">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ events.length - getUpcomingCount() }}</span>
+          <span class="stat-label">Passés</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ── GRILLE ── -->
-  <div class="events-grid" *ngIf="pagedEvents.length > 0">
-    <div class="event-card" *ngFor="let event of pagedEvents" [attr.id]="event.id != null ? 'edu-event-' + event.id : null">
+  <!-- EMPTY STATE -->
+  <div *ngIf="pagedEvents.length === 0" class="empty-state">
+    <div class="empty-glass">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+    <h3 class="empty-title">Aucun événement trouvé</h3>
+    <p class="empty-sub">Essayez d'affiner votre recherche</p>
+  </div>
 
+  <!-- EVENTS GRID -->
+  <div *ngIf="pagedEvents.length > 0" class="events-grid">
+    <div class="event-card" *ngFor="let event of pagedEvents">
+
+      <!-- Image -->
       <div class="card-image-wrapper">
-        <img [src]="getImageUrl(event.imageUrl)" [alt]="event.title" class="card-image" (error)="onImgError($event)"/>
-        <div class="card-badge" [class.upcoming]="isUpcoming(event.startDateTime)" [class.past]="!isUpcoming(event.startDateTime)">
+        <img
+          class="card-image"
+          [src]="getImageUrl(event.imageUrl)"
+          (error)="onImgError($event)"
+          [alt]="event.title"
+        >
+        <span
+          class="card-badge"
+          [class.upcoming]="isUpcoming(event.startDateTime)"
+          [class.past]="!isUpcoming(event.startDateTime)"
+        >
           {{ isUpcoming(event.startDateTime) ? 'À venir' : 'Passé' }}
-        </div>
-        <div class="card-actions-overlay">
-          <button class="action-btn share-btn" type="button" (click)="openShareDialog(event); $event.stopPropagation()" title="Partager dans la communauté">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-            </svg>
-          </button>
-          <button class="action-btn edit-btn" (click)="edit(event)" title="Modifier">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/>
-            </svg>
-          </button>
-          <button class="action-btn delete-btn" (click)="delete(event.id!)" title="Supprimer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              <path d="M10 11v6M14 11v6"/>
-              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-            </svg>
-          </button>
-        </div>
+        </span>
       </div>
 
+      <!-- Body -->
       <div class="card-body">
         <div class="card-date-row">
-          <div class="date-pill">
+          <span class="date-pill">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
             {{ formatDate(event.startDateTime) }}
-          </div>
-          <div class="time-pill">
+          </span>
+          <span class="time-pill">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
             </svg>
             {{ formatTime(event.startDateTime) }}
-          </div>
+          </span>
+        </div>
+
+        <!-- Alzheimer Friendly Time Remaining -->
+        <div class="time-remaining-pill" *ngIf="isUpcoming(event.startDateTime)" style="margin-top: 4px; background: #fdf2f8; color: #9d174d; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; border: 1px solid #fbcfe8;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          {{ getTimeRemainingText(event.startDateTime) }}
         </div>
 
         <h3 class="card-title">{{ event.title }}</h3>
-
         <p class="card-description" *ngIf="event.description">{{ event.description }}</p>
 
         <div class="card-separator"></div>
 
-        <div class="card-footer">
-          <div class="card-location">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-            <span>{{ event.location }}</span>
+        <div class="card-footer d-flex flex-column gap-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="card-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>{{ event.location }}</span>
+            </div>
+            <span class="card-remind" *ngIf="event.remindEnabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              Rappel
+            </span>
           </div>
-          <div class="card-remind" *ngIf="event.remindEnabled">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            Rappel
-          </div>
+
+          <!-- Participation Button (Moved here) -->
+          <button class="btn w-100 fw-bold shadow-sm text-white py-3 animate-fade-in" 
+                  style="background-color: #800080; border-radius: 12px;"
+                  (click)="openBooking(event)">
+            <i class="fa-solid fa-chair me-2"></i>
+            Participer
+          </button>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- ── PAGINATION ── -->
+  <!-- PAGINATION -->
   <div class="pagination" *ngIf="totalPages > 1">
     <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
     </button>
     <button
       class="page-btn"
-      *ngFor="let p of pageNumbers"
-      [class.active]="p === currentPage"
-      (click)="goToPage(p)"
-    >{{ p }}</button>
+      *ngFor="let page of pageNumbers"
+      [class.active]="currentPage === page"
+      (click)="goToPage(page)"
+    >{{ page }}</button>
     <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
-  </div>
-
-  <!-- ── ÉTAT VIDE ── -->
-  <div class="empty-state" *ngIf="pagedEvents.length === 0">
-    <div class="empty-glass">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #7a8baa">
-        <rect x="3" y="4" width="18" height="18" rx="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="9 18 15 12 9 6"/>
       </svg>
-    </div>
-    <p class="empty-title">Aucun événement trouvé</p>
-    <p class="empty-sub" *ngIf="searchQuery">Essayez un autre terme de recherche.</p>
-    <p class="empty-sub" *ngIf="!searchQuery">Commencez par créer votre premier événement.</p>
-    <button class="btn-create" (click)="openForm()" *ngIf="!searchQuery" style="margin-top:8px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-      Créer un événement
     </button>
   </div>
 
-  <app-share-event-dialog
-    [open]="shareDialogOpen"
-    (openChange)="onShareDialogChange($event)"
-    [event]="shareEvent"
-  ></app-share-event-dialog>
+  <!-- Seat Booking Modal -->
+  <app-event-seat-grid 
+    *ngIf="showBooking" 
+    [event]="selectedEvent" 
+    (closed)="onBookingClosed()">
+  </app-event-seat-grid>
 
 </div>

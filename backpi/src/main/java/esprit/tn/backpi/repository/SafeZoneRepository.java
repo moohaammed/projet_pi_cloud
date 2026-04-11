@@ -10,3 +10,4 @@ public interface SafeZoneRepository extends JpaRepository<SafeZone, Long> {
     List<SafeZone> findByDoctor_Id(Long doctorId);
     List<SafeZone> findByPatient_IdAndActifTrue(Long patientId);
 }
+
