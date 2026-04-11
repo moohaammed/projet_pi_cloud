@@ -5,7 +5,7 @@ import { Hospital } from '../models/hospital.model';
 
 @Injectable({ providedIn: 'root' })
 export class HospitalService {
-  private apiUrl = 'http://localhost:8089/api/hospitals';
+  private apiUrl = 'http://localhost:8080/api/hospitals';
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Hospital[]> {

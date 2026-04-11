@@ -8,17 +8,18 @@ import { EventListComponent } from './components/education/event/event-list.comp
 import { ActivityListComponent } from './components/education/activity/activity-list.component';
 import { EducationComponent } from './components/education/activity/education.component';
 import { EventFrontComponent } from './components/education/event/event_front';
-
-// Gestion Patient & Collaboration
 import { CommunicationTestComponent } from './components/collaboration/communication-test/communication-test.component';
 import { GestionPatientRoleComponent } from './gestion-patient-role/gestion-patient-role.component';
 import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard.component';
 import { MedecinDashboardComponent } from './medecin-dashboard/medecin-dashboard.component';
 import { HomeComponent } from './components/home/home.component';
+import { AlertDashboardComponent } from './components/medecin/alert-dashboard/alert-dashboard.component';
 
 export const routes: Routes = [
-  // ===== AUTH AlzCare =====
+
   { path: '', redirectTo: 'home', pathMatch: 'full' },
+
+  // ===== AUTH =====
   {
     path: 'auth/login',
     loadComponent: () =>
@@ -31,9 +32,10 @@ export const routes: Routes = [
       import('./components/auth/register/register.component')
         .then(m => m.RegisterComponent)
   },
+
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
 
-  // ===== USERS AlzCare =====
+  // ===== USERS =====
   {
     path: 'users',
     loadComponent: () =>
@@ -59,22 +61,93 @@ export const routes: Routes = [
     data: { roles: ['ADMIN'] }
   },
 
+  // ===== HOSPITALS — ADMIN + DOCTOR =====
   {
-  path: 'map',
+    path: 'hospitals',
+    loadComponent: () =>
+      import('./components/hospital/hospital-list/hospital-list.component')
+        .then(m => m.HospitalListComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'hospitals/new',
+    loadComponent: () =>
+      import('./components/hospital/hospital-form/hospital-form.component')
+        .then(m => m.HospitalFormComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'DOCTOR'] }  // ← DOCTOR peut ajouter
+  },
+  {
+    path: 'hospitals/edit/:id',
+    loadComponent: () =>
+      import('./components/hospital/hospital-form/hospital-form.component')
+        .then(m => m.HospitalFormComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'DOCTOR'] }  // ← DOCTOR peut modifier
+  },
+  {
+    path: 'hospitals/:id',
+    loadComponent: () =>
+      import('./components/hospital/hospital-detail/hospital-detail.component')
+        .then(m => m.HospitalDetailComponent),
+    canActivate: [authGuard]
+  },
+
+  // ===== MAP =====
+  {
+    path: 'map',
+    loadComponent: () =>
+      import('./components/map/doctor-map/doctor-map.component')
+        .then(m => m.DoctorMapComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['DOCTOR', 'ADMIN'] }
+  },
+  {
+  path: 'patient-profiles',
   loadComponent: () =>
-    import('./components/map/doctor-map/doctor-map.component')
-      .then(m => m.DoctorMapComponent),
+    import('./components/patient/patient-list/patient-list.component')
+      .then(m => m.PatientListComponent),
   canActivate: [authGuard, roleGuard],
-  data: { roles: ['DOCTOR', 'ADMIN'] }
+  data: { roles: ['ADMIN', 'DOCTOR'] }
+},
+{
+  path: 'patient-profiles/new',
+  loadComponent: () =>
+    import('./components/patient/patient-form/patient-form.component')
+      .then(m => m.PatientFormComponent),
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['ADMIN'] }
+},
+{
+  path: 'patient-profiles/edit/:id',
+  loadComponent: () =>
+    import('./components/patient/patient-form/patient-form.component')
+      .then(m => m.PatientFormComponent),
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['ADMIN', 'DOCTOR'] }
+},
+{
+  path: 'medecin/alertes',
+  component: AlertDashboardComponent
+},
+{
+  path: 'patient-profiles/:id',
+  loadComponent: () =>
+    import('./components/patient/patient-detail/patient-detail.component')
+      .then(m => m.PatientDetailComponent),
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['ADMIN', 'DOCTOR'] }
+},
+{
+  path: 'patient-map',
+  loadComponent: () =>
+    import('./components/map/patient-map/patient-map.component')
+      .then(m => m.PatientMapComponent),
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['PATIENT'] }
 },
 
-
-  // ===== COLLABORATION (Avec sous-routes lazy-loadées) =====
-
-
-
-  // ===== COLLABORATION (Avec sous-routes lazy-loadées) =====
-
+  // ===== COLLABORATION =====
   {
     path: 'collaboration',
     component: CommunicationTestComponent,
@@ -107,7 +180,7 @@ export const routes: Routes = [
     ]
   },
 
-  // --- ADMIN ROUTES ---
+  // ===== ADMIN =====
   {
     path: 'admin',
     canActivate: [authGuard, roleGuard],
@@ -116,46 +189,30 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        loadComponent: () => import('./components/admin-dashboard-home/admin-dashboard-home.component').then(m => m.AdminDashboardHomeComponent)
+        loadComponent: () =>
+          import('./components/admin-dashboard-home/admin-dashboard-home.component')
+            .then(m => m.AdminDashboardHomeComponent)
       },
       {
         path: 'collaboration',
-        loadComponent: () => import('./components/collaboration/admin-collaboration-dashboard/admin-collaboration-dashboard.component').then(m => m.AdminCollaborationDashboardComponent)
+        loadComponent: () =>
+          import('./components/collaboration/admin-collaboration-dashboard/admin-collaboration-dashboard.component')
+            .then(m => m.AdminCollaborationDashboardComponent)
       },
       {
         path: 'rendezvous',
-        loadComponent: () => import('./components/dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+        loadComponent: () =>
+          import('./components/dashboard/admin-dashboard/admin-dashboard.component')
+            .then(m => m.AdminDashboardComponent)
       }
     ]
   },
 
-  // ===== DASHBOARDS & ROLES =====
-  {
-    path: 'patient-dashboard',
-    component: PatientDashboardComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'medecin-dashboard',
-    component: MedecinDashboardComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'gestion-patient-role',
-    component: GestionPatientRoleComponent,
-    canActivate: [authGuard]
-  },
-  // ===== EXISTANT =====
-
-
-  // ===== EXISTANT (inchangé) =====
-
-  // --- Tes Routes (Gestion Patient) ---
+  // ===== DASHBOARDS =====
+  { path: 'patient-dashboard', component: PatientDashboardComponent, canActivate: [authGuard] },
+  { path: 'medecin-dashboard', component: MedecinDashboardComponent, canActivate: [authGuard] },
+  { path: 'gestion-patient-role', component: GestionPatientRoleComponent, canActivate: [authGuard] },
   { path: 'patients', component: GestionPatientRoleComponent },
-  { path: 'patient-dashboard', component: PatientDashboardComponent },
-  { path: 'medecin-dashboard', component: MedecinDashboardComponent },
-
-  { path: 'collaboration', component: CommunicationTestComponent },
 
   // ===== RENDEZ-VOUS =====
   { path: 'rendezvous', component: RendezVousListComponent, canActivate: [authGuard] },
@@ -163,20 +220,11 @@ export const routes: Routes = [
   { path: 'rendezvous/:id', component: RendezVousDetailComponent, canActivate: [authGuard] },
   { path: 'rendezvous/:id/edit', component: RendezVousFormComponent, canActivate: [authGuard] },
 
-
   // ===== EDUCATION =====
   { path: 'events', component: EventListComponent, canActivate: [authGuard] },
   { path: 'activities', component: ActivityListComponent, canActivate: [authGuard] },
   { path: 'education', component: EducationComponent, canActivate: [authGuard] },
   { path: 'eventfront', component: EventFrontComponent, canActivate: [authGuard] },
-
-
-  // --- Routes Education ---
-  { path: 'events', component: EventListComponent },
-  { path: 'activities', component: ActivityListComponent },
-  { path: 'education', component: EducationComponent },
-  { path: 'eventfront', component: EventFrontComponent },
-
 
   { path: '**', redirectTo: 'auth/login' }
 ];

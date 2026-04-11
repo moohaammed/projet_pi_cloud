@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
+import { MapService } from '../services/map.service'; // ← ajoute
 
 @Component({
   selector: 'app-medecin-dashboard',
@@ -18,6 +19,7 @@ export class MedecinDashboardComponent implements OnInit {
   analyses: any[] = [];
   selectedAnalyse: any = null;
   observationToAdd: string = '';
+  alertesCount = 0; // ← ajoute
 
   isLoadingPatients = false;
   isLoadingAnalyses = false;
@@ -26,11 +28,23 @@ export class MedecinDashboardComponent implements OnInit {
 
   constructor(
     private patientService: PatientService,
-    private analyseService: AnalyseService
+    private analyseService: AnalyseService,
+    private mapService: MapService // ← ajoute
   ) { }
 
   ngOnInit(): void {
     this.loadPatients();
+    this.chargerAlertes(); // ← ajoute
+  }
+
+  // ← AJOUTE CETTE METHODE
+  chargerAlertes(): void {
+    this.mapService.getAllAlerts().subscribe({
+      next: (alertes) => {
+        this.alertesCount = alertes.filter((a: any) => !a.resolue).length;
+      },
+      error: () => {}
+    });
   }
 
   showSuccess(msg: string) {
@@ -79,7 +93,7 @@ export class MedecinDashboardComponent implements OnInit {
     this.analyseService.updateAnalyse(this.selectedAnalyse.id, payload).subscribe({
       next: () => {
         this.showSuccess("Observation ajoutée avec succès.");
-        this.selectPatient(this.selectedPatient); // reload analyses
+        this.selectPatient(this.selectedPatient);
         this.selectedAnalyse = null;
         this.isSavingObservation = false;
       },

@@ -4,6 +4,7 @@ import { Client } from '@stomp/stompjs';
 import { MessageDto } from './message.service';
 import { Notification } from './notification.service';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../../environments/environment'; 
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +26,14 @@ export class WebSocketService {
       this.stompClient.deactivate();
     }
 
+     // ← REMPLACE CETTE LIGNE
+    const wsUrl = environment.apiUrl
+      .replace('https://', 'wss://')
+      .replace('http://', 'ws://');
+
+
     this.stompClient = new Client({
-      brokerURL: `ws://localhost:8080/ws?userId=${userId}`,
+      brokerURL: `${wsUrl}/ws?userId=${userId}`,
       debug: (str: string) => console.log(str),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,

@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PatientLocation, SafeZone, GeoAlert } from '../models/map.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
 
-  private baseUrl = 'http://localhost:8089/api';
-
+  private baseUrl = `${environment.apiUrl}/api`;
   constructor(private http: HttpClient) {}
 
   sendLocation(patientId: number, lat: number,
@@ -65,4 +65,10 @@ export class MapService {
       `${this.baseUrl}/alerts/${id}/resoudre`, {}
     );
   }
+  sendSOS(patientId: number, lat: number | undefined, lng: number | undefined): Observable<any> {
+  return this.http.post(
+    `${this.baseUrl}/alerts/sos/patient/${patientId}`,
+    { latitude: lat, longitude: lng }
+  );
+}
 }

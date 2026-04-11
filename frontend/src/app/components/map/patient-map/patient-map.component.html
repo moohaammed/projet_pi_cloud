@@ -1,0 +1,171 @@
+<div class="patient-screen d-flex flex-column align-items-center justify-content-between"
+     style="height:100vh; overflow:hidden;
+            background: linear-gradient(180deg, #f0f4ff 0%, #e8ecf8 100%)">
+
+  <!-- ===== BARRE STATUS EN HAUT ===== -->
+  <div class="w-100 px-4 pt-3 d-flex justify-content-between align-items-center">
+
+    <!-- GPS Indicator -->
+    <div class="d-flex align-items-center gap-2">
+      <div class="position-relative">
+        <div class="rounded-circle"
+             [style.background]="gpsActif ? '#28a745' : (status === 'starting' ? '#ffc107' : '#dc3545')"
+             style="width:12px; height:12px">
+        </div>
+        <!-- Pulse autour du point vert -->
+        <div *ngIf="gpsActif"
+             class="position-absolute rounded-circle"
+             style="width:20px; height:20px; top:-4px; left:-4px;
+                    background:rgba(40,167,69,0.3);
+                    animation: pulse-dot 2s infinite"></div>
+      </div>
+      <span class="small fw-semibold"
+            [class.text-success]="gpsActif"
+            [class.text-warning]="status === 'starting'"
+            [class.text-danger]="!gpsActif && status !== 'starting'">
+        {{ statusMessage }}
+      </span>
+    </div>
+
+    <!-- Batterie -->
+    <div class="d-flex align-items-center gap-1">
+      <i class="fa-solid small" [class]="batterieIcon"
+         [style.color]="batterieColor"></i>
+      <span class="small fw-bold" [style.color]="batterieColor">
+        {{ batterie }}%
+      </span>
+    </div>
+
+  </div>
+
+  <!-- ===== ZONE CENTRALE ===== -->
+  <div class="d-flex flex-column align-items-center text-center px-4 flex-grow-1
+              justify-content-center">
+
+    <!-- État normal -->
+    <div *ngIf="!sosEnvoye">
+      <p class="text-muted mb-1" style="font-size:16px">Bonjour,</p>
+      <h2 class="fw-bold text-dark mb-2" style="font-size:30px">
+        {{ currentUser.prenom }} {{ currentUser.nom }}
+      </h2>
+      <p class="text-muted mb-5" style="font-size:14px">
+        <i class="fa-solid fa-shield-halved text-success me-1"></i>
+        Vous êtes protégé — votre médecin vous suit
+      </p>
+    </div>
+
+    <!-- État SOS -->
+    <div *ngIf="sosEnvoye" class="mb-5">
+      <div class="fw-bold text-success mb-1" style="font-size:24px">
+        ✓ Alerte envoyée !
+      </div>
+      <div class="text-muted" style="font-size:15px">
+        Votre famille a été prévenue
+      </div>
+      <div class="mt-2 text-muted small">
+        Restez où vous êtes — {{ sosCountdown }}s
+      </div>
+    </div>
+
+    <!-- BOUTON SOS -->
+    <div class="position-relative mb-4">
+
+      <!-- Cercles pulsants autour du bouton -->
+      <div *ngIf="!sosEnvoye"
+           class="position-absolute rounded-circle"
+           style="width:280px; height:280px; top:-30px; left:-30px;
+                  background:rgba(220,53,69,0.08);
+                  animation: pulse-ring 2s infinite 0s"></div>
+      <div *ngIf="!sosEnvoye"
+           class="position-absolute rounded-circle"
+           style="width:260px; height:260px; top:-20px; left:-20px;
+                  background:rgba(220,53,69,0.12);
+                  animation: pulse-ring 2s infinite 0.5s"></div>
+
+      <button class="sos-btn position-relative"
+              [class.pulse]="!sosEnvoye"
+              [class.sent]="sosEnvoye"
+              (click)="envoiSOS()"
+              [disabled]="sosEnvoye">
+
+        <div *ngIf="!sosEnvoye" class="d-flex flex-column align-items-center">
+          <i class="fa-solid fa-bell" style="font-size:50px; margin-bottom:8px"></i>
+          <span style="font-size:32px; letter-spacing:6px; font-weight:900">SOS</span>
+        </div>
+
+        <div *ngIf="sosEnvoye" class="d-flex flex-column align-items-center">
+          <i class="fa-solid fa-check" style="font-size:60px"></i>
+        </div>
+
+      </button>
+    </div>
+
+    <!-- Texte sous le bouton -->
+    <p class="text-muted" style="font-size:15px; max-width:280px; line-height:1.6">
+      <span *ngIf="!sosEnvoye">
+        Appuyez sur le bouton si vous avez besoin d'aide
+      </span>
+      <span *ngIf="sosEnvoye" class="text-success fw-semibold">
+        Les secours ont été alertés.<br>Ne bougez pas.
+      </span>
+    </p>
+
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <div class="w-100 px-4 pb-4 d-flex flex-column align-items-center gap-2">
+
+    <!-- Stats GPS -->
+    <div *ngIf="status === 'tracking'"
+         class="d-flex align-items-center gap-3 text-muted"
+         style="font-size:12px">
+      <span *ngIf="lastUpdate">
+        <i class="fa-solid fa-clock me-1"></i>
+        {{ lastUpdate | date:'HH:mm:ss' }}
+      </span>
+      <span>
+        <i class="fa-solid fa-location-dot text-success me-1"></i>
+        {{ positionsEnvoyees }} positions envoyées
+      </span>
+    </div>
+
+    <!-- Démarrage -->
+    <div *ngIf="status === 'starting'"
+         class="d-flex align-items-center gap-2 text-warning">
+      <div class="spinner-border spinner-border-sm"></div>
+      <span class="small">Recherche du signal GPS...</span>
+    </div>
+
+    <!-- Hors ligne -->
+    <div *ngIf="status === 'offline'"
+         class="alert alert-warning py-2 px-3 w-100 text-center mb-0 rounded-3"
+         style="font-size:13px">
+      <i class="fa-solid fa-wifi-slash me-2"></i>
+      GPS indisponible — reconnexion en cours...
+    </div>
+
+    <!-- Alerte batterie faible -->
+    <div *ngIf="batterie < 20 && status !== 'sos'"
+         class="alert alert-danger py-2 px-3 w-100 text-center mb-0 rounded-3"
+         style="font-size:13px">
+      <i class="fa-solid fa-battery-quarter me-2"></i>
+      Batterie faible — Branchez votre téléphone
+    </div>
+
+    <!-- Info arrière-plan -->
+    <div class="text-muted text-center" style="font-size:11px; max-width:280px">
+      <i class="fa-solid fa-info-circle me-1"></i>
+      Gardez cette page ouverte pour que le GPS reste actif
+    </div>
+
+    <!-- Déconnexion discrète -->
+    <button class="btn btn-outline-secondary btn-sm rounded-pill px-4 mt-1"
+            style="font-size:12px; opacity:0.5"
+            (click)="logout()">
+      <i class="fa-solid fa-right-from-bracket me-1"></i>
+      Déconnexion
+    </button>
+
+  </div>
+
+</div>

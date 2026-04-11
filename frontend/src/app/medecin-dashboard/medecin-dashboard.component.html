@@ -18,6 +18,12 @@
         <button class="btn btn-outline-primary btn-sm" (click)="loadPatients()" [disabled]="isLoadingPatients">
           <i class="fa-solid fa-rotate-right me-1"></i>Actualiser
         </button>
+         <a routerLink="/medecin/alertes" class="btn btn-danger btn-sm">
+    <i class="fa-solid fa-bell me-1"></i>Alertes
+    <span *ngIf="alertesCount > 0" class="badge bg-white text-danger ms-1">
+      {{ alertesCount }}
+    </span>
+  </a>
         <a routerLink="/patients" class="btn btn-outline-secondary btn-sm">
           <i class="fa-solid fa-arrow-left me-1"></i>Retour
         </a>

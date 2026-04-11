@@ -1,0 +1,119 @@
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h3 class="fw-bold mb-1">
+        <i class="fa-solid fa-bed-pulse text-primary me-2"></i>
+        Gestion des patients
+      </h3>
+      <p class="text-muted mb-0">{{ filtered.length }} patient(s)</p>
+    </div>
+    <a *ngIf="isAdmin" routerLink="/patient-profiles/new"
+       class="btn btn-primary">
+      <i class="fa-solid fa-user-plus me-1"></i>Ajouter un patient
+    </a>
+  </div>
+
+  <!-- Recherche -->
+  <div class="mb-4">
+    <div class="input-group">
+      <span class="input-group-text bg-white">
+        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+      </span>
+      <input type="text" class="form-control"
+             placeholder="Rechercher par nom, prénom ou email..."
+             [(ngModel)]="search" (input)="onSearch()">
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- Table -->
+  <div class="card border-0 shadow-sm rounded-4" *ngIf="!loading">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-4">Patient</th>
+              <th>Contact</th>
+              <th>Statut</th>
+              <th class="text-end pe-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of filtered">
+              <td class="ps-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-circle d-flex align-items-center
+                              justify-content-center fw-bold text-white"
+                       style="width:40px; height:40px; font-size:14px;
+                              background:#0d6efd; flex-shrink:0">
+                    {{ p.nom.charAt(0) }}{{ p.prenom.charAt(0) }}
+                  </div>
+                  <div>
+                    <div class="fw-semibold">{{ p.nom }} {{ p.prenom }}</div>
+                    <div class="text-muted small">{{ p.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="small" *ngIf="p.telephone">
+                  <i class="fa-solid fa-phone me-1 text-success"></i>
+                  {{ p.telephone }}
+                </div>
+                <div class="text-muted small" *ngIf="!p.telephone">
+                  Non renseigné
+                </div>
+              </td>
+              <td>
+                <span class="badge rounded-pill"
+                      [class.bg-success]="p.actif"
+                      [class.bg-secondary]="!p.actif">
+                  {{ p.actif ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td class="text-end pe-4">
+                <div class="d-flex gap-2 justify-content-end">
+                  <a [routerLink]="['/patient-profiles', p.id]"
+                     class="btn btn-sm btn-outline-primary">
+                    <i class="fa-solid fa-eye me-1"></i>Fiche
+                  </a>
+                  <a *ngIf="isAdmin || isDoctor"
+                     [routerLink]="['/patient-profiles/edit', p.id]"
+                     class="btn btn-sm btn-warning">
+                    <i class="fa-solid fa-pen"></i>
+                  </a>
+                  <button class="btn btn-sm"
+                          [class.btn-outline-success]="!p.actif"
+                          [class.btn-outline-secondary]="p.actif"
+                          (click)="toggleActif(p.id!)"
+                          [title]="p.actif ? 'Désactiver' : 'Activer'">
+                    <i class="fa-solid"
+                       [class.fa-toggle-on]="p.actif"
+                       [class.fa-toggle-off]="!p.actif"></i>
+                  </button>
+                  <button *ngIf="isAdmin"
+                          class="btn btn-sm btn-danger"
+                          (click)="delete(p.id!)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filtered.length === 0">
+              <td colspan="4" class="text-center text-muted py-5">
+                <i class="fa-solid fa-user-slash fs-2 mb-2 d-block"></i>
+                Aucun patient trouvé
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
