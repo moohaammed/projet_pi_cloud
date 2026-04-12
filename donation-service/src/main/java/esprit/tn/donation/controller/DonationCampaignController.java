@@ -1,8 +1,8 @@
-package esprit.tn.backpi.controllers.donation;
+package esprit.tn.donation.controller;
 
-import esprit.tn.backpi.entities.donation.DonationCampaign;
-import esprit.tn.backpi.services.collaboration.FileStorageService;
-import esprit.tn.backpi.services.donation.DonationCampaignService;
+import esprit.tn.donation.entity.DonationCampaign;
+import esprit.tn.donation.service.DonationCampaignService;
+import esprit.tn.donation.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ public class DonationCampaignController {
 
     // GET /api/campaigns/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<DonationCampaign> getById(@PathVariable Long id) {
+    public ResponseEntity<DonationCampaign> getById(@PathVariable String id) {
         return ResponseEntity.ok(campaignService.getCampaignById(id));
     }
 
@@ -47,20 +47,20 @@ public class DonationCampaignController {
 
     // PUT /api/campaigns/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<DonationCampaign> update(@PathVariable Long id, @RequestBody DonationCampaign campaign) {
+    public ResponseEntity<DonationCampaign> update(@PathVariable String id, @RequestBody DonationCampaign campaign) {
         return ResponseEntity.ok(campaignService.updateCampaign(id, campaign));
     }
 
     // DELETE /api/campaigns/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         campaignService.deleteCampaign(id);
         return ResponseEntity.noContent().build();
     }
 
     // POST /api/campaigns/{id}/image
     @PostMapping("/{id}/image")
-    public ResponseEntity<DonationCampaign> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<DonationCampaign> uploadImage(@PathVariable String id, @RequestParam("file") MultipartFile file) {
         DonationCampaign campaign = campaignService.getCampaignById(id);
         String imageUrl = fileStorageService.storeFile(file);
         campaign.setImageUrl(imageUrl);

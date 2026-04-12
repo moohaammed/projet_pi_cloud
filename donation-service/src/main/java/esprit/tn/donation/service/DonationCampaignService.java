@@ -1,8 +1,9 @@
-package esprit.tn.backpi.services.donation;
+package esprit.tn.donation.service;
 
-import esprit.tn.backpi.entities.donation.DonationCampaign;
-import esprit.tn.backpi.repositories.donation.DonationCampaignRepository;
-import esprit.tn.backpi.repositories.donation.DonationRepository;
+import esprit.tn.donation.entity.Donation;
+import esprit.tn.donation.entity.DonationCampaign;
+import esprit.tn.donation.repository.DonationCampaignRepository;
+import esprit.tn.donation.repository.DonationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +34,13 @@ public class DonationCampaignService {
     }
 
     // READ BY ID
-    public DonationCampaign getCampaignById(Long id) {
+    public DonationCampaign getCampaignById(String id) {
         return campaignRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Campaign non trouvée : " + id));
     }
 
     // UPDATE
-    public DonationCampaign updateCampaign(Long id, DonationCampaign updated) {
+    public DonationCampaign updateCampaign(String id, DonationCampaign updated) {
         DonationCampaign existing = getCampaignById(id);
 
         existing.setTitle(updated.getTitle());
@@ -56,15 +57,16 @@ public class DonationCampaignService {
     }
 
     // DELETE
-    public void deleteCampaign(Long id) {
+    public void deleteCampaign(String id) {
         campaignRepository.deleteById(id);
     }
 
     // RECALCULATE current amount from donations
-    public void refreshCurrentAmount(Long campaignId) {
+    public void refreshCurrentAmount(String campaignId) {
         DonationCampaign campaign = getCampaignById(campaignId);
-        Double total = donationRepository.sumAmountByCampaignId(campaignId);
-        campaign.setCurrentAmount(total != null ? total : 0.0);
+        List<Donation> completedDonations = donationRepository.findByCampaignIdAndStatus(campaignId, "COMPLETED");
+        Double total = completedDonations.stream().mapToDouble(d -> d.getAmount() != null ? d.getAmount() : 0.0).sum();
+        campaign.setCurrentAmount(total);
         campaignRepository.save(campaign);
     }
 }

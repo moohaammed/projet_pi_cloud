@@ -1,7 +1,7 @@
-package esprit.tn.backpi.services.donation;
+package esprit.tn.donation.service;
 
-import esprit.tn.backpi.entities.donation.Donation;
-import esprit.tn.backpi.repositories.donation.DonationRepository;
+import esprit.tn.donation.entity.Donation;
+import esprit.tn.donation.repository.DonationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class DonationService {
 
     // UPDATE STATUS FROM STRIPE
     public Donation completeStripeDonation(String sessionId) {
-        Donation donation = donationRepository.findByStripeSessionId(sessionId);
+        Donation donation = donationRepository.findByStripeSessionId(sessionId).orElse(null);
         if (donation != null && !"COMPLETED".equals(donation.getStatus())) {
             donation.setStatus("COMPLETED");
             donationRepository.save(donation);
@@ -47,13 +47,13 @@ public class DonationService {
     }
 
     // READ BY ID
-    public Donation getDonationById(Long id) {
+    public Donation getDonationById(String id) {
         return donationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Donation non trouvée : " + id));
     }
 
     // READ BY CAMPAIGN
-    public List<Donation> getDonationsByCampaign(Long campaignId) {
+    public List<Donation> getDonationsByCampaign(String campaignId) {
         return donationRepository.findByCampaignId(campaignId);
     }
 
@@ -68,9 +68,9 @@ public class DonationService {
     }
 
     // DELETE — also refreshes campaign total
-    public void deleteDonation(Long id) {
+    public void deleteDonation(String id) {
         Donation donation = getDonationById(id);
-        Long campaignId = donation.getCampaignId();
+        String campaignId = donation.getCampaignId();
         String status = donation.getStatus();
         donationRepository.deleteById(id);
         if (campaignId != null && "COMPLETED".equals(status)) {

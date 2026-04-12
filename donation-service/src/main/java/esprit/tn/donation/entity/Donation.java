@@ -1,26 +1,22 @@
-package esprit.tn.backpi.entities.donation;
+package esprit.tn.donation.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "donations")
+@Document(collection = "donations")
 public class Donation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
     private Double amount;
 
-    @Column(nullable = false)
     private String donorFirstName;
 
-    @Column(nullable = false)
     private String donorLastName;
 
-    @Column(nullable = false)
     private String donorEmail;
 
     private String donorPhone;
@@ -29,12 +25,11 @@ public class Donation {
 
     private Boolean anonymous = false;
 
-    @Column(length = 500)
     private String message;
 
-    private Long campaignId; // FK vers DonationCampaign
+    private String campaignId; // FK vers DonationCampaign
 
-    private Long userId; // FK nullable vers User (si connecté)
+    private Long userId; // FK nullable vers User (si connecté - keep as Long since User DB uses Long)
     
     private String stripeSessionId; // Pour le tracking Stripe
     
@@ -42,8 +37,7 @@ public class Donation {
 
     private LocalDateTime createdAt;
 
-    @PrePersist
-    public void prePersist() {
+    public Donation() {
         this.createdAt = LocalDateTime.now();
         if (this.anonymous == null) this.anonymous = false;
         if (this.status == null) this.status = "PENDING";
@@ -51,8 +45,8 @@ public class Donation {
 
     // ── Getters / Setters ──────────────────────────────────
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public Double getAmount() { return amount; }
     public void setAmount(Double amount) { this.amount = amount; }
@@ -78,8 +72,8 @@ public class Donation {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
-    public Long getCampaignId() { return campaignId; }
-    public void setCampaignId(Long campaignId) { this.campaignId = campaignId; }
+    public String getCampaignId() { return campaignId; }
+    public void setCampaignId(String campaignId) { this.campaignId = campaignId; }
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }

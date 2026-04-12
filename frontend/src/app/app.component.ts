@@ -8,7 +8,7 @@ import { NotificationService } from './services/collaboration/notification.servi
 import { VideoCallService } from './services/videocall.service';
 import { VideoCallComponent } from './components/videocall/videocall.component';
 import { Subscription } from 'rxjs';
-import { AlzheimerAccessibilityService } from './services/alzheimer-accessibility.service';
+import { AlzheimerAccessibilityService } from './services/alz-accessibility.service';
 
 @Component({
   selector: 'app-root',

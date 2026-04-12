@@ -1,23 +1,20 @@
-package esprit.tn.backpi.entities.donation;
+package esprit.tn.donation.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "donation_campaigns")
+@Document(collection = "donation_campaigns")
 public class DonationCampaign {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
     private String title;
 
-    @Column(length = 1000)
     private String description;
 
-    @Column(nullable = false)
     private Double goalAmount;
 
     private Double currentAmount = 0.0;
@@ -28,8 +25,7 @@ public class DonationCampaign {
 
     private LocalDateTime createdAt;
 
-    @PrePersist
-    public void prePersist() {
+    public DonationCampaign() {
         this.createdAt = LocalDateTime.now();
         if (this.currentAmount == null) this.currentAmount = 0.0;
         if (this.active == null) this.active = true;
@@ -37,8 +33,8 @@ public class DonationCampaign {
 
     // ── Getters / Setters ──────────────────────────────────
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

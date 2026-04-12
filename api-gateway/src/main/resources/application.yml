@@ -33,6 +33,12 @@ spring:
           predicates:
             - Path=/api/rendezvous/**
 
+        # ── Donation service ──────────────────────────────────────────
+        - id: donation-rest
+          uri: lb://donation-service
+          predicates:
+            - Path=/api/donations/**,/api/campaigns/**
+
         # ── Main service (backpi) ──────────────────────────────────────────
         - id: main-service
           uri: lb://backpi

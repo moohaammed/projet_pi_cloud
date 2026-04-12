@@ -1,7 +1,7 @@
-package esprit.tn.backpi.controllers.donation;
+package esprit.tn.donation.controller;
 
-import esprit.tn.backpi.entities.donation.Donation;
-import esprit.tn.backpi.services.donation.DonationService;
+import esprit.tn.donation.entity.Donation;
+import esprit.tn.donation.service.DonationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -41,13 +41,13 @@ public class DonationController {
 
     // GET /api/donations/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Donation> getById(@PathVariable Long id) {
+    public ResponseEntity<Donation> getById(@PathVariable String id) {
         return ResponseEntity.ok(donationService.getDonationById(id));
     }
 
     // GET /api/donations/campaign/{campaignId}
     @GetMapping("/campaign/{campaignId}")
-    public List<Donation> getByCampaign(@PathVariable Long campaignId) {
+    public List<Donation> getByCampaign(@PathVariable String campaignId) {
         return donationService.getDonationsByCampaign(campaignId);
     }
 
@@ -78,7 +78,6 @@ public class DonationController {
         Donation savedDonation = donationService.createDonation(donation);
 
         // Stripe checkout requires a currency supported by the Stripe account.
-        // Changing to 'usd' and calculating amount in cents (USD has 2 decimals, not 3).
         long amountInCents = (long) (savedDonation.getAmount() * 100);
 
         SessionCreateParams params = SessionCreateParams.builder()
@@ -139,7 +138,7 @@ public class DonationController {
 
     // DELETE /api/donations/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         donationService.deleteDonation(id);
         return ResponseEntity.noContent().build();
     }

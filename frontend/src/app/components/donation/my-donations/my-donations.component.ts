@@ -203,7 +203,7 @@ export class MyDonationsComponent implements OnInit {
       .reduce((sum, d) => sum + (d.amount || 0), 0);
   }
 
-  getCampaignTitle(campaignId?: number): string {
+  getCampaignTitle(campaignId?: string): string {
     if (!campaignId) return 'Campagne inconnue';
     const c = this.campaignsList.find(c => c.id === campaignId);
     return c ? (c.title || 'Inconnue') : `Campagne (#${campaignId})`;
