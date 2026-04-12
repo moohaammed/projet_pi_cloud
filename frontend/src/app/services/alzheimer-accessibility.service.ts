@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from './auth.service';
 import { RendezVousService } from './rendezvous.service';
@@ -7,6 +7,7 @@ import { interval, Subscription } from 'rxjs';
 import { filter, startWith, switchMap } from 'rxjs/operators';
 import { Router, NavigationEnd } from '@angular/router';
 import { AiService } from './ai.service';
+import { VideoCallService } from './videocall.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,18 +21,52 @@ export class AlzheimerAccessibilityService {
   private platformId = inject(PLATFORM_ID);
   private ignoreVoiceCommands: boolean = false;
   private hasInteracted: boolean = false;
+  private isAgentPaused: boolean = false;
 
   constructor(
     private authService: AuthService,
     private rendezvousService: RendezVousService,
     private router: Router,
-    private aiService: AiService
+    private aiService: AiService,
+    private videoCallService: VideoCallService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     if (this.isBrowser) {
       this.initReminderLoop();
       this.initSpeechRecognition();
       this.initPageRouteListener();
+      this.initCallActiveListener();
+    }
+  }
+
+  private initCallActiveListener() {
+    effect(() => {
+      const isCallActive = this.videoCallService.showCallOverlay();
+      if (isCallActive) {
+        console.log('Call active: Pausing accessibility AI agent.');
+        this.pauseAgent();
+      } else {
+        console.log('Call ended: Resuming accessibility AI agent.');
+        this.resumeAgent();
+      }
+    });
+  }
+
+  private pauseAgent() {
+    this.isAgentPaused = true;
+    this.stopListening();
+    this.stopReminders();
+    if (this.isBrowser && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+  private resumeAgent() {
+    this.isAgentPaused = false;
+    const isPatient = this.authService.isLoggedIn() && this.authService.getRole() === 'PATIENT';
+    if (isPatient) {
+      this.startListening();
+      this.startReminders();
     }
   }
 
@@ -59,7 +94,7 @@ export class AlzheimerAccessibilityService {
   }
 
   private describeCurrentPage() {
-    if (!this.isBrowser || !window.speechSynthesis) return;
+    if (!this.isBrowser || !window.speechSynthesis || this.isAgentPaused) return;
 
     // Interrupt any ongoing speech when navigating to a new page
     window.speechSynthesis.cancel();
@@ -124,7 +159,7 @@ export class AlzheimerAccessibilityService {
     this.recognition.maxAlternatives = 1;
 
     this.recognition.onresult = (event: any) => {
-      if (this.ignoreVoiceCommands || window.speechSynthesis.speaking) {
+      if (this.isAgentPaused || this.ignoreVoiceCommands || window.speechSynthesis.speaking) {
         return;
       }
 
@@ -165,6 +200,7 @@ export class AlzheimerAccessibilityService {
   }
 
   private startListening() {
+    if (this.isAgentPaused) return;
     if (this.recognition && !this.isListening) {
       this.isListening = true;
       try {
@@ -240,7 +276,7 @@ export class AlzheimerAccessibilityService {
   // --- Reminders Logic ---
 
   private startReminders() {
-    if (this.reminderSubscription) return;
+    if (this.isAgentPaused || this.reminderSubscription) return;
 
     this.reminderSubscription = interval(120000)
       .pipe(
@@ -261,7 +297,7 @@ export class AlzheimerAccessibilityService {
       });
   }
   private async processAICommand(command: string) {
-    if (this.ignoreVoiceCommands || window.speechSynthesis.speaking) {
+    if (this.isAgentPaused || this.ignoreVoiceCommands || window.speechSynthesis.speaking) {
       return;
     }
     const result = await this.aiService.sendCommand(command);
@@ -345,7 +381,7 @@ export class AlzheimerAccessibilityService {
   }
 
   private speak(text: string) {
-    if (!this.isBrowser || !window.speechSynthesis) return;
+    if (!this.isBrowser || !window.speechSynthesis || this.isAgentPaused) return;
 
     this.ignoreVoiceCommands = true;
 

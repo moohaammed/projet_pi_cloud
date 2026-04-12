@@ -4,6 +4,7 @@ import { Client } from '@stomp/stompjs';
 import { MessageDto } from './message.service';
 import { Notification } from './notification.service';
 import { BehaviorSubject } from 'rxjs';
+import SockJS from 'sockjs-client';
 
 @Injectable({
   providedIn: 'root'
@@ -27,8 +28,9 @@ export class WebSocketService {
       this.stompClient.deactivate();
     }
 
+    const socket = new SockJS(`http://127.0.0.1:8081/ws?userId=${userId}`);
     this.stompClient = new Client({
-      brokerURL: `ws://localhost:8081/ws?userId=${userId}`,
+      webSocketFactory: () => socket,
       debug: (str: string) => console.log(str),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
@@ -49,7 +51,7 @@ export class WebSocketService {
     this.stompClient.activate();
   }
 
-  setUserId(userId: number) {
+  public setUserId(userId: number) {
     console.log('Setting WebSocket user ID:', userId);
     this.connect(userId);
   }
