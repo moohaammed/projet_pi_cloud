@@ -280,5 +280,15 @@ export const routes: Routes = [
   { path: 'donations/:campaignId', component: DonationFormComponent },
 
 
+
+  // SMARTWATCH — Heart Rate Monitor
+  {
+    path: 'heart-rate',
+    loadComponent: () =>
+      import('./components/live-heart-rate/live-heart-rate.component')
+        .then(m => m.LiveHeartRateComponent),
+    canActivate: [authGuard]
+  },
+
   { path: '**', redirectTo: 'auth/login' }
 ];

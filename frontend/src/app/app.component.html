@@ -124,6 +124,19 @@
 
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/heart-rate"
+                routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;"
+                [title]="isSidebarCollapsed ? 'Heart Rate' : ''">
+                <i class="fa-solid fa-heart-pulse fs-5"
+                  [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Heart Rate</span>
+              </a>
+            </li>
+
+            <li class="nav-item w-100">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/patient-profiles"
                 routerLinkActive="active-purple fw-semibold shadow-sm"
                 style="cursor: pointer;"
@@ -305,6 +318,8 @@
                       routerLinkActive="active">Community</a></li>
                   <li class="nav-item"><a class="nav-link" routerLink="/donations"
                       routerLinkActive="active">Donations</a></li>
+                  <li class="nav-item"><a class="nav-link" routerLink="/heart-rate"
+                      routerLinkActive="active"><i class="fa-solid fa-heart-pulse me-1"></i>Heart Rate</a></li>
                   <li class="nav-item ms-lg-3 d-flex gap-2" *ngIf="auth.isLoggedIn()">
                     <a routerLink="/my-donations" class="btn btn-outline-primary btn-sm rounded-pill px-3">Mes Dons</a>
                     <a [routerLink]="getAccountLink()" class="btn btn-primary btn-sm rounded-pill px-4">Compte</a>

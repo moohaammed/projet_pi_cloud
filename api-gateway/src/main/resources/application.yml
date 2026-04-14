@@ -39,6 +39,12 @@ spring:
           predicates:
             - Path=/api/donations/**,/api/campaigns/**
 
+        # ── Smartwatch service ──────────────────────────────────────────
+        - id: smartwatch-service
+          uri: lb://smartwatch-service
+          predicates:
+            - Path=/api/heart-rate/**
+
         # ── Main service (backpi) ──────────────────────────────────────────
         - id: main-service
           uri: lb://backpi
