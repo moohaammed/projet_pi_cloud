@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
 import { PatientProgressionService } from '../services/patient-progression.service';
+import { PredictionService } from '../services/prediction.service';
 
 @Component({
   selector: 'app-medecin-dashboard',
@@ -34,10 +35,32 @@ export class MedecinDashboardComponent implements OnInit {
   isLoadingProgression = false;
   isResetting = false;
 
+  predictionData: any = {
+    Age: null,
+    EDUC: null,
+    SES: null,
+    MMSE: null,
+    eTIV: null,
+    nWBV: null,
+    ASF: null
+  };
+  predictionResult: any = null;
+  isPredicting = false;
+
+  riskPredictionData: any = {
+    MMSE: null,
+    CDRSB: null,
+    ADAS11: null,
+    ADAS13: null
+  };
+  riskPredictionResult: any = null;
+  isPredictingRisk = false;
+
   constructor(
     private patientService: PatientService,
     private analyseService: AnalyseService,
-    private progressionService: PatientProgressionService
+    private progressionService: PatientProgressionService,
+    private predictionService: PredictionService
   ) { }
 
   ngOnInit(): void {
@@ -63,6 +86,9 @@ export class MedecinDashboardComponent implements OnInit {
   selectPatient(patient: any) {
     this.selectedPatient = patient;
     this.selectedAnalyse = null;
+    this.predictionResult = null;
+    this.riskPredictionResult = null;
+    this.predictionData.Age = patient.age || null;
     this.isLoadingAnalyses = true;
     this.analyseService.getAnalysesByPatient(patient.id).subscribe({
       next: (data) => {
@@ -88,6 +114,8 @@ export class MedecinDashboardComponent implements OnInit {
         this.progressionScoreGame = data.scoreGame;
         this.progressionStadeGame = data.stadeGame;
         this.progressionScoreFinal = (this.progressionScoreQuiz + this.progressionScoreGame) / 2;
+        this.predictionData.MMSE = this.progressionScoreFinal;
+        this.riskPredictionData.MMSE = this.progressionScoreFinal;
       },
       error: (err) => console.error(err)
     });
@@ -144,6 +172,38 @@ export class MedecinDashboardComponent implements OnInit {
         this.isSavingObservation = false;
       },
       error: () => this.isSavingObservation = false
+    });
+  }
+
+  predictAlzheimer() {
+    this.isPredicting = true;
+    this.predictionResult = null;
+    this.predictionService.predict(this.predictionData).subscribe({
+      next: (res: any) => {
+        this.predictionResult = res;
+        this.isPredicting = false;
+        this.showSuccess('Prédiction terminée avec succès.');
+      },
+      error: (err) => {
+        console.error(err);
+        this.isPredicting = false;
+      }
+    });
+  }
+
+  predictRiskAlzheimer() {
+    this.isPredictingRisk = true;
+    this.riskPredictionResult = null;
+    this.predictionService.predictRisk(this.riskPredictionData).subscribe({
+      next: (res: any) => {
+        this.riskPredictionResult = res;
+        this.isPredictingRisk = false;
+        this.showSuccess('Prédiction du risque terminée avec succès.');
+      },
+      error: (err) => {
+        console.error(err);
+        this.isPredictingRisk = false;
+      }
     });
   }
 }

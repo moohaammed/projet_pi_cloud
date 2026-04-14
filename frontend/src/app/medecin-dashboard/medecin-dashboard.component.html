@@ -242,6 +242,127 @@
             </div>
           </div>
 
+          <!-- Prédiction IA d'Alzheimer -->
+          <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="selectedPatient">
+            <div class="card-header bg-transparent border-0 py-3 px-4">
+              <h6 class="fw-bold mb-0 text-dark">
+                 <i class="fa-solid fa-robot me-2 text-primary"></i>
+                 Prédiction IA d'Alzheimer
+              </h6>
+            </div>
+            <div class="card-body px-4 pb-4">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Âge (Age)</label>
+                  <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.Age" placeholder="Ex: 70">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Éducation (EDUC) <small class="text-muted">Années</small></label>
+                  <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.EDUC" placeholder="Ex: 15">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Niveau Social (SES) <small class="text-muted">1 à 5</small></label>
+                  <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.SES" placeholder="1=Haut, 5=Bas">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Score Mémoire (MMSE)</label>
+                  <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.MMSE" placeholder="De 0 à 30">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-bold">Taille du Cerveau (eTIV)</label>
+                  <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.eTIV" placeholder="Volume Est.">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-bold">Santé du Cerveau (nWBV)</label>
+                  <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.nWBV" placeholder="Volume Normalisé">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-bold">Facteur du Cerveau (ASF)</label>
+                  <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.ASF" placeholder="Facteur Atlas">
+                </div>
+                <div class="col-12 mt-4 text-end">
+                  <button class="btn btn-primary px-4 fw-bold shadow-sm" style="background: #8b5cf6; border-color: #8b5cf6;" (click)="predictAlzheimer()" [disabled]="isPredicting">
+                    <span *ngIf="isPredicting" class="spinner-border spinner-border-sm me-2"></span>
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Lancer la Prédiction
+                  </button>
+                </div>
+              </div>
+
+              <!-- Résultats de la prédiction -->
+              <div *ngIf="predictionResult" class="mt-4 p-4 rounded-4 shadow-sm border border-light bg-white">
+                <div class="d-flex align-items-center gap-4">
+                  <i class="fa-solid fa-brain fa-3x" [ngClass]="predictionResult?.prediction === 'Demented' ? 'text-danger' : 'text-success'"></i>
+                  <div>
+                    <h5 class="fw-bold mb-1 text-primary">Résultat de l'analyse :</h5>
+                    <div class="fs-5 fw-bold" [ngClass]="predictionResult?.prediction === 'Demented' ? 'text-danger' : 'text-success'">
+                      <span *ngIf="predictionResult?.prediction">{{ predictionResult.prediction }}</span>
+                      <span *ngIf="predictionResult?.result">{{ predictionResult.result }}</span>
+                      <span *ngIf="predictionResult?.state">{{ predictionResult.state }}</span>
+                      <span *ngIf="predictionResult?.Group">{{ predictionResult.Group }}</span>
+                    </div>
+                    <div class="small text-muted mt-2" *ngIf="!predictionResult?.prediction && !predictionResult?.result && !predictionResult?.state && !predictionResult?.Group">
+                      <pre class="mb-0 p-2 bg-light rounded text-dark">{{ predictionResult | json }}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prédiction IA des Risques Cliniques (Nouveau Modèle) -->
+          <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="selectedPatient">
+            <div class="card-header bg-transparent border-0 py-3 px-4">
+              <h6 class="fw-bold mb-0 text-dark">
+                 <i class="fa-solid fa-stethoscope me-2 text-warning"></i>
+                 Prédiction IA - Évaluation du Stade Clinique
+              </h6>
+            </div>
+            <div class="card-body px-4 pb-4">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Score Mémoire (MMSE)</label>
+                  <input type="number" class="form-control shadow-sm" [(ngModel)]="riskPredictionData.MMSE" placeholder="De 0 à 30">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Score Démence (CDRSB)</label>
+                  <input type="number" step="0.5" class="form-control shadow-sm" [(ngModel)]="riskPredictionData.CDRSB" placeholder="Ex: 0.5, 1.0">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Alzheimer Score 11 (ADAS11)</label>
+                  <input type="number" step="1" class="form-control shadow-sm" [(ngModel)]="riskPredictionData.ADAS11" placeholder="Ex: 10">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Alzheimer Score 13 (ADAS13)</label>
+                  <input type="number" step="1" class="form-control shadow-sm" [(ngModel)]="riskPredictionData.ADAS13" placeholder="Ex: 15">
+                </div>
+                <div class="col-12 mt-4 text-end">
+                  <button class="btn btn-warning px-4 fw-bold shadow-sm" (click)="predictRiskAlzheimer()" [disabled]="isPredictingRisk">
+                    <span *ngIf="isPredictingRisk" class="spinner-border spinner-border-sm me-2"></span>
+                    <i class="fa-solid fa-microscope me-2"></i>Évaluer le Risque
+                  </button>
+                </div>
+              </div>
+
+              <!-- Résultats de la prédiction Risque -->
+              <div *ngIf="riskPredictionResult" class="mt-4 p-4 rounded-4 shadow-sm border border-light bg-white">
+                <div class="d-flex align-items-center gap-4">
+                  <i class="fa-solid fa-notes-medical fa-3x" [ngClass]="riskPredictionResult?.risk_class > 0 ? 'text-warning' : 'text-success'"></i>
+                  <div>
+                    <h5 class="fw-bold mb-1 text-primary">Résultat de l'Évaluation :</h5>
+                    <div class="fs-5 fw-bold" [ngClass]="riskPredictionResult?.risk_class > 0 ? 'text-warning' : 'text-success'">
+                      <span *ngIf="riskPredictionResult?.risk_label">{{ riskPredictionResult.risk_label }} 
+                        <small class="text-muted fs-6 mb-0 d-block d-md-inline ms-md-2">(Classe de risque: {{ riskPredictionResult.risk_class }})</small>
+                      </span>
+                    </div>
+                    <div class="small text-muted mt-2" *ngIf="!riskPredictionResult?.risk_label">
+                      <pre class="mb-0 p-2 bg-light rounded text-dark">{{ riskPredictionResult | json }}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Analyses Table -->
           <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
