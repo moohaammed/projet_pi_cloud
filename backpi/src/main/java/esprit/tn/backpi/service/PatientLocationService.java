@@ -59,28 +59,26 @@ public class PatientLocationService {
         return locationRepository.findByPatient_Id(patientId);
     }
 
-    // Vérifier si le patient est dans la zone
     private void checkZones(User patient, Double lat, Double lng) {
-        safeZoneRepository.findByPatient_IdAndActifTrue(patient.getId())
-                .ifPresent(zone -> {
-                    double distance = calculateDistance(
-                            lat, lng,
-                            zone.getLatitudeCentre(),
-                            zone.getLongitudeCentre()
-                    );
+        // ← Remplace ifPresent par une boucle sur la liste
+        List<SafeZone> zones = safeZoneRepository.findByPatient_IdAndActifTrue(patient.getId());
 
-                    if (distance > zone.getRayonRouge()) {
-                        createAlert(patient, TypeAlerte.HORS_ZONE_ROUGE, lat, lng,
-                                "URGENT ! Patient hors zone rouge à " +
-                                        (int)distance + "m du centre");
-                    } else if (distance > zone.getRayonVert()) {
-                        createAlert(patient, TypeAlerte.HORS_ZONE_VERTE, lat, lng,
-                                "Patient hors zone verte à " +
-                                        (int)distance + "m du centre");
-                    }
-                });
+        for (SafeZone zone : zones) {
+            double distance = calculateDistance(
+                    lat, lng,
+                    zone.getLatitudeCentre(),
+                    zone.getLongitudeCentre()
+            );
+
+            if (distance > zone.getRayonRouge()) {
+                createAlert(patient, TypeAlerte.HORS_ZONE_ROUGE, lat, lng,
+                        "URGENT ! Patient hors zone rouge à " + (int)distance + "m du centre");
+            } else if (distance > zone.getRayonVert()) {
+                createAlert(patient, TypeAlerte.HORS_ZONE_VERTE, lat, lng,
+                        "Patient hors zone verte à " + (int)distance + "m du centre");
+            }
+        }
     }
-
     // Calcul distance en mètres (formule Haversine)
     public double calculateDistance(double lat1, double lng1,
                                     double lat2, double lng2) {

@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface SafeZoneRepository extends JpaRepository<SafeZone, Long> {
     List<SafeZone> findByPatient_Id(Long patientId);
     List<SafeZone> findByDoctor_Id(Long doctorId);
-    Optional<SafeZone> findByPatient_IdAndActifTrue(Long patientId);
+    List<SafeZone> findByPatient_IdAndActifTrue(Long patientId);
 }
+

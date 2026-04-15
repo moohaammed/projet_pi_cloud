@@ -13,3 +13,4 @@ export interface RegisterRequest {
   telephone?: string;
   role: Role;
 }
+

@@ -1,0 +1,22 @@
+{
+  "name": "AlzCare SOS",
+  "short_name": "AlzCare",
+  "description": "Application de suivi Alzheimer",
+  "theme_color": "#dc3545",
+  "background_color": "#f0f4ff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/patient-map",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

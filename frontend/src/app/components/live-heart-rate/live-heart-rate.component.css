@@ -1,0 +1,507 @@
+/* ═══════════════════════════════════════════════════════════════
+   LIVE HEART-RATE DASHBOARD — Premium Dark Medical Theme
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.heart-rate-dashboard {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(145deg, #0a0e1a 0%, #111827 50%, #0d1117 100%);
+  color: #e2e8f0;
+}
+
+/* ── HEADER ── */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.3);
+}
+
+.dashboard-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dashboard-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+.connection-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.connection-badge.connected {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.connection-badge.disconnected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* ── GRID ── */
+.dashboard-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 340px 1fr;
+}
+
+/* ── CARDS (shared) ── */
+.card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 20px;
+  padding: 1.75rem;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(148, 163, 184, 0.15);
+}
+
+.card-header-mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── BPM CARD ── */
+.bpm-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 320px;
+}
+
+.bpm-card .card-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  border-radius: 50%;
+  opacity: 0.08;
+  transition: background 0.6s ease;
+  pointer-events: none;
+}
+
+.bpm-card.bpm-normal .card-glow { background: radial-gradient(circle, #22c55e 0%, transparent 70%); }
+.bpm-card.bpm-low .card-glow { background: radial-gradient(circle, #3b82f6 0%, transparent 70%); }
+.bpm-card.bpm-high .card-glow { background: radial-gradient(circle, #ef4444 0%, transparent 70%); }
+
+.bpm-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.bpm-value-container {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.bpm-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 5.5rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bpm-normal .bpm-value {
+  background: linear-gradient(135deg, #22c55e 0%, #86efac 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.bpm-low .bpm-value {
+  background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.bpm-high .bpm-value {
+  background: linear-gradient(135deg, #ef4444 0%, #fca5a5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.bpm-na {
+  opacity: 0.3;
+}
+
+.bpm-unit {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bpm-heartbeat {
+  font-size: 2rem;
+  color: #ef4444;
+  animation: heartbeat 1s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.25); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.15); }
+  56% { transform: scale(1); }
+}
+
+.bpm-zone {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 1.25rem;
+}
+
+.bpm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* ── ECG CARD ── */
+.ecg-card {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.ecg-canvas-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0a0e1a;
+  border: 1px solid rgba(0, 255, 136, 0.1);
+}
+
+.ecg-canvas {
+  display: block;
+  width: 100%;
+  height: 250px;
+}
+
+.ecg-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #00ff88;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00ff88;
+  animation: pulse-dot 1.5s infinite;
+}
+
+.ecg-overlay-disconnected {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: rgba(10, 14, 26, 0.85);
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.ecg-overlay-disconnected i {
+  font-size: 1.5rem;
+  color: #ef4444;
+}
+
+/* ── STATS ROW ── */
+.stats-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(148, 163, 184, 0.2);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.stat-icon.avg { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.stat-icon.min { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.stat-icon.max { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.stat-icon.readings { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.stat-value small {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ── HISTORY TABLE ── */
+.history-card {
+  grid-column: 1 / -1;
+}
+
+.history-count {
+  color: #64748b;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.06);
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table thead th {
+  padding: 0.75rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(15, 23, 42, 0.5);
+  text-align: left;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.history-table tbody tr {
+  transition: background 0.2s ease;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.04);
+}
+
+.history-table tbody tr:hover {
+  background: rgba(148, 163, 184, 0.04);
+}
+
+.history-table tbody tr.latest {
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.history-table td {
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+}
+
+.bpm-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.bpm-badge.normal { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+.bpm-badge.low { background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
+.bpm-badge.high { background: rgba(239, 68, 68, 0.12); color: #f87171; }
+
+.zone-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.zone-tag.normal { background: rgba(34, 197, 94, 0.1); color: #4ade80; }
+.zone-tag.low { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+.zone-tag.high { background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #64748b;
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  color: #334155;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.empty-state small {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ecg-card {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .stats-row {
+    grid-column: 1;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .history-card {
+    grid-column: 1;
+  }
+
+  .bpm-value {
+    font-size: 4rem;
+  }
+
+  .heart-rate-dashboard {
+    padding: 1rem;
+  }
+}

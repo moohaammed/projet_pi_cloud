@@ -1,192 +1,490 @@
 <div class="d-flex" style="height: calc(100vh - 60px)">
-
-  <!-- Sidebar gauche — liste patients -->
-  <div class="border-end bg-white overflow-auto"
-       style="width: 280px; flex-shrink:0">
+ 
+  <!-- ===== SIDEBAR GAUCHE ===== -->
+  <div class="border-end bg-white d-flex flex-column"
+       style="width:260px; flex-shrink:0">
+ 
     <div class="p-3 border-bottom">
       <h6 class="fw-bold mb-1">
-        <i class="fa-solid fa-users text-primary me-2"></i>
-        Mes patients
+        <i class="fa-solid fa-users text-primary me-2"></i>Mes patients
       </h6>
       <small class="text-muted">{{ patients.length }} patients suivis</small>
     </div>
-
-    <div class="p-2">
+ 
+    <div class="overflow-auto flex-grow-1 p-2">
       <div *ngFor="let p of patients"
            class="d-flex align-items-center p-2 rounded-3 mb-1"
-           style="cursor:pointer"
+           style="cursor:pointer; transition:all 0.2s"
            [class.bg-primary]="selectedPatient?.id === p.id"
            [class.text-white]="selectedPatient?.id === p.id"
+           [class.bg-light]="selectedPatient?.id !== p.id"
            (click)="selectPatient(p)">
         <div class="rounded-circle d-flex align-items-center justify-content-center
                     fw-bold me-2 flex-shrink-0"
-             style="width:36px; height:36px; font-size:13px"
+             style="width:36px; height:36px; font-size:12px"
              [style.background]="selectedPatient?.id === p.id ? 'rgba(255,255,255,0.3)' : '#e8f4ff'"
              [style.color]="selectedPatient?.id === p.id ? 'white' : '#0d6efd'">
           {{ p.nom.charAt(0) }}{{ p.prenom.charAt(0) }}
         </div>
-        <div>
-          <div class="fw-semibold small">{{ p.nom }} {{ p.prenom }}</div>
-          <div class="small opacity-75">{{ p.email }}</div>
+        <div class="overflow-hidden">
+          <div class="fw-semibold small text-truncate">{{ p.nom }} {{ p.prenom }}</div>
+          <div class="small opacity-75 text-truncate">{{ p.email }}</div>
         </div>
+        <span class="ms-auto badge rounded-pill flex-shrink-0"
+              [class.bg-success]="p.actif"
+              [class.bg-secondary]="!p.actif"
+              style="font-size:9px">
+          {{ p.actif ? 'A' : 'I' }}
+        </span>
       </div>
-
+ 
       <div *ngIf="patients.length === 0" class="text-center text-muted py-4">
-        <i class="fa-solid fa-user-slash mb-2 d-block fs-3"></i>
+        <i class="fa-solid fa-user-slash d-block fs-3 mb-2"></i>
         Aucun patient
       </div>
     </div>
+ 
+    <!-- Liste hôpitaux -->
+    <div class="border-top p-2" style="max-height:180px; overflow-y:auto">
+      <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+        <small class="fw-bold text-muted text-uppercase"
+               style="letter-spacing:0.5px">
+          Hôpitaux ({{ hospitals.length }})
+        </small>
+        <button class="btn btn-xs py-0 px-1"
+                [class.btn-danger]="showHospitals"
+                [class.btn-outline-secondary]="!showHospitals"
+                style="font-size:10px"
+                (click)="toggleHospitals()">
+          {{ showHospitals ? 'Masquer' : 'Afficher' }}
+        </button>
+      </div>
+      <div *ngFor="let h of hospitals"
+           class="p-1 px-2 rounded mb-1 border-start border-danger border-2"
+           style="font-size:11px; background:#fff5f5">
+        <div class="fw-semibold text-danger">{{ h.nom }}</div>
+        <div class="text-muted">{{ h.ville }}</div>
+      </div>
+    </div>
   </div>
-
-  <!-- Carte principale -->
+ 
+  <!-- ===== CARTE PRINCIPALE ===== -->
   <div class="flex-grow-1 position-relative">
     <div id="doctor-map" style="width:100%; height:100%"></div>
-
-    <!-- Badge alertes -->
+ 
+    <!-- Message si mode édition zone -->
+    <div *ngIf="editingZone"
+         class="position-absolute top-0 start-50 translate-middle-x mt-3"
+         style="z-index:1000">
+      <div class="alert alert-warning shadow-sm py-2 px-3 mb-0 d-flex align-items-center gap-2">
+        <i class="fa-solid fa-hand-pointer"></i>
+        <span class="small fw-medium">
+          Cliquez sur la carte pour déplacer le centre de la zone
+        </span>
+      </div>
+    </div>
+ 
+    <!-- Alertes actives -->
     <div *ngIf="unresolvedAlerts.length > 0"
          class="position-absolute top-0 end-0 m-3"
-         style="z-index:1000; max-width:300px">
-      <div class="card border-0 shadow">
-        <div class="card-header bg-danger text-white py-2">
-          <i class="fa-solid fa-bell me-2"></i>
-          {{ unresolvedAlerts.length }} alerte(s) active(s)
+         style="z-index:1000; max-width:280px">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-danger text-white py-2 d-flex
+                    align-items-center justify-content-between">
+          <span class="small fw-bold">
+            <i class="fa-solid fa-bell me-1"></i>
+            {{ unresolvedAlerts.length }} alerte(s)
+          </span>
         </div>
-        <div class="card-body p-0" style="max-height:200px; overflow-y:auto">
+        <div style="max-height:180px; overflow-y:auto">
           <div *ngFor="let alert of unresolvedAlerts"
                class="d-flex align-items-start p-2 border-bottom">
-            <i class="fa-solid me-2 mt-1"
-               [class]="getAlertIcon(alert.typeAlerte)"
-               [class.text-danger]="alert.typeAlerte === 'HORS_ZONE_ROUGE' || alert.typeAlerte === 'SOS'"
-               [class.text-warning]="alert.typeAlerte === 'HORS_ZONE_VERTE'"
-               [class.text-secondary]="alert.typeAlerte === 'BATTERIE_FAIBLE'">
-            </i>
+            <i class="fa-solid me-2 mt-1 text-danger small"
+               [class]="getAlertIcon(alert.typeAlerte)"></i>
             <div class="flex-grow-1">
-              <div class="small fw-medium">{{ alert.message }}</div>
-              <div class="text-muted" style="font-size:11px">
+              <div style="font-size:11px" class="fw-medium">{{ alert.typeAlerte }}</div>
+              <div class="text-muted" style="font-size:10px">
                 {{ alert.declencheeAt | date:'dd/MM HH:mm' }}
               </div>
             </div>
-            <button class="btn btn-sm btn-outline-success ms-1 py-0"
-                    (click)="resolveAlert(alert.id!)">
-              ✓
-            </button>
+            <button class="btn btn-sm btn-outline-success py-0 px-1"
+                    style="font-size:10px"
+                    (click)="resolveAlert(alert.id!)">✓</button>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Bouton refresh -->
-    <button class="btn btn-white shadow-sm position-absolute bottom-0 start-0 m-3"
-            style="z-index:1000"
-            (click)="refreshAllPositions()">
-      <i class="fa-solid fa-rotate text-primary me-1"></i>
-      Actualiser
-    </button>
+ 
+    <!-- Légende -->
+    <div class="position-absolute bottom-0 start-0 m-3 bg-white rounded-3 shadow-sm p-3"
+         style="z-index:1000; font-size:11px; min-width:150px">
+      <div class="fw-bold mb-2 text-muted">Légende</div>
+      <div class="d-flex align-items-center mb-1">
+        <div style="width:12px; height:12px; background:#0d6efd;
+                    border-radius:50%; margin-right:6px"></div>
+        Patient en ligne
+      </div>
+      <div class="d-flex align-items-center mb-1">
+        <div style="width:12px; height:12px; background:#6c757d;
+                    border-radius:50%; margin-right:6px; opacity:0.5"></div>
+        Patient hors ligne
+      </div>
+      <div class="d-flex align-items-center mb-1">
+        <div style="width:12px; height:12px; background:#dc3545;
+                    border-radius:4px; margin-right:6px"></div>
+        Hôpital
+      </div>
+      <div class="d-flex align-items-center mb-1">
+        <div style="width:14px; height:3px; background:#28a745;
+                    margin-right:6px"></div>
+        Zone verte
+      </div>
+      <div class="d-flex align-items-center mb-2">
+        <div style="width:14px; height:3px; background:#dc3545;
+                    margin-right:6px"></div>
+        Zone rouge
+      </div>
+      <div class="d-flex align-items-center mb-2">
+        <div style="width:14px; height:3px; background:#6f42c1;
+                    border-top:2px dashed #6f42c1; margin-right:6px"></div>
+        Historique
+      </div>
+      <button class="btn btn-outline-primary btn-sm w-100 py-0"
+              style="font-size:11px"
+              (click)="refreshAllPositions()">
+        <i class="fa-solid fa-rotate me-1"></i>Actualiser
+      </button>
+    </div>
   </div>
-
-  <!-- Sidebar droite — gestion zones -->
+ 
+  <!-- ===== SIDEBAR DROITE ===== -->
   <div *ngIf="selectedPatient"
        class="border-start bg-white overflow-auto"
-       style="width:300px; flex-shrink:0">
-    <div class="p-3 border-bottom">
-      <h6 class="fw-bold mb-0">
-        <i class="fa-solid fa-map-location-dot text-primary me-2"></i>
-        {{ selectedPatient.nom }} {{ selectedPatient.prenom }}
-      </h6>
-    </div>
-
-    <div class="p-3">
-
-      <!-- Zone existante -->
-      <div *ngIf="selectedZone && !editingZone">
-        <h6 class="fw-semibold mb-3">Zone de sécurité</h6>
-
-        <div class="mb-2 p-2 bg-success bg-opacity-10 rounded-3 border border-success">
-          <div class="d-flex justify-content-between">
-            <span class="small fw-medium text-success">Zone verte</span>
-            <span class="badge bg-success">{{ selectedZone.rayonVert }}m</span>
-          </div>
+       style="width:320px; flex-shrink:0">
+ 
+    <!-- Header patient -->
+    <div class="p-3 text-white"
+         style="background: linear-gradient(135deg, #0d6efd, #0a58ca)">
+      <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle bg-white d-flex align-items-center justify-content-center
+                    fw-bold text-primary flex-shrink-0"
+             style="width:40px; height:40px; font-size:14px">
+          {{ selectedPatient.nom.charAt(0) }}{{ selectedPatient.prenom.charAt(0) }}
         </div>
-
-        <div class="mb-3 p-2 bg-danger bg-opacity-10 rounded-3 border border-danger">
-          <div class="d-flex justify-content-between">
-            <span class="small fw-medium text-danger">Zone rouge</span>
-            <span class="badge bg-danger">{{ selectedZone.rayonRouge }}m</span>
-          </div>
+        <div>
+          <div class="fw-bold">{{ selectedPatient.nom }} {{ selectedPatient.prenom }}</div>
+          <div class="small opacity-75">{{ selectedPatient.email }}</div>
         </div>
-
-        <div class="mb-2 small text-muted">
-          <i class="fa-solid fa-location-dot me-1"></i>
-          Centre : {{ selectedZone.latitudeCentre | number:'1.4-4' }},
-          {{ selectedZone.longitudeCentre | number:'1.4-4' }}
-        </div>
-
-        <button class="btn btn-outline-primary btn-sm w-100"
-                (click)="editingZone = true">
-          <i class="fa-solid fa-pen me-1"></i>Modifier la zone
-        </button>
       </div>
-
-      <!-- Formulaire zone -->
-      <div *ngIf="!selectedZone || editingZone">
-        <h6 class="fw-semibold mb-3">
-          {{ selectedZone ? 'Modifier' : 'Créer' }} la zone
-        </h6>
-
-        <ng-container *ngIf="selectedZone || true">
+    </div>
+ 
+    <!-- Onglets -->
+    <div class="d-flex border-bottom">
+      <button class="flex-fill btn btn-sm py-2 rounded-0 border-0"
+              [class.btn-primary]="activeTab === 'zone'"
+              [class.text-muted]="activeTab !== 'zone'"
+              (click)="activeTab = 'zone'">
+        <i class="fa-solid fa-circle-dot me-1"></i>Zones
+      </button>
+      <button class="flex-fill btn btn-sm py-2 rounded-0 border-0 border-start border-end"
+              [class.btn-primary]="activeTab === 'history'"
+              [class.text-muted]="activeTab !== 'history'"
+              (click)="activeTab = 'history'">
+        <i class="fa-solid fa-route me-1"></i>Trajets
+      </button>
+      <button class="flex-fill btn btn-sm py-2 rounded-0 border-0"
+              [class.btn-primary]="activeTab === 'alerts'"
+              [class.text-muted]="activeTab !== 'alerts'"
+              (click)="activeTab = 'alerts'">
+        <i class="fa-solid fa-bell me-1"></i>Alertes
+        <span *ngIf="unresolvedAlerts.length > 0"
+              class="badge bg-danger rounded-pill ms-1" style="font-size:9px">
+          {{ unresolvedAlerts.length }}
+        </span>
+      </button>
+    </div>
+ 
+    <div class="p-3">
+ 
+      <!-- ===== ONGLET ZONES ===== -->
+      <div *ngIf="activeTab === 'zone'">
+ 
+        <!-- Zone existante - affichage -->
+        <div *ngIf="selectedZone && !editingZone">
+          <h6 class="fw-semibold mb-3">Zone de sécurité active</h6>
+ 
+          <!-- Info maison -->
+          <div class="mb-3 p-2 bg-light rounded-3 d-flex align-items-center gap-2">
+            <i class="fa-solid fa-house text-primary"></i>
+            <div class="small">
+              <div class="fw-semibold">Position maison</div>
+              <div class="text-muted">
+                {{ selectedZone.latitudeCentre | number:'1.4-4' }},
+                {{ selectedZone.longitudeCentre | number:'1.4-4' }}
+              </div>
+            </div>
+            <button class="btn btn-outline-primary btn-sm ms-auto py-0 px-1"
+                    style="font-size:10px"
+                    (click)="centrerSurMaison()">
+              <i class="fa-solid fa-crosshairs"></i>
+            </button>
+          </div>
+ 
+          <div class="mb-2 p-3 rounded-3 border border-success bg-success bg-opacity-10">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold text-success small">🟢 Zone verte</div>
+                <div class="text-muted" style="font-size:11px">Zone de confort</div>
+              </div>
+              <span class="badge bg-success fs-6">{{ selectedZone.rayonVert }}m</span>
+            </div>
+          </div>
+ 
+          <div class="mb-3 p-3 rounded-3 border border-danger bg-danger bg-opacity-10">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold text-danger small">🔴 Zone rouge</div>
+                <div class="text-muted" style="font-size:11px">Alerte critique</div>
+              </div>
+              <span class="badge bg-danger fs-6">{{ selectedZone.rayonRouge }}m</span>
+            </div>
+          </div>
+ 
+          <button class="btn btn-outline-primary btn-sm w-100"
+                  (click)="startEditZone()">
+            <i class="fa-solid fa-pen me-1"></i>Modifier la zone
+          </button>
+        </div>
+ 
+        <!-- Formulaire zone -->
+        <div *ngIf="!selectedZone || editingZone">
+          <h6 class="fw-semibold mb-1">
+            <i class="fa-solid fa-draw-polygon text-primary me-1"></i>
+            {{ selectedZone ? 'Modifier' : 'Créer' }} la zone
+          </h6>
+          <p class="text-muted small mb-3">
+            <i class="fa-solid fa-hand-pointer me-1"></i>
+            Cliquez sur la carte pour positionner le centre
+          </p>
+ 
+          <!-- ← BOUTON POSITION ACTUELLE -->
+          <button class="btn btn-outline-primary btn-sm w-100 mb-3"
+                  (click)="utiliserPositionActuelle()">
+            <i class="fa-solid fa-house me-1"></i>
+            Utiliser position actuelle comme maison
+          </button>
+ 
           <div class="mb-2">
             <label class="form-label small fw-medium">Latitude centre</label>
             <input type="number" class="form-control form-control-sm"
-                   [(ngModel)]="(selectedZone || {latitudeCentre: 36.8065}).latitudeCentre"
-                   #latInput step="0.0001">
+                   [(ngModel)]="newZone.latitudeCentre"
+                   step="0.0001"
+                   (ngModelChange)="updatePreviewZone()">
           </div>
-          <div class="mb-2">
+ 
+          <div class="mb-3">
             <label class="form-label small fw-medium">Longitude centre</label>
             <input type="number" class="form-control form-control-sm"
-                   step="0.0001">
+                   [(ngModel)]="newZone.longitudeCentre"
+                   step="0.0001"
+                   (ngModelChange)="updatePreviewZone()">
           </div>
+ 
           <div class="mb-2">
-            <label class="form-label small fw-medium">
-              <span class="text-success">Zone verte</span> (mètres)
+            <label class="form-label small fw-medium d-flex justify-content-between">
+              <span class="text-success fw-bold">🟢 Zone verte</span>
+              <span class="badge bg-success">{{ newZone.rayonVert }}m</span>
             </label>
-            <input type="number" class="form-control form-control-sm"
-                   [(ngModel)]="newZone.rayonVert">
+            <input type="range" class="form-range"
+                   [(ngModel)]="newZone.rayonVert"
+                   min="50" max="2000" step="50"
+                   (input)="updatePreviewZone()">
+            <div class="d-flex justify-content-between text-muted"
+                 style="font-size:10px">
+              <span>50m</span><span>2000m</span>
+            </div>
           </div>
+ 
           <div class="mb-3">
-            <label class="form-label small fw-medium">
-              <span class="text-danger">Zone rouge</span> (mètres)
+            <label class="form-label small fw-medium d-flex justify-content-between">
+              <span class="text-danger fw-bold">🔴 Zone rouge</span>
+              <span class="badge bg-danger">{{ newZone.rayonRouge }}m</span>
             </label>
-            <input type="number" class="form-control form-control-sm"
-                   [(ngModel)]="newZone.rayonRouge">
+            <input type="range" class="form-range"
+                   [(ngModel)]="newZone.rayonRouge"
+                   min="100" max="5000" step="100"
+                   (input)="updatePreviewZone()">
+            <div class="d-flex justify-content-between text-muted"
+                 style="font-size:10px">
+              <span>100m</span><span>5000m</span>
+            </div>
           </div>
+ 
           <div class="d-flex gap-2">
-            <button class="btn btn-primary btn-sm w-100"
-                    (click)="saveZone(newZone)">
-              <i class="fa-solid fa-floppy-disk me-1"></i>Enregistrer
+            <button class="btn btn-primary btn-sm flex-grow-1"
+                    (click)="saveZone()">
+              <i class="fa-solid fa-floppy-disk me-1"></i>
+              {{ selectedZone ? 'Modifier' : 'Enregistrer' }}
             </button>
             <button *ngIf="editingZone"
                     class="btn btn-outline-secondary btn-sm"
-                    (click)="editingZone = false">
+                    (click)="cancelEdit()">
               Annuler
             </button>
           </div>
-        </ng-container>
+        </div>
+ 
+        <!-- Hôpital le plus proche -->
+        <hr class="my-3">
+        <h6 class="fw-semibold mb-2 small">
+          <i class="fa-solid fa-hospital text-danger me-1"></i>
+          Hôpital le plus proche
+        </h6>
+        <div *ngIf="nearestHospital" class="card border-danger border-opacity-25">
+          <div class="card-body p-2">
+            <div class="fw-semibold small text-danger">{{ nearestHospital.nom }}</div>
+            <div class="text-muted" style="font-size:11px">
+              {{ nearestHospital.adresse }}, {{ nearestHospital.ville }}
+            </div>
+            <div *ngIf="nearestHospital.telephone" style="font-size:11px" class="mt-1">
+              <i class="fa-solid fa-phone me-1 text-success"></i>
+              {{ nearestHospital.telephone }}
+            </div>
+            <a [href]="'https://maps.google.com/?q=' + nearestHospital.latitude + ',' + nearestHospital.longitude"
+               target="_blank"
+               class="btn btn-outline-danger btn-sm w-100 mt-2 py-0"
+               style="font-size:11px">
+              <i class="fa-solid fa-compass me-1"></i>Itinéraire
+            </a>
+          </div>
+        </div>
+        <div *ngIf="!nearestHospital" class="text-muted small text-center py-2">
+          Aucun hôpital avec coordonnées GPS
+        </div>
       </div>
-
-      <!-- Alertes du patient -->
-      <hr>
-      <h6 class="fw-semibold mb-2">Historique alertes</h6>
-      <div *ngFor="let alert of alerts | slice:0:5"
-           class="mb-2 p-2 rounded-3 border small"
-           [class.border-danger]="alert.typeAlerte === 'HORS_ZONE_ROUGE'"
-           [class.border-warning]="alert.typeAlerte === 'HORS_ZONE_VERTE'"
-           [class.border-secondary]="alert.typeAlerte === 'BATTERIE_FAIBLE'">
-        <div class="fw-medium">{{ alert.typeAlerte }}</div>
-        <div class="text-muted">{{ alert.declencheeAt | date:'dd/MM HH:mm' }}</div>
-        <span *ngIf="alert.resolue" class="badge bg-success">Résolue</span>
-        <span *ngIf="!alert.resolue" class="badge bg-danger">Active</span>
+ 
+      <!-- ===== ONGLET HISTORIQUE ===== -->
+      <div *ngIf="activeTab === 'history'">
+        <h6 class="fw-semibold mb-2">
+          <i class="fa-solid fa-route me-1" style="color:#6f42c1"></i>
+          Historique des 7 derniers jours
+        </h6>
+ 
+        <button class="btn w-100 mb-3"
+                [class.btn-outline-secondary]="!showHistory"
+                (click)="toggleHistory()"
+                [style.background]="showHistory ? '#6f42c1' : ''"
+                [style.color]="showHistory ? 'white' : ''">
+          <i class="fa-solid me-1"
+             [class.fa-eye-slash]="showHistory"
+             [class.fa-eye]="!showHistory"></i>
+          {{ showHistory ? 'Masquer le trajet' : 'Afficher le trajet' }}
+        </button>
+ 
+        <div *ngIf="showHistory && history.length > 0"
+             class="card border-0 bg-light rounded-3 mb-3">
+          <div class="card-body p-3">
+            <div class="row g-2 text-center">
+              <div class="col-6">
+                <div class="fw-bold text-primary fs-5">{{ getHistoryStats().total }}</div>
+                <div class="text-muted small">Points GPS</div>
+              </div>
+              <div class="col-6">
+                <div class="fw-bold text-primary fs-5">{{ getHistoryStats().distance }} km</div>
+                <div class="text-muted small">Distance totale</div>
+              </div>
+            </div>
+          </div>
+        </div>
+ 
+        <div *ngIf="showHistory && history.length === 0"
+             class="text-center text-muted py-3">
+          <i class="fa-solid fa-route d-block fs-2 mb-2 opacity-50"></i>
+          Aucun trajet enregistré
+        </div>
+ 
+        <div *ngIf="showHistory && history.length > 0">
+          <h6 class="fw-semibold small text-muted mb-2">Dernières positions</h6>
+          <div *ngFor="let loc of history.slice(0, 5)"
+               class="d-flex align-items-center gap-2 p-2 border-bottom small">
+            <i class="fa-solid fa-location-dot text-primary flex-shrink-0"></i>
+            <div>
+              <div>{{ loc.latitude | number:'1.4-4' }}, {{ loc.longitude | number:'1.4-4' }}</div>
+              <div class="text-muted" style="font-size:10px">
+                {{ loc.timestamp | date:'dd/MM HH:mm' }}
+                <span *ngIf="loc.batterie" class="ms-2">🔋 {{ loc.batterie }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+ 
+      <!-- ===== ONGLET ALERTES ===== -->
+      <div *ngIf="activeTab === 'alerts'">
+        <h6 class="fw-semibold mb-3">
+          <i class="fa-solid fa-bell text-warning me-1"></i>
+          Historique des alertes
+        </h6>
+ 
+        <div *ngFor="let alert of alerts"
+             class="mb-2 p-2 rounded-3 border small"
+             [class.border-danger]="alert.typeAlerte === 'HORS_ZONE_ROUGE' || alert.typeAlerte === 'SOS'"
+             [class.border-warning]="alert.typeAlerte === 'HORS_ZONE_VERTE'"
+             [class.border-secondary]="alert.typeAlerte === 'BATTERIE_FAIBLE'"
+             [class.opacity-50]="alert.resolue">
+          <div class="d-flex justify-content-between">
+            <div>
+              <i class="fa-solid me-1"
+                 [class]="getAlertIcon(alert.typeAlerte)"
+                 [class.text-danger]="alert.typeAlerte === 'HORS_ZONE_ROUGE' || alert.typeAlerte === 'SOS'"
+                 [class.text-warning]="alert.typeAlerte === 'HORS_ZONE_VERTE'"
+                 [class.text-secondary]="alert.typeAlerte === 'BATTERIE_FAIBLE'"></i>
+              <span class="fw-medium">{{ alert.typeAlerte }}</span>
+            </div>
+            <span *ngIf="alert.resolue" class="badge bg-success py-0">✓</span>
+            <button *ngIf="!alert.resolue"
+                    class="btn btn-sm btn-outline-success py-0 px-1"
+                    style="font-size:10px"
+                    (click)="resolveAlert(alert.id!)">
+              Résoudre
+            </button>
+          </div>
+          <div class="text-muted mt-1" style="font-size:10px">
+            {{ alert.declencheeAt | date:'dd/MM/yyyy HH:mm' }}
+          </div>
+          <!-- Position GPS de l'alerte -->
+          <div *ngIf="alert.latitude && alert.longitude"
+               class="mt-1">
+            <a [href]="'https://www.google.com/maps?q=' + alert.latitude + ',' + alert.longitude"
+               target="_blank"
+               class="btn btn-outline-primary btn-sm py-0 px-1 w-100"
+               style="font-size:10px">
+              <i class="fa-solid fa-map-location-dot me-1"></i>
+              Voir position GPS
+            </a>
+          </div>
+        </div>
+ 
+        <div *ngIf="alerts.length === 0" class="text-center text-muted py-4">
+          <i class="fa-solid fa-check-circle text-success d-block fs-2 mb-2"></i>
+          Aucune alerte
+        </div>
+      </div>
+ 
     </div>
   </div>
-
+ 
+  <!-- Message si aucun patient sélectionné -->
+  <div *ngIf="!selectedPatient"
+       class="border-start bg-light d-flex flex-column align-items-center
+              justify-content-center text-muted"
+       style="width:320px; flex-shrink:0">
+    <i class="fa-solid fa-hand-pointer fs-1 mb-3 text-primary opacity-50"></i>
+    <div class="fw-semibold">Sélectionnez un patient</div>
+    <div class="small text-center px-3 mt-1">
+      Cliquez sur un patient dans la liste pour gérer ses zones et voir son historique
+    </div>
+  </div>
+ 
 </div>
+ 

@@ -5,6 +5,7 @@ import { MessageDto } from './message.service';
 import { Notification } from './notification.service';
 import { BehaviorSubject } from 'rxjs';
 import SockJS from 'sockjs-client';
+import { environment } from '../../../environments/environment'; 
 
 @Injectable({
   providedIn: 'root'
@@ -28,14 +29,16 @@ export class WebSocketService {
       this.stompClient.deactivate();
     }
 
-    const socket = new SockJS(`http://127.0.0.1:8081/ws?userId=${userId}`);
-    this.stompClient = new Client({
-      webSocketFactory: () => socket,
-      debug: (str: string) => console.log(str),
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    });
+const socket = new SockJS(`${environment.apiUrl}/ws?userId=${userId}`);
+
+this.stompClient = new Client({
+  webSocketFactory: () => socket,
+  debug: (str: string) => console.log(str),
+  reconnectDelay: 5000,
+  heartbeatIncoming: 4000,
+  heartbeatOutgoing: 4000,
+});
+     
 
     this.stompClient.onConnect = () => {
       console.log('Connected to WS as User', userId);

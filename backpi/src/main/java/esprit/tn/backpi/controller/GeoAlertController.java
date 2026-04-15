@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import esprit.tn.backpi.entity.SOSRequest;
 
 @RestController
 @RequestMapping("/api/alerts")
-@CrossOrigin(origins = "http://localhost:4200")
 public class GeoAlertController {
 
     @Autowired private GeoAlertService alertService;
@@ -32,5 +32,17 @@ public class GeoAlertController {
     @PatchMapping("/{id}/resoudre")
     public ResponseEntity<GeoAlert> resoudre(@PathVariable Long id) {
         return ResponseEntity.ok(alertService.resoudre(id));
+    }
+
+    @PostMapping("/sos/patient/{patientId}")
+    public ResponseEntity<?> envoyerSOS(
+            @PathVariable Long patientId,
+            @RequestBody SOSRequest request) {
+        alertService.creerAlerteSOS(patientId, request.getLatitude(), request.getLongitude());
+        return ResponseEntity.ok("SOS envoyé");
+    }
+    @PatchMapping("/{id}/confirmer")
+    public ResponseEntity<GeoAlert> confirmerVu(@PathVariable Long id) {
+        return ResponseEntity.ok(alertService.confirmerVu(id));
     }
 }

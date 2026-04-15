@@ -21,13 +21,17 @@ public class GeoAlert {
     private Double latitude;
     private Double longitude;
 
+    @Column(name = "sms_sent", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean smsSent = false;
+
     private String message;
 
+    @Column(name = "resolved", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean resolue = false;
-
     private LocalDateTime declencheeAt = LocalDateTime.now();
     private LocalDateTime resolueAt;
-
+    public boolean isSmsSent() { return smsSent; }
+    public void setSmsSent(boolean smsSent) { this.smsSent = smsSent; }
     // Getters / Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
