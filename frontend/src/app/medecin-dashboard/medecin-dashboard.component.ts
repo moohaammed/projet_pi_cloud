@@ -10,10 +10,8 @@ import { MapService } from '../services/map.service';
 import { PatientProgressionService } from '../services/patient-progression.service';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
-import { HttpClient } from '@angular/common/http';
 import { RappelService } from '../services/rappel.service';
 import { PredictionService } from '../services/prediction.service';
-
 
 @Component({
   selector: 'app-medecin-dashboard',
@@ -29,15 +27,14 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   analyses: any[] = [];
   selectedAnalyse: any = null;
   observationToAdd: string = '';
-  alertesCount = 0; // ← ajoute
+  alertesCount = 0;
 
   isLoadingPatients = false;
   isLoadingAnalyses = false;
   isSavingObservation = false;
   successMessage = '';
-  activeTab: string = 'analyses'; // 'analyses' or 'rappels'
+  activeTab: string = 'analyses';
 
-  // Reminders
   reminders: any[] = [];
   isLoadingReminders = false;
   showReminderModal = false;
@@ -83,7 +80,6 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   riskPredictionResult: any = null;
   isPredictingRisk = false;
 
-  // MRI Tooling
   imgBrightness = 1.0;
   imgContrast = 1.0;
   imgExposure = 1.0;
@@ -101,24 +97,16 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     private progressionService: PatientProgressionService,
     private authService: AuthService,
     private userService: UserService,
-    private rappelService: RappelService
-
-    private progressionService: PatientProgressionService,
+    private rappelService: RappelService,
     private predictionService: PredictionService,
-
-
-    private mapService: MapService, // ← ajoute
-
-
-
+    private mapService: MapService
   ) { }
 
   ngOnInit(): void {
     this.loadPatients();
-    this.chargerAlertes(); // ← ajoute
+    this.chargerAlertes();
   }
 
-  // ← AJOUTE CETTE METHODE
   chargerAlertes(): void {
     this.mapService.getAllAlerts().subscribe({
       next: (alertes) => {
@@ -155,6 +143,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     this.riskPredictionResult = null;
     this.predictionData.Age = patient.age || null;
     this.isLoadingAnalyses = true;
+
     this.analyseService.getAnalysesByPatient(patient.id).subscribe({
       next: (data) => {
         this.analyses = data || [];
@@ -164,13 +153,11 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
       error: () => this.isLoadingAnalyses = false
     });
 
-    // Load progression
-    const userId = patient.user ? patient.user.id : patient.id; // fallback if user logic differs
+    const userId = patient.user ? patient.user.id : patient.id;
     if (userId) {
       this.loadProgression(userId);
     }
 
-    // Reset tab and load reminders
     this.activeTab = 'analyses';
     this.loadReminders(patient.id);
   }
@@ -192,6 +179,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
   loadProgression(userId: number) {
     this.isLoadingProgression = true;
+
     this.progressionService.getScoreAndStade(userId).subscribe({
       next: (data) => {
         this.progressionScoreQuiz = data.scoreQuiz;
@@ -222,6 +210,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
     const userId = this.selectedPatient.user ? this.selectedPatient.user.id : this.selectedPatient.id;
     this.isResetting = true;
+
     this.progressionService.resetPatient(userId, type).subscribe({
       next: () => {
         this.showSuccess("Progression réinitialisée avec succès.");
@@ -242,17 +231,40 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   viewAnalyseDetails(analyse: any) {
     this.selectedAnalyse = { ...analyse };
     this.observationToAdd = analyse.observationMedicale || '';
+
     if (analyse.observationMedicale && analyse.observationMedicale.startsWith('{')) {
       try {
         this.selectedAnalyse.geminiData = JSON.parse(analyse.observationMedicale);
         this.observationToAdd = '';
-      } catch (e) {
+      } catch {
         this.selectedAnalyse.geminiData = null;
       }
     } else {
       this.selectedAnalyse.geminiData = null;
     }
+
     this.resetFilters();
+  }
+
+  saveObservation() {
+    if (!this.selectedAnalyse || !this.observationToAdd) return;
+    this.isSavingObservation = true;
+    
+    const updated = {
+      ...this.selectedAnalyse,
+      observationMedicale: this.observationToAdd
+    };
+    
+    this.analyseService.updateAnalyse(this.selectedAnalyse.id, updated).subscribe({
+      next: () => {
+        this.selectedAnalyse.observationMedicale = this.observationToAdd;
+        this.showSuccess("Observation médicale enregistrée.");
+        this.isSavingObservation = false;
+        const idx = this.analyses.findIndex(a => a.id === this.selectedAnalyse.id);
+        if (idx !== -1) this.analyses[idx].observationMedicale = this.observationToAdd;
+      },
+      error: () => this.isSavingObservation = false
+    });
   }
 
   initEvolutionChart() {
@@ -297,27 +309,115 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
-  // ── MRI Tooling Methods ──────────────────────────────────────────────
+  // --- Reminders ---
+  openAddReminder() {
+    this.isEditingReminder = false;
+    this.editingReminderId = null;
+    this.reminderForm = { title: '', description: '', heure_rappel: '', jours: 'TOUS', type: 'AUTRE', actif: true };
+    this.selectedDays = ['TOUS'];
+    this.showReminderModal = true;
+  }
+
+  openEditReminder(rappel: any) {
+    this.isEditingReminder = true;
+    this.editingReminderId = rappel.id;
+    this.reminderForm = {
+      titre: rappel.titre,
+      description: rappel.description,
+      heure_rappel: rappel.heureRappel,
+      type: rappel.type,
+      actif: rappel.actif
+    };
+    this.selectedDays = rappel.jours.split(',');
+    this.showReminderModal = true;
+  }
+
+  saveReminder() {
+    if (!this.selectedPatient) return;
+    const payload = {
+      ...this.reminderForm,
+      heureRappel: this.reminderForm.heure_rappel,
+      jours: this.selectedDays.includes('TOUS') ? 'TOUS' : this.selectedDays.join(','),
+      patient: { id: this.selectedPatient.id }
+    };
+
+    const action = this.isEditingReminder && this.editingReminderId ? 
+      this.rappelService.update(this.editingReminderId, payload) : 
+      this.rappelService.create(payload);
+
+    action.subscribe({
+      next: () => {
+        this.showSuccess(this.isEditingReminder ? "Rappel mis à jour." : "Nouveau rappel créé.");
+        this.showReminderModal = false;
+        this.loadReminders(this.selectedPatient.id);
+      }
+    });
+  }
+
+  deleteReminder(id: number) {
+    if (!confirm("Supprimer ce rappel ?")) return;
+    this.rappelService.delete(id).subscribe({
+      next: () => {
+        this.showSuccess("Rappel supprimé.");
+        this.loadReminders(this.selectedPatient.id);
+      }
+    });
+  }
+
+  toggleReminderActif(rappel: any) {
+    this.rappelService.toggle(rappel.id).subscribe({
+      next: () => {
+        rappel.actif = !rappel.actif;
+        this.showSuccess(rappel.actif ? "Rappel activé." : "Rappel désactivé.");
+      }
+    });
+  }
+
+  toggleDay(day: string) {
+    if (day === 'TOUS') {
+      this.selectedDays = ['TOUS'];
+    } else {
+      if (this.selectedDays.includes('TOUS')) this.selectedDays = [];
+      const idx = this.selectedDays.indexOf(day);
+      if (idx > -1) this.selectedDays.splice(idx, 1);
+      else this.selectedDays.push(day);
+      if (this.selectedDays.length === 0 || this.selectedDays.length === 7) this.selectedDays = ['TOUS'];
+    }
+  }
+
+  // --- IA ---
+  predictAlzheimer() {
+    if (!this.selectedPatient) return;
+    this.isPredicting = true;
+    this.predictionService.predict(this.predictionData).subscribe({
+      next: (res) => { this.predictionResult = res; this.isPredicting = false; },
+      error: () => this.isPredicting = false
+    });
+  }
+
+  predictRiskAlzheimer() {
+    if (!this.selectedPatient) return;
+    this.isPredictingRisk = true;
+    this.predictionService.predictRisk(this.riskPredictionData).subscribe({
+      next: (res) => { this.riskPredictionResult = res; this.isPredictingRisk = false; },
+      error: () => this.isPredictingRisk = false
+    });
+  }
+
+  // --- MRI Tools ---
+  resetFilters() {
+    this.imgBrightness = 1.0; this.imgContrast = 1.0; this.imgExposure = 1.0;
+    this.imgZoom = 1.0; this.imgInvert = false; this.panX = 0; this.panY = 0;
+  }
+
+  toggleInvert() { this.imgInvert = !this.imgInvert; }
+
   get mriFilterStyle() {
-    return `brightness(${this.imgBrightness * this.imgExposure}) contrast(${this.imgContrast * this.imgExposure}) ${this.imgInvert ? 'invert(1)' : ''}`;
+    return `brightness(${this.imgBrightness}) contrast(${this.imgContrast}) brightness(${this.imgExposure}) ${this.imgInvert ? 'invert(1)' : ''}`;
   }
 
   get mriTransformStyle() {
-    return `scale(${this.imgZoom}) translate(${this.panX}px, ${this.panY}px)`;
-  }
-
-  toggleInvert() {
-    this.imgInvert = !this.imgInvert;
-  }
-
-  resetFilters() {
-    this.imgBrightness = 1.0;
-    this.imgContrast = 1.0;
-    this.imgExposure = 1.0;
-    this.imgZoom = 1.0;
-    this.imgInvert = false;
-    this.panX = 0;
-    this.panY = 0;
+    return `scale(${this.imgZoom}) translate(${this.panX / this.imgZoom}px, ${this.panY / this.imgZoom}px)`;
   }
 
   startDrag(event: MouseEvent) {
@@ -329,186 +429,17 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
   doDrag(event: MouseEvent) {
     if (!this.isDragging) return;
-    event.preventDefault();
     this.panX = event.clientX - this.startX;
     this.panY = event.clientY - this.startY;
   }
 
-  stopDrag() {
-    this.isDragging = false;
-  }
+  stopDrag() { this.isDragging = false; }
 
   downloadFilteredImage() {
-    if (!this.selectedAnalyse || !this.selectedAnalyse.imageIRM) return;
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.src = this.selectedAnalyse.imageIRM;
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.filter = `brightness(${this.imgBrightness * this.imgExposure}) contrast(${this.imgContrast * this.imgExposure}) ${this.imgInvert ? 'invert(1)' : ''}`;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `IRM_${this.selectedPatient?.nom || 'Patient'}_Filters.png`;
-            a.click();
-            URL.revokeObjectURL(url);
-          }
-        }, 'image/png');
-      }
-    };
-  }
-
-  saveObservation() {
-    if (!this.selectedAnalyse) return;
-    this.isSavingObservation = true;
-
-    const payload = { ...this.selectedAnalyse, observationMedicale: this.observationToAdd };
-    this.analyseService.updateAnalyse(this.selectedAnalyse.id, payload).subscribe({
-      next: () => {
-        this.showSuccess("Observation ajoutée avec succès.");
-        this.selectPatient(this.selectedPatient);
-        this.selectedAnalyse = null;
-        this.isSavingObservation = false;
-      },
-      error: () => this.isSavingObservation = false
-    });
-  }
-
-  // ── Rappels Quotidiens ──────────────────────────────────────────
-
-  openAddReminder() {
-    this.isEditingReminder = false;
-    this.editingReminderId = null;
-    this.reminderForm = {
-      titre: '',
-      description: '',
-      heure_rappel: '08:00',
-      jours: 'TOUS',
-      type: 'AUTRE',
-      actif: true
-    };
-    this.selectedDays = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI', 'DIMANCHE']; // Default to all days
-    this.showReminderModal = true;
-  }
-
-  openEditReminder(rappel: any) {
-    this.isEditingReminder = true;
-    this.editingReminderId = rappel.id;
-    this.reminderForm = { ...rappel };
-    if (rappel.jours === 'TOUS') {
-      this.selectedDays = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI', 'DIMANCHE'];
-    } else {
-      this.selectedDays = rappel.jours.split(',');
-    }
-    this.showReminderModal = true;
-  }
-
-  toggleDay(day: string) {
-    if (day === 'TOUS') {
-      if (this.selectedDays.length === 7) {
-        this.selectedDays = [];
-      } else {
-        this.selectedDays = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI', 'DIMANCHE'];
-      }
-    } else {
-      const idx = this.selectedDays.indexOf(day);
-      if (idx > -1) this.selectedDays.splice(idx, 1);
-      else this.selectedDays.push(day);
-    }
-
-    if (this.selectedDays.length === 7) this.reminderForm.jours = 'TOUS';
-    else this.reminderForm.jours = this.selectedDays.join(',');
-  }
-
-  saveReminder() {
-    if (!this.selectedPatient) return;
-
-    const currentUser = this.authService.getCurrentUser();
-    const payload = {
-      titre: this.reminderForm.titre,
-      description: this.reminderForm.description,
-      heureRappel: this.reminderForm.heure_rappel,
-      jours: this.reminderForm.jours,
-      type: this.reminderForm.type,
-      actif: this.reminderForm.actif,
-      patient: { id: this.selectedPatient.id },
-      createdBy: { id: currentUser.id }
-    };
-
-    if (this.isEditingReminder && this.editingReminderId) {
-      this.rappelService.update(this.editingReminderId, payload).subscribe({
-        next: () => {
-          this.showSuccess("Rappel modifié avec succès.");
-          this.loadReminders(this.selectedPatient.id);
-          this.showReminderModal = false;
-        }
-      });
-    } else {
-      this.rappelService.create(payload).subscribe({
-        next: () => {
-          this.showSuccess("Rappel ajouté avec succès.");
-          this.loadReminders(this.selectedPatient.id);
-          this.showReminderModal = false;
-        }
-      });
-    }
-  }
-
-  deleteReminder(id: number) {
-    if (confirm("Supprimer ce rappel ?")) {
-      this.rappelService.delete(id).subscribe({
-        next: () => {
-          this.showSuccess("Rappel supprimé.");
-          this.loadReminders(this.selectedPatient.id);
-        }
-      });
-    }
-  }
-
-  toggleReminderActif(rappel: any) {
-    this.rappelService.toggle(rappel.id).subscribe({
-      next: () => {
-        rappel.actif = !rappel.actif;
-      }
-    });
-  }
-
-  predictAlzheimer() {
-    this.isPredicting = true;
-    this.predictionResult = null;
-    this.predictionService.predict(this.predictionData).subscribe({
-      next: (res: any) => {
-        this.predictionResult = res;
-        this.isPredicting = false;
-        this.showSuccess('Prédiction terminée avec succès.');
-      },
-      error: (err) => {
-        console.error(err);
-        this.isPredicting = false;
-      }
-    });
-  }
-
-  predictRiskAlzheimer() {
-    this.isPredictingRisk = true;
-    this.riskPredictionResult = null;
-    this.predictionService.predictRisk(this.riskPredictionData).subscribe({
-      next: (res: any) => {
-        this.riskPredictionResult = res;
-        this.isPredictingRisk = false;
-        this.showSuccess('Prédiction du risque terminée avec succès.');
-      },
-      error: (err) => {
-        console.error(err);
-        this.isPredictingRisk = false;
-      }
-    });
+    if (!this.selectedAnalyse?.imageIRM) return;
+    const link = document.createElement('a');
+    link.href = this.selectedAnalyse.imageIRM;
+    link.download = `IRM_${this.selectedPatient.nom}_${this.selectedAnalyse.date}.jpg`;
+    link.click();
   }
 }

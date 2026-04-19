@@ -37,12 +37,51 @@ a, button {
 }
 
 /* ── Header ──────────────────────────────────────── */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 16px;
+  padding-right: 60px; /* avoid floating icons */
+  box-sizing: border-box;
+}
+
 .dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
   background: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
   padding: 24px 32px;
-  margin-bottom: 32px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
+}
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dashboard-main {
+  display: grid;
+  grid-template-columns: 35% 65%;
+  gap: 16px;
+  align-items: start;
+}
+
+.patient-list {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.patient-detail {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  position: sticky;
+  top: 16px;
 }
 
 .dashboard-header h1 {
@@ -109,14 +148,15 @@ a, button {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 8px 12px;
+  min-height: 60px;
   position: relative;
   cursor: pointer;
   box-shadow: var(--shadow-card);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .patient-card-modern:hover {
@@ -157,7 +197,7 @@ a, button {
 
 .p-name {
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: 13px;
   color: var(--text-main);
   margin-bottom: 2px;
 }
@@ -171,8 +211,8 @@ a, button {
 
 .p-status-badge {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 8px;
+  right: 8px;
   padding: 4px 8px;
   border-radius: 20px;
   font-size: 0.7rem;
@@ -238,6 +278,9 @@ a, button {
   border-radius: 12px;
   gap: 4px;
   margin: 0 32px 24px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .segment-btn {
@@ -264,9 +307,14 @@ a, button {
   box-shadow: var(--shadow-sm);
 }
 
+/* Ensure sticky tab remains above scrollable content */
+.segmented-control {
+  box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1);
+}
+
 /* ── Sections & Tables ───────────────────────────── */
 .section-body {
-  padding: 0 32px 32px 32px;
+  padding: 16px;
 }
 
 .modern-table {
@@ -356,6 +404,20 @@ a, button {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
   outline: none;
+}
+
+.extra-small {
+  font-size: 0.7rem;
+}
+
+.btn-xs {
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  border-radius: 4px;
+}
+
+.min-vh-25 {
+  min-height: 250px;
 }
 
 /* ── Utilities ───────────────────────────────────── */

@@ -5,7 +5,6 @@ import esprit.tn.backpi.entity.Role;
 import esprit.tn.backpi.repository.UserRepository;
 import esprit.tn.backpi.entities.gestion_patient.Patient;
 import esprit.tn.backpi.repositories.gestion_patient.PatientRepository;
-import esprit.tn.backpi.services.collaboration.ChatGroupService;
 import esprit.tn.backpi.services.collaboration.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,9 +26,6 @@ public class AuthController {
     private PatientRepository patientRepository;
 
     @Autowired
-    private ChatGroupService chatGroupService;
-
-    @Autowired
     private FileStorageService fileStorageService;
 
     @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
@@ -47,7 +43,7 @@ public class AuthController {
         }
 
         User saved = userRepository.save(user);
-        chatGroupService.assignUserToDefaultGroup(saved);
+        // chatGroupService.assignUserToDefaultGroup(saved);
 
         // ── If PATIENT role: auto-create a Patient record linked to this user ──
         if (Role.PATIENT.equals(saved.getRole())) {
