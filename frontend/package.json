@@ -30,6 +30,7 @@
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
     "express": "^4.18.2",
+    "firebase": "^12.12.0",
     "leaflet": "^1.9.4",
     "rxjs": "~7.8.0",
     "sockjs-client": "^1.6.1",

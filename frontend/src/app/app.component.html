@@ -1,3 +1,5 @@
+
+
 <ng-container *ngIf="isAuthPage(); else mainLayout">
   <router-outlet></router-outlet>
 </ng-container>
@@ -41,9 +43,11 @@
                 routerLink="/admin/dashboard" routerLinkActive="active-purple fw-semibold shadow-sm"
                 [routerLinkActiveOptions]="{exact:true}" style="cursor: pointer;"
                 [title]="isSidebarCollapsed ? 'Overview' : ''">
-                <i class="fa-solid fa-gauge-high fs-5" [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Dashboard</span>
+                <div class="d-flex flex-column align-items-center w-100">
+                  <i class="fa-solid fa-gauge-high fs-5" [class.me-3]="!isSidebarCollapsed && !accService.simplifiedMode()"
+                    [class.mx-auto]="isSidebarCollapsed || accService.simplifiedMode()"></i>
+                  <span *ngIf="!isSidebarCollapsed || accService.simplifiedMode()" class="fs-15" [class.mt-1]="accService.simplifiedMode()">Dashboard</span>
+                </div>
               </a>
             </li>
 
@@ -148,7 +152,10 @@
             <!-- Notifications -->
             <div class="position-relative cursor-pointer text-muted hover-primary">
               <i class="fa-regular fa-bell fs-5"></i>
-              <span
+              <span *ngIf="notificationPermissionDenied()"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="font-size: 8px; padding: 3px 5px;">1</span>
+              <span *ngIf="!notificationPermissionDenied()"
                 class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
             </div>
 
@@ -172,8 +179,17 @@
           </div>
         </header>
 
-        <main class="flex-grow-1 p-4 p-lg-5 overflow-auto bg-gradient-primary">
+        <main class="flex-grow-1 p-4 p-lg-5 overflow-auto bg-grey">
           <div class="container-fluid p-0">
+            <!-- Simplified Mode Instructions -->
+            <div *ngIf="accService.simplifiedMode()" class="mb-4">
+              <div class="simplified-breadcrumb mb-2">
+                Vous êtes ici : {{ getBreadcrumbs() }}
+              </div>
+              <div class="alert alert-info border-0 shadow-sm rounded-4">
+                <strong>Instruction :</strong> {{ getInstructionPhrase() }}
+              </div>
+            </div>
             <router-outlet></router-outlet>
           </div>
         </main>
@@ -247,6 +263,14 @@
 
     <!-- Content Area -->
     <main style="min-height: 70vh;">
+      <div class="container py-4" *ngIf="accService.simplifiedMode()">
+        <div class="simplified-breadcrumb mb-2">
+          Vous êtes ici : {{ getBreadcrumbs() }}
+        </div>
+        <div class="alert alert-info border-0 shadow-sm rounded-4">
+          <strong>Instruction :</strong> {{ getInstructionPhrase() }}
+        </div>
+      </div>
       <router-outlet></router-outlet>
     </main>
 

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
+import esprit.tn.backpi.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/users")
@@ -16,6 +18,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
@@ -80,6 +85,21 @@ public class UserController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("User non trouvé id: " + id);
+        }
+    }
+
+    // ── FCM TOKEN : save user fcm token ──────────────────────────────────────
+    @PatchMapping("/{id}/fcm-token")
+    public ResponseEntity<?> saveFcmToken(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        try {
+            User user = userService.findById(id);
+            if (body.containsKey("fcmToken")) {
+                user.setFcmToken(body.get("fcmToken"));
+                userRepository.save(user);
+            }
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }
 }

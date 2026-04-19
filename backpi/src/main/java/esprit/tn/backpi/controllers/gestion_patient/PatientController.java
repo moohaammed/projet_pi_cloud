@@ -1,11 +1,13 @@
 package esprit.tn.backpi.controllers.gestion_patient;
 
 import esprit.tn.backpi.entities.gestion_patient.Patient;
+import esprit.tn.backpi.repositories.gestion_patient.PatientRepository;
 import esprit.tn.backpi.services.gestion_patient.IPatientService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -13,9 +15,11 @@ import java.util.List;
 public class PatientController {
 
     private final IPatientService patientService;
+    private final PatientRepository patientRepository;
 
-    public PatientController(IPatientService patientService) {
+    public PatientController(IPatientService patientService, PatientRepository patientRepository) {
         this.patientService = patientService;
+        this.patientRepository = patientRepository;
     }
 
     @GetMapping
@@ -26,6 +30,13 @@ public class PatientController {
     @GetMapping("/{id}")
     public Patient getPatientById(@PathVariable("id") Long id) {
         return patientService.retrievePatient(id);
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<Patient> getPatientByUserId(@PathVariable("userId") Long userId) {
+        return patientRepository.findByUser_Id(userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 
     @PostMapping
@@ -42,5 +53,55 @@ public class PatientController {
     @DeleteMapping("/{id}")
     public void deletePatient(@PathVariable("id") Long id) {
         patientService.removePatient(id);
+    }
+
+    // ── Assignment endpoints ────────────────────────────────────────────────
+
+    /** Returns all patients assigned to a given doctor user ID */
+    @GetMapping("/by-medecin/{medecinId}")
+    public List<Patient> getPatientsByMedecin(@PathVariable Long medecinId) {
+        return patientRepository.findByMedecinId(medecinId);
+    }
+
+    /** Returns all patients NOT yet assigned to any doctor */
+    @GetMapping("/unassigned")
+    public List<Patient> getUnassignedPatients() {
+        return patientRepository.findByMedecinIdIsNull();
+    }
+
+    /** Returns the doctor ID assigned to a patient identified by user ID */
+    @GetMapping("/assigned-doctor/{userPatientId}")
+    public ResponseEntity<?> getAssignedDoctor(@PathVariable Long userPatientId) {
+        Optional<Patient> opt = patientRepository.findByUser_Id(userPatientId);
+        if (opt.isEmpty() || opt.get().getMedecinId() == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(java.util.Map.of("medecinId", opt.get().getMedecinId()));
+    }
+
+    /** Assign patient (by patient ID) to a doctor */
+    @PostMapping("/{patientId}/assign/{medecinId}")
+    public ResponseEntity<Patient> assignPatient(@PathVariable Long patientId, @PathVariable Long medecinId) {
+        Patient p = patientRepository.findById(patientId).orElseThrow();
+        p.setMedecinId(medecinId);
+        return ResponseEntity.ok(patientRepository.save(p));
+    }
+
+    /** Unassign patient by their patient ID */
+    @DeleteMapping("/{patientId}/unassign")
+    public ResponseEntity<Void> unassignPatient(@PathVariable Long patientId) {
+        patientRepository.findById(patientId).ifPresent(p -> {
+            p.setMedecinId(null);
+            patientRepository.save(p);
+        });
+        return ResponseEntity.ok().build();
+    }
+
+    /** Reassign patient to a new doctor by patient ID */
+    @PostMapping("/{patientId}/reassign/{newMedecinId}")
+    public ResponseEntity<Patient> reassignPatient(@PathVariable Long patientId, @PathVariable Long newMedecinId) {
+        Patient p = patientRepository.findById(patientId).orElseThrow();
+        p.setMedecinId(newMedecinId);
+        return ResponseEntity.ok(patientRepository.save(p));
     }
 }

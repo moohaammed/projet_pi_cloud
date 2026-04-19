@@ -9,10 +9,13 @@ import { VideoCallService } from './services/videocall.service';
 import { VideoCallComponent } from './components/videocall/videocall.component';
 import { Subscription } from 'rxjs';
 
+import { AccessibilityService } from './services/accessibility.service';
+import { AccessibilityToggleComponent } from './components/accessibility-toggle/accessibility-toggle.component';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, VideoCallComponent],
+  imports: [RouterModule, CommonModule, FormsModule, VideoCallComponent, AccessibilityToggleComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -25,11 +28,13 @@ export class AppComponent implements OnDestroy {
   notificationService = inject(NotificationService);
   videoCallService = inject(VideoCallService);
   platformId = inject(PLATFORM_ID);
+  accService = inject(AccessibilityService);
 
   // Video Call State
   showVideoCall = inject(VideoCallService).showCallOverlay;
   videoCallRoomId = inject(VideoCallService).currentRoomId;
   incomingVideoCall = signal<{ roomId: string; callerName: string; senderId: string } | null>(null);
+  notificationPermissionDenied = signal<boolean>(false);
   private videoCallInviteSub?: Subscription;
 
   constructor() {
@@ -113,6 +118,10 @@ export class AppComponent implements OnDestroy {
         const callerName = (data?.callerName as string) || 'Someone';
         this.incomingVideoCall.set({ roomId, callerName, senderId: String(msg.senderId) });
       });
+    }
+
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      this.notificationPermissionDenied.set(Notification.permission === 'denied');
     }
   }
 
@@ -209,5 +218,22 @@ export class AppComponent implements OnDestroy {
 
   isLoggedIn(): boolean {
     return this.auth.isLoggedIn();
+  }
+
+  getBreadcrumbs(): string {
+    const url = this.router.url;
+    if (url.includes('home')) return 'Accueil';
+    if (url.includes('scans')) return 'Accueil > Mes Scans';
+    if (url.includes('results')) return 'Accueil > Mes Scans > Résultat';
+    if (url.includes('patient-dashboard')) return 'Accueil > Tableau de Bord';
+    return 'Accueil';
+  }
+
+  getInstructionPhrase(): string {
+    const url = this.router.url;
+    if (url.includes('results')) return 'Sur cette page, vous pouvez voir la réponse de votre médecin.';
+    if (url.includes('scans')) return 'Sur cette page, vous pouvez envoyer vos images médicales.';
+    if (url.includes('rendezvous')) return 'Sur cette page, vous pouvez demander un rendez-vous.';
+    return 'Utilisez les boutons ci-dessous pour naviguer.';
   }
 }

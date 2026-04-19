@@ -68,14 +68,6 @@ export const routes: Routes = [
     data: { roles: ['ADMIN'] }
   },
 
-  {
-  path: 'map',
-  loadComponent: () =>
-    import('./components/map/doctor-map/doctor-map.component')
-      .then(m => m.DoctorMapComponent),
-  canActivate: [authGuard, roleGuard],
-  data: { roles: ['DOCTOR', 'ADMIN'] }
-},
 
 
   // ===== COLLABORATION (Avec sous-routes lazy-loadées) =====

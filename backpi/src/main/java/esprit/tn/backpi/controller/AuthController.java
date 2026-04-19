@@ -1,7 +1,10 @@
 package esprit.tn.backpi.controller;
 
 import esprit.tn.backpi.entity.User;
+import esprit.tn.backpi.entity.Role;
 import esprit.tn.backpi.repository.UserRepository;
+import esprit.tn.backpi.entities.gestion_patient.Patient;
+import esprit.tn.backpi.repositories.gestion_patient.PatientRepository;
 import esprit.tn.backpi.services.collaboration.ChatGroupService;
 import esprit.tn.backpi.services.collaboration.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
 
     @Autowired
     private ChatGroupService chatGroupService;
@@ -42,6 +48,28 @@ public class AuthController {
 
         User saved = userRepository.save(user);
         chatGroupService.assignUserToDefaultGroup(saved);
+
+        // ── If PATIENT role: auto-create a Patient record linked to this user ──
+        if (Role.PATIENT.equals(saved.getRole())) {
+            Patient patient = new Patient();
+            patient.setNom(saved.getNom());
+            patient.setPrenom(saved.getPrenom());
+            patient.setUser(saved);
+            Patient savedPatient = patientRepository.save(patient);
+            // Include patientId in the response so the frontend can pre-load the profile
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                Map.of(
+                    "id",        saved.getId(),
+                    "nom",       saved.getNom(),
+                    "prenom",    saved.getPrenom(),
+                    "email",     saved.getEmail(),
+                    "role",      saved.getRole(),
+                    "actif",     saved.isActif(),
+                    "patientId", savedPatient.getId()
+                )
+            );
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
