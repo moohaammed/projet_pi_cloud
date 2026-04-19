@@ -1,33 +1,27 @@
 package tn.esprit.smartwatchservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.smartwatchservice.dto.HeartRateRequest;
 import tn.esprit.smartwatchservice.entity.HeartRateRecord;
-import tn.esprit.smartwatchservice.service.HeartRateService;
+import tn.esprit.smartwatchservice.service.HeartRateQueryService;
 
 import java.util.List;
 
+/**
+ * REST controller for querying heart-rate data from MongoDB.
+ * All endpoints are read-only (plus delete).
+ *
+ * The old POST endpoint has been removed — ingestion now goes
+ * through {@link HeartRateIngestionController}.
+ */
 @RestController
 @RequestMapping("/api/heart-rate")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class HeartRateController {
 
-    private final HeartRateService heartRateService;
-
-    /**
-     * POST /api/heart-rate
-     * Save a new heart-rate measurement from a smartwatch.
-     * The recordedAt timestamp is generated automatically by the server.
-     */
-    @PostMapping
-    public ResponseEntity<HeartRateRecord> create(@RequestBody HeartRateRequest request) {
-        HeartRateRecord saved = heartRateService.save(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
+    private final HeartRateQueryService queryService;
 
     /**
      * GET /api/heart-rate/latest/{userId}
@@ -36,7 +30,7 @@ public class HeartRateController {
      */
     @GetMapping("/latest/{userId}")
     public ResponseEntity<HeartRateRecord> getLatest(@PathVariable Long userId) {
-        return heartRateService.getLatest(userId)
+        return queryService.getLatest(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
@@ -48,7 +42,7 @@ public class HeartRateController {
      */
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<HeartRateRecord>> getHistory(@PathVariable Long userId) {
-        List<HeartRateRecord> records = heartRateService.getHistory(userId);
+        List<HeartRateRecord> records = queryService.getHistory(userId);
         if (records.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -61,7 +55,7 @@ public class HeartRateController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<HeartRateRecord> getById(@PathVariable String id) {
-        return heartRateService.getById(id)
+        return queryService.getById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -72,7 +66,7 @@ public class HeartRateController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
-        heartRateService.delete(id);
+        queryService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

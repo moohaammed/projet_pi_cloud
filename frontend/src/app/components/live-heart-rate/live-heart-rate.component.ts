@@ -10,6 +10,7 @@ import {
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HeartRateService, HeartRateRecord } from '../../services/heart-rate.service';
 import { AuthService } from '../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-live-heart-rate',
@@ -32,9 +33,8 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   private ecgData: number[] = [];
   private readonly ECG_MAX_POINTS = 200;
 
-  private pollInterval: any = null;
-  private lastDataTime: number = 0;
-  private readonly DISCONNECT_THRESHOLD_MS = 6000;
+  private sseSubscription: Subscription | null = null;
+  private reconnectTimeout: any = null;
   private isBrowser: boolean;
 
   private userId: number = 1; // TODO: Replace with authenticated user ID
@@ -63,11 +63,10 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     // Initialize ECG data with zeros
     this.ecgData = new Array(this.ECG_MAX_POINTS).fill(0);
 
-    // Start polling every 2 seconds
-    this.pollLatest();
-    this.pollInterval = setInterval(() => this.pollLatest(), 2000);
+    // Connect to the live SSE stream
+    this.connectToLiveStream();
 
-    // Load history
+    // Load history from MongoDB (one-time)
     this.loadHistory();
 
     // Start ECG canvas animation
@@ -75,46 +74,70 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.pollInterval) {
-      clearInterval(this.pollInterval);
+    if (this.sseSubscription) {
+      this.sseSubscription.unsubscribe();
+    }
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
     }
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
   }
 
-  private pollLatest(): void {
-    this.heartRateService.getLatest(this.userId).subscribe({
-      next: (record) => {
-        if (record && record.bpm) {
-          this.currentBpm = record.bpm;
-          this.deviceName = record.deviceName || '—';
-          this.lastRecordedAt = record.recordedAt;
-          this.lastDataTime = Date.now();
-          this.status = 'connected';
+  /**
+   * Connect to the SSE live stream from the Heart Beat service.
+   * Passes the current userId so the server only streams events for this user.
+   * Replaces the old 2-second polling mechanism with real-time push.
+   */
+  private connectToLiveStream(): void {
+    console.log(`[LIVE] Connecting to SSE stream for userId=${this.userId}...`);
 
-          // Push to ECG data
-          this.pushEcgData(record.bpm);
+    this.sseSubscription = this.heartRateService.connectLiveStream(this.userId).subscribe({
+      next: (event: any) => {
+        console.log('[LIVE] Received heart-rate event:', event);
 
-          // Update BPM sparkline
-          this.bpmHistory.push(record.bpm);
-          if (this.bpmHistory.length > 30) {
-            this.bpmHistory.shift();
-          }
-        } else {
-          this.checkDisconnected();
+        this.currentBpm = event.bpm;
+        this.deviceName = event.deviceName || '—';
+        this.lastRecordedAt = event.receivedAt || event.capturedAt || '';
+        this.status = 'connected';
+
+        // Push to ECG waveform
+        this.pushEcgData(event.bpm);
+
+        // Update BPM sparkline history
+        this.bpmHistory.push(event.bpm);
+        if (this.bpmHistory.length > 30) {
+          this.bpmHistory.shift();
+        }
+
+        // Prepend to history display (newest first)
+        const record: HeartRateRecord = {
+          eventId: event.eventId,
+          userId: event.userId,
+          deviceName: event.deviceName,
+          bpm: event.bpm,
+          source: event.source,
+          capturedAt: event.capturedAt,
+          receivedAt: event.receivedAt,
+          recordedAt: event.receivedAt || ''
+        };
+        this.history.unshift(record);
+        if (this.history.length > 50) {
+          this.history.pop();
         }
       },
-      error: () => {
-        this.checkDisconnected();
+      error: (err) => {
+        console.warn('[LIVE] SSE stream error:', err);
+        this.status = 'disconnected';
+
+        // Auto-reconnect after 3 seconds
+        this.reconnectTimeout = setTimeout(() => {
+          console.log('[LIVE] Attempting SSE reconnect...');
+          this.connectToLiveStream();
+        }, 3000);
       }
     });
-  }
-
-  private checkDisconnected(): void {
-    if (Date.now() - this.lastDataTime > this.DISCONNECT_THRESHOLD_MS) {
-      this.status = 'disconnected';
-    }
   }
 
   private loadHistory(): void {

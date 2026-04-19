@@ -1,10 +1,15 @@
 import asyncio
 import requests
+from datetime import datetime, timezone
 from bleak import BleakScanner, BleakClient
 
 WATCH_NAME_KEYWORD = "ST2"
 CHAR_UUID = "000033f2-0000-1000-8000-00805f9b34fb"
-BACKEND_URL = "http://localhost:8080/api/heart-rate"
+
+# ═══════════════════════════════════════════════════════════
+# Updated for Kafka-backed async ingestion endpoint
+# ═══════════════════════════════════════════════════════════
+BACKEND_URL = "http://localhost:8080/api/heart-rate/ingest"
 USER_ID = 1
 
 last_sent_bpm = None
@@ -42,14 +47,19 @@ def notification_handler(sender, data: bytearray):
     payload = {
         "userId": USER_ID,
         "deviceName": "ST2",
-        "bpm": bpm
+        "bpm": bpm,
+        "source": "BLE_CLIENT",
+        "capturedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     }
 
     try:
         response = requests.post(BACKEND_URL, json=payload, timeout=3)
         print(f"[POST] {response.status_code} -> {payload}")
-        if response.status_code not in (200, 201):
+        if response.status_code not in (200, 201, 202):
             print(f"[POST RESPONSE] {response.text}")
+        elif response.status_code == 202:
+            body = response.json()
+            print(f"[ACCEPTED] eventId={body.get('eventId', 'N/A')}")
     except Exception as e:
         print(f"[ERROR] Failed to send to backend: {e}")
 
