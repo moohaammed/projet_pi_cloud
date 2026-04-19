@@ -8,6 +8,7 @@ import { NotificationService } from './services/collaboration/notification.servi
 import { VideoCallService } from './services/videocall.service';
 import { VideoCallComponent } from './components/videocall/videocall.component';
 import { Subscription } from 'rxjs';
+import { AlzheimerAccessibilityService } from './services/alz-accessibility.service';
 
 import { AccessibilityService } from './services/accessibility.service';
 import { AccessibilityToggleComponent } from './components/accessibility-toggle/accessibility-toggle.component';
@@ -29,6 +30,7 @@ export class AppComponent implements OnDestroy {
   videoCallService = inject(VideoCallService);
   platformId = inject(PLATFORM_ID);
   accService = inject(AccessibilityService);
+  alzAccessibility = inject(AlzheimerAccessibilityService);
 
   // Video Call State
   showVideoCall = inject(VideoCallService).showCallOverlay;
@@ -61,7 +63,7 @@ export class AppComponent implements OnDestroy {
         });
       }
     });
-    
+
     // Initial check if already logged in (e.g. page refresh)
     if (this.auth.isLoggedIn()) {
       const user = this.auth.getCurrentUser();
@@ -74,12 +76,12 @@ export class AppComponent implements OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       this.videoCallInviteSub = this.videoCallService.signalMessages$.subscribe((msg) => {
         console.log('AppComponent: Signal REÇU', msg.type, 'de', msg.senderId, 'pour', msg.recipientId);
-        
+
         if (msg.type !== 'messenger-invite' && msg.type !== 'rendezvous-invite') {
           console.log('AppComponent: Signal ignoré (type incorrect)');
           return;
         }
-        
+
         const user = this.auth.getCurrentUser();
         if (!user) {
           console.warn('AppComponent: Pas d\'utilisateur connecté, signal ignoré');
@@ -133,10 +135,10 @@ export class AppComponent implements OnDestroy {
     const inv = this.incomingVideoCall();
     if (!inv) return;
     this.incomingVideoCall.set(null);
-    
+
     // Logic to redirect if needed
     this.applyRoomFromVideoInvite(inv.roomId);
-    
+
     this.videoCallService.openCall(inv.roomId);
   }
 
@@ -184,8 +186,8 @@ export class AppComponent implements OnDestroy {
   }
 
   showAdminShell(): boolean {
-    return this.auth.isLoggedIn() && 
-           this.auth.getRole() === 'ADMIN' && 
+    return this.auth.isLoggedIn() &&
+           this.auth.getRole() === 'ADMIN' &&
            !this.isAuthPage();
   }
 

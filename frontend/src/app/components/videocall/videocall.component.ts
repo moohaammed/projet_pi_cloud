@@ -7,6 +7,7 @@ import { VideoCallService, SignalMessage } from '../../services/videocall.servic
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 import { AiAgentPanelComponent } from '../ai-agent-panel/ai-agent-panel.component';
+import { HandTrackingService, HandGestureEvent } from '../../services/collaboration/hand-tracking.service';
 
 @Component({
   selector: 'app-videocall',
@@ -21,6 +22,7 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('drawingCanvas') drawingCanvas!: ElementRef<HTMLCanvasElement>;
 
   private localStream?: MediaStream;
   private peerConnection?: RTCPeerConnection;
@@ -33,6 +35,16 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   public isVideoOff = false;
   public connectionStatus = 'Initialisation...';
   public participants: Map<string, string> = new Map();
+
+  // ── Hand Tracking & Drawing ────────────────────────────────────────────────
+  public isHandsEnabled = false;
+  public zoomFactor = 1.0;
+  public mouseX = 0;
+  public mouseY = 0;
+  public isMouseDown = false;
+  private ctx?: CanvasRenderingContext2D;
+  private lastX: number | null = null;
+  private lastY: number | null = null;
 
   // ── AI Agent Panel ──────────────────────────────────────────────────────────
   public showAgentPanel = false;
@@ -64,7 +76,8 @@ export class VideoCallComponent implements OnInit, OnDestroy {
 
   constructor(
     private videoCallService: VideoCallService,
-    private authService: AuthService
+    private authService: AuthService,
+    private handTracking: HandTrackingService
   ) {
     this.currentUser = this.authService.getCurrentUser();
   }
@@ -85,6 +98,8 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     this.signalSubscription = this.videoCallService.signalMessages$.subscribe(msg => {
       this.handleSignalMessage(msg);
     });
+
+    setTimeout(() => this.initCanvas(), 1000);
   }
 
   ngOnDestroy() {
@@ -95,6 +110,140 @@ export class VideoCallComponent implements OnInit, OnDestroy {
     this.signalSubscription?.unsubscribe();
     if (this.roomId) {
       this.videoCallService.unsubscribeFromRoom(this.roomId);
+    }
+    this.handTracking.stop();
+  }
+
+  // ── Shared Drawing Logic ───────────────────────────────────────────────────
+
+  private initCanvas() {
+    if (!this.drawingCanvas) return;
+    const canvas = this.drawingCanvas.nativeElement;
+    
+    // Ensure canvas matches its display size in pixels
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    
+    this.ctx = canvas.getContext('2d')!;
+    this.ctx.strokeStyle = '#00FF41'; // Matrix neon green for better visibility
+    this.ctx.lineWidth = 6;
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
+    
+    console.log('VC: Canvas de dessin initialisé', canvas.width, 'x', canvas.height);
+  }
+
+  public toggleHands() {
+    this.isHandsEnabled = !this.isHandsEnabled;
+    if (!this.isHandsEnabled) {
+      this.handTracking.stop();
+    }
+    // Mouse mode is active when isHandsEnabled is true, no need for camera init.
+  }
+
+  private async startHandTracking() {
+    if (!this.localVideo) return;
+    await this.handTracking.initialize(this.localVideo.nativeElement, (results) => {
+      const gesture = this.handTracking.detectGesture(results);
+      this.handleLocalGesture(gesture);
+    });
+  }
+
+  public onMouseDown(event: MouseEvent) {
+    this.isMouseDown = true;
+    this.handleMouseMove(event);
+  }
+
+  public onMouseMove(event: MouseEvent) {
+    const canvas = this.drawingCanvas.nativeElement;
+    const rect = canvas.getBoundingClientRect();
+    this.mouseX = event.clientX - rect.left;
+    this.mouseY = event.clientY - rect.top;
+
+    if (this.isMouseDown) {
+      const normalizedX = this.mouseX / canvas.width;
+      const normalizedY = this.mouseY / canvas.height;
+      this.drawOnCanvas(normalizedX, normalizedY, true);
+    }
+  }
+
+  public onMouseUp() {
+    this.isMouseDown = false;
+    this.lastX = null;
+    this.lastY = null;
+  }
+
+  private handleMouseMove(event: MouseEvent) {
+    this.onMouseMove(event);
+  }
+
+  private handleLocalGesture(event: any) {
+    // Keep for potential legacy use or removed
+  }
+
+  private drawOnCanvas(normalizedX: number, normalizedY: number, isLocal: boolean, isEraser: boolean = false, weight: number = 4) {
+    if (!this.ctx || !this.drawingCanvas) return;
+    
+    const canvas = this.drawingCanvas.nativeElement;
+    const x = normalizedX * canvas.width;
+    const y = normalizedY * canvas.height;
+
+    this.ctx.lineWidth = isEraser ? 30 : (weight * 3);
+    this.ctx.globalCompositeOperation = isEraser ? 'destination-out' : 'source-over';
+    this.ctx.strokeStyle = isEraser ? 'rgba(0,0,0,1)' : '#00FF41';
+
+    if (this.lastX !== null && this.lastY !== null) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.lastX, this.lastY);
+      this.ctx.lineTo(x, y);
+      this.ctx.stroke();
+    }
+    
+    this.lastX = x;
+    this.lastY = y;
+
+    if (isLocal) {
+      this.videoCallService.sendSignal(this.roomId, {
+        type: 'draw-event',
+        senderId: this.currentUser.id.toString(),
+        data: { 
+          draw: { x: normalizedX, y: normalizedY },
+          erase: isEraser,
+          weight: weight
+        }
+      });
+    }
+  }
+
+  public clearCanvas(isLocal: boolean) {
+    if (!this.ctx || !this.drawingCanvas) return;
+    const canvas = this.drawingCanvas.nativeElement;
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.lastX = null;
+    this.lastY = null;
+
+    if (isLocal) {
+      this.videoCallService.sendSignal(this.roomId, {
+        type: 'draw-event',
+        senderId: this.currentUser.id.toString(),
+        data: { clear: true }
+      });
+    }
+  }
+
+  private applyZoom(isBigger: boolean, isLocal: boolean) {
+    if (isBigger) this.zoomFactor += 0.05;
+    else this.zoomFactor -= 0.05;
+    
+    this.zoomFactor = Math.max(0.2, Math.min(5, this.zoomFactor));
+
+    if (isLocal) {
+      this.videoCallService.sendSignal(this.roomId, {
+        type: 'draw-event',
+        senderId: this.currentUser.id.toString(),
+        data: { zoom: this.zoomFactor }
+      });
     }
   }
 
@@ -261,6 +410,15 @@ export class VideoCallComponent implements OnInit, OnDestroy {
       } else if (msg.type === 'ice-candidate') {
         if (this.peerConnection && dataPayload && dataPayload.candidate) {
           await this.peerConnection.addIceCandidate(new RTCIceCandidate(dataPayload));
+        }
+      } else if (msg.type === 'draw-event') {
+        const drawData = dataPayload;
+        if (drawData.draw) {
+          this.drawOnCanvas(drawData.draw.x, drawData.draw.y, false, drawData.erase, drawData.weight);
+        } else if (drawData.clear) {
+          this.clearCanvas(false);
+        } else if (drawData.zoom) {
+          this.zoomFactor = drawData.zoom;
         }
       }
     } catch (e) {

@@ -1,5 +1,5 @@
 export interface DonationCampaign {
-  id?: number;
+  id?: string;
   title?: string;
   description?: string;
   goalAmount?: number;
@@ -10,7 +10,7 @@ export interface DonationCampaign {
 }
 
 export interface Donation {
-  id?: number;
+  id?: string;
   amount?: number;
   donorFirstName?: string;
   donorLastName?: string;
@@ -19,7 +19,7 @@ export interface Donation {
   paymentMethod?: string;
   anonymous?: boolean;
   message?: string;
-  campaignId?: number;
+  campaignId?: string;
   userId?: number;
   stripeSessionId?: string;
   status?: string;

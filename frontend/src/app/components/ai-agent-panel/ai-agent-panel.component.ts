@@ -97,20 +97,47 @@ export class AiAgentPanelComponent implements OnInit, OnDestroy {
     };
 
     this.recognition.onerror = (e: any) => {
+      console.error('Speech Recognition Error:', e.error);
       if (e.error === 'no-speech') return;
-      this.zone.run(() => { this.errorMessage = `Micro : ${e.error}`; this.cdr.detectChanges(); });
+      
+      this.zone.run(() => { 
+        if (e.error === 'network') {
+          this.errorMessage = 'Erreur réseau microphone logicielle. Vérifiez votre connexion ou actualisez la page.';
+        } else {
+          this.errorMessage = `Micro : ${e.error}`;
+        }
+        this.cdr.detectChanges(); 
+      });
+      
+      // If network error, stop listening to avoid infinite loops, but allow user to retry
+      if (e.error === 'network') {
+        this.stopListening();
+      }
     };
 
     this.recognition.onend = () => {
-      if (this.isListening) try { this.recognition.start(); } catch { }
+      // Auto-restart ONLY if no fatal error like 'network' happened
+      if (this.isListening && !this.errorMessage) {
+        try { this.recognition.start(); } catch { }
+      }
     };
   }
 
   public startListening(): void {
-    if (!this.recognition) return;
-    this.isListening = true;
+    const hadNetworkError = this.errorMessage.includes('réseau');
     this.errorMessage = '';
-    try { this.recognition.start(); } catch { }
+    
+    // If recognition is not initialized or we had a network error previously, recreate it
+    if (!this.recognition || hadNetworkError) {
+      this.initSpeechRecognition();
+    }
+    
+    this.isListening = true;
+    try { 
+      this.recognition.start(); 
+    } catch (e) {
+      // already started
+    }
   }
 
   public stopListening(): void {

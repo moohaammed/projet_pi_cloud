@@ -1,1 +1,150 @@
-<p>hospital-form works!</p>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a routerLink="/hospitals" class="text-decoration-none">Hôpitaux</a>
+          </li>
+          <li class="breadcrumb-item active">
+            {{ isEdit ? 'Modifier' : 'Ajouter' }}
+          </li>
+        </ol>
+      </nav>
+
+      <div class="card border-0 shadow-sm rounded-4">
+
+        <!-- Header -->
+        <div class="card-header bg-primary text-white rounded-top-4 p-4">
+          <h5 class="mb-0 fw-bold">
+            <i class="fa-solid fa-hospital me-2"></i>
+            {{ isEdit ? 'Modifier l\'hôpital' : 'Ajouter un hôpital' }}
+          </h5>
+          <small class="opacity-75">
+            Remplissez les informations de l'établissement
+          </small>
+        </div>
+
+        <div class="card-body p-4">
+
+          <div *ngIf="error" class="alert alert-danger">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>{{ error }}
+          </div>
+
+          <!-- Informations générales -->
+          <h6 class="fw-bold text-muted mb-3 text-uppercase small">
+            <i class="fa-solid fa-info-circle me-1"></i>Informations générales
+          </h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">
+                Nom de l'hôpital <span class="text-danger">*</span>
+              </label>
+              <input [(ngModel)]="hospital.nom" name="nom"
+                     class="form-control" placeholder="Ex: Hôpital Charles Nicolle">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">
+                Ville <span class="text-danger">*</span>
+              </label>
+              <input [(ngModel)]="hospital.ville" name="ville"
+                     class="form-control" placeholder="Ex: Tunis">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-medium">Adresse complète</label>
+              <input [(ngModel)]="hospital.adresse" name="adresse"
+                     class="form-control" placeholder="Rue, quartier...">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-medium">Description</label>
+              <textarea [(ngModel)]="hospital.description" name="description"
+                        class="form-control" rows="3"
+                        placeholder="Présentation de l'établissement..."></textarea>
+            </div>
+          </div>
+
+          <!-- Contact -->
+          <h6 class="fw-bold text-muted mb-3 text-uppercase small">
+            <i class="fa-solid fa-address-book me-1"></i>Contact
+          </h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Téléphone</label>
+              <input [(ngModel)]="hospital.telephone" name="telephone"
+                     class="form-control" placeholder="+216 XX XXX XXX">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Email</label>
+              <input [(ngModel)]="hospital.email" name="email"
+                     type="email" class="form-control"
+                     placeholder="contact@hopital.tn">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-medium">Site web</label>
+              <input [(ngModel)]="hospital.siteWeb" name="siteWeb"
+                     class="form-control" placeholder="https://...">
+            </div>
+          </div>
+
+          <!-- Localisation GPS -->
+          <h6 class="fw-bold text-muted mb-3 text-uppercase small">
+            <i class="fa-solid fa-map-location-dot me-1"></i>
+            Localisation GPS
+            <small class="text-muted fw-normal ms-1">(pour affichage sur carte)</small>
+          </h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Latitude</label>
+              <input [(ngModel)]="hospital.latitude" name="latitude"
+                     type="number" class="form-control"
+                     placeholder="Ex: 36.8065" step="0.0001">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Longitude</label>
+              <input [(ngModel)]="hospital.longitude" name="longitude"
+                     type="number" class="form-control"
+                     placeholder="Ex: 10.1815" step="0.0001">
+            </div>
+          </div>
+
+          <!-- Note et avis -->
+          <h6 class="fw-bold text-muted mb-3 text-uppercase small">
+            <i class="fa-solid fa-star me-1"></i>Évaluation
+          </h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Note (0-5)</label>
+              <input [(ngModel)]="hospital.rating" name="rating"
+                     type="number" class="form-control"
+                     min="0" max="5" step="0.1">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Nombre d'avis</label>
+              <input [(ngModel)]="hospital.nombreAvis" name="nombreAvis"
+                     type="number" class="form-control" min="0">
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2 pt-2 border-top">
+            <button class="btn btn-primary flex-grow-1"
+                    (click)="save()" [disabled]="loading">
+              <span *ngIf="loading"
+                    class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!loading" class="fa-solid fa-floppy-disk me-2"></i>
+              {{ isEdit ? 'Enregistrer les modifications' : 'Créer l\'hôpital' }}
+            </button>
+            <button class="btn btn-outline-secondary"
+                    (click)="cancel()" [disabled]="loading">
+              <i class="fa-solid fa-xmark me-1"></i>Annuler
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

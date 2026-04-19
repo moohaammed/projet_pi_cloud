@@ -45,7 +45,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
   currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1);
   medReminderLoading = signal(false);
   /** Hide Yes/No after the user answered (session only; reload may show again). */
-  medicationReminderAnsweredIds = signal<Set<number>>(new Set());
+  medicationReminderAnsweredIds = signal<Set<string>>(new Set());
   medReminderAckLoading = signal<boolean>(false);
 
   // AI Handover State
@@ -56,7 +56,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
     if (url) window.open(url, '_blank');
   }
 
-  navigateToPost(pubId: number) {
+  navigateToPost(pubId: string) {
     this.router.navigate(['/collaboration/feed'], { fragment: 'pub-' + pubId });
   }
 
@@ -328,7 +328,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
         if (params['dm']) {
           this.openDmChat(Number(params['dm']));
         } else if (params['group']) {
-          const gid = Number(params['group']);
+          const gid = params['group'] as string;
           const grp = this.chatGroupService.groups().find(g => g.id === gid);
           if (grp) {
             this.enterGroup(grp);
@@ -406,23 +406,13 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   fetchHandoverSummary() {
-    const grp = this.activeGroup();
-    if (!grp?.id) return;
-
-    this.isGeneratingSummary.set(true);
-    this.currentSummary.set(null);
-
-    this.messageService.getAiHandoverSummary(grp.id).subscribe({
-      next: (res) => {
-        this.currentSummary.set(res.summary);
-        this.isGeneratingSummary.set(false);
-      },
-      error: (err) => {
-        console.error('Error fetching AI summary:', err);
-        this.currentSummary.set('Failed to generate AI summary. Please try again.');
-        this.isGeneratingSummary.set(false);
-      }
-    });
+    this.showInfoSidebar.set(true);
+    if (!this.showHandoverPanel()) {
+      this.toggleHandoverPanel();
+    } else {
+      const grp = this.activeGroup();
+      if (grp) this.careRelayService.loadHandover(grp.id!);
+    }
   }
 
   openBotChat() {
@@ -500,7 +490,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
     this.videoCallService.closeCallOverlay();
   }
 
-  sendGroupMessage(groupId: number) {
+  sendGroupMessage(groupId: string) {
     if (this.isPollMode()) {
       this.submitPoll(groupId);
       return;
@@ -520,12 +510,12 @@ export class MessengerComponent implements OnInit, OnDestroy {
     });
   }
 
-  submitPoll(groupId: number) {
+  submitPoll(groupId: string) {
     const validOptions = this.pollOptions().filter(o => !!o.trim());
     if (!this.pollQuestion.trim() || validOptions.length < 2) return;
 
     this.messageService.createMessage({
-      content: '[Poll]', // Placeholder content for search/preview
+      content: '[Poll]',
       chatGroupId: groupId,
       senderId: this.currentUserId(),
       type: 'POLL',
@@ -539,10 +529,8 @@ export class MessengerComponent implements OnInit, OnDestroy {
     });
   }
 
-  vote(messageId: number, optionId: number) {
-    this.messageService.voteOnPoll(messageId, this.currentUserId(), optionId).subscribe(updatedMsg => {
-       // Real-time update handled by WebSocket, but we can optimistically update if needed
-    });
+  vote(messageId: string, optionId: string) {
+    this.messageService.voteOnPoll(messageId, this.currentUserId(), optionId).subscribe();
   }
 
   togglePin(msg: MessageDto) {
@@ -571,16 +559,32 @@ export class MessengerComponent implements OnInit, OnDestroy {
     }
   }
 
+  updatePollOption(index: number, value: string) {
+    this.pollOptions.update(opts => {
+      const copy = [...opts];
+      copy[index] = value;
+      return copy;
+    });
+  }
+
+  getTotalVotes(msg: MessageDto): number {
+    if (!msg.pollOptions) return 0;
+    return msg.pollOptions.reduce((s, o) => s + (o.votes || 0), 0);
+  }
+
   trackByIndex(index: number, obj: any): any {
     return index;
   }
 
   sendDmMessage() {
-    if (!this.dmContent.trim() || !this.activeDmUserId()) return;
+    const trimmed = this.dmContent.trim();
+    if (!trimmed || !this.activeDmUserId()) return;
+    
     this.messageService.createMessage({
-      content: this.dmContent,
+      content: trimmed,
       senderId: this.currentUserId(),
-      receiverId: this.activeDmUserId()!
+      receiverId: this.activeDmUserId()!,
+      type: 'TEXT'
     }).subscribe(() => {
       this.dmContent = '';
       this.refreshData();
@@ -594,7 +598,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
     
     // 1. Create a local temporary message for UI
     const tempMsg: MessageDto = {
-      id: Date.now(),
+      id: Date.now().toString(),
       content: content,
       senderId: this.currentUserId(),
       senderName: 'You',
@@ -629,12 +633,12 @@ export class MessengerComponent implements OnInit, OnDestroy {
     });
   }
 
-  medicationReminderAnswered(messageId: number | undefined): boolean {
+  medicationReminderAnswered(messageId: string | undefined): boolean {
     if (messageId == null) return true;
     return this.medicationReminderAnsweredIds().has(messageId);
   }
 
-  answerMedicationReminder(messageId: number, tookMedication: boolean) {
+  answerMedicationReminder(messageId: string, tookMedication: boolean) {
     this.medReminderAckLoading.set(true);
     const content = tookMedication ? 'Yes, I took it.' : 'Not yet.';
     this.messageService
@@ -689,7 +693,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
     this.chatGroupService.activeGroup.set(null);
   }
 
-  leaveGroupAction(groupId: number) {
+  leaveGroupAction(groupId: string) {
     if (confirm('Are you sure you want to leave this group?')) {
       this.chatGroupService.leaveGroup(groupId, this.currentUserId()).subscribe(() => {
         this.closeChat();

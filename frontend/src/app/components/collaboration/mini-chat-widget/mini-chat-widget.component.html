@@ -1,29 +1,27 @@
   <div class="mini-chat-widget">
-    <!-- Chat Toggle Button -->
-    <button class="btn btn-primary rounded-circle shadow-lg chat-fab d-flex align-items-center justify-content-center" 
-            (click)="toggleMiniChat()" 
-            [class.active]="isMiniChatOpen()">
-      <i class="fa-solid fs-20" [class.fa-comment-dots]="!isMiniChatOpen()" [class.fa-xmark]="isMiniChatOpen()"></i>
+    <!-- Chat FAB -->
+    <button class="chat-fab shadow-doc" (click)="toggleMiniChat()" [class.active]="isMiniChatOpen()">
+      <i class="fa-solid fs-24" [class.fa-plus]="!isMiniChatOpen()" [class.fa-xmark]="isMiniChatOpen()"></i>
     </button>
 
     <!-- Mini Chat Panel -->
     <div class="mini-chat-panel card border-0 shadow-lg" *ngIf="isMiniChatOpen()">
       
-      <!-- Contacts View -->
       <ng-container *ngIf="!activeMiniChatUserId() && !activeMiniChatGroupId()">
-        <div class="card-header bg-primary text-white border-0 py-3 rounded-top d-flex justify-content-between align-items-center">
-          <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bolt me-2 text-warning"></i> Quick Chat</h6>
+        <div class="chat-header d-flex justify-content-between align-items-center bg-white shadow-sm">
+          <h6 class="mb-0 fw-black text-doc-heading ls-n1 fs-16"><i class="fa-solid fa-bolt me-2 text-primary"></i> Quick Collaboration</h6>
         </div>
         
-        <!-- Toggle Tabs -->
-        <ul class="nav nav-pills nav-fill bg-white border-bottom p-1" style="font-size: 13px;">
-          <li class="nav-item">
-            <button class="nav-link rounded-0 py-1" [class.active]="activeMiniChatType() === 'users'" (click)="activeMiniChatType.set('users')">Contacts</button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link rounded-0 py-1" [class.active]="activeMiniChatType() === 'groups'" (click)="activeMiniChatType.set('groups')">Groups</button>
-          </li>
-        </ul>
+        <div class="p-1 px-3 bg-white">
+          <ul class="nav nav-pills nav-fill bg-light p-1 rounded-pill" style="font-size: 12px;">
+            <li class="nav-item">
+              <button class="nav-link py-1 rounded-pill fw-bold" [class.active]="activeMiniChatType() === 'users'" (click)="activeMiniChatType.set('users')">Contacts</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link py-1 rounded-pill fw-bold" [class.active]="activeMiniChatType() === 'groups'" (click)="activeMiniChatType.set('groups')">Specialties</button>
+            </li>
+          </ul>
+        </div>
 
         <div class="p-2 border-bottom bg-light">
           <input type="text" class="form-control form-control-sm border-0 shadow-none bg-white rounded-pill px-3" 
@@ -76,26 +74,28 @@
 
       <!-- Active Conversation View -->
       <ng-container *ngIf="activeMiniChatUserId() || activeMiniChatGroupId()">
-        <div class="card-header bg-primary text-white border-0 py-2 rounded-top d-flex align-items-center gap-2">
-          <button class="btn btn-link btn-sm text-white p-0 me-1" (click)="closeMiniChatConversation()">
+        <div class="chat-header d-flex align-items-center gap-2 bg-white shadow-sm py-3">
+          <button class="btn btn-soft-primary btn-sm rounded-circle p-1 me-1 shadow-none" (click)="closeMiniChatConversation()">
             <i class="fa-solid fa-arrow-left"></i>
           </button>
-          <div *ngIf="activeMiniChatUserId() && getUserImage(activeMiniChatUserId()!)" class="avatar-sm rounded-circle overflow-hidden shadow-sm" style="width: 30px; height: 30px;">
-            <img [src]="getUserImage(activeMiniChatUserId()!)" class="w-100 h-100 object-fit-cover" alt="User Image">
+          <div class="position-relative">
+              <div *ngIf="activeMiniChatUserId() && getUserImage(activeMiniChatUserId()!)" class="avatar-sm rounded-circle overflow-hidden shadow-sm border border-2 border-white">
+                <img [src]="getUserImage(activeMiniChatUserId()!)" class="w-100 h-100 object-fit-cover" alt="User Image">
+              </div>
+              <div *ngIf="!activeMiniChatUserId() || !getUserImage(activeMiniChatUserId()!)"
+                class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 30px; height: 30px; font-size: 12px;">
+                {{ miniChatTitle().substring(0, 1) }}
+              </div>
+              <span class="status-indicator online position-absolute bottom-0 end-0" style="width: 8px; height: 8px;"></span>
           </div>
-          <div *ngIf="!activeMiniChatUserId() || !getUserImage(activeMiniChatUserId()!)"
-            class="avatar-sm bg-white rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 30px; height: 30px; font-size: 12px;">
-            {{ miniChatTitle().substring(0, 1) }}
-          </div>
-          <h6 class="mb-0 fw-bold text-truncate flex-grow-1 fs-14">{{ miniChatTitle() }}</h6>
+          <h6 class="mb-0 fw-bold text-doc-heading text-truncate flex-grow-1 fs-14">{{ miniChatTitle() }}</h6>
           
-          <!-- Open in Messenger shortcut -->
-          <button class="btn btn-link btn-sm text-white p-0 ms-1" title="Open in Messenger" (click)="openInMessenger()">
-            <i class="fa-solid fa-up-right-from-square"></i>
+          <button class="btn btn-soft-primary btn-sm rounded-circle p-1 ms-1 shadow-none" title="Immersive Messenger" (click)="openInMessenger()">
+            <i class="fa-solid fa-expand fs-12"></i>
           </button>
         </div>
         
-        <div class="card-body p-2 bg-light d-flex flex-column-reverse overflow-auto comm-scroll-sm" style="height: 320px;">
+        <div class="chat-body card-body p-3 bg-light d-flex flex-column-reverse overflow-auto comm-scroll-sm" style="flex: 1; min-height: 0;">
           <div class="flex-grow-1"></div> <!-- Spacer to push messages to bottom if few -->
           <div *ngFor="let msg of miniChatMessages()" class="mb-3">
              <div class="d-flex flex-column" [class.align-items-end]="msg.senderId === currentUserId()">
@@ -118,17 +118,15 @@
                    </button>
                  </div>
 
-                 <!-- Reply Reference -->
                  <div *ngIf="msg.parentMessageId" class="reply-preview ps-2 mb-1 bg-white border-start border-primary border-3 rounded-1" style="opacity: 0.8; font-size: 11px;">
                    <i class="fa-solid fa-reply me-1 text-muted"></i>
                    <span class="text-truncate d-inline-block" style="max-width: 150px;">Replying to...</span>
                  </div>
 
                  <!-- Content Rendering -->
-                 <div class="p-2 rounded-3 text-break d-inline-block shadow-sm"
-                      [class.bg-primary]="msg.senderId === currentUserId()"
-                      [class.text-white]="msg.senderId === currentUserId()"
-                      [class.bg-white]="msg.senderId !== currentUserId()"
+                 <div class="bubble p-2 px-3 shadow-sm"
+                      [class.sent]="msg.senderId === currentUserId()"
+                      [class.received]="msg.senderId !== currentUserId()"
                       [class.message-pinned]="msg.pinned">
                    
                    <!-- Poll Type -->
@@ -156,7 +154,28 @@
                    </div>
 
                    <!-- Text Content (with mentions) -->
-                   <div *ngIf="msg.content && msg.type !== 'POLL'" [innerHTML]="formatMessage(msg.content)"></div>
+                   <div *ngIf="msg.content && msg.type !== 'POLL'">
+                     <p class="mb-0" [innerHTML]="formatMessage(msg.content)"></p>
+          
+                     <!-- Medication Reminder Actions (Restored) -->
+                     <div *ngIf="msg.type === 'MEDICATION_REMINDER' && !medicationReminderAnswered(msg.id)" 
+                          class="mt-2 pt-2 border-top border-white border-opacity-20 d-flex gap-2">
+                       <button class="btn btn-xs rounded-pill bg-white text-success fw-black shadow-sm border-0 px-2 py-0 fs-9 transition-all"
+                               (click)="answerMedicationReminder(msg.id!, true)"
+                               [disabled]="medReminderAckLoading()">
+                         YES
+                       </button>
+                       <button class="btn btn-xs rounded-pill bg-white text-danger fw-black shadow-sm border-0 px-2 py-0 fs-9 transition-all"
+                               (click)="answerMedicationReminder(msg.id!, false)"
+                               [disabled]="medReminderAckLoading()">
+                         NO
+                       </button>
+                     </div>
+                     <div *ngIf="msg.type === 'MEDICATION_REMINDER' && medicationReminderAnswered(msg.id)"
+                          class="mt-1 text-white opacity-75 fs-9 fw-bold italic text-end">
+                       <i class="fa-solid fa-check-circle me-1"></i> Sent
+                     </div>
+                   </div>
                  </div>
 
                  <!-- Footer icons (sentiment, pin) -->
@@ -188,68 +207,61 @@
           </div>
         </div>
 
-        <div class="card-footer bg-white border-top p-2 position-relative">
+        <div class="chat-input-wrapper animate-fade-in shadow-inner">
           
           <!-- Reply Indicator -->
-          <div *ngIf="replyingTo" class="reply-preview d-flex align-items-center justify-content-between mb-2">
-            <span class="text-truncate text-muted"><i class="fa-solid fa-reply fs-10 me-1"></i> Replying to current message...</span>
+          <div *ngIf="replyingTo" class="reply-preview d-flex align-items-center justify-content-between mb-2 shadow-sm animate-fade-in">
+            <span class="text-truncate text-muted"><i class="fa-solid fa-reply fs-10 me-1"></i> Context: {{ lastMessageContent }}</span>
             <button class="btn btn-link btn-sm p-0 text-danger" (click)="cancelReply()"><i class="fa-solid fa-xmark"></i></button>
           </div>
 
           <!-- Poll Creator Compact -->
-          <div *ngIf="isPollMode()" class="poll-creator-compact mb-2">
+          <div *ngIf="isPollMode()" class="poll-creator-compact mb-2 shadow-sm animate-fade-in">
              <div class="d-flex justify-content-between align-items-center mb-2">
-               <span class="fw-bold fs-12">New Poll</span>
+               <span class="fw-bold fs-12 text-primary">Dynamic Poll</span>
                <button class="btn btn-link btn-sm p-0 text-danger" (click)="togglePollMode()"><i class="fa-solid fa-xmark"></i></button>
              </div>
-             <input type="text" class="form-control form-control-sm mb-1" placeholder="Question..." [(ngModel)]="pollQuestion">
+             <input type="text" class="form-control form-control-sm mb-1 rounded-pill bg-white" placeholder="Question..." [(ngModel)]="pollQuestion">
              <div *ngFor="let opt of pollOptions(); let i = index; trackBy: trackByIndex" class="input-group input-group-sm mb-1">
-               <input type="text" class="form-control" [placeholder]="'Option ' + (i+1)" [(ngModel)]="pollOptions()[i]">
-               <button *ngIf="pollOptions().length > 2" class="btn btn-outline-danger" (click)="removePollOption(i)"><i class="fa-solid fa-minus"></i></button>
+               <input type="text" class="form-control rounded-pill-start bg-white" [placeholder]="'Option ' + (i+1)" [(ngModel)]="pollOptions()[i]">
+               <button *ngIf="pollOptions().length > 2" class="btn btn-outline-danger rounded-pill-end shadow-none" (click)="removePollOption(i)"><i class="fa-solid fa-minus"></i></button>
              </div>
-             <button class="btn btn-outline-primary btn-sm w-100 mt-1" (click)="addPollOption()" *ngIf="pollOptions().length < 6">
-               <i class="fa-solid fa-plus fs-10 me-1"></i> Add Option
+             <button class="btn btn-soft-primary btn-sm w-100 mt-1 rounded-pill fw-bold" (click)="addPollOption()" *ngIf="pollOptions().length < 6">
+                Add Alternative
              </button>
           </div>
 
           <!-- Attachment Preview -->
-          <div *ngIf="selectedMessageFile" class="attachment-preview d-flex align-items-center bg-light rounded p-1 mb-2">
-            <i class="fa-solid fa-file-image text-primary me-2 ms-1"></i>
-            <span class="text-truncate fs-11 flex-grow-1">{{ selectedMessageFile.name }}</span>
-            <button class="btn btn-link btn-sm text-danger p-0 px-1" (click)="selectedMessageFile = null"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-
-          <!-- Emoji Picker Panel -->
-          <div class="emoji-picker-container shadow-lg" *ngIf="showEmojiPicker()">
-            <div class="emoji-grid comm-scroll-sm">
-              <span *ngFor="let e of EMOJI_LIST" class="emoji-item" (click)="addEmoji(e)">{{ e }}</span>
-            </div>
+          <div *ngIf="selectedMessageFile" class="attachment-preview d-flex align-items-center bg-soft-primary rounded-pill p-1 px-3 mb-2 animate-fade-in">
+            <i class="fa-solid fa-file-image text-primary me-2"></i>
+            <span class="text-truncate fs-11 flex-grow-1 fw-bold">{{ selectedMessageFile.name }}</span>
+            <button class="btn btn-link btn-sm text-danger p-0 ms-2" (click)="selectedMessageFile = null"><i class="fa-solid fa-xmark"></i></button>
           </div>
 
           <!-- Main Input Controls -->
-          <div class="d-flex align-items-center gap-1">
-            <div class="btn-group">
-               <button class="btn btn-link btn-sm p-1 text-muted" (click)="fileInput.click()" title="Attachment">
-                 <i class="fa-solid fa-paperclip fs-14"></i>
+          <div class="d-flex align-items-center gap-2">
+            <div class="d-flex gap-1">
+               <button class="btn btn-light btn-sm rounded-circle p-1 shadow-sm" (click)="fileInput.click()" title="Attachment">
+                 <i class="fa-solid fa-paperclip fs-13 text-muted"></i>
                </button>
-               <button class="btn btn-link btn-sm p-1 text-muted btn-emoji-toggle" (click)="toggleEmojiPicker()" title="Emoji">
-                 <i class="fa-regular fa-face-smile fs-14"></i>
-               </button>
-               <button *ngIf="activeMiniChatGroupId()" class="btn btn-link btn-sm p-1 text-muted" (click)="togglePollMode()" title="Poll">
-                 <i class="fa-solid fa-square-poll-vertical fs-14"></i>
+               <button *ngIf="activeMiniChatGroupId()" class="btn btn-light btn-sm rounded-circle p-1 shadow-sm" (click)="togglePollMode()" title="Poll">
+                 <i class="fa-solid fa-chart-simple fs-13 text-muted"></i>
                </button>
             </div>
             
             <input #fileInput type="file" hidden (change)="onMessageFileSelected($event)" accept="image/*">
 
-            <div class="input-group input-group-sm flex-grow-1">
-              <input type="text" class="form-control border-0 shadow-none bg-light rounded-pill px-3" 
+            <div class="input-group d-flex align-items-center flex-grow-1">
+              <input type="text" class="form-control border-0 bg-transparent flex-grow-1" 
                      [ngModel]="miniChatInput" 
                      (ngModelChange)="onChatInput($event)"
                      (keyup.enter)="sendMiniChatMessage()"
-                     [placeholder]="isPollMode() ? 'Send poll...' : 'Type a message...'">
-              <button class="btn btn-primary rounded-circle ms-2 shadow-sm d-flex align-items-center justify-content-center p-0" 
-                      style="width: 32px; height: 32px;"
+                     [placeholder]="isPollMode() ? 'Send poll...' : 'Type feedback...'">
+              <button class="btn btn-link btn-sm p-1 text-muted" (click)="toggleEmojiPicker()" title="Emoji">
+                <i class="fa-regular fa-face-smile fs-16"></i>
+              </button>
+              <button class="btn btn-primary rounded-circle ms-2 shadow-sm d-flex align-items-center justify-content-center p-0 transition-all hover-scale" 
+                      style="width: 32px; height: 32px; flex: 0 0 32px;"
                       (click)="sendMiniChatMessage()"
                       [disabled]="!miniChatInput.trim() && !selectedMessageFile && !isPollMode()">
                 <i class="fa-solid fa-paper-plane fs-12"></i>

@@ -4,6 +4,8 @@ import { Client } from '@stomp/stompjs';
 import { MessageDto } from './message.service';
 import { Notification } from './notification.service';
 import { BehaviorSubject } from 'rxjs';
+import SockJS from 'sockjs-client';
+import { environment } from '../../../environments/environment'; 
 
 @Injectable({
   providedIn: 'root'
@@ -27,13 +29,16 @@ export class WebSocketService {
       this.stompClient.deactivate();
     }
 
-    this.stompClient = new Client({
-      brokerURL: `ws://localhost:8080/ws?userId=${userId}`,
-      debug: (str: string) => console.log(str),
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    });
+const socket = new SockJS(`${environment.apiUrl}/ws?userId=${userId}`);
+
+this.stompClient = new Client({
+  webSocketFactory: () => socket,
+  debug: (str: string) => console.log(str),
+  reconnectDelay: 5000,
+  heartbeatIncoming: 4000,
+  heartbeatOutgoing: 4000,
+});
+     
 
     this.stompClient.onConnect = () => {
       console.log('Connected to WS as User', userId);
@@ -49,7 +54,7 @@ export class WebSocketService {
     this.stompClient.activate();
   }
 
-  setUserId(userId: number) {
+  public setUserId(userId: number) {
     console.log('Setting WebSocket user ID:', userId);
     this.connect(userId);
   }
@@ -71,7 +76,7 @@ export class WebSocketService {
     }
   }
 
-  subscribeToGroup(gid: number) {
+  subscribeToGroup(gid: string) {
     if (this.connected$.value && this.stompClient) {
       this.stompClient.subscribe('/topic/group/' + gid, (msg: any) => {
         this.realtimeMessage.set(JSON.parse(msg.body));

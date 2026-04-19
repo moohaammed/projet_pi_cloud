@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, effect, untracked, PLATFORM_ID, computed, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { PublicationService, PublicationDto, SharedEventPreviewDto } from '../../../services/collaboration/publication.service';
 import { AlzUserService } from '../../../services/alz-user.service';
 import { CommentService } from '../../../services/collaboration/comment.service';
@@ -32,9 +32,10 @@ export class FeedComponent implements OnInit {
   messageService = inject(MessageService);
   chatGroupService = inject(ChatGroupService);
   route = inject(ActivatedRoute);
+  router = inject(Router);
   platformId = inject(PLATFORM_ID);
 
-  groupId = signal<number | null>(null);
+  groupId = signal<string | null>(null);
   currentGroup = signal<ChatGroupDto | null>(null);
 
   currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1); 
@@ -105,14 +106,14 @@ export class FeedComponent implements OnInit {
   newPollQuestion = '';
   newPollOptions: { text: string }[] = [{ text: '' }, { text: '' }];
   selectedFile: File | null = null;
-  newCommentContent: { [key: number]: string } = {};
+  newCommentContent: { [key: string]: string } = {};
 
-  editingItemId: number | null = null;
+  editingItemId: string | null = null;
   editingItemType: 'PUBLICATION' | 'COMMENT' | null = null;
   editingContent: string = '';
   editingType: string = 'EXPERIENCE';
   editingAnonymous: boolean = false;
-  openDropdownId: number | null = null;
+  openDropdownId: string | null = null;
 
   // --- SHARING LOGIC ---
   showShareModal = signal<boolean>(false);
@@ -140,7 +141,7 @@ export class FeedComponent implements OnInit {
     this.shareSearchQuery.set('');
   }
 
-  sharePostToGroup(groupId: number) {
+  sharePostToGroup(groupId: string) {
     const pub = this.sharingPost();
     if (!pub || !pub.id) return;
 
@@ -197,7 +198,7 @@ export class FeedComponent implements OnInit {
           if (liveMsg.status === 'Live Started') {
             // we create a transient notification that looks like a snackbar
             const liveBadge = {
-              id: Date.now(),
+              id: Date.now().toString(),
               receiverId: this.currentUserId(),
               content: `${liveMsg.userName} just went LIVE in the circle! 🔴`,
               type: 'LIVE',
@@ -286,7 +287,7 @@ export class FeedComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       if (params['groupId']) {
-        this.groupId.set(Number(params['groupId']));
+        this.groupId.set(params['groupId'] as string);
       } else {
         this.groupId.set(null);
       }
@@ -294,6 +295,10 @@ export class FeedComponent implements OnInit {
         this.refreshData();
       }
     });
+  }
+
+  openDmChat(userId: number) {
+    this.router.navigate(['/collaboration/messenger'], { queryParams: { dm: userId } });
   }
 
   refreshData() {
@@ -328,7 +333,7 @@ export class FeedComponent implements OnInit {
 
   // --- EMOJI PICKER LOGIC ---
   showPostEmojiPicker = signal<boolean>(false);
-  showCommentEmojiPicker = signal<{[key: number]: boolean}>({});
+  showCommentEmojiPicker = signal<{[key: string]: boolean}>({});
   
   readonly EMOJI_LIST = [
     '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😻','😼','😽','🙀','😿','😾',
@@ -337,7 +342,7 @@ export class FeedComponent implements OnInit {
     '🔥','✨','⭐','🌟','☁️','☀️','🌈','☘️','🍀','🌸','🌹','🌻','🌱','🌿','🍃','🍂','🍁','🍄','🌾','🌵','🌴','🌳','🌲'
   ];
 
-  toggleEmojiPicker(type: 'POST' | 'COMMENT', id?: number) {
+  toggleEmojiPicker(type: 'POST' | 'COMMENT', id?: string) {
     if (type === 'POST') {
       this.showPostEmojiPicker.set(!this.showPostEmojiPicker());
     } else if (type === 'COMMENT' && id !== undefined) {
@@ -346,7 +351,7 @@ export class FeedComponent implements OnInit {
     }
   }
 
-  addEmoji(emoji: string, type: 'POST' | 'COMMENT', id?: number) {
+  addEmoji(emoji: string, type: 'POST' | 'COMMENT', id?: string) {
     if (type === 'POST') {
       this.newPubContent += emoji;
     } else if (type === 'COMMENT' && id !== undefined) {
@@ -439,11 +444,24 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  vote(pubId: number, optionIndex: number) {
+  vote(pubId: string, optionIndex: number) {
     this.publicationService.voteInPoll(pubId, optionIndex, this.currentUserId()).subscribe({
       next: () => this.refreshData(),
       error: (err) => alert('Error voting: ' + (err.error?.message || err.message))
     });
+  }
+
+  toggleSupport(pubId: string) {
+    this.publicationService.toggleSupport(pubId, this.currentUserId()).subscribe({
+      next: () => this.refreshData(),
+      error: (err) => alert('Error: ' + (err.error?.message || err.message))
+    });
+  }
+
+  isSupportedByMe(pub: PublicationDto): boolean {
+    if (!pub.supportIds) return false;
+    const ids = pub.supportIds.split(',');
+    return ids.includes(this.currentUserId().toString());
   }
 
   getVotePercentage(pub: PublicationDto, option: any): number {
@@ -463,7 +481,8 @@ export class FeedComponent implements OnInit {
     img.src = 'assets/images/event-placeholder.jpg';
   }
 
-  formatSharedEventDate(raw: string): string {
+  formatSharedEventDate(raw: string | undefined): string {
+    if (!raw) return 'Not specified';
     try {
       return new Date(raw).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
     } catch {
@@ -471,7 +490,7 @@ export class FeedComponent implements OnInit {
     }
   }
 
-  submitComment(pubId: number) {
+  submitComment(pubId: string) {
     const content = this.newCommentContent[pubId];
     if (!content?.trim()) return;
     this.commentService.createComment({
@@ -487,7 +506,7 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  deleteItem(id: number, type: 'PUBLICATION' | 'COMMENT') {
+  deleteItem(id: string, type: 'PUBLICATION' | 'COMMENT') {
     this.openDropdownId = null;
     if (type === 'PUBLICATION') {
       this.publicationService.deletePublication(id).subscribe({
@@ -502,7 +521,7 @@ export class FeedComponent implements OnInit {
     }
   }
 
-  startEdit(id: number, type: 'PUBLICATION' | 'COMMENT', content: string, pub?: PublicationDto) {
+  startEdit(id: string, type: 'PUBLICATION' | 'COMMENT', content: string, pub?: PublicationDto) {
     this.openDropdownId = null;
     this.editingItemId = id;
     this.editingItemType = type;
@@ -535,7 +554,7 @@ export class FeedComponent implements OnInit {
       this.commentService.updateComment(this.editingItemId, {
         content: this.editingContent,
         authorId: this.currentUserId(),
-        publicationId: 0 
+        publicationId: '' // not needed for update
       }).subscribe({
         next: () => {
           this.cancelEdit();
@@ -556,7 +575,7 @@ export class FeedComponent implements OnInit {
     this.selectedFile = null;
   }
 
-  toggleDropdown(id: number) {
+  toggleDropdown(id: string) {
     this.openDropdownId = this.openDropdownId === id ? null : id;
   }
 

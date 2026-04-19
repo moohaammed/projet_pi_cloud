@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/education/event.service';
+import { EventSeatGridComponent } from './event-seat-grid.component';
 import { CalendarEvent } from '../../../models/education/event.model';
 
 @Component({
   selector: 'app-event-front',
   templateUrl: './event_front.html',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EventSeatGridComponent],
   styles: [`
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800&display=swap');
 
@@ -356,6 +357,39 @@ import { CalendarEvent } from '../../../models/education/event.model';
     }
     .card-remind svg { width: 11px; height: 11px; }
 
+    .card-actions {
+      display: flex;
+      margin-top: 10px;
+    }
+
+    .btn-participate {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(128, 0, 128, 0.2);
+    }
+
+    .btn-participate:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(128, 0, 128, 0.3);
+    }
+
+    .btn-participate:active {
+      transform: translateY(0);
+    }
+
     .pagination {
       display: flex;
       align-items: center;
@@ -451,9 +485,23 @@ export class EventFrontComponent implements OnInit {
   currentPage = 1;
   pageSize = 6;
 
+  showBooking = false;
+  selectedEvent: CalendarEvent | null = null;
+  todayDateStr: string = '';
+
   constructor(private eventService: EventService) {}
 
-  ngOnInit() { this.load(); }
+  ngOnInit() { 
+    this.updateTodayDate();
+    this.load(); 
+    // Mise à jour de la date chaque minute pour s'assurer qu'elle reste correcte
+    setInterval(() => this.updateTodayDate(), 60000);
+  }
+
+  updateTodayDate() {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    this.todayDateStr = new Date().toLocaleDateString('fr-FR', options);
+  }
 
   load() {
     this.eventService.getAll().subscribe((data: CalendarEvent[]) => {
@@ -507,8 +555,42 @@ export class EventFrontComponent implements OnInit {
     return new Date(dateStr) > new Date();
   }
 
+  getTimeRemainingText(dateStr?: string): string {
+    if (!dateStr) return '';
+    const eventDate = new Date(dateStr);
+    const now = new Date();
+    
+    if (eventDate <= now) {
+      return 'L\'événement est déjà passé';
+    }
+
+    const diffMs = eventDate.getTime() - now.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+    if (diffDays === 0) {
+      if (diffHours === 0) return 'Très bientôt (moins d\'une heure)';
+      return `Aujourd'hui, dans ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    } else if (diffDays === 1) {
+      return `Demain, plus que ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    } else {
+      return `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''} et ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    }
+  }
+
   getUpcomingCount(): number {
     return this.events.filter(e => this.isUpcoming(e.startDateTime)).length;
+  }
+
+  openBooking(event: CalendarEvent) {
+    this.selectedEvent = event;
+    this.showBooking = true;
+  }
+
+  onBookingClosed() {
+    this.showBooking = false;
+    this.selectedEvent = null;
+    this.load(); // Rafraîchir pour voir les places dispo (si affichées un jour sur la card)
   }
 
   onImgError(event: any) { event.target.src = 'assets/images/event-placeholder.jpg'; }

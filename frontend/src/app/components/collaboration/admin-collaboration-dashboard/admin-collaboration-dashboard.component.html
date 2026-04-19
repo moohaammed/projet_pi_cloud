@@ -4,10 +4,10 @@
   style="z-index: 10;">
   <div class="d-flex align-items-center gap-4">
     <div class="section-header text-start mb-0">
-      <h2 class="fw-bold mb-1 section-header__title text-capitalize fs-28">
-        Collaboration <span class="underline position-relative text-primary">Hub</span>
+      <h2 class="fw-black mb-1 section-header__title text-capitalize fs-28 ls-n1">
+        Clinical Collaboration <span class="underline text-primary position-relative">Governance</span>
       </h2>
-      <div class="sub-title fs-14 text-muted">Manage community groups and safety filters.</div>
+      <div class="sub-title fs-14 text-doc-secondary opacity-75">Oversee community health, safety logs, and clinical specialty groups.</div>
     </div>
   </div>
 
@@ -17,16 +17,17 @@
     <!-- VIEW SWITCHER DROPDOWN -->
     <div class="dropdown me-2" style="position: relative;">
       <button
-        class="btn btn-soft-primary fw-bold rounded-pill shadow-sm d-flex justify-content-between align-items-center small px-4 py-2"
-        style="width: 210px; border: 1px solid rgba(128,0,128,0.2);" (click)="dropdownOpen = !dropdownOpen">
-        <span class="text-truncate">
-          <i class="fa-solid fa-heart-pulse me-2" *ngIf="currentView === 'health'"></i>
-          <i class="fa-solid fa-users-gear me-2" *ngIf="currentView === 'groups'"></i>
-          <i class="fa-solid fa-shield-exclamation me-2" *ngIf="currentView === 'moderation'"></i>
-          <i class="fa-solid fa-bullhorn me-2" *ngIf="currentView === 'announcements'"></i>
+        class="btn btn-white fw-bold rounded-pill shadow-sm d-flex justify-content-between align-items-center small px-4 py-2 border"
+        style="width: 230px;" (click)="dropdownOpen = !dropdownOpen">
+        <span class="text-truncate text-doc-heading text-uppercase letter-spacing-1 fs-12">
+          <i class="fa-solid fa-heart-pulse me-2 text-primary" *ngIf="currentView === 'health'"></i>
+          <i class="fa-solid fa-users-gear me-2 text-primary" *ngIf="currentView === 'groups'"></i>
+          <i class="fa-solid fa-shield-exclamation me-2 text-danger" *ngIf="currentView === 'moderation'"></i>
+          <i class="fa-solid fa-microchip me-2 text-primary" *ngIf="currentView === 'ai'"></i>
+          <i class="fa-solid fa-bullhorn me-2 text-primary" *ngIf="currentView === 'announcements'"></i>
           {{ viewLabel(currentView) }}
         </span>
-        <i class="fa-solid fa-chevron-down ms-2" style="font-size: 0.8rem;"></i>
+        <i class="fa-solid fa-chevron-down ms-2 text-muted" style="font-size: 0.8rem;"></i>
       </button>
 
       <!-- Dropdown Menu -->
@@ -34,29 +35,35 @@
         style="position: absolute; top: 100%; right: 0; min-width: 240px;">
 
         <li>
-          <button class="dropdown-item py-2 fw-medium rounded-3" [class.active-soft]="currentView === 'health'"
+          <button class="dropdown-item py-2 fw-black rounded-3 text-uppercase fs-11 letter-spacing-1" [class.active-soft]="currentView === 'health'"
             (click)="switchView('health'); dropdownOpen = false">
-            <i class="fa-solid fa-heart-pulse me-3 text-muted w-15px"></i> Health Dashboard
+            <i class="fa-solid fa-chart-line me-3 opacity-50"></i> Health Monitoring
           </button>
         </li>
         <li>
-          <button class="dropdown-item py-2 fw-medium rounded-3" [class.active-soft]="currentView === 'groups'"
+          <button class="dropdown-item py-2 fw-black rounded-3 text-uppercase fs-11 letter-spacing-1" [class.active-soft]="currentView === 'groups'"
             (click)="switchView('groups'); dropdownOpen = false">
-            <i class="fa-solid fa-users-gear me-3 text-muted w-15px"></i> Groups & Members
+            <i class="fa-solid fa-user-group me-3 opacity-50"></i> Specialty Circles
           </button>
         </li>
         <li>
-          <button class="dropdown-item py-2 fw-medium rounded-3 d-flex justify-content-between align-items-center"
+          <button class="dropdown-item py-2 fw-black rounded-3 text-uppercase fs-11 letter-spacing-1 d-flex justify-content-between align-items-center"
             [class.active-soft]="currentView === 'moderation'" (click)="switchView('moderation'); dropdownOpen = false">
-            <div><i class="fa-solid fa-shield-exclamation me-3 text-muted w-15px"></i> Moderation</div>
-            <span class="badge bg-danger rounded-pill"
+            <div><i class="fa-solid fa-shield-virus me-3 opacity-50"></i> Risk Compliance</div>
+            <span class="badge bg-danger rounded-pill px-2 py-1"
               *ngIf="kpis.pendingModeration > 0">{{kpis.pendingModeration}}</span>
           </button>
         </li>
         <li>
-          <button class="dropdown-item py-2 fw-medium rounded-3" [class.active-soft]="currentView === 'announcements'"
+          <button class="dropdown-item py-2 fw-black rounded-3 text-uppercase fs-11 letter-spacing-1" [class.active-soft]="currentView === 'ai'"
+            (click)="switchView('ai'); dropdownOpen = false">
+            <i class="fa-solid fa-microchip me-3 opacity-50 text-primary"></i> AI Intelligence Pulse
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item py-2 fw-black rounded-3 text-uppercase fs-11 letter-spacing-1" [class.active-soft]="currentView === 'announcements'"
             (click)="switchView('announcements'); dropdownOpen = false">
-            <i class="fa-solid fa-bullhorn me-3 text-muted w-15px"></i> Announcements
+            <i class="fa-solid fa-bullhorn me-3 opacity-50"></i> Global Broadcast
           </button>
         </li>
       </ul>
@@ -80,37 +87,34 @@
 <!-- MODULAR VIEW SWITCHER (collaboration sub-views) -->
 <div [ngSwitch]="currentView" class="position-relative z-1" (click)="dropdownOpen = false">
 
-  <!-- 1. HEALTH & ANALYTICS VIEW -->
   <div *ngSwitchCase="'health'" class="animate-fade-in">
     <section class="mb-5 mt-4">
-      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Safety Vitals</h2>
+      <h6 class="mb-4 fw-black text-muted text-uppercase letter-spacing-1">Risk Assessment Vitals</h6>
       <div class="row g-4">
         <div class="col-md-6">
           <div
-            class="card shadow border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-warning">
+            class="card shadow-doc border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-warning">
             <div class="card-body p-4">
-              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Unresolved safety alerts
-              </div>
-              <div class="fs-1 fw-bold text-dark mb-1 d-flex align-items-end">
+              <div class="text-muted small fw-black text-uppercase mb-2 opacity-75">Critical Safety Alerts</div>
+              <div class="fs-1 fw-black text-doc-heading mb-1 d-flex align-items-end">
                 {{ kpis.unresolvedSafetyAlerts }}
                 <span
-                  class="fs-14 text-warning ms-2 mb-2 px-2 py-1 bg-soft-warning rounded-pill fw-bold">Critical</span>
+                  class="fs-12 text-warning ms-3 mb-2 px-3 py-1 bg-soft-warning rounded-pill fw-black text-uppercase">High Priority</span>
               </div>
-              <p class="small mb-0 text-muted">Distress signals pending review by nursing staff.</p>
+              <p class="small mb-0 text-doc-secondary opacity-75">Unresolved signals requiring clinical review.</p>
             </div>
           </div>
         </div>
         <div class="col-md-6">
           <div
-            class="card shadow border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-danger">
+            class="card shadow-doc border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-danger">
             <div class="card-body p-4">
-              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Pending moderation</div>
-              <div class="fs-1 fw-bold text-dark mb-1 d-flex align-items-end">
+              <div class="text-muted small fw-black text-uppercase mb-2 opacity-75">Moderation Backlog</div>
+              <div class="fs-1 fw-black text-doc-heading mb-1 d-flex align-items-end">
                 {{ kpis.pendingModeration }}
-                <span class="fs-14 text-danger ms-2 mb-2 px-2 py-1 bg-soft-danger rounded-pill fw-bold">Action
-                  Required</span>
+                <span class="fs-12 text-danger ms-3 mb-2 px-3 py-1 bg-soft-danger rounded-pill fw-black text-uppercase">Admin Task</span>
               </div>
-              <p class="small mb-0 text-muted">Feed posts flagged by safety filters.</p>
+              <p class="small mb-0 text-doc-secondary opacity-75">Reported items pending enforcement actions.</p>
             </div>
           </div>
         </div>
@@ -118,9 +122,97 @@
     </section>
 
     <section class="mb-5">
-      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Engagement & Stress Trend</h2>
-      <div class="card shadow rounded-4 border-0 p-4 bg-white">
-        <canvas #complianceCanvas height="250"></canvas>
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <h6 class="mb-0 fw-black text-muted text-uppercase letter-spacing-1">Health & Stress Trend</h6>
+        <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-black fs-11 shadow-sm">Last 30 Days</span>
+      </div>
+      <div class="card shadow-doc rounded-4 border-0 p-4 bg-white">
+        <div class="chart-wrapper">
+          <canvas #complianceCanvas></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW ANALYTICS SECTION -->
+    <section class="mb-5 animate-fade-in">
+      <div class="row g-4">
+        <!-- Sentiment Breakdown -->
+        <div class="col-lg-4">
+          <div class="card shadow-doc border-0 rounded-4 h-100 bg-white">
+            <div class="card-body p-4">
+              <h6 class="fw-black text-doc-heading mb-4 ls-n1 fs-15">Sentiment Overview</h6>
+              <div class="chart-container-small">
+                <canvas #sentimentCanvas></canvas>
+              </div>
+              <div class="mt-4 pt-2 border-top">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-doc-secondary small fw-bold"><i class="fa-solid fa-circle text-success me-2"></i> Clinical Harmony</span>
+                  <span class="fw-black text-doc-heading small">{{ sentimentDist?.positive || 0 }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="text-doc-secondary small fw-bold"><i class="fa-solid fa-circle text-danger me-2"></i> Distress Hits</span>
+                  <span class="fw-black text-doc-heading small">{{ sentimentDist?.negative || 0 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Mix -->
+        <div class="col-lg-4">
+          <div class="card shadow-doc border-0 rounded-4 h-100 bg-white">
+            <div class="card-body p-4">
+              <h6 class="fw-black text-doc-heading mb-4 ls-n1 fs-15">Platform Engagement</h6>
+              <div class="chart-container-small">
+                <canvas #activityCanvas></canvas>
+              </div>
+              <div class="mt-4 pt-2 border-top">
+                <div class="row text-center g-2">
+                  <div class="col-6">
+                    <div class="p-2 bg-light rounded-3">
+                      <div class="small text-muted fw-bold">Posts</div>
+                      <div class="fw-black">{{ engagementMix?.publications || 0 }}</div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-2 bg-light rounded-3">
+                      <div class="small text-muted fw-bold">MSGs</div>
+                      <div class="fw-black">{{ engagementMix?.messages || 0 }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Intervention -->
+        <div class="col-lg-4">
+          <div class="card shadow-doc border-0 rounded-4 h-100 bg-white">
+            <div class="card-body p-4">
+              <h6 class="fw-black text-doc-heading mb-4 ls-n1 fs-15">Intelligence Utility</h6>
+              <div class="d-flex flex-column gap-4 h-100">
+                <div class="p-3 rounded-4 bg-soft-primary border border-primary border-opacity-10 shadow-sm">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="fa-solid fa-microchip text-primary me-2"></i>
+                    <span class="text-primary small fw-black text-uppercase letter-spacing-1">Handover summaries</span>
+                  </div>
+                  <div class="fs-2 fw-black text-doc-heading ls-n1">{{ aiImpact?.summariesGenerated || 0 }}</div>
+                  <small class="text-doc-secondary fw-bold opacity-75">Automated clinical transitions</small>
+                </div>
+                
+                <div class="p-3 rounded-4 bg-soft-info border border-info border-opacity-10 shadow-sm">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="fa-solid fa-eye text-info me-2"></i>
+                    <span class="text-info small fw-black text-uppercase letter-spacing-1">Retention Impact</span>
+                  </div>
+                  <div class="fs-2 fw-black text-doc-heading ls-n1">3.2x</div>
+                  <small class="text-doc-secondary fw-bold opacity-75">Usage lift over manual logs</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -153,34 +245,33 @@
     </section>
 
     <section class="mb-5">
-      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Private Communication Analysis
-      </h2>
-      <div class="table-responsive card shadow rounded-4 border-0 overflow-hidden bg-white">
+      <h6 class="mb-4 fw-black text-muted text-uppercase letter-spacing-1">Communication Activity Log</h6>
+      <div class="table-responsive card shadow-doc rounded-4 border-0 overflow-hidden bg-white">
         <table class="table table-hover mb-0 align-middle">
-          <thead class="bg-soft-primary border-bottom border-black border-opacity-10">
+          <thead>
             <tr>
-              <th class="ps-4 py-3 text-uppercase small fw-bold text-primary">Chat Participants</th>
-              <th class="py-3 text-uppercase small fw-bold text-primary text-center">Volume</th>
-              <th class="py-3 text-uppercase small fw-bold text-danger text-center">Distress Hits</th>
-              <th class="py-3 text-uppercase small fw-bold text-primary text-end pe-4">Last Activity</th>
+              <th class="ps-4 py-3">Participants Circle</th>
+              <th class="py-3 text-center">Volume</th>
+              <th class="py-3 text-center">Distress Hits</th>
+              <th class="pe-4 py-3 text-end">Peak Activity</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let d of dmMeta">
-              <td class="ps-4 fw-medium">
+              <td class="ps-4 fw-bold text-doc-heading fs-14">
                 <div class="d-flex align-items-center">
-                  <span class="badge bg-soft-primary text-primary me-2">#{{ d.userIdA }}</span>
-                  <i class="fa-solid fa-arrows-left-right text-muted mx-2 fs-12"></i>
-                  <span class="badge bg-soft-primary text-primary">#{{ d.userIdB }}</span>
+                  <span class="badge bg-soft-primary text-primary px-3 rounded-pill fw-black fs-11">User #{{ d.userIdA }}</span>
+                  <i class="fa-solid fa-bolt-lightning text-muted mx-3 fs-12 opacity-50"></i>
+                  <span class="badge bg-soft-primary text-primary px-3 rounded-pill fw-black fs-11">User #{{ d.userIdB }}</span>
                 </div>
               </td>
-              <td class="text-center fw-bold text-dark">{{ d.messageCount }}</td>
+              <td class="text-center fw-black text-doc-heading">{{ d.messageCount }}</td>
               <td class="text-center">
-                <span [class]="d.distressedMessageCount > 0 ? 'text-danger fw-bold' : 'text-muted'">
+                <span [class]="d.distressedMessageCount > 0 ? 'badge bg-danger shadow-sm px-3 py-1 text-white' : 'badge bg-light text-muted px-3 py-1 fw-bold'">
                   {{ d.distressedMessageCount }}
                 </span>
               </td>
-              <td class="text-end pe-4 text-muted small">{{ d.lastActivity | date : 'medium' }}</td>
+              <td class="text-end pe-4 text-doc-secondary fs-13 fw-medium">{{ d.lastActivity | date : 'MMM d, HH:mm' }}</td>
             </tr>
           </tbody>
         </table>
@@ -188,7 +279,153 @@
     </section>
   </div>
 
-  <!-- 2. GROUP & MEMBER MANAGEMENT VIEW -->
+  <!-- 2. AI INTELLIGENCE PULSE VIEW -->
+  <div *ngSwitchCase="'ai'" class="animate-fade-in mt-4">
+    <section class="mb-5 animate-fade-in" *ngIf="clinicalPulse">
+      <div class="card shadow-doc border-0 rounded-4 overflow-hidden bg-white border-top border-4 border-primary">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h6 class="fw-black text-doc-heading mb-0 ls-n1 fs-16">
+              <i class="fa-solid fa-brain text-primary me-2 pulse-slow"></i> Intelligence Center: Clinical Pulse
+            </h6>
+            <span class="badge bg-soft-primary text-primary px-3 py-1 rounded-pill fw-black fs-11">
+              AI ANALYZED ({{ clinicalPulse.totalAnalyzed }} Events)
+            </span>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-lg-7">
+              <div class="p-3 bg-light rounded-4 h-100 border border-opacity-10 shadow-sm position-relative">
+                <i class="fa-solid fa-quote-left text-primary opacity-25 position-absolute" style="top: 1rem; right: 1rem; font-size: 2rem;"></i>
+                <div class="text-muted small fw-black text-uppercase mb-2">AI Behavioral Insight</div>
+                <p class="fs-15 text-doc-heading fw-medium mb-0 pe-4 ai-output">
+                  "{{ clinicalPulse.aiSummary }}"
+                </p>
+              </div>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="d-flex flex-column gap-3">
+                <div class="p-3 bg-white border rounded-4 shadow-sm">
+                  <div class="text-muted small fw-black text-uppercase mb-2">Thematic Clusters</div>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span *ngFor="let theme of clinicalPulse.topThemes" 
+                          class="badge bg-soft-info text-info border border-info border-opacity-10 px-3 py-2 rounded-pill fw-bold fs-11">
+                      <i class="fa-solid fa-tags me-1 opacity-50"></i> {{ theme.trim() }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="p-3 bg-white border rounded-4 shadow-sm d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="text-muted small fw-black text-uppercase">Sentiment Velocity</div>
+                    <div class="fw-black fs-18" [ngClass]="getVelocityColor(clinicalPulse.sentimentVelocity)">
+                      {{ clinicalPulse.sentimentVelocity }}
+                    </div>
+                  </div>
+                  <div class="velocity-indicator">
+                    <i class="fa-solid fa-arrow-trend-up fs-2 text-success" *ngIf="clinicalPulse.sentimentVelocity.toLowerCase().includes('improving')"></i>
+                    <i class="fa-solid fa-arrow-trend-down fs-2 text-danger" *ngIf="clinicalPulse.sentimentVelocity.toLowerCase().includes('degrading')"></i>
+                    <i class="fa-solid fa-arrows-left-right fs-2 text-primary" *ngIf="clinicalPulse.sentimentVelocity.toLowerCase().includes('stable')"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW: HISTORICAL RETROSPECTIVE GENERATOR -->
+    <section class="mb-5 animate-fade-in">
+      <div class="card shadow-doc border-0 rounded-4 overflow-hidden bg-white">
+        <div class="card-header bg-soft-primary border-0 p-4 d-flex align-items-center justify-content-between">
+          <h6 class="fw-black text-primary mb-0 ls-n1 fs-16">
+            <i class="fa-solid fa-clock-rotate-left me-2"></i> Historical Intelligence Snapshot (On-Demand)
+          </h6>
+          <div class="d-flex align-items-center gap-2">
+            <select class="form-select form-select-sm rounded-pill px-3 border-0 shadow-sm fw-bold text-muted fs-12" 
+                    style="width: 220px;" [(ngModel)]="retroGroupId">
+              <option [ngValue]="undefined" disabled>Select Clinical Group...</option>
+              <option *ngFor="let g of groups" [value]="g.id">{{ g.name }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            <button class="btn btn-soft-primary fw-black fs-12 px-4 rounded-pill transition-all" 
+                    [disabled]="retroLoading" (click)="fetchRetrospective(24)">
+              <i class="fa-solid fa-bolt me-1"></i> LAST 24 HOURS
+            </button>
+            <button class="btn btn-soft-primary fw-black fs-12 px-4 rounded-pill transition-all" 
+                    [disabled]="retroLoading" (click)="fetchRetrospective(48)">
+              <i class="fa-solid fa-calendar me-1"></i> LAST 48 HOURS
+            </button>
+            <button class="btn btn-soft-primary fw-black fs-12 px-4 rounded-pill transition-all" 
+                    [disabled]="retroLoading" (click)="fetchRetrospective(168)">
+              <i class="fa-solid fa-calendar-days me-1"></i> LAST 7 DAYS
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="retroLoading" class="text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status"></div>
+            <p class="text-muted small fw-bold mb-0">AI is reconstructing clinical events...</p>
+          </div>
+
+          <!-- Result State -->
+          <div *ngIf="activeRetrospective && !retroLoading" class="animate-fade-in">
+            <div class="row g-4">
+              <div class="col-lg-8">
+                <div class="p-4 bg-light rounded-4 border border-opacity-10 shadow-sm position-relative">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="badge bg-primary text-white px-3 py-1 rounded-pill fw-black fs-11">
+                      RETROSPECTIVE: LAST {{ activeRetrospective.window === 168 ? '7 DAYS' : activeRetrospective.window + 'H' }}
+                    </span>
+                    <span class="text-muted small fw-black opacity-50">GENERATED NOW</span>
+                  </div>
+                  <p class="fs-15 text-doc-heading fw-medium mb-0 ai-output">
+                    {{ activeRetrospective.summary }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="d-flex flex-column gap-3">
+                  <div class="p-3 bg-soft-info text-info rounded-4 border border-info border-opacity-10 shadow-sm">
+                    <div class="small fw-black text-uppercase mb-2"><i class="fa-solid fa-list-check me-1"></i> Pending Tasks Found</div>
+                    <ul class="list-unstyled mb-0 small fw-bold">
+                      <li *ngFor="let task of activeRetrospective.pendingTasks" class="mb-2 d-flex align-items-start">
+                        <i class="fa-solid fa-circle-chevron-right me-2 mt-1 opacity-50"></i> {{ task }}
+                      </li>
+                      <li *ngIf="!activeRetrospective.pendingTasks?.length" class="opacity-50">No unresolved tasks in this window.</li>
+                    </ul>
+                  </div>
+                  <div class="p-3 bg-soft-danger text-danger rounded-4 border border-danger border-opacity-10 shadow-sm">
+                    <div class="small fw-black text-uppercase mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Critical Concerns</div>
+                    <ul class="list-unstyled mb-0 small fw-bold">
+                      <li *ngFor="let alert of activeRetrospective.criticalAlerts" class="mb-2 d-flex align-items-start">
+                        <i class="fa-solid fa-warning me-2 mt-1 opacity-50"></i> {{ alert }}
+                      </li>
+                      <li *ngIf="!activeRetrospective.criticalAlerts?.length" class="opacity-50">No high-risk segments identified.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!activeRetrospective && !retroLoading" class="text-center py-5 border rounded-4 bg-light border-dashed">
+            <i class="fa-solid fa-wand-magic-sparkles fs-1 text-primary opacity-25 mb-3"></i>
+            <h6 class="fw-black text-muted mb-1">No Active Snapshot</h6>
+            <p class="text-muted small mb-0">Choose a clinical group and a time window to generate an AI retrospective.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 3. GROUP & MEMBER MANAGEMENT VIEW -->
   <div *ngSwitchCase="'groups'" class="animate-fade-in mt-4">
     <section class="mb-5">
       <div class="card shadow border-0 p-4 mb-4 rounded-4 bg-white">
@@ -349,58 +586,143 @@
 
   <!-- 4. ANNOUNCEMENTS VIEW -->
   <div *ngSwitchCase="'announcements'" class="animate-fade-in mt-4">
-    <section class="mb-4">
+    <section class="mb-5">
       <div class="row g-4">
         <div class="col-lg-8">
-          <div class="card shadow border-0 p-5 rounded-4 bg-white">
+          <div class="card shadow-doc border-0 p-5 rounded-4 bg-white border-top border-4 border-primary">
             <div class="d-flex align-items-center mb-4">
               <div
                 class="bg-soft-primary text-primary rounded-circle p-3 me-3 d-flex align-items-center justify-content-center shadow-sm">
-                <i class="fa-solid fa-broadcast-tower fs-4"></i>
+                <i class="fa-solid fa-broadcast-tower fs-4 pulse-slow"></i>
               </div>
               <div>
-                <h4 class="mb-0 fw-bold text-dark">Global Broadcast</h4>
-                <p class="text-muted small mb-0">Your message will be pinned to all community feeds.</p>
+                <h4 class="mb-0 fw-black text-doc-heading ls-n1">Broadcast Command Center</h4>
+                <p class="text-muted small mb-0">Target specific clinical communities or push a global announcement.</p>
+              </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+              <div class="col-md-6">
+                <label class="form-label-doc">Target Audience</label>
+                <div class="input-container-doc">
+                  <i class="fa-solid fa-users input-icon-doc"></i>
+                  <select class="form-select-doc w-100" [(ngModel)]="announcementTargetGroupId">
+                    <option [ngValue]="null">🌍 Global (All Communities)</option>
+                    <optgroup label="Clinical Groups">
+                      <option *ngFor="let g of groups" [value]="g.id">👤 {{ g.name }}</option>
+                    </optgroup>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-doc">Release Schedule</label>
+                <div class="input-container-doc">
+                  <i class="fa-solid fa-clock input-icon-doc"></i>
+                  <input type="datetime-local" #timeInput
+                         class="form-control-doc w-100 ps-4"
+                         (click)="timeInput.showPicker()"
+                         [(ngModel)]="announcementScheduledAt">
+                </div>
               </div>
             </div>
 
             <div class="mb-4">
-              <label class="form-label fw-bold text-muted small text-uppercase" style="letter-spacing: 0.5px;">Message
-                Body</label>
+              <label class="form-label-doc">Message Content</label>
               <textarea
-                class="form-control bg-grey border-0 rounded-4 p-4 shadow-sm fs-15 transition-all focus-ring-primary"
-                rows="6" placeholder="What important update do you want to share with everyone?"
-                [(ngModel)]="announcementText" style="resize: none;"></textarea>
+                class="form-control-doc w-100 p-4"
+                rows="6" placeholder="Draft your professional announcement here..."
+                [(ngModel)]="announcementText" style="resize: none; height: auto;"></textarea>
             </div>
+            
             <div class="text-end">
-              <button class="btn btn-primary btn-lg fw-bold rounded-pill px-5 shadow hov-grow"
+              <button class="btn btn-primary btn-lg fw-black rounded-pill px-5 shadow transition-all hov-grow"
                 (click)="sendAnnouncement()" [disabled]="!announcementText">
-                <i class="fa-solid fa-paper-plane me-2"></i> Send Announcement
+                <i class="fa-solid fa-paper-plane me-2"></i> {{ announcementScheduledAt ? 'Schedule Publication' : 'Broadcast Now' }}
               </button>
+            </div>
+          </div>
+
+          <!-- SCHEDULED POSTS LIST -->
+          <div class="mt-5">
+            <div class="section-header text-start mb-4">
+              <h3 class="h6 fw-bold text-muted text-uppercase ls-1"><i class="fa-solid fa-clock-rotate-left me-2"></i>Upcoming Broadcasts ({{scheduledAnnouncements.length}})</h3>
+            </div>
+            
+            <div class="row g-3">
+              <div *ngFor="let s of scheduledAnnouncements" class="col-12">
+                <div class="card shadow-sm border-0 rounded-4 bg-white p-3 border-start border-4 border-warning">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-soft-warning text-warning rounded-pill px-2 py-1 fs-11 fw-black">
+                          <i class="fa-solid fa-calendar-day me-1"></i> {{ s.createdAt | date:'medium' }}
+                        </span>
+                        <span class="badge bg-soft-primary text-primary rounded-pill px-2 py-1 fs-11 fw-black">
+                          <i class="fa-solid fa-users me-1"></i> {{ s.groupName || 'Global community' }}
+                        </span>
+                      </div>
+                      <p class="mb-0 text-doc-heading fw-bold small truncate-2 opacity-75">
+                        {{ s.content }}
+                      </p>
+                    </div>
+                    <button class="btn btn-soft-danger btn-sm rounded-pill px-3 fw-bold ms-3" (click)="cancelAnnouncement(s.id)">
+                      <i class="fa-solid fa-xmark me-1"></i> Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div *ngIf="scheduledAnnouncements.length === 0" class="col-12 text-center py-5 bg-light rounded-4 border border-dashed">
+                <i class="fa-solid fa-calendar-check fs-2 text-muted opacity-25 mb-2"></i>
+                <p class="text-muted small mb-0">No announcements currently scheduled.</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="col-lg-4 mt-4 mt-lg-0">
-          <div class="card border-0 bg-soft-primary rounded-4 p-4 shadow h-100">
-            <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-lightbulb me-2"></i> Admin Best Practices</h6>
-            <ul class="list-unstyled small text-dark opacity-75 d-flex flex-column gap-3">
-              <li class="d-flex align-items-start">
-                <i class="fa-solid fa-check text-success me-2 mt-1"></i>
-                Keep messages concise and helpful.
-              </li>
-              <li class="d-flex align-items-start">
-                <i class="fa-solid fa-check text-success me-2 mt-1"></i>
-                Use announcements for platform updates or system maintenance warnings.
-              </li>
-              <li class="d-flex align-items-start">
-                <i class="fa-solid fa-check text-success me-2 mt-1"></i>
-                Announcements will feature a distinct "System Admin" badge.
-              </li>
-            </ul>
-            <div class="mt-auto pt-4 text-center">
-              <img src="template/assets/img/icon/bullhorn-large.png" alt="" class="img-fluid opacity-25"
-                style="max-height: 120px;">
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-doc rounded-4 bg-white h-100 overflow-hidden">
+            <div class="card-header bg-emerald border-0 p-4 text-white">
+              <h6 class="fw-black mb-0 ls-n1"><i class="fa-solid fa-shield-halved me-2"></i> Admin Best Practices</h6>
+            </div>
+            <div class="card-body p-4">
+              <div class="d-flex flex-column gap-4">
+                <div class="d-flex gap-3">
+                  <div class="icon-box bg-soft-success text-success rounded-3 p-2 h-fit">
+                    <i class="fa-solid fa-feather"></i>
+                  </div>
+                  <div>
+                    <div class="fw-black text-doc-heading fs-13 mb-1">Tone of Voice</div>
+                    <p class="text-muted small mb-0">Maintain a professional and empathetic tone. Use clinical-grade language for medical updates.</p>
+                  </div>
+                </div>
+                
+                <div class="d-flex gap-3">
+                  <div class="icon-box bg-soft-primary text-primary rounded-3 p-2 h-fit">
+                    <i class="fa-solid fa-clock"></i>
+                  </div>
+                  <div>
+                    <div class="fw-black text-doc-heading fs-13 mb-1">Strategic Scheduling</div>
+                    <p class="text-muted small mb-0">Schedule maintenance warnings during low-activity hours (e.g., 2 AM) to minimize disruption.</p>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                  <div class="icon-box bg-soft-info text-info rounded-3 p-2 h-fit">
+                    <i class="fa-solid fa-bullseye"></i>
+                  </div>
+                  <div>
+                    <div class="fw-black text-doc-heading fs-13 mb-1">Precise Targeting</div>
+                    <p class="text-muted small mb-0">Avoid spamming the global feed. Target specific groups when the info is relevant only to them.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-5 p-3 bg-light rounded-4 border border-dashed text-center">
+                <i class="fa-solid fa-user-check text-primary fs-3 mb-2 opacity-50"></i>
+                <div class="small fw-bold text-doc-heading">Admin Verified</div>
+                <div class="text-muted fs-11">All broadcasts are signed with your professional identity.</div>
+              </div>
             </div>
           </div>
         </div>

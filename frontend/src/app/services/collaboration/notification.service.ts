@@ -1,8 +1,8 @@
-﻿import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
  
 export interface Notification {
-  id?: number;
+  id?: string;
   receiverId: number;
   content: string;
   type: string;
@@ -26,14 +26,14 @@ export class NotificationService {
     });
   }
  
-  markAsRead(id: number) {
+  markAsRead(id: string) {
     this.http.put(`${this.baseUrl}/${id}/read`, {}).subscribe(() => {
         this.notifications.update(list => list.map(n => n.id === id ? {...n, isRead: true} : n));
         this.updateUnreadCount();
     });
   }
- 
-  deleteNotification(id: number) {
+
+  deleteNotification(id: string) {
     return this.http.delete(`${this.baseUrl}/${id}`).subscribe(() => {
         this.notifications.update(list => list.filter(n => n.id !== id));
         this.updateUnreadCount();

@@ -69,11 +69,11 @@ export class CommunicationTestComponent implements OnInit {
     }
   }
 
-  markAsRead(id: number) {
+  markAsRead(id: string) {
     this.notificationService.markAsRead(id);
   }
 
-  deleteNotification(id: number) {
+  deleteNotification(id: string) {
     this.notificationService.deleteNotification(id);
   }
 
@@ -86,7 +86,7 @@ export class CommunicationTestComponent implements OnInit {
     return this.router.url.includes(route);
   }
 
-  unpinMessage(id: number) {
+  unpinMessage(id: string) {
     this.pinnedMessages.set(this.pinnedMessages().filter(m => m.id !== id));
   }
 }

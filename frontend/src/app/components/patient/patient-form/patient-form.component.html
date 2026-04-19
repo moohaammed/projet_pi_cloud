@@ -1,0 +1,158 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+
+      <nav class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a routerLink="/patient-profiles" class="text-decoration-none">
+              Patients
+            </a>
+          </li>
+          <li class="breadcrumb-item active">
+            {{ isEdit ? 'Modifier' : 'Ajouter' }}
+          </li>
+        </ol>
+      </nav>
+
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-primary text-white p-4 rounded-top-4">
+          <h5 class="mb-0 fw-bold">
+            <i class="fa-solid fa-bed-pulse me-2"></i>
+            {{ isEdit ? 'Modifier le patient' : 'Ajouter un patient' }}
+          </h5>
+        </div>
+
+        <div class="card-body p-4">
+          <div *ngIf="error" class="alert alert-danger">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>{{ error }}
+          </div>
+
+          <!-- Infos de base -->
+          <h6 class="fw-bold text-muted text-uppercase small mb-3">
+            Informations de base
+          </h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-medium">
+                Nom <span class="text-danger">*</span>
+              </label>
+              <input [(ngModel)]="patient.nom" name="nom"
+                     class="form-control" placeholder="Nom">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">
+                Prénom <span class="text-danger">*</span>
+              </label>
+              <input [(ngModel)]="patient.prenom" name="prenom"
+                     class="form-control" placeholder="Prénom">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">
+                Email <span class="text-danger">*</span>
+              </label>
+              <input [(ngModel)]="patient.email" name="email"
+                     type="email" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Téléphone</label>
+              <input [(ngModel)]="patient.telephone" name="telephone"
+                     class="form-control" placeholder="+216 XX XXX XXX">
+            </div>
+            <div *ngIf="!isEdit" class="col-md-6">
+              <label class="form-label fw-medium">
+                Mot de passe <span class="text-danger">*</span>
+              </label>
+              <input [(ngModel)]="patient.password" name="password"
+                     type="password" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-medium">Date de naissance</label>
+              <input [(ngModel)]="patient.dateNaissance" name="dateNaissance"
+                     type="date" class="form-control">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-medium">Adresse</label>
+              <input [(ngModel)]="patient.adresse" name="adresse"
+                     class="form-control" placeholder="Adresse du patient">
+            </div>
+          </div>
+
+          <!-- Stade Alzheimer -->
+          <h6 class="fw-bold text-muted text-uppercase small mb-3">
+            Stade Alzheimer
+          </h6>
+          <div class="d-flex gap-3 mb-4">
+            <div *ngFor="let s of stades"
+                 class="flex-fill text-center p-3 rounded-3 border"
+                 style="cursor:pointer"
+                 [class.border-success]="patient.stade === s.value && s.value === 'LEGER'"
+                 [class.border-warning]="patient.stade === s.value && s.value === 'MODERE'"
+                 [class.border-danger]="patient.stade === s.value && s.value === 'SEVERE'"
+                 [class.bg-success]="patient.stade === s.value && s.value === 'LEGER'"
+                 [class.bg-warning]="patient.stade === s.value && s.value === 'MODERE'"
+                 [class.bg-danger]="patient.stade === s.value && s.value === 'SEVERE'"
+                 [class.text-white]="patient.stade === s.value"
+                 (click)="patient.stade = s.value">
+              <div class="fw-bold">{{ s.label }}</div>
+            </div>
+          </div>
+
+          <!-- Contact d'urgence -->
+          <h6 class="fw-bold text-muted text-uppercase small mb-3">
+            Contact d'urgence
+          </h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Nom du contact</label>
+              <input [(ngModel)]="patient.contactUrgenceNom"
+                     name="contactUrgenceNom" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Téléphone</label>
+              <input [(ngModel)]="patient.contactUrgenceTelephone"
+                     name="contactUrgenceTelephone" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-medium">Relation</label>
+              <select [(ngModel)]="patient.contactUrgenceRelation"
+                      name="contactUrgenceRelation" class="form-select">
+                <option value="">Choisir...</option>
+                <option>Fils</option>
+                <option>Fille</option>
+                <option>Époux/Épouse</option>
+                <option>Frère/Sœur</option>
+                <option>Autre</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <h6 class="fw-bold text-muted text-uppercase small mb-3">
+            Notes médicales
+          </h6>
+          <textarea [(ngModel)]="patient.notes" name="notes"
+                    class="form-control mb-4" rows="3"
+                    placeholder="Observations, traitements en cours...">
+          </textarea>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2 border-top pt-3">
+            <button class="btn btn-primary flex-grow-1"
+                    (click)="save()" [disabled]="loading">
+              <span *ngIf="loading"
+                    class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!loading" class="fa-solid fa-floppy-disk me-2"></i>
+              {{ isEdit ? 'Enregistrer les modifications' : 'Créer le patient' }}
+            </button>
+            <button class="btn btn-outline-secondary"
+                    (click)="cancel()" [disabled]="loading">
+              Annuler
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,70 +1,60 @@
 <div class="groups-discovery-container animate-fade-in py-4">
 
-  <!-- Restored Hero Section (Clean Version) -->
-  <div class="discovery-hero-clean mb-4 p-5 rounded-5 border bg-white shadow-sm position-relative overflow-hidden">
+  <!-- Hero Section -->
+  <div class="discovery-hero-clean mb-4 p-5 position-relative overflow-hidden">
     <div class="hero-content position-relative" style="z-index: 2;">
-      <h2 class="fw-bold mb-2 text-dark">Find Your <span class="text-primary">Community</span></h2>
-      <p class="text-muted mb-4 max-w-500">Connect with others who share your journey. Join support groups, social hubs,
-        and care teams.</p>
+      <h2 class="fw-black mb-2 text-doc-heading ls-n1">Explore <span class="text-primary">Communities</span></h2>
+      <p class="text-doc-secondary mb-4 max-w-500 fs-16">Connect with medical experts, support networks, and clinical collaborators designed for professional excellence.</p>
 
-      <div class="search-box-hero d-flex gap-2 p-1 bg-light rounded-pill max-w-600 border mx-auto">
+      <div class="search-box-hero d-flex gap-2 p-1 bg-white mb-0 max-w-600 border mx-auto">
         <div class="input-group border-0 h-100 align-items-center">
           <span class="input-group-text bg-transparent border-0"><i
-              class="fa-solid fa-magnifying-glass text-muted fs-18"></i></span>
-          <input type="text" class="form-control border-0 shadow-none bg-transparent fs-16"
-            placeholder="Search for communities..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+              class="fa-solid fa-magnifying-glass text-muted fs-16"></i></span>
+          <input type="text" class="form-control border-0 shadow-none bg-transparent fs-15 fw-medium"
+            placeholder="Search specialties or hubs..." [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
         </div>
         <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm" data-bs-toggle="modal"
+          <button class="btn btn-primary rounded-pill px-4 fw-black shadow-sm h-100" data-bs-toggle="modal"
             data-bs-target="#createGroupModal">
-            <i class="fa-solid fa-plus-circle me-1"></i> New
+            <i class="fa-solid fa-plus-circle me-2"></i> Join New
           </button>
         </div>
       </div>
     </div>
-    <div class="hero-accent-circle position-absolute bg-soft-primary rounded-circle"
-      style="width: 300px; height: 300px; right: -100px; top: -100px; opacity: 0.5;"></div>
+    <div class="hero-accent-circle position-absolute bg-primary rounded-circle"
+      style="width: 400px; height: 400px; right: -150px; top: -150px; opacity: 0.05;"></div>
   </div>
 
-  <!-- Restored Category Chips -->
-  <div class="category-filters d-flex gap-2 overflow-auto pb-3 mb-4 comm-scroll-hide">
-    <button class="btn btn-sm rounded-pill px-3 py-2 fw-bold transition-all"
+  <!-- Sorting & Category Bar -->
+  <div class="category-filters d-flex align-items-center gap-3 overflow-auto pb-4 mb-4 comm-scroll-hide">
+    <button class="btn btn-sm rounded-pill px-4 py-2 fw-black transition-all"
       [class.btn-primary]="selectedCategory() === 'ALL'" [class.btn-light]="selectedCategory() !== 'ALL'"
       (click)="selectedCategory.set('ALL')">
-      All Communities
+      All Specialties
     </button>
-    <button class="btn btn-sm rounded-pill px-3 py-2 fw-bold transition-all"
+    <button class="btn btn-sm rounded-pill px-4 py-2 fw-black transition-all"
       [class.btn-primary]="selectedCategory() === 'SUPPORT'" [class.btn-light]="selectedCategory() !== 'SUPPORT'"
       (click)="selectedCategory.set('SUPPORT')">
-      <i class="fa-solid fa-hand-holding-heart me-1"></i> Medical Support
+      Clinical Support
     </button>
-    <button class="btn btn-sm rounded-pill px-3 py-2 fw-bold transition-all"
+    <button class="btn btn-sm rounded-pill px-4 py-2 fw-black transition-all"
       [class.btn-primary]="selectedCategory() === 'SOCIAL'" [class.btn-light]="selectedCategory() !== 'SOCIAL'"
       (click)="selectedCategory.set('SOCIAL')">
-      <i class="fa-solid fa-mug-hot me-1"></i> Social Hubs
-    </button>
-    <button class="btn btn-sm rounded-pill px-3 py-2 fw-bold transition-all"
-      [class.btn-primary]="selectedCategory() === 'REGIONAL'" [class.btn-light]="selectedCategory() !== 'REGIONAL'"
-      (click)="selectedCategory.set('REGIONAL')">
-      <i class="fa-solid fa-map-location-dot me-1"></i> Regional
+      Collaborative Hubs
     </button>
 
-    <div class="ms-2 d-flex align-items-center gap-2 bg-white border px-3 rounded-pill">
-      <div class="form-check form-switch mb-0">
+    <div class="ms-auto d-flex align-items-center gap-2 bg-white shadow-sm border px-3 py-2 rounded-pill">
+      <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
         <input class="form-check-input" type="checkbox" id="myGroupsToggle" 
                [ngModel]="showOnlyMyGroups()" (ngModelChange)="showOnlyMyGroups.set($event)">
-        <label class="form-check-label fs-12 fw-bold text-muted" for="myGroupsToggle">My Communities</label>
+        <label class="form-check-label fs-12 fw-black text-muted text-uppercase letter-spacing-1 mb-0" for="myGroupsToggle">My Circles</label>
       </div>
-    </div>
-
-    <!-- Sorting Dropdown in line -->
-    <div class="ms-auto d-flex align-items-center gap-2 bg-white border px-3 rounded-pill">
-      <span class="fs-12 fw-bold text-muted">Sort:</span>
-      <select class="form-select form-select-sm bg-transparent border-0 shadow-none fw-bold text-primary"
-        [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)" style="width: auto;">
-        <option value="NAME_ASC">A-Z</option>
-        <option value="NAME_DESC">Z-A</option>
-        <option value="MEMBERS_DESC">Popular</option>
+      <div class="vr mx-2 opacity-10" style="height: 20px;"></div>
+      <select class="form-select form-select-sm bg-transparent border-0 shadow-none fw-black text-primary p-0 fs-12 text-uppercase letter-spacing-1"
+        [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)" style="width: auto; cursor: pointer;">
+        <option value="NAME_ASC">Sort: A-Z</option>
+        <option value="NAME_DESC">Sort: Z-A</option>
+        <option value="MEMBERS_DESC">Sort: Popular</option>
       </select>
     </div>
   </div>
@@ -83,11 +73,11 @@
         <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-shadow transition-all">
           <div class="d-flex align-items-center gap-3">
             <div class="avatar-request rounded-circle bg-soft-warning text-warning d-flex align-items-center justify-content-center fw-bold fs-16" style="width: 45px; height: 45px;">
-              {{ (req.user.prenom || 'U').substring(0,1).toUpperCase() }}
+              {{ (req.userId || 'U').toString().substring(0,1).toUpperCase() }}
             </div>
             <div class="flex-grow-1 overflow-hidden">
-              <h6 class="mb-0 fw-bold fs-14 text-dark text-truncate">{{ req.user.prenom }} {{ req.user.nom }}</h6>
-              <p class="mb-0 fs-12 text-muted text-truncate">Wants to join <strong>{{ req.group.name }}</strong></p>
+              <h6 class="mb-0 fw-bold fs-14 text-dark text-truncate">User {{ req.userId }}</h6>
+              <p class="mb-0 fs-12 text-muted text-truncate">Wants to join <strong>{{ req.groupName }}</strong></p>
             </div>
           </div>
           <div class="d-flex gap-2 mt-3">
@@ -103,64 +93,41 @@
     </div>
   </div>
 
-  <!-- Keep Discovery Grid (Directory Style Cards) -->
   <div class="row g-4">
     <div class="col-xl-4 col-md-6 d-flex" *ngFor="let grp of filteredGroups()">
-      <div
-        class="card border-0 shadow-sm rounded-5 group-card-directory overflow-hidden bg-white w-100 flex-fill transition-all">
+      <div class="card border-0 shadow-sm rounded-4 group-card-directory overflow-hidden bg-white w-100 flex-fill transition-all">
         <div class="card-body p-0 d-flex flex-column h-100">
 
           <!-- Card Header/Info -->
-          <div class="p-4 flex-grow-1 position-relative">
-            <!-- Actions Dropdown -->
-            <div class="position-absolute top-0 end-0 p-3 pt-4">
-              <div class="dropdown">
-                <button class="btn btn-link text-muted p-0 shadow-none border-0" type="button" data-bs-toggle="dropdown">
-                  <i class="fa-solid fa-ellipsis-vertical fs-18"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
-                  <li><a class="dropdown-item rounded-3 py-2 fs-13" href="javascript:void(0)" (click)="$event.stopPropagation()"><i class="fa-solid fa-link me-2"></i> Copy Link</a></li>
-                  <li><a class="dropdown-item rounded-3 py-2 fs-13 text-danger" *ngIf="isMember(grp)" href="javascript:void(0)" (click)="$event.stopPropagation(); leaveGroup(grp.id)"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Leave Group</a></li>
-                  <li><hr class="dropdown-divider opacity-5"></li>
-                  <li><a class="dropdown-item rounded-3 py-2 fs-13" href="javascript:void(0)" (click)="$event.stopPropagation()"><i class="fa-solid fa-circle-exclamation me-2"></i> Report</a></li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="p-4 flex-grow-1 position-relative pb-1">
+            <div class="d-flex align-items-start gap-3 mb-4">
               <div
-                class="avatar-directory rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center fw-bold fs-24 position-relative shadow-sm"
+                class="avatar-directory rounded-4 flex-shrink-0 d-flex align-items-center justify-content-center fw-black fs-24 position-relative border-4 border-white shadow-sm"
                 [style.background-color]="getThemeColor(grp.theme) + '15'" [style.color]="getThemeColor(grp.theme)">
-                {{ grp.name.substring(0, 1).toUpperCase() }}
-                <span class="online-indicator position-absolute"></span>
+                {{ grp.name.substring(0, 2).toUpperCase() }}
               </div>
               <div class="flex-grow-1 overflow-hidden">
-                <h6 class="fs-18 fw-bold mb-1 text-dark text-truncate">{{ grp.name }}</h6>
+                <h5 class="fs-18 fw-black mb-1 text-doc-heading text-truncate ls-n1">{{ grp.name }}</h5>
                 <div class="d-flex align-items-center gap-2">
-                  <span class="badge rounded-pill bg-soft-primary px-2 fs-10 text-primary fw-bold">{{ grp.theme ||
-                    'General' }}</span>
-                  <span class="fs-12 text-muted fw-medium"><i class="fa-solid fa-users me-1"></i> {{ grp.members.length
-                    }}</span>
+                  <span class="badge rounded-pill bg-soft-primary px-3 fs-10 text-primary fw-black text-uppercase">{{ grp.theme || 'General' }}</span>
+                  <span class="fs-12 text-muted fw-bold"><i class="fa-solid fa-user-group me-1"></i> {{ grp.members.length }}</span>
                 </div>
               </div>
             </div>
 
-            <p class="text-muted fs-14 mb-0 line-clamp-3" style="line-height: 1.6;">{{ grp.description }}</p>
+            <p class="text-doc-secondary fs-14 mb-4 line-clamp-3 lh-relaxed">{{ grp.description }}</p>
           </div>
 
-          <!-- Card Footer Bar (Kept the New Design) -->
+          <!-- Card Footer Bar -->
           <div
-            class="p-3 px-4 bg-soft-primary border-top d-flex justify-content-between align-items-center cursor-pointer hover-bg-primary transition-all group-footer-action"
+            class="p-4 px-4 border-top d-flex justify-content-between align-items-center cursor-pointer group-footer-action transition-all"
             (click)="isMember(grp) ? enterGroup(grp) : requestJoin(grp.id)">
             <div class="d-flex flex-column">
-              <span class="fs-12 fw-bold text-primary tracking-wide text-uppercase" *ngIf="isMember(grp)">View
-                Community</span>
-              <span class="fs-12 fw-bold text-primary tracking-wide text-uppercase" *ngIf="!isMember(grp)">Request to
-                Join</span>
-              <small class="text-muted fs-10">Updated active recently</small>
+              <span class="fs-12 fw-black text-primary tracking-wider text-uppercase" *ngIf="isMember(grp)">Enter Community</span>
+              <span class="fs-12 fw-black text-primary tracking-wider text-uppercase" *ngIf="!isMember(grp)">Send Request</span>
+              <small class="text-muted fs-11 fw-bold opacity-75">Active clinical hub</small>
             </div>
-            <i
-              class="fa-solid fa-arrow-right fs-18 text-primary shadow-sm bg-white rounded-circle p-2 icon-action transition-all"></i>
+            <i class="fa-solid fa-arrow-right-long fs-18 text-primary bg-white shadow-sm rounded-circle p-2 icon-action transition-all d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;"></i>
           </div>
 
         </div>
@@ -182,57 +149,56 @@
   </div>
 </div>
 
-<!-- Create Group Modal -->
-<div class="modal fade" id="createGroupModal" tabindex="-1">
+<<div class="modal fade" id="createGroupModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 rounded-5 shadow-lg overflow-hidden">
-      <div class="modal-header border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
-        <h4 class="modal-title fw-bold">Open New Community</h4>
+    <div class="modal-content border-0 shadow-lg animate-slide-up">
+      <div class="modal-header border-0 p-4 pb-0">
+        <h4 class="modal-title fw-black ls-n1">New Specialty Circle</h4>
         <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-4 pt-3">
-        <div class="mb-3">
-          <label class="form-label fs-13 fw-bold text-muted text-uppercase mb-2">Desired Group Name</label>
-          <input class="form-control rounded-4 p-3 bg-light border-0 shadow-none fs-15" [(ngModel)]="newGroupName"
-            placeholder="Caregivers Support NYC" />
+        <div class="mb-4">
+          <label class="form-label fs-11 fw-black text-muted text-uppercase letter-spacing-1 mb-2">Circle Identity</label>
+          <input class="form-control rounded-pill p-3 bg-light border-0 shadow-none fs-15 fw-bold px-4" [(ngModel)]="newGroupName"
+            placeholder="e.g. Cardiology Research Group" />
         </div>
-        <div class="mb-3">
-          <label class="form-label fs-13 fw-bold text-muted text-uppercase mb-2">Community Theme</label>
-          <div class="row g-2">
+        <div class="mb-4">
+          <label class="form-label fs-11 fw-black text-muted text-uppercase letter-spacing-1 mb-2">Focus Area</label>
+          <div class="row g-2 group-theme-radio">
             <div class="col-4">
               <input type="radio" class="btn-check" name="theme_final" id="tf-support" [(ngModel)]="newGroupTheme"
                 value="SUPPORT">
-              <label class="btn btn-outline-info w-100 py-3 rounded-4 border-2" for="tf-support">
-                <i class="fa-solid fa-heart-pulse d-block mb-1 fs-18"></i>
-                <small class="fw-bold">Medical</small>
+              <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-support">
+                <i class="fa-solid fa-user-doctor d-block mb-1 fs-20"></i>
+                <small class="fw-black text-uppercase fs-10">Clinical</small>
               </label>
             </div>
             <div class="col-4">
               <input type="radio" class="btn-check" name="theme_final" id="tf-social" [(ngModel)]="newGroupTheme"
                 value="SOCIAL">
-              <label class="btn btn-outline-success w-100 py-3 rounded-4 border-2" for="tf-social">
-                <i class="fa-solid fa-mug-hot d-block mb-1 fs-18"></i>
-                <small class="fw-bold">Social</small>
+              <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-social">
+                <i class="fa-solid fa-comments d-block mb-1 fs-20"></i>
+                <small class="fw-black text-uppercase fs-10">Network</small>
               </label>
             </div>
             <div class="col-4">
               <input type="radio" class="btn-check" name="theme_final" id="tf-regional" [(ngModel)]="newGroupTheme"
                 value="REGIONAL">
-              <label class="btn btn-outline-warning w-100 py-3 rounded-4 border-2" for="tf-regional">
-                <i class="fa-solid fa-location-dot d-block mb-1 fs-18"></i>
-                <small class="fw-bold">Regional</small>
+              <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-regional">
+                <i class="fa-solid fa-earth-americas d-block mb-1 fs-20"></i>
+                <small class="fw-black text-uppercase fs-10">Regional</small>
               </label>
             </div>
           </div>
         </div>
         <div class="mb-4">
-          <label class="form-label fs-13 fw-bold text-muted text-uppercase mb-2">Short Description</label>
-          <textarea class="form-control rounded-4 p-3 bg-light border-0 shadow-none fs-15" rows="4"
-            [(ngModel)]="newGroupDesc" placeholder="Briefly describe your group..."></textarea>
+          <label class="form-label fs-11 fw-black text-muted text-uppercase letter-spacing-1 mb-2">Mission Statement</label>
+          <textarea class="form-control rounded-4 p-3 bg-light border-0 shadow-none fs-15 fw-medium" rows="4"
+            [(ngModel)]="newGroupDesc" placeholder="Briefly describe the purpose of this community..."></textarea>
         </div>
-        <button class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg" (click)="createGroup()"
+        <button class="btn btn-primary w-100 py-3 rounded-pill fw-black shadow-doc letter-spacing-1 text-uppercase" (click)="createGroup()"
           data-bs-dismiss="modal" [disabled]="newGroupName.trim().length < 3">
-          Launch Community <i class="fa-solid fa-rocket ms-2"></i>
+          Initialize Hub <i class="fa-solid fa-rocket ms-2"></i>
         </button>
       </div>
     </div>

@@ -6,11 +6,14 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
+import { MapService } from '../services/map.service';
 import { PatientProgressionService } from '../services/patient-progression.service';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { HttpClient } from '@angular/common/http';
 import { RappelService } from '../services/rappel.service';
+import { PredictionService } from '../services/prediction.service';
+
 
 @Component({
   selector: 'app-medecin-dashboard',
@@ -26,6 +29,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   analyses: any[] = [];
   selectedAnalyse: any = null;
   observationToAdd: string = '';
+  alertesCount = 0; // ← ajoute
 
   isLoadingPatients = false;
   isLoadingAnalyses = false;
@@ -58,6 +62,27 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   isLoadingProgression = false;
   isResetting = false;
 
+  predictionData: any = {
+    Age: null,
+    EDUC: null,
+    SES: null,
+    MMSE: null,
+    eTIV: null,
+    nWBV: null,
+    ASF: null
+  };
+  predictionResult: any = null;
+  isPredicting = false;
+
+  riskPredictionData: any = {
+    MMSE: null,
+    CDRSB: null,
+    ADAS11: null,
+    ADAS13: null
+  };
+  riskPredictionResult: any = null;
+  isPredictingRisk = false;
+
   // MRI Tooling
   imgBrightness = 1.0;
   imgContrast = 1.0;
@@ -77,10 +102,30 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private userService: UserService,
     private rappelService: RappelService
+
+    private progressionService: PatientProgressionService,
+    private predictionService: PredictionService,
+
+
+    private mapService: MapService, // ← ajoute
+
+
+
   ) { }
 
   ngOnInit(): void {
     this.loadPatients();
+    this.chargerAlertes(); // ← ajoute
+  }
+
+  // ← AJOUTE CETTE METHODE
+  chargerAlertes(): void {
+    this.mapService.getAllAlerts().subscribe({
+      next: (alertes) => {
+        this.alertesCount = alertes.filter((a: any) => !a.resolue).length;
+      },
+      error: () => {}
+    });
   }
 
   ngOnDestroy(): void {
@@ -106,6 +151,9 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   selectPatient(patient: any) {
     this.selectedPatient = patient;
     this.selectedAnalyse = null;
+    this.predictionResult = null;
+    this.riskPredictionResult = null;
+    this.predictionData.Age = patient.age || null;
     this.isLoadingAnalyses = true;
     this.analyseService.getAnalysesByPatient(patient.id).subscribe({
       next: (data) => {
@@ -115,13 +163,13 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
       },
       error: () => this.isLoadingAnalyses = false
     });
-    
+
     // Load progression
     const userId = patient.user ? patient.user.id : patient.id; // fallback if user logic differs
     if (userId) {
       this.loadProgression(userId);
     }
-    
+
     // Reset tab and load reminders
     this.activeTab = 'analyses';
     this.loadReminders(patient.id);
@@ -151,6 +199,8 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
         this.progressionScoreGame = data.scoreGame;
         this.progressionStadeGame = data.stadeGame;
         this.progressionScoreFinal = (this.progressionScoreQuiz + this.progressionScoreGame) / 2;
+        this.predictionData.MMSE = this.progressionScoreFinal;
+        this.riskPredictionData.MMSE = this.progressionScoreFinal;
       },
       error: (err) => console.error(err)
     });
@@ -169,7 +219,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
   resetPatientProgression(type: string = 'ALL') {
     if (!this.selectedPatient || !confirm(`Êtes-vous sûr de vouloir réinitialiser la progression de ce patient pour la catégorie ${type} ?`)) return;
-    
+
     const userId = this.selectedPatient.user ? this.selectedPatient.user.id : this.selectedPatient.id;
     this.isResetting = true;
     this.progressionService.resetPatient(userId, type).subscribe({
@@ -195,7 +245,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     if (analyse.observationMedicale && analyse.observationMedicale.startsWith('{')) {
       try {
         this.selectedAnalyse.geminiData = JSON.parse(analyse.observationMedicale);
-        this.observationToAdd = ''; 
+        this.observationToAdd = '';
       } catch (e) {
         this.selectedAnalyse.geminiData = null;
       }
@@ -323,7 +373,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     this.analyseService.updateAnalyse(this.selectedAnalyse.id, payload).subscribe({
       next: () => {
         this.showSuccess("Observation ajoutée avec succès.");
-        this.selectPatient(this.selectedPatient); // reload analyses
+        this.selectPatient(this.selectedPatient);
         this.selectedAnalyse = null;
         this.isSavingObservation = false;
       },
@@ -372,14 +422,14 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
       if (idx > -1) this.selectedDays.splice(idx, 1);
       else this.selectedDays.push(day);
     }
-    
+
     if (this.selectedDays.length === 7) this.reminderForm.jours = 'TOUS';
     else this.reminderForm.jours = this.selectedDays.join(',');
   }
 
   saveReminder() {
     if (!this.selectedPatient) return;
-    
+
     const currentUser = this.authService.getCurrentUser();
     const payload = {
       titre: this.reminderForm.titre,
@@ -426,6 +476,38 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     this.rappelService.toggle(rappel.id).subscribe({
       next: () => {
         rappel.actif = !rappel.actif;
+      }
+    });
+  }
+
+  predictAlzheimer() {
+    this.isPredicting = true;
+    this.predictionResult = null;
+    this.predictionService.predict(this.predictionData).subscribe({
+      next: (res: any) => {
+        this.predictionResult = res;
+        this.isPredicting = false;
+        this.showSuccess('Prédiction terminée avec succès.');
+      },
+      error: (err) => {
+        console.error(err);
+        this.isPredicting = false;
+      }
+    });
+  }
+
+  predictRiskAlzheimer() {
+    this.isPredictingRisk = true;
+    this.riskPredictionResult = null;
+    this.predictionService.predictRisk(this.riskPredictionData).subscribe({
+      next: (res: any) => {
+        this.riskPredictionResult = res;
+        this.isPredictingRisk = false;
+        this.showSuccess('Prédiction du risque terminée avec succès.');
+      },
+      error: (err) => {
+        console.error(err);
+        this.isPredictingRisk = false;
       }
     });
   }

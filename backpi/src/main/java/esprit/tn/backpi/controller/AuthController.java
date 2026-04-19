@@ -82,8 +82,6 @@ public class AuthController {
                                 .body(Map.of("message", "Ce compte est suspendu"));
                     }
                     if (user.getPassword().equals(loginRequest.getPassword())) {
-                        // Ensure user is in their default group
-                        chatGroupService.assignUserToDefaultGroup(user);
                         return ResponseEntity.ok(user);
                     }
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -152,11 +150,10 @@ public class AuthController {
                 newUser.setNom(nameParts.length > 1 ? nameParts[1] : nameParts[0]);  // Last name
 
                 newUser.setActif(true);
-                newUser.setRole(esprit.tn.backpi.entity.Role.PATIENT);
+                newUser.setRole(Role.PATIENT);
                 newUser.setPassword(java.util.UUID.randomUUID().toString());
                 return userRepository.save(newUser);
             });
-            chatGroupService.assignUserToDefaultGroup(user);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             e.printStackTrace();

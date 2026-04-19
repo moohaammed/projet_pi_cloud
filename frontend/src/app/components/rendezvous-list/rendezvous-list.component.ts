@@ -27,7 +27,7 @@ export class RendezVousListComponent implements OnInit {
   searchPatientId = '';
   searchMedecinId = '';
   filterStatut = '';
-  deleteConfirmId: number | null = null;
+  deleteConfirmId: string | null = null;
   currentUser: any = null;
 
   viewMode: 'list' | 'calendar' = 'list';
@@ -158,7 +158,7 @@ export class RendezVousListComponent implements OnInit {
 
   handleEventDrop(info: any): void {
     const droppedEvent = info.event;
-    const rvId = Number(droppedEvent.id);
+    const rvId = droppedEvent.id;
     const newStart = droppedEvent.start;
 
     const existingRvIndex = this.rendezvousList.findIndex(rv => rv.id === rvId);
@@ -191,7 +191,7 @@ export class RendezVousListComponent implements OnInit {
     this.router.navigate(['/rendezvous', rvId]);
   }
 
-  confirmDelete(id: number): void {
+  confirmDelete(id: string): void {
     this.deleteConfirmId = id;
   }
 
@@ -199,7 +199,7 @@ export class RendezVousListComponent implements OnInit {
     this.deleteConfirmId = null;
   }
 
-  doDelete(id: number): void {
+  doDelete(id: string): void {
     this.service.delete(id).subscribe({
       next: () => {
         this.rendezvousList = this.rendezvousList.filter(rv => rv.id !== id);
@@ -213,7 +213,7 @@ export class RendezVousListComponent implements OnInit {
     });
   }
 
-  changeStatut(id: number, statut: StatutRendezVous): void {
+  changeStatut(id: string, statut: StatutRendezVous): void {
     this.service.updateStatut(id, statut).subscribe({
       next: (updated) => {
         const idx = this.rendezvousList.findIndex(rv => rv.id === id);
