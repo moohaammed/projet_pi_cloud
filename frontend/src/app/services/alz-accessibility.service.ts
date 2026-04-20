@@ -189,7 +189,15 @@ export class AlzheimerAccessibilityService {
     if (this.isAgentPaused) return;
     if (this.recognition && !this.isListening) {
       this.isListening = true;
-      this.recognition.start();
+      try {
+        this.recognition.start();
+      } catch (err: any) {
+        if (err.name === 'InvalidStateError') {
+          console.warn('[Alz Accessibility] SpeechRecognition is already started or starting.');
+        } else {
+          console.error('[Alz Accessibility] Error starting SpeechRecognition:', err);
+        }
+      }
     }
   }
 

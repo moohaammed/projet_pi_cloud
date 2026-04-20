@@ -8,7 +8,7 @@ import { ActivityModel } from '../../../models/education/activity.model';
 import { AuthService } from '../../../services/auth.service';
 import { PatientProgressionService } from '../../../services/patient-progression.service';
 import { AudioSessionService } from '../../../services/education/audio-session.service';
-import { AlzheimerAccessibilityService } from '../../../services/alzheimer-accessibility.service';
+import { AlzheimerAccessibilityService } from '../../../services/alz-accessibility.service';
 
 @Component({
   selector: 'app-activity-player-page',
@@ -3911,13 +3911,16 @@ export class EducationComponent implements OnInit, OnDestroy {
   }
 
   getEmbedUrl(youtubeUrl: string): SafeResourceUrl {
+    if (!youtubeUrl) return '';
     const videoId = this.extractYoutubeId(youtubeUrl);
     if (videoId) {
       // Use youtube-nocookie.com to avoid tracker blockers preventing IP resolution
       const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
       return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
     }
-    return '';
+    // Fallback : au cas où le lien n'est pas un lien YouTube standard (Dailymotion, un lien direct, etc.)
+    // La vidéo s'affichera directement dans l'iframe avec l'URL fournie.
+    return this.sanitizer.bypassSecurityTrustResourceUrl(youtubeUrl);
   }
 
   private extractYoutubeId(url: string): string | null {

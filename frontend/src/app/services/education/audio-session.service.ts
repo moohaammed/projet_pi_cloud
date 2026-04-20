@@ -23,10 +23,12 @@ export interface ProcessAnswerResponse {
   incorrectAnswers: number;
 }
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({ providedIn: 'root' })
 export class AudioSessionService {
 
-  private readonly baseUrl = `http://localhost:8085/api/audio-sessions`;
+  private readonly baseUrl = `${environment.apiUrl}/api/audio-sessions`;
 
   // ── SpeechSynthesis ──────────────────────────────────────────────
   private synth: SpeechSynthesis = window.speechSynthesis;

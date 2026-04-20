@@ -38,7 +38,7 @@ spring:
         - id: education-rest
           uri: lb://education-service
           predicates:
-            - Path=/api/activities/**,/api/patient-activity/**,/api/events/**,/api/event-seats/**,/uploads/education/**
+            - Path=/api/activities/**,/api/patient-activity/**,/api/events/**,/api/event-seats/**,/uploads/education/**,/api/audio-sessions/**
 
         # ── Donation service ──────────────────────────────────────────
         - id: donation-rest
