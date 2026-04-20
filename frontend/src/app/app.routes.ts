@@ -281,6 +281,15 @@ export const routes: Routes = [
 
 
 
+  // HELP NOTIFICATION — Patient Emergency Contacts
+  {
+    path: 'help-notification-contacts',
+    loadComponent: () =>
+      import('./components/help-notification-contacts/help-notification-contacts.component')
+        .then(m => m.HelpNotificationContactsComponent),
+    canActivate: [authGuard]
+  },
+
   // SMARTWATCH — Heart Rate Monitor
   {
     path: 'heart-rate',

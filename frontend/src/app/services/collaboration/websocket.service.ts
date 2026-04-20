@@ -17,6 +17,8 @@ export class WebSocketService {
   public notificationMessage = signal<Notification | null>(null);
   public liveStatusMessage = signal<any>(null);
   public webrtcSignal = signal<any>(null);
+  public helpNotificationMessage = signal<any>(null);
+
   public connected$ = new BehaviorSubject<boolean>(false);
 
   constructor() { }
@@ -111,5 +113,10 @@ export class WebSocketService {
     this.stompClient.subscribe(`/user/queue/webrtc`, (msg: any) => {
       this.webrtcSignal.set(JSON.parse(msg.body));
     });
+    // Help Notification channel (separate from SOS/GPS)
+    this.stompClient.subscribe(`/user/queue/help-notifications`, (msg: any) => {
+      this.helpNotificationMessage.set(JSON.parse(msg.body));
+    });
   }
 }
+

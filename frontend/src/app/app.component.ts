@@ -34,6 +34,9 @@ export class AppComponent implements OnDestroy {
   incomingVideoCall = signal<{ roomId: string; callerName: string; senderId: string } | null>(null);
   private videoCallInviteSub?: Subscription;
 
+  // Help Notification Popup State
+  helpNotificationPopup = signal<{ content: string; patientName: string; relationType: string; timestamp: string } | null>(null);
+
   constructor() {
     // Reactive connection to WebSocket and VideoCall when user is logged in
     this.auth.getLoggedIn$().subscribe(loggedIn => {
@@ -55,6 +58,23 @@ export class AppComponent implements OnDestroy {
       if (notif) {
         untracked(() => {
           this.notificationService.addNotification(notif);
+        });
+      }
+    });
+
+    // Help Notification popup effect (separate from SOS/GPS)
+    effect(() => {
+      const helpNotif = this.webSocketService.helpNotificationMessage();
+      if (helpNotif) {
+        untracked(() => {
+          this.helpNotificationPopup.set({
+            content: helpNotif.content || 'Help notification received',
+            patientName: helpNotif.patientName || 'Unknown',
+            relationType: helpNotif.relationType || '',
+            timestamp: helpNotif.timestamp || new Date().toISOString()
+          });
+          // Auto-dismiss after 15 seconds
+          setTimeout(() => this.dismissHelpNotification(), 15000);
         });
       }
     });
@@ -207,6 +227,10 @@ export class AppComponent implements OnDestroy {
       return '/admin/dashboard';
     }
     return '/patient-dashboard';
+  }
+
+  dismissHelpNotification(): void {
+    this.helpNotificationPopup.set(null);
   }
 
   isLoggedIn(): boolean {

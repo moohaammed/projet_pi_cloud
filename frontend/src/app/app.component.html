@@ -359,6 +359,17 @@
                     </a>
                   </li>
 
+                  <!-- HELP NOTIFICATION — Patient Emergency Contacts -->
+                  <li class="nav-item" *ngIf="auth.getRole() === 'PATIENT'">
+                    <a routerLink="/help-notification-contacts"
+                       class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-bold
+                              d-flex align-items-center gap-2"
+                       routerLinkActive="active">
+                      <i class="fa-solid fa-address-book"></i>
+                      <span>Help Notification</span>
+                    </a>
+                  </li>
+
                   <li class="nav-item ms-lg-3" *ngIf="auth.isLoggedIn()">
                     <a [routerLink]="getAccountLink()"
                       class="btn btn-primary btn-sm rounded-pill px-4">Compte</a>
@@ -433,6 +444,33 @@
   </ng-template>
 </ng-template>
 
+<!-- HELP NOTIFICATION POPUP (for doctor/relation receiving help notification) -->
+<div *ngIf="helpNotificationPopup() as hn"
+  class="position-fixed top-0 end-0 mt-4 me-4 p-0 shadow-lg rounded-4 overflow-hidden"
+  style="z-index: 10000; max-width: min(420px, 92vw); animation: helpNotifSlideIn 0.4s ease-out;">
+  <div class="px-4 py-3 text-white d-flex align-items-center gap-2"
+       style="background: linear-gradient(135deg, #800080, #b300b3);">
+    <i class="fa-solid fa-bell fa-lg"></i>
+    <strong class="flex-grow-1">Help Notification</strong>
+    <button type="button" class="btn-close btn-close-white btn-sm"
+            (click)="dismissHelpNotification()"></button>
+  </div>
+  <div class="bg-white p-4">
+    <p class="mb-2 fw-medium text-dark">
+      <i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>
+      {{ hn.content }}
+    </p>
+    <div class="d-flex gap-3 small text-muted">
+      <span *ngIf="hn.relationType">
+        <i class="fa-solid fa-tag me-1"></i>{{ hn.relationType }}
+      </span>
+      <span>
+        <i class="fa-solid fa-clock me-1"></i>Just now
+      </span>
+    </div>
+  </div>
+</div>
+
 <!-- GLOBAL VIDEO CALL RINGING UI -->
 <div *ngIf="incomingVideoCall() as inv"
   class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-4 py-3
@@ -451,3 +489,4 @@
   [roomId]="videoCallRoomId()"
   (closeCall)="closeGlobalVideoCall()">
 </app-videocall>
+
