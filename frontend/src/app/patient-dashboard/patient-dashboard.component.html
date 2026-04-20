@@ -12,13 +12,82 @@
           <p class="text-muted mb-0 small">Gérez votre profil et suivez vos analyses IRM</p>
         </div>
       </div>
-      <div class="d-flex gap-2">
+      <div class="d-flex gap-2 align-items-center">
+        <span *ngIf="assignedDoctor" class="badge bg-success py-2 px-3 me-2 shadow-sm" style="font-size: 0.9em;">
+           <i class="fa-solid fa-user-doctor me-2"></i>Mon Médecin: Dr. {{assignedDoctor.prenom}} {{assignedDoctor.nom}}
+        </span>
         <a routerLink="/patients" class="btn btn-outline-secondary btn-sm">
           <i class="fa-solid fa-arrow-left me-1"></i>Retour
         </a>
         <button class="btn btn-primary btn-sm" (click)="goToContactDoctor()">
-          <i class="fa-solid fa-stethoscope me-2"></i>Contact Doctor
+          <i class="fa-solid fa-stethoscope me-2"></i>Contacter Médecins
         </button>
+
+        <!-- Notification Bell -->
+        <div class="notification-wrapper ms-2 position-relative">
+          <button class="btn btn-light btn-sm rounded-circle position-relative shadow-sm"
+                  (click)="toggleNotificationPanel()"
+                  style="width: 38px; height: 38px; background: white; border-color: #dee2e6;">
+            <i class="fa-solid fa-bell text-primary"></i>
+            <span *ngIf="unreadCount > 0" 
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  style="font-size: 0.65rem; border: 2px solid white;">
+              {{ unreadCount > 9 ? '9+' : unreadCount }}
+            </span>
+          </button>
+
+          <!-- Notification Dropdown Panel -->
+          <div *ngIf="showNotificationPanel" 
+               class="notification-panel shadow-lg rounded-4 border-0 p-0"
+               style="position: absolute; right: 0; top: 45px; width: 320px; z-index: 1060; background: white; overflow: hidden;">
+            <div class="p-3 bg-light d-flex justify-content-between align-items-center border-bottom">
+              <h6 class="fw-bold mb-0">Notifications</h6>
+              <span class="badge bg-soft-primary text-primary">{{ unreadCount }} nouvelles</span>
+            </div>
+            
+            <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
+              <div *ngIf="isLoadingNotifications" class="text-center py-4">
+                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+              </div>
+              
+              <div *ngIf="!isLoadingNotifications && notifications.length === 0" class="text-center py-5 text-muted px-3">
+                <i class="fa-solid fa-bell-slash fa-2x mb-2 opacity-25"></i>
+                <p class="small mb-0">Vous n'avez pas encore de notifications.</p>
+              </div>
+
+              <div *ngFor="let n of notifications" 
+                   class="notification-item p-3 border-bottom d-flex gap-3" 
+                   [class.unread-notif]="!n.isRead"
+                   (click)="markAsRead(n)">
+                <div class="notif-icon rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                     [ngClass]="{
+                       'bg-soft-danger text-danger': n.type === 'URGENT',
+                       'bg-soft-warning text-warning': n.type === 'RAPPEL_MEDICAL',
+                       'bg-soft-info text-info': n.type === 'RAPPEL_QUOTIDIEN',
+                       'bg-soft-success text-success': n.type === 'INFO'
+                     }"
+                     style="width: 36px; height: 36px;">
+                  <i class="fa-solid" [ngClass]="{
+                    'fa-triangle-exclamation': n.type === 'URGENT',
+                    'fa-clipboard-check': n.type === 'RAPPEL_MEDICAL',
+                    'fa-clock': n.type === 'RAPPEL_QUOTIDIEN',
+                    'fa-circle-info': n.type === 'INFO'
+                  }"></i>
+                </div>
+                <div class="overflow-hidden">
+                  <p class="small mb-1 text-dark" style="line-height: 1.4;">{{ n.message }}</p>
+                  <span class="text-muted" style="font-size: 0.7rem;">{{ n.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-2 bg-white border-top text-center" *ngIf="notifications.length > 0">
+              <button class="btn btn-link text-primary btn-sm fw-bold text-decoration-none w-100" (click)="markAllAsRead()">
+                Tout marquer comme lu
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -35,29 +104,16 @@
       <div><strong>Erreur !</strong> {{ errorMessage }}</div>
     </div>
 
-    <!-- ══ Patient ID Lookup ════════════════════════════ -->
-    <div class="card border-0 shadow-sm mb-4" *ngIf="!patientId">
+    <!-- ══ Profile Creation Prompt ════════════════════════════ -->
+    <div class="card border-0 shadow-sm border-primary border-start border-4 mb-4" *ngIf="!patientId && !isLoadingPatient">
       <div class="card-body p-4">
-        <h6 class="fw-bold mb-3">
-          <i class="fa-solid fa-magnifying-glass me-2 text-primary"></i>
-          Charger un dossier existant
+        <h6 class="fw-bold mb-2">
+          <i class="fa-solid fa-address-card me-2 text-primary"></i>
+          Dossier Patient Incomplet
         </h6>
-        <div class="row g-3 align-items-end">
-          <div class="col-md-6">
-            <div class="form-group">
-              <input type="number" class="form-control" [(ngModel)]="patientId" name="lookupId" placeholder="Ex : 5">
-              <label>ID Patient</label>
-            </div>
-          </div>
-          <div class="col-auto">
-            <button class="btn btn-outline-primary" (click)="loadPatient()">
-              <i class="fa-solid fa-download me-1"></i>Charger
-            </button>
-          </div>
-          <div class="col-auto">
-            <span class="text-muted small">— ou créez un nouveau profil ci-dessous —</span>
-          </div>
-        </div>
+        <p class="text-muted mb-0">
+          Il semble que votre dossier médical ne soit pas encore complet. Veuillez compléter vos informations personnelles dans le formulaire ci-dessous pour débloquer l'analyse IRM.
+        </p>
       </div>
     </div>
 
@@ -68,10 +124,6 @@
         Patient actif : <strong>{{ patient.nom }} {{ patient.prenom }}</strong>
         <span class="badge bg-primary ms-2">#{{ patientId }}</span>
       </span>
-      <button class="btn btn-sm btn-outline-secondary"
-              (click)="patientId = null; patient = { nom: '', prenom: '', age: null, poids: null, sexe: 'Homme', user_id: null }; analyses = []">
-        Changer
-      </button>
     </div>
 
     <div class="row mb-4" *ngIf="!isLoadingProgression">
@@ -204,7 +256,16 @@
             <hr>
           </div>
           <div class="card-body px-4 pb-4">
-            <form (ngSubmit)="submitAnalyse()" #analyseForm="ngForm">
+            
+            <div *ngIf="!patientId" class="text-center py-5 text-muted">
+              <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                <i class="fa-solid fa-lock fa-2x text-secondary"></i>
+              </div>
+              <h6 class="fw-bold text-dark">Espace verrouillé</h6>
+              <p class="small mb-0">Vous devez d'abord compléter et créer votre profil médical (à gauche) pour pouvoir soumettre des analyses IRM.</p>
+            </div>
+
+            <form *ngIf="patientId" (ngSubmit)="submitAnalyse()" #analyseForm="ngForm">
 
               <!-- Rapport -->
               <div class="mb-4">
@@ -223,7 +284,7 @@
                 </label>
                 <input type="file" class="form-control" accept="image/*"
                        (change)="onFileSelected($event, 'image_irm')">
-                <small class="text-muted">Formats acceptés : JPG, PNG, DCM</small>
+                <small class="text-muted d-block">Formats acceptés : JPG, PNG, DCM</small>
                 
                 <div *ngIf="newAnalyse.interpretation" class="alert alert-success mt-3 mb-0 border-0 p-3 shadow-sm d-flex align-items-center gap-3">
                   <i class="fa-solid fa-robot fa-2x"></i>
@@ -379,7 +440,7 @@
               </div>
             </div>
 
-            <div *ngIf="!selectedAnalyse.geminiData && selectedAnalyse.observationMedicale" class="alert alert-warning border-0 mt-3">
+            <div *ngIf="selectedAnalyse.observationMedicale" class="alert alert-warning border-0 mt-3">
               <h6 class="fw-bold">
                 <i class="fa-solid fa-user-doctor me-1"></i>Observation du Médecin
               </h6>

@@ -3,11 +3,11 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, map, of, delay } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = `${environment.apiUrl}/api/auth`;  
   private isBrowser: boolean;
   private loggedIn$: BehaviorSubject<boolean>;
 
@@ -142,7 +142,7 @@ export class AuthService {
     switch (role) {
       case 'ADMIN':    this.router.navigate(['/admin/dashboard']); break;
       case 'DOCTOR':   this.router.navigate(['/medecin-dashboard']); break;
-      case 'PATIENT':  this.router.navigate(['/home']); break;
+      case 'PATIENT':  this.router.navigate(['/patient-dashboard']); break;
       case 'RELATION': this.router.navigate(['/patient-dashboard']); break;
       default:         this.router.navigate(['/auth/login']);
     }

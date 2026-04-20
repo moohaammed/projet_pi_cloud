@@ -349,7 +349,7 @@ export class DonationFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const campaignId = Number(this.route.snapshot.paramMap.get('campaignId'));
+    const campaignId = this.route.snapshot.paramMap.get('campaignId');
     if (campaignId) {
       this.donationService.getCampaignById(campaignId).subscribe(c => {
         this.campaign = c;

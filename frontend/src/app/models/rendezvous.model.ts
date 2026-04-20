@@ -1,7 +1,7 @@
 export type StatutRendezVous = 'PLANIFIE' | 'CONFIRME' | 'ANNULE' | 'TERMINE';
 
 export interface RendezVous {
-  id: number;
+  id: string;
   patientId: number;
   medecinId: number;
   dateHeure: string;

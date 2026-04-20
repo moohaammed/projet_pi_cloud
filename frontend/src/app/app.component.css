@@ -180,3 +180,67 @@
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes pulse-sos {
+  0%   { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+  70%  { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+/* ── Voice Navigation Button ── */
+.voice-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(128, 0, 128, 0.2);
+  background: transparent;
+  color: #aaa;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+.voice-nav-btn:hover {
+  border-color: var(--docwala-purple);
+  color: var(--docwala-purple);
+  background: rgba(128, 0, 128, 0.06);
+  transform: scale(1.08);
+}
+.voice-nav-btn.active {
+  background: linear-gradient(135deg, #800080, #5c0057);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 14px rgba(128, 0, 128, 0.4);
+  animation: voice-btn-pulse 2.5s ease-in-out infinite;
+}
+@keyframes voice-btn-pulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(128, 0, 128, 0.35); }
+  50%       { box-shadow: 0 4px 22px rgba(128, 0, 128, 0.6); }
+}
+
+/* Admin header variant */
+.voice-nav-btn-admin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid rgba(128, 0, 128, 0.2);
+  color: #aaa;
+  transition: all 0.25s ease;
+}
+.voice-nav-btn-admin:hover {
+  border-color: var(--docwala-purple);
+  color: var(--docwala-purple);
+}
+.voice-nav-btn-admin.active {
+  background: linear-gradient(135deg, #800080, #5c0057);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 14px rgba(128, 0, 128, 0.4);
+  animation: voice-btn-pulse 2.5s ease-in-out infinite;
+}

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ActivityModel } from '../../models/education/activity.model';
@@ -6,7 +7,7 @@ import { ActivityModel } from '../../models/education/activity.model';
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
 
-  private api = 'http://localhost:8080/api/activities';
+  private api = `${environment.apiUrl}/api/activities`;
 
   constructor(private http: HttpClient) {}
 
@@ -14,7 +15,7 @@ export class ActivityService {
     return this.http.get<ActivityModel[]>(this.api);
   }
 
-  getById(id: number): Observable<ActivityModel> {
+  getById(id: string): Observable<ActivityModel> {
     return this.http.get<ActivityModel>(`${this.api}/${id}`);
   }
 
@@ -34,11 +35,11 @@ export class ActivityService {
     return this.http.post<ActivityModel>(this.api, activity);
   }
 
-  update(id: number, activity: ActivityModel): Observable<ActivityModel> {
+  update(id: string, activity: ActivityModel): Observable<ActivityModel> {
     return this.http.put<ActivityModel>(`${this.api}/${id}`, activity);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.api}/${id}`);
   }
 }

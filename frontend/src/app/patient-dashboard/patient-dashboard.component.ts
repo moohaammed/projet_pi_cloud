@@ -6,6 +6,8 @@ import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
 import { PatientProgressionService } from '../services/patient-progression.service';
 import { AuthService } from '../services/auth.service';
+import { AssignmentService } from '../services/assignment.service';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-patient-dashboard',
@@ -21,6 +23,7 @@ export class PatientDashboardComponent implements OnInit {
 
   newAnalyse: any = { rapport_medical: '', image_irm: '', score_jeu: null };
   selectedAnalyse: any = null;
+  assignedDoctor: any = null;
 
   chatQuestion: string = '';
   chatHistory: {sender: string, text: string}[] = [];
@@ -40,11 +43,19 @@ export class PatientDashboardComponent implements OnInit {
   progressionHistory: any[] = [];
   isLoadingProgression = false;
 
+  // Notifications
+  notifications: any[] = [];
+  unreadCount: number = 0;
+  showNotificationPanel = false;
+  isLoadingNotifications = false;
+
   constructor(
     private patientService: PatientService,
     private analyseService: AnalyseService,
     private progressionService: PatientProgressionService,
     private authService: AuthService,
+    private assignmentService: AssignmentService,
+    private notificationService: NotificationService,
     private router: Router
   ) { }
 
@@ -52,16 +63,62 @@ export class PatientDashboardComponent implements OnInit {
     const user = this.authService.getCurrentUser();
     if (user && user.id) {
        this.loadProgression(user.id);
-    }
-    // Load only if we have a known patient ID
-    if (this.patientId) {
-      this.loadPatientProfile();
-      this.loadAnalyses();
+       this.loadAssignedDoctor(user.id);
+       // Removed loadNotifications/loadUnreadCount from here, they need patientId.
+       
+       // Automatically load patient profile for the connected user
+       this.isLoadingPatient = true;
+       this.patientService.getPatientByUserId(user.id).subscribe({
+         next: (data) => {
+           if (data && data.id) {
+             this.patientId = data.id;
+             this.patient = {
+                nom: data.nom,
+                prenom: data.prenom,
+                age: data.age,
+                poids: data.poids,
+                sexe: data.sexe,
+                user_id: data.user ? data.user.id : user.id
+             };
+             // Only load analyses & notifications when we have a valid patientId
+             this.loadAnalyses();
+             if (this.patientId) {
+               this.loadNotifications(this.patientId);
+               this.loadUnreadCount(this.patientId);
+             }
+           } else {
+             // If patient doesn't exist yet, we keep patientId = null
+             // so the profile creation form feels right. But we pre-fill name.
+             this.patient.nom = user.nom || '';
+             this.patient.prenom = user.prenom || '';
+             this.patient.user_id = user.id;
+           }
+           this.isLoadingPatient = false;
+         },
+         error: (err) => {
+           console.log('No patient record found for this user', err);
+           this.patient.nom = user.nom || '';
+           this.patient.prenom = user.prenom || '';
+           this.patient.user_id = user.id;
+           this.isLoadingPatient = false;
+         }
+       });
     }
   }
 
   goToContactDoctor() {
     this.router.navigate(['/contact-doctor']);
+  }
+
+  loadAssignedDoctor(userId: number) {
+    this.assignmentService.getMedecinByPatient(userId).subscribe({
+      next: (data) => {
+        this.assignedDoctor = data;
+      },
+      error: () => {
+        this.assignedDoctor = null;
+      }
+    });
   }
 
   loadProgression(userId: number) {
@@ -265,16 +322,22 @@ export class PatientDashboardComponent implements OnInit {
       reader.onload = (e: any) => {
         this.newAnalyse[field] = e.target.result;
 
-        // If user selects an MRI, call ML API immediately to preview prediction!
+        // Directly call ML API for Alzheimer classification
         if (field === 'image_irm') {
           console.log('[PatientDashboard] Image selected. Calling ML API...');
+          this.isSubmitting = true; // Use existing submitting state or just hide/show logic
+          this.newAnalyse.interpretation = null;
+          this.newAnalyse.pourcentage_risque = null;
+          
           this.analyseService.predictAlzheimer(this.newAnalyse.image_irm).subscribe({
             next: (mlResult) => {
               this.newAnalyse.interpretation = mlResult.prediction;
               this.newAnalyse.pourcentage_risque = mlResult.confidence;
               console.log('[PatientDashboard] ML API Success:', mlResult);
+              this.isSubmitting = false;
             },
             error: (err) => {
+              this.isSubmitting = false;
               console.error("Machine Learning API error:", err);
               this.showError("Impossible de joindre le serveur IA pour l'analyse immédiate.");
             }
@@ -335,5 +398,54 @@ export class PatientDashboardComponent implements OnInit {
         this.isChatting = false;
       }
     });
+  }
+
+  // ── Notifications ───────────────────────────────────────────────
+
+  loadNotifications(patientId: number) {
+    this.isLoadingNotifications = true;
+    this.notificationService.getLatest(patientId).subscribe({
+      next: (data) => {
+        this.notifications = data || [];
+        this.isLoadingNotifications = false;
+      },
+      error: () => this.isLoadingNotifications = false
+    });
+  }
+
+  loadUnreadCount(patientId: number) {
+    this.notificationService.getUnreadCount(patientId).subscribe({
+      next: (data) => this.unreadCount = data.count
+    });
+  }
+
+  toggleNotificationPanel() {
+    this.showNotificationPanel = !this.showNotificationPanel;
+    if (this.showNotificationPanel && this.patientId) {
+      this.loadNotifications(this.patientId);
+    }
+  }
+
+  markAsRead(notif: any) {
+    if (notif.isRead) return; 
+    this.notificationService.markAsRead(notif.id).subscribe({
+      next: () => {
+        notif.isRead = true;
+        this.unreadCount = Math.max(0, this.unreadCount - 1);
+      }
+    });
+  }
+
+  markAllAsRead() {
+    const user = this.authService.getCurrentUser();
+    if (user && user.id) {
+      this.notificationService.markAllAsRead(user.id).subscribe({
+        next: () => {
+          this.notifications.forEach(n => n.isRead = true);
+          this.unreadCount = 0;
+          this.showSuccess("Toutes les notifications sont marquées comme lues.");
+        }
+      });
+    }
   }
 }

@@ -44,7 +44,7 @@ export class RendezVousDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.service.getById(+id).subscribe({
+      this.service.getById(id).subscribe({
         next: (data) => {
           console.log('VC: RendezVous data loaded', data);
           // Check access
@@ -82,7 +82,7 @@ export class RendezVousDetailComponent implements OnInit {
     return statut ? map[statut] ?? 'bg-secondary' : 'bg-secondary';
   }
 
-  deleteRv(id: number): void {
+  deleteRv(id: string): void {
     if (confirm('Voulez-vous vraiment supprimer ce rendez-vous ?')) {
       this.service.delete(id).subscribe({
         next: () => this.router.navigate(['/rendezvous']),

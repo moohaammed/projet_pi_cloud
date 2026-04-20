@@ -1,0 +1,76 @@
+<div class="container mt-4">
+  
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2> Tableau des Alertes</h2>
+    <button class="btn btn-primary" (click)="chargerAlertes()">
+       Rafraîchir
+    </button>
+  </div>
+
+  <!-- Alertes non résolues -->
+  <h4 class="text-danger">
+     Alertes en cours ({{ alertesNonResolues.length }})
+  </h4>
+
+  <div *ngFor="let alerte of alertesNonResolues" 
+       class="card mb-3 border-danger">
+    <div class="card-body">
+      
+      <div class="d-flex justify-content-between">
+        <span [class]="getBadgeClass(alerte.typeAlerte)">
+          {{ alerte.typeAlerte }}
+        </span>
+        <small class="text-muted">{{ alerte.declencheeAt | date:'dd/MM/yyyy HH:mm' }}</small>
+      </div>
+
+      <h5 class="mt-2">
+         {{ alerte.patient?.prenom }} {{ alerte.patient?.nom }}
+      </h5>
+      
+      <p>{{ alerte.message }}</p>
+
+      <div class="d-flex gap-2">
+        <!-- Voir sur la carte -->
+        <button class="btn btn-outline-primary btn-sm" 
+                (click)="ouvrirGPS(alerte)"
+                [disabled]="!alerte.latitude">
+           Voir position GPS
+        </button>
+
+        <!-- Confirmer vue -->
+        <button class="btn btn-success btn-sm"
+                (click)="confirmerVu(alerte)">
+           J'ai vu l'alerte
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="alertesNonResolues.length === 0" class="alert alert-success">
+     Aucune alerte en cours
+  </div>
+
+  <!-- Historique -->
+  <h4 class="mt-4 text-muted">
+     Historique ({{ alertesResolues.length }})
+  </h4>
+
+  <div *ngFor="let alerte of alertesResolues" 
+       class="card mb-2 border-secondary opacity-75">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <span [class]="getBadgeClass(alerte.typeAlerte)">
+          {{ alerte.typeAlerte }}
+        </span>
+        <span class="badge bg-success">Résolue</span>
+      </div>
+      <p class="mt-2 mb-0">
+         {{ alerte.patient?.prenom }} {{ alerte.patient?.nom }} — 
+        {{ alerte.declencheeAt | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+    </div>
+  </div>
+
+</div>

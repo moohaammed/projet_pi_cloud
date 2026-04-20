@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
-
+import { environment } from '../../environments/environment';
 @Injectable({
     providedIn: 'root'
 })
 export class PatientService {
-    private apiUrl = 'http://localhost:8080/api/patients';
+    private apiUrl = `${environment.apiUrl}/api/patients`;
 
     constructor(private http: HttpClient) { }
 
@@ -28,6 +28,17 @@ export class PatientService {
             tap(res => console.log(`[PatientService] Response getPatientById:`, res)),
             catchError(err => {
                 console.error(`[PatientService] Error getPatientById:`, err);
+                return throwError(() => err);
+            })
+        );
+    }
+
+    getPatientByUserId(userId: number): Observable<any> {
+        console.log(`[PatientService] GET ${this.apiUrl}/by-user/${userId}`);
+        return this.http.get<any>(`${this.apiUrl}/by-user/${userId}`).pipe(
+            tap(res => console.log(`[PatientService] Response getPatientByUserId:`, res)),
+            catchError(err => {
+                console.error(`[PatientService] Error getPatientByUserId:`, err);
                 return throwError(() => err);
             })
         );
