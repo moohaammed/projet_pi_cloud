@@ -1,0 +1,117 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------< esprit.tn:patient-medecin-service >------------------
+[INFO] Building patient-medecin-service 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.0:run (default-cli) > test-compile @ patient-medecin-service >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ patient-medecin-service ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ patient-medecin-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ patient-medecin-service ---
+[INFO] skip non existing resourceDirectory D:\projet_pi_\projet_pi_cloud\patient-medecin-service\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ patient-medecin-service ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.3.0:run (default-cli) < test-compile @ patient-medecin-service <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.0:run (default-cli) @ patient-medecin-service ---
+[INFO] Attaching agents: []
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.0)
+
+2026-04-20T22:53:01.848+02:00  INFO 9020 --- [patient-medecin-service] [           main] e.t.p.PatientMedecinApplication          : Starting PatientMedecinApplication using Java 17.0.8 with PID 9020 (D:\projet_pi_\projet_pi_cloud\patient-medecin-service\target\classes started by DELL in D:\projet_pi_\projet_pi_cloud\patient-medecin-service)
+2026-04-20T22:53:01.854+02:00  INFO 9020 --- [patient-medecin-service] [           main] e.t.p.PatientMedecinApplication          : No active profile set, falling back to 1 default profile: "default"
+2026-04-20T22:53:03.947+02:00  INFO 9020 --- [patient-medecin-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2026-04-20T22:53:04.364+02:00  INFO 9020 --- [patient-medecin-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 404 ms. Found 5 MongoDB repository interfaces.
+2026-04-20T22:53:05.011+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=dccfbe4c-d663-34d9-8bac-3f3d39b9713e
+2026-04-20T22:53:05.415+02:00  WARN 9020 --- [patient-medecin-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-04-20T22:53:05.432+02:00  WARN 9020 --- [patient-medecin-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'deferringLoadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.DeferringLoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-04-20T22:53:06.292+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8089 (http)
+2026-04-20T22:53:06.337+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-20T22:53:06.338+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
+2026-04-20T22:53:06.704+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-20T22:53:06.708+02:00  INFO 9020 --- [patient-medecin-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4745 ms
+2026-04-20T22:53:07.867+02:00  INFO 9020 --- [patient-medecin-service] [           main] org.mongodb.driver.client                : MongoClient with metadata {"application": {"name": "Cluster0"}, "driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "5.0.1"}, "os": {"type": "Windows", "name": "Windows 10", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/17.0.8+9-LTS-211"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='yosr', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@2eb60c71, com.mongodb.Jep395RecordCodecProvider@87d9a01, com.mongodb.KotlinCodecProvider@7e5b621b]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[127.0.0.1:27017], srvHost=cluster0.a5ojkea.mongodb.net, srvServiceName=mongodb, mode=MULTIPLE, requiredClusterType=REPLICA_SET, requiredReplicaSetName='atlas-58v3qy-shard-0', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=true, invalidHostNameAllowed=false, context=null}, applicationName='Cluster0', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null}
+2026-04-20T22:53:08.953+02:00  INFO 9020 --- [patient-medecin-service] [kea.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-aziyvx6-shard-00-02.a5ojkea.mongodb.net:27017 to client view of cluster
+2026-04-20T22:53:09.002+02:00  INFO 9020 --- [patient-medecin-service] [kea.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017 to client view of cluster
+2026-04-20T22:53:09.009+02:00  INFO 9020 --- [patient-medecin-service] [kea.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-aziyvx6-shard-00-00.a5ojkea.mongodb.net:27017 to client view of cluster
+2026-04-20T22:53:10.027+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2026-04-20T22:53:11.226+02:00  INFO 9020 --- [patient-medecin-service] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-aziyvx6-shard-00-02.a5ojkea.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=597522500, setName='atlas-58v3qy-shard-0', canonicalAddress=ac-aziyvx6-shard-00-02.a5ojkea.mongodb.net:27017, hosts=[ac-aziyvx6-shard-00-00.a5ojkea.mongodb.net:27017, ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017, ac-aziyvx6-shard-00-02.a5ojkea.mongodb.net:27017], passives=[], arbiters=[], primary='ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='use1-az6'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=185, topologyVersion=TopologyVersion{processId=69cff84c13630e6d99aec36b, counter=4}, lastWriteDate=Mon Apr 20 22:53:09 CEST 2026, lastUpdateTimeNanos=177626860576400}
+2026-04-20T22:53:12.531+02:00  INFO 9020 --- [patient-medecin-service] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017, type=REPLICA_SET_PRIMARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1305339200, setName='atlas-58v3qy-shard-0', canonicalAddress=ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017, hosts=[ac-aziyvx6-shard-00-00.a5ojkea.mongodb.net:27017, ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017, ac-aziyvx6-shard-00-02.a5ojkea.mongodb.net:27017], passives=[], arbiters=[], primary='ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='use1-az4'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=7fffffff000000000000038c, setVersion=185, topologyVersion=TopologyVersion{processId=69cff5f2f5e36dd0dc992e08, counter=7}, lastWriteDate=Mon Apr 20 22:53:10 CEST 2026, lastUpdateTimeNanos=177628165006600}
+2026-04-20T22:53:12.534+02:00  INFO 9020 --- [patient-medecin-service] [ngodb.net:27017] org.mongodb.driver.cluster               : Discovered replica set primary ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017 with max election id 7fffffff000000000000038c and max set version 185
+2026-04-20T22:53:12.983+02:00  INFO 9020 --- [patient-medecin-service] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-aziyvx6-shard-00-00.a5ojkea.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1774569200, setName='atlas-58v3qy-shard-0', canonicalAddress=ac-aziyvx6-shard-00-00.a5ojkea.mongodb.net:27017, hosts=[ac-aziyvx6-shard-00-00.a5ojkea.mongodb.net:27017, ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017, ac-aziyvx6-shard-00-02.a5ojkea.mongodb.net:27017], passives=[], arbiters=[], primary='ac-aziyvx6-shard-00-01.a5ojkea.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='use1-az2'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=185, topologyVersion=TopologyVersion{processId=69cff379dfa36a06a3285d5d, counter=5}, lastWriteDate=Mon Apr 20 22:53:10 CEST 2026, lastUpdateTimeNanos=177628617984100}
+2026-04-20T22:53:13.275+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2026-04-20T22:53:13.342+02:00  INFO 9020 --- [patient-medecin-service] [           main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2026-04-20T22:53:13.445+02:00  WARN 9020 --- [patient-medecin-service] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-04-20T22:53:13.513+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2026-04-20T22:53:13.725+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2026-04-20T22:53:13.743+02:00  INFO 9020 --- [patient-medecin-service] [           main] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-04-20T22:53:13.792+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
+2026-04-20T22:53:13.792+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
+2026-04-20T22:53:13.792+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
+2026-04-20T22:53:13.792+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Application is null : false
+2026-04-20T22:53:13.792+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
+2026-04-20T22:53:13.793+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
+2026-04-20T22:53:13.794+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
+2026-04-20T22:53:14.364+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : The response status is 200
+2026-04-20T22:53:14.368+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
+2026-04-20T22:53:14.374+02:00  INFO 9020 --- [patient-medecin-service] [           main] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-04-20T22:53:14.384+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1776718394383 with initial instances count: 7
+2026-04-20T22:53:14.391+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application PATIENT-MEDECIN-SERVICE with eureka with status UP
+2026-04-20T22:53:14.392+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1776718394392, current=UP, previous=STARTING]
+2026-04-20T22:53:14.394+02:00  INFO 9020 --- [patient-medecin-service] [nfoReplicator-0] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PATIENT-MEDECIN-SERVICE/patient-medecin-service:8089: registering service...
+2026-04-20T22:53:14.403+02:00  INFO 9020 --- [patient-medecin-service] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application PATIENT-MEDECIN-SERVICE with eureka with status DOWN
+2026-04-20T22:53:14.403+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1776718394403, current=DOWN, previous=UP]
+2026-04-20T22:53:14.404+02:00  WARN 9020 --- [patient-medecin-service] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-04-20T22:53:14.454+02:00  INFO 9020 --- [patient-medecin-service] [nfoReplicator-0] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PATIENT-MEDECIN-SERVICE/patient-medecin-service:8089 - registration status: 204
+2026-04-20T22:53:14.454+02:00  INFO 9020 --- [patient-medecin-service] [nfoReplicator-0] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PATIENT-MEDECIN-SERVICE/patient-medecin-service:8089: registering service...
+2026-04-20T22:53:14.460+02:00  INFO 9020 --- [patient-medecin-service] [nfoReplicator-0] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PATIENT-MEDECIN-SERVICE/patient-medecin-service:8089 - registration status: 204
+2026-04-20T22:53:15.503+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Shutting down DiscoveryClient ...
+2026-04-20T22:53:18.513+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Unregistering ...
+2026-04-20T22:53:18.523+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PATIENT-MEDECIN-SERVICE/patient-medecin-service:8089 - deregister  status: 200
+2026-04-20T22:53:18.530+02:00  INFO 9020 --- [patient-medecin-service] [           main] com.netflix.discovery.DiscoveryClient    : Completed shut down of DiscoveryClient
+2026-04-20T22:53:18.554+02:00  INFO 9020 --- [patient-medecin-service] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-20T22:53:18.582+02:00 ERROR 9020 --- [patient-medecin-service] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8089 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8089 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  28.316 s
+[INFO] Finished at: 2026-04-20T22:53:19+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.0:run (default-cli) on project patient-medecin-service: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
