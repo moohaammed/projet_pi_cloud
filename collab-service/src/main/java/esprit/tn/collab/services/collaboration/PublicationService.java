@@ -32,7 +32,7 @@ public class PublicationService {
     private final CareBotService careBotService;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${main.service.url:http://localhost:8082}")
+    @Value("${main.service.url:http://localhost:8086}")
     private String mainServiceUrl;
 
     public PublicationService(PublicationRepository publicationRepository,
@@ -263,9 +263,10 @@ public class PublicationService {
     }
 
     @SuppressWarnings("unchecked")
-    private SharedEventPreviewDto fetchEventPreview(Long eventId) {
+    private SharedEventPreviewDto fetchEventPreview(String eventId) {
         try {
-            Map<String, Object> ev = restTemplate.getForObject(mainServiceUrl + "/api/events/" + eventId, Map.class);
+            String url = mainServiceUrl + "/api/events/" + eventId;
+            Map<String, Object> ev = restTemplate.getForObject(url, Map.class);
             if (ev == null) return null;
             SharedEventPreviewDto p = new SharedEventPreviewDto();
             p.setId(eventId);
@@ -277,6 +278,7 @@ public class PublicationService {
             if (start != null) p.setStartDateTime(start.toString());
             return p;
         } catch (Exception e) {
+            System.err.println("[PublicationService] fetchEventPreview failed for id=" + eventId + " url=" + mainServiceUrl + " error=" + e.getMessage());
             return null;
         }
     }

@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+﻿import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 export interface CommentDto {
@@ -14,12 +14,12 @@ export interface PollOptionDto {
   id?: string;
   text: string;
   votes?: number;
-  /** User IDs who voted for this option — used to highlight the current user's choice */
+  /** User IDs who voted for this option â€” used to highlight the current user's choice */
   voterIds?: number[];
 }
 
 export interface SharedEventPreviewDto {
-  id: number;
+  id: string;
   title?: string;
   startDateTime?: string;
   location?: string;
@@ -51,7 +51,7 @@ export interface PublicationDto {
   groupName?: string;
   commentCount?: number;
   shareCount?: number;
-  linkedEventId?: number;
+  linkedEventId?: string;
   linkedEvent?: SharedEventPreviewDto | null;
   supportCount?: number;
   supportIds?: string;
@@ -65,7 +65,7 @@ export interface PublicationCreateRequest {
   pollQuestion?: string;
   pollOptions?: string[];
   groupId?: string;
-  linkedEventId?: number;
+  linkedEventId?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -105,6 +105,10 @@ export class PublicationService {
     return this.http.post<PublicationDto>(this.baseUrl, formData);
   }
 
+  createPublicationJson(req: PublicationCreateRequest) {
+    return this.http.post<PublicationDto>(`${this.baseUrl}/json`, req);
+  }
+
   voteInPoll(pubId: string, optionIndex: number, userId: number) {
     return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/poll/vote`, { optionIndex, userId });
   }
@@ -131,3 +135,4 @@ export class PublicationService {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }
+

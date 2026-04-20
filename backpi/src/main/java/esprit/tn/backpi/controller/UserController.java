@@ -103,7 +103,7 @@ public class UserController {
             .collect(java.util.stream.Collectors.toList());
         return ResponseEntity.ok(users);
     }
-}
+
     // ── FCM TOKEN : save user fcm token ──────────────────────────────────────
     @PatchMapping("/{id}/fcm-token")
     public ResponseEntity<?> saveFcmToken(@PathVariable Long id, @RequestBody Map<String, String> body) {

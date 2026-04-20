@@ -705,7 +705,7 @@ export class FeedComponent implements OnInit {
   }
 
   sharedEventImageUrl(ev: SharedEventPreviewDto): string {
-    if (ev.imageUrl) return 'http://localhost:8081' + ev.imageUrl;
+    if (ev.imageUrl) return 'http://localhost:8080' + ev.imageUrl;
     return 'assets/images/event-placeholder.jpg';
   }
 

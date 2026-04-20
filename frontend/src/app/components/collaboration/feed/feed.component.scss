@@ -1,4 +1,4 @@
-.card {
+﻿.card {
   background: #ffffff;
   border-radius: 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
@@ -964,3 +964,38 @@ textarea {
     transform: translateY(0);
   }
 }
+
+.feed-event-link {
+  &:hover .feed-event-card {
+    transform: translateY(-2px);
+    box-shadow: 0 0.75rem 1.5rem rgba(128, 0, 128, 0.15) !important;
+  }
+}
+
+.feed-event-card {
+  border: 1px solid #e9ecef !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.feed-event-card-media {
+  min-height: 160px;
+  background: #f5e6f5;
+}
+
+.feed-event-card-img {
+  object-fit: cover;
+  min-height: 160px;
+  max-height: 220px;
+}
+
+.feed-event-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+
+

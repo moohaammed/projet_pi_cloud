@@ -43,15 +43,16 @@
                 routerLinkActive="active-purple fw-semibold shadow-sm"
                 [routerLinkActiveOptions]="{exact:true}" style="cursor: pointer;"
                 [title]="isSidebarCollapsed ? 'Overview' : ''">
-                <div class="d-flex flex-column align-items-center w-100">
-                  <i class="fa-solid fa-gauge-high fs-5" [class.me-3]="!isSidebarCollapsed && !accService.simplifiedMode()"
-                    [class.mx-auto]="isSidebarCollapsed || accService.simplifiedMode()"></i>
-                  <span *ngIf="!isSidebarCollapsed || accService.simplifiedMode()" class="fs-15" [class.mt-1]="accService.simplifiedMode()">Dashboard</span>
+                <div class="d-flex flex-column align-items-center w-100" *ngIf="accService.simplifiedMode()">
+                  <i class="fa-solid fa-gauge-high fs-5"></i>
+                  <span class="fs-15 mt-1">Dashboard</span>
                 </div>
-                <i class="fa-solid fa-gauge-high fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Dashboard</span>
+                <ng-container *ngIf="!accService.simplifiedMode()">
+                  <i class="fa-solid fa-gauge-high fs-5"
+                    [class.me-3]="!isSidebarCollapsed"
+                    [class.mx-auto]="isSidebarCollapsed"></i>
+                  <span *ngIf="!isSidebarCollapsed" class="fs-15">Dashboard</span>
+                </ng-container>
               </a>
             </li>
 
@@ -295,10 +296,10 @@
           <div class="d-flex align-items-center gap-4 ms-3 h-100">
             <!-- Voice Toggle -->
             <div class="cursor-pointer transition-all" 
-                 [ngClass]="guidanceService.voiceUnlocked() ? 'text-success' : 'text-muted'"
-                 (click)="guidanceService.toggleVoice()"
+                 [ngClass]="isVoiceEnabled() ? 'text-success' : 'text-muted'"
+                 (click)="toggleUnifiedVoice()"
                  title="Toggle Voice Assistance">
-              <i class="fa-solid fs-5" [ngClass]="guidanceService.voiceUnlocked() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
+              <i class="fa-solid fs-5" [ngClass]="isVoiceEnabled() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
             </div>
 
             <!-- Dark Mode Toggle -->
@@ -312,13 +313,13 @@
 
             <!-- Profile -->
             <!-- ── BOUTON GUIDE VOCAL (Admin) ── -->
-            <div class="voice-nav-btn-admin"
+            <div class="voice-nav-btn-admin cursor-pointer"
                  *ngIf="auth.getRole() === 'PATIENT'"
-                 [class.active]="alzAccessibility.voiceEnabled()"
-                 (click)="alzAccessibility.toggleVoice()"
-                 [title]="alzAccessibility.voiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'"
+                 [class.active]="isVoiceEnabled()"
+                 (click)="toggleUnifiedVoice()"
+                 [title]="isVoiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'"
                  style="cursor:pointer">
-              <i class="fa-solid fs-5" [class.fa-volume-high]="alzAccessibility.voiceEnabled()" [class.fa-volume-xmark]="!alzAccessibility.voiceEnabled()"></i>
+              <i class="fa-solid fs-5" [class.fa-volume-high]="isVoiceEnabled()" [class.fa-volume-xmark]="!isVoiceEnabled()"></i>
             </div>
             <div class="position-relative cursor-pointer text-muted hover-primary">
               <i class="fa-regular fa-bell fs-5"></i>
@@ -375,37 +376,49 @@
     <div class="topbar d-none d-lg-block py-3">
       <div class="container">
         <div class="row align-items-center">
-          <div class="col-lg-6 col-md-5 col-12">
+          <!-- Left side: Contact Info -->
+          <div class="col-lg-4 col-md-4 col-12">
             <ul class="top-contact list-unstyled d-flex gap-4 mb-0 small">
               <li><i class="fa fa-phone"></i> +216 71 000 000</li>
               <li>
                 <i class="fa fa-envelope"></i>
-                <a href="mailto:contact&#64;alzcare.tn"
-                   class="text-decoration-none">contact&#64;alzcare.tn</a>
+                <a href="mailto:contact&#64;alzcare.tn" class="text-decoration-none">contact&#64;alzcare.tn</a>
               </li>
             </ul>
           </div>
-          <div class="col-lg-6 col-md-7 col-12 d-flex justify-content-end align-items-center gap-3">
-            <span class="small text-muted" *ngIf="auth.isLoggedIn()">Logged as: <strong>{{ auth.getRole()
-                }}</strong></span>
+          
+          <!-- Right side: Actions (SOS, Compte, Voice, Logout) -->
+          <div class="col-lg-8 col-md-8 col-12 d-flex justify-content-end align-items-center gap-3">
+            <span class="small text-muted" *ngIf="auth.isLoggedIn()">Logged as: <strong>{{ auth.getRole() }}</strong></span>
             
+            <!-- Compte Button -->
+            <a *ngIf="auth.isLoggedIn()" [routerLink]="getAccountLink()" 
+               class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm fw-bold">
+              <i class="fa-solid fa-user-circle me-1"></i>Compte
+            </a>
+
+            <!-- SOS Button (for Patients) -->
+            <a *ngIf="auth.getRole() === 'PATIENT'" routerLink="/patient-map"
+               class="btn btn-sm btn-danger rounded-pill px-3 fw-bold d-flex align-items-center gap-2 shadow-sm"
+               style="animation: pulse-sos 2s infinite">
+              <i class="fa-solid fa-bell"></i>
+              <span>SOS</span>
+            </a>
+
             <!-- Global Voice Toggle -->
-            <button class="btn btn-sm rounded-pill px-3 border-0 transition-all d-flex align-items-center gap-2"
-              [ngClass]="guidanceService.voiceUnlocked() ? 'btn-soft-success' : 'btn-soft-secondary'"
-              (click)="guidanceService.toggleVoice()"
+            <button class="btn btn-sm rounded-pill px-3 border-0 transition-all d-flex align-items-center gap-2 shadow-sm"
+              [ngClass]="isVoiceEnabled() ? 'btn-soft-success' : 'btn-soft-secondary'"
+              (click)="toggleUnifiedVoice()"
               title="Toggle Voice Assistance">
-              <i class="fa-solid" [ngClass]="guidanceService.voiceUnlocked() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
+              <i class="fa-solid" [ngClass]="isVoiceEnabled() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
               <span class="fw-bold fs-11">VOICE</span>
             </button>
 
-            <button class="btn btn-sm btn-outline-danger" *ngIf="auth.isLoggedIn()"
-            <span class="small text-muted" *ngIf="auth.isLoggedIn()">
-              Logged as: <strong>{{ auth.getRole() }}</strong>
-            </span>
-            <button class="btn btn-sm btn-outline-danger"
+            <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold"
               *ngIf="auth.isLoggedIn()"
               (click)="auth.logout()">Logout</button>
-            <a routerLink="/auth/login" class="btn btn-sm btn-primary"
+              
+            <a routerLink="/auth/login" class="btn btn-sm btn-primary shadow-sm fw-bold"
               *ngIf="!auth.isLoggedIn()">Login</a>
           </div>
         </div>
@@ -431,105 +444,105 @@
               <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center gap-3">
 
-                  <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active"
-                      [routerLinkActiveOptions]="{exact: true}">Home</a></li>
-                  <li class="nav-item"><a class="nav-link" routerLink="/rendezvous"
-                      routerLinkActive="active">Rendez-vous</a></li>
-                  <li class="nav-item"><a class="nav-link" routerLink="/education"
-                      routerLinkActive="active">Education</a></li>
-                  <li class="nav-item"><a class="nav-link" routerLink="/eventfront" routerLinkActive="active">Events</a>
-                  </li>
-                  <li class="nav-item"><a class="nav-link" routerLink="/collaboration/feed"
-                      routerLinkActive="active">Community</a></li>
-                  <li class="nav-item"><a class="nav-link" routerLink="/donations"
-                      routerLinkActive="active">Donations</a></li>
-                  <li class="nav-item"><a class="nav-link" routerLink="/heart-rate"
-                      routerLinkActive="active"><i class="fa-solid fa-heart-pulse me-1"></i>Heart Rate</a></li>
-                  <li class="nav-item ms-lg-3 d-flex gap-2" *ngIf="auth.isLoggedIn()">
-                    <a routerLink="/my-donations" class="btn btn-outline-primary btn-sm rounded-pill px-3">Mes Dons</a>
-                    <a [routerLink]="getAccountLink()" class="btn btn-primary btn-sm rounded-pill px-4">Compte</a>
-                  </li>
                   <li class="nav-item">
-                    <a class="nav-link" routerLink="/hospitals"
-                      routerLinkActive="active">Hôpitaux</a>
+                    <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+                  </li>
+                  
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/rendezvous" routerLinkActive="active">Rendez-vous</a>
+                  </li>
+                  
+                  <!-- Dropdown: Activités & Événements -->
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navDropdownAct" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Activités
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 p-2 animate-fade-in" aria-labelledby="navDropdownAct">
+                      <li>
+                        <a class="dropdown-item rounded-3 py-2" routerLink="/education" routerLinkActive="active-purple">
+                          <i class="fa-solid fa-graduation-cap me-2 text-primary"></i>Education
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item rounded-3 py-2" routerLink="/eventfront" routerLinkActive="active-purple">
+                          <i class="fa-solid fa-calendar-day me-2 text-primary"></i>Events
+                        </a>
+                      </li>
+                    </ul>
                   </li>
 
-                  <!-- PATIENTS — DOCTOR + ADMIN -->
-                  <li class="nav-item"
-                    *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
-                    <a class="nav-link" routerLink="/patient-profiles"
-                      routerLinkActive="active">
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/collaboration/feed" routerLinkActive="active">Community</a>
+                  </li>
+                  
+                  <!-- Dropdown: Dons -->
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navDropdownDons" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Dons
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 p-2 animate-fade-in" aria-labelledby="navDropdownDons">
+                      <li>
+                        <a class="dropdown-item rounded-3 py-2" routerLink="/donations" routerLinkActive="active-purple">
+                          <i class="fa-solid fa-hand-holding-heart me-2 text-primary"></i>Donations
+                        </a>
+                      </li>
+                      <li *ngIf="auth.isLoggedIn()">
+                        <a class="dropdown-item rounded-3 py-2" routerLink="/my-donations" routerLinkActive="active-purple">
+                          <i class="fa-solid fa-history me-2 text-primary"></i>Mes Dons
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/heart-rate" routerLinkActive="active">
+                      <i class="fa-solid fa-heart-pulse me-1"></i>Heart Rate
+                    </a>
+                  </li>
+                  
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/hospitals" routerLinkActive="active">Hôpitaux</a>
+                  </li>
+
+                  <!-- Role-based items -->
+                  <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
+                    <a class="nav-link" routerLink="/patient-profiles" routerLinkActive="active">
                       <i class="fa-solid fa-bed-pulse me-1"></i>Patients
                     </a>
                   </li>
+                  
                   <li class="nav-item" *ngIf="auth.getRole() === 'RELATION'">
-  <a class="nav-link fw-bold" style="color:#9b59b6" routerLink="/mon-patient" routerLinkActive="active">
-    <i class="fa-solid fa-user-injured me-1"></i>Mon patient
-  </a>
-</li>
-
-                  <!-- GÉOLOCALISATION — DOCTOR + ADMIN -->
-                  <li class="nav-item"
-                    *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
-                    <a class="nav-link fw-bold text-primary"
-                      routerLink="/map" routerLinkActive="active">
-                      <i class="fa-solid fa-map-location-dot me-1"></i>
-                      Géolocalisation
+                    <a class="nav-link fw-bold" style="color:#9b59b6" routerLink="/mon-patient" routerLinkActive="active">
+                      <i class="fa-solid fa-user-injured me-1"></i>Mon patient
                     </a>
                   </li>
 
-                  <!-- ANALYSE CHEMIN — DOCTOR + RELATION -->
-                  <li class="nav-item"
-                      *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'RELATION'">
-                    <a class="nav-link fw-bold"
-                       style="color: #7c3aed;"
-                       routerLink="/analyzer" routerLinkActive="active">
+                  <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
+                    <a class="nav-link fw-bold text-primary" routerLink="/map" routerLinkActive="active">
+                      <i class="fa-solid fa-map-location-dot me-1"></i>Géolocalisation
+                    </a>
+                  </li>
+
+                  <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'RELATION'">
+                    <a class="nav-link fw-bold" style="color: #7c3aed;" routerLink="/analyzer" routerLinkActive="active">
                       <i class="fa-solid fa-brain me-1"></i>Analyse IA
                     </a>
                   </li>
 
-                  <!-- ★ SUIVI DE MON PATIENT — RELATION uniquement ★ -->
                   <li class="nav-item" *ngIf="auth.getRole() === 'RELATION'">
                     <a class="nav-link fw-bold d-flex align-items-center gap-1 px-3 py-1 rounded-pill"
-                       style="background:linear-gradient(135deg,#6f42c1,#3c3489);
-                              color:white; font-size:14px"
-                       routerLink="/relation-map"
-                       routerLinkActive="active">
-                      <i class="fa-solid fa-map-location-dot"></i>
-                      Suivi patient
+                       style="background:linear-gradient(135deg,#6f42c1,#3c3489); color:white; font-size:14px"
+                       routerLink="/relation-map" routerLinkActive="active">
+                      <i class="fa-solid fa-map-location-dot"></i> Suivi patient
                     </a>
                   </li>
 
-                  <!-- MES INCIDENTS — PATIENT -->
                   <li class="nav-item" *ngIf="auth.getRole() === 'PATIENT'">
-                    <a class="nav-link fw-semibold text-danger"
-                       routerLink="/patient/incidents" routerLinkActive="active">
+                    <a class="nav-link fw-semibold text-danger" routerLink="/patient/incidents" routerLinkActive="active">
                       <i class="fa-solid fa-bell-exclamation me-1"></i>Mes Incidents
                     </a>
                   </li>
-
-                  <!-- BOUTON SOS PATIENT -->
-                  <li class="nav-item" *ngIf="auth.getRole() === 'PATIENT'">
-                    <a routerLink="/patient-map"
-                       class="btn btn-danger rounded-pill px-3 py-2 fw-bold
-                              d-flex align-items-center gap-2"
-                       style="animation: pulse-sos 2s infinite">
-                      <i class="fa-solid fa-bell"></i>
-                      <span>SOS</span>
-                    </a>
-                  </li>
-                  <!-- ── BOUTON GUIDE VOCAL ── -->
-                  <li class="nav-item" *ngIf="auth.isLoggedIn() && auth.getRole() === 'PATIENT'">
-                    <button class="voice-nav-btn"
-                            [class.active]="alzAccessibility.voiceEnabled()"
-                            (click)="alzAccessibility.toggleVoice()"
-                            [title]="alzAccessibility.voiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'">
-                      <i class="fa-solid" [class.fa-volume-high]="alzAccessibility.voiceEnabled()" [class.fa-volume-xmark]="!alzAccessibility.voiceEnabled()"></i>
-                    </button>
-                  </li>
-
-
-
+                  
                 </ul>
               </div>
             </nav>
@@ -549,6 +562,7 @@
       </div>
       <router-outlet></router-outlet>
     </main>
+
 
     <footer class="footer bg-dark text-white pt-5 mt-5">
       <div class="container">

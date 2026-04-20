@@ -59,7 +59,7 @@ public class PublicationController {
                                                     @RequestParam(value = "type", required = false) String typeStr,
                                                     @RequestParam(value = "pollOptions", required = false) List<String> pollOptions,
                                                     @RequestParam(value = "pollQuestion", required = false) String pollQuestion,
-                                                    @RequestParam(value = "linkedEventId", required = false) Long linkedEventId,
+                                                    @RequestParam(value = "linkedEventId", required = false) String linkedEventId,
                                                     @RequestParam(value = "files", required = false) List<MultipartFile> files) {
         if (linkedEventId != null) dto.setLinkedEventId(linkedEventId);
         if (typeStr != null && dto.getType() == null) {

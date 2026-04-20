@@ -70,7 +70,7 @@ public class Publication {
     private String chatGroupName;
 
     
-    private Long linkedEventId;
+    private String linkedEventId;
 
     
     private ModerationStatus moderationStatus = ModerationStatus.NONE;
@@ -155,8 +155,8 @@ public class Publication {
         }
     }
 
-    public Long getLinkedEventId() { return linkedEventId; }
-    public void setLinkedEventId(Long linkedEventId) { this.linkedEventId = linkedEventId; }
+    public String getLinkedEventId() { return linkedEventId; }
+    public void setLinkedEventId(String linkedEventId) { this.linkedEventId = linkedEventId; }
     public ModerationStatus getModerationStatus() { return moderationStatus; }
     public void setModerationStatus(ModerationStatus moderationStatus) { this.moderationStatus = moderationStatus; }
     public ModerationReason getModerationReason() { return moderationReason; }

@@ -29,7 +29,7 @@ public class PublicationResponseDto {
     private List<PollOptionResponseDto> pollOptions;
     private String groupId;
     private String groupName;
-    private Long linkedEventId;
+    private String linkedEventId;
     private SharedEventPreviewDto linkedEvent;
     private List<CommentResponseDto> comments;
     private int commentCount;
@@ -87,8 +87,8 @@ public class PublicationResponseDto {
     public void setGroupId(String groupId) { this.groupId = groupId; }
     public String getGroupName() { return groupName; }
     public void setGroupName(String groupName) { this.groupName = groupName; }
-    public Long getLinkedEventId() { return linkedEventId; }
-    public void setLinkedEventId(Long linkedEventId) { this.linkedEventId = linkedEventId; }
+    public String getLinkedEventId() { return linkedEventId; }
+    public void setLinkedEventId(String linkedEventId) { this.linkedEventId = linkedEventId; }
     public SharedEventPreviewDto getLinkedEvent() { return linkedEvent; }
     public void setLinkedEvent(SharedEventPreviewDto linkedEvent) { this.linkedEvent = linkedEvent; }
 }
