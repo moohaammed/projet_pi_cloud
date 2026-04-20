@@ -51,16 +51,7 @@
                   <span *ngIf="!isSidebarCollapsed || accService.simplifiedMode()"
                     class="fs-15"
                     [class.mt-1]="accService.simplifiedMode()">Dashboard</span>
-                <div class="d-flex flex-column align-items-center w-100" *ngIf="accService.simplifiedMode()">
-                  <i class="fa-solid fa-gauge-high fs-5"></i>
-                  <span class="fs-15 mt-1">Dashboard</span>
                 </div>
-                <ng-container *ngIf="!accService.simplifiedMode()">
-                  <i class="fa-solid fa-gauge-high fs-5"
-                    [class.me-3]="!isSidebarCollapsed"
-                    [class.mx-auto]="isSidebarCollapsed"></i>
-                  <span *ngIf="!isSidebarCollapsed" class="fs-15">Dashboard</span>
-                </ng-container>
               </a>
             </li>
 
