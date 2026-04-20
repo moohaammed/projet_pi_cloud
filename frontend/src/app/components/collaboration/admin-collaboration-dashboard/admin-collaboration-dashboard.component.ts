@@ -5,6 +5,7 @@ import {
   AdminCollaborationService,
   ChatGroupAdmin,
   ClinicalPulse,
+  ContentItem,
   DirectMessageMetadata,
   ModerationQueueItem,
   SafetyAlertLogRow,
@@ -16,6 +17,7 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../../services/auth.service';
+import { AlzUserService } from '../../../services/alz-user.service';
 
 @Component({
   selector: 'app-admin-collaboration-dashboard',
@@ -27,6 +29,9 @@ import { AuthService } from '../../../services/auth.service';
 export class AdminCollaborationDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   public readonly auth = inject(AuthService);
   private readonly adminApi = inject(AdminCollaborationService);
+  private readonly userService = inject(AlzUserService);
+  
+  Math = Math;
 
   @ViewChild('complianceCanvas') complianceCanvas?: ElementRef<HTMLCanvasElement>;
   @ViewChild('sentimentCanvas') sentimentCanvas?: ElementRef<HTMLCanvasElement>;
@@ -37,16 +42,77 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   moderation: ModerationQueueItem[] = [];
   dmMeta: DirectMessageMetadata[] = [];
   groups: ChatGroupAdmin[] = [];
+  defaultGroups: ChatGroupAdmin[] = [];
   
-  // Analytics State
+  dmFilterQuery = '';
+  dmShowOnlyDistressed = false;
+  dmCurrentPage = 1;
+  dmPageSize = 10;
+  
+  get filteredDmMeta(): DirectMessageMetadata[] {
+    let list = [...this.dmMeta];
+    const query = this.dmFilterQuery.toLowerCase().trim();
+    
+    if (this.dmShowOnlyDistressed) {
+      list = list.filter(dm => dm.distressedMessageCount > 0);
+    }
+    
+    if (query) {
+      list = list.filter(dm => {
+        const nameA = this.getUserName(dm.userIdA).toLowerCase();
+        const nameB = this.getUserName(dm.userIdB).toLowerCase();
+        return nameA.includes(query) || nameB.includes(query) ||
+               dm.userIdA.toString().includes(query) || dm.userIdB.toString().includes(query);
+      });
+    }
+    
+    return list;
+  }
+  
+  get paginatedDmMeta(): DirectMessageMetadata[] {
+    const start = (this.dmCurrentPage - 1) * this.dmPageSize;
+    return this.filteredDmMeta.slice(start, start + this.dmPageSize);
+  }
+  
+  get dmTotalPages(): number {
+    return Math.ceil(this.filteredDmMeta.length / this.dmPageSize);
+  }
+  
+  get dmPageNumbers(): number[] {
+    const total = this.dmTotalPages;
+    const current = this.dmCurrentPage;
+    let start = Math.max(1, current - 2);
+    const end = Math.min(total, start + 4);
+    if (end - start < 4) start = Math.max(1, end - 4);
+    const pages: number[] = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  }
+  
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.dmTotalPages) this.dmCurrentPage = page;
+  }
+  
+  nextPage(): void {
+    if (this.dmCurrentPage < this.dmTotalPages) this.dmCurrentPage++;
+  }
+  
+  prevPage(): void {
+    if (this.dmCurrentPage > 1) this.dmCurrentPage--;
+  }
+  
+  clearDmFilters(): void {
+    this.dmFilterQuery = '';
+    this.dmShowOnlyDistressed = false;
+    this.dmCurrentPage = 1;
+  }
+  
   engagementMix: any = null;
   sentimentDist: any = null;
   aiImpact: any = null;
   clinicalPulse: ClinicalPulse | null = null;
-  
-  // Community Manager State
-  currentView: 'health' | 'groups' | 'moderation' | 'announcements' | 'ai' = 'health';
-  // Announcement State
+
+  currentView: 'health' | 'groups' | 'moderation' | 'announcements' | 'ai' | 'content' = 'health';
   announcementText = '';
   announcementTargetGroupId: string | null = null;
   announcementScheduledAt: string = '';
@@ -56,7 +122,64 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   searchResultGroups: ChatGroupAdmin[] = [];
   editingGroup: ChatGroupAdmin | null = null;
 
-  // Retrospective State
+  contentPosts: ContentItem[] = [];
+  contentMessages: ContentItem[] = [];
+  contentTab: 'posts' | 'messages' | 'dms' = 'posts';
+  contentSearchQuery = '';
+  contentLoading = false;
+  contentPage = 1;
+  contentPageSize = 8;
+
+  get filteredContentItems(): ContentItem[] {
+    const list = this.contentTab === 'posts' ? this.contentPosts :
+                 this.contentTab === 'messages' ? this.contentMessages : [];
+    if (this.contentSearchQuery === '__distressed__') {
+      return list.filter(item => item.distressed);
+    }
+    const q = this.contentSearchQuery.toLowerCase().trim();
+    if (!q) return list;
+    return list.filter(item =>
+      item.content?.toLowerCase().includes(q) ||
+      item.authorName?.toLowerCase().includes(q) ||
+      item.groupName?.toLowerCase().includes(q)
+    );
+  }
+
+  get paginatedContentItems(): ContentItem[] {
+    const start = (this.contentPage - 1) * this.contentPageSize;
+    return this.filteredContentItems.slice(start, start + this.contentPageSize);
+  }
+
+  get contentTotalPages(): number {
+    return Math.ceil(this.filteredContentItems.length / this.contentPageSize);
+  }
+
+  get contentDistressedCount(): number {
+    const list = this.contentTab === 'posts' ? this.contentPosts : this.contentMessages;
+    return list.filter(i => i.distressed).length;
+  }
+
+  get contentFlaggedCount(): number {
+    return this.contentPosts.filter(i => i.moderationStatus === 'PENDING_REVIEW').length;
+  }
+
+  get contentTotalDistressed(): number {
+    return this.contentPosts.filter(p => p.distressed).length +
+           this.contentMessages.filter(m => m.distressed).length;
+  }
+
+  onContentTabChange(tab: 'posts' | 'messages' | 'dms'): void {
+    this.contentTab = tab;
+    this.contentPage = 1;
+    this.contentSearchQuery = '';
+  }
+  showCreateGroupForm = false;
+  newGroupName = '';
+  newGroupDescription = '';
+  newGroupCategory = 'MIXED';
+  newGroupIsDefault = false;
+  newGroupDefaultRole = '';
+
   activeRetrospective: any = null;
   retroLoading = false;
   retroGroupId?: string;
@@ -66,10 +189,16 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
 
   private pendingCalls = 0;
   private chart: Chart | null = null;
+  private refreshInterval: any;
 
   ngOnInit(): void {
     Chart.register(...registerables);
+    this.userService.fetchUsers();
     this.reload();
+    
+    this.refreshInterval = setInterval(() => {
+      this.reloadDmMetadata();
+    }, 30000);
   }
 
   ngAfterViewInit(): void {
@@ -78,6 +207,24 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
 
   ngOnDestroy(): void {
     this.chart?.destroy();
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
+  }
+  
+  getUserName(userId: number): string {
+    const user = this.userService.users().find(u => u.id === userId);
+    if (user) {
+      return `${user.prenom || ''} ${user.nom || ''}`.trim() || `User ${userId}`;
+    }
+    return `User ${userId}`;
+  }
+  
+  reloadDmMetadata(): void {
+    this.adminApi.getDirectMessageMetadata().subscribe({
+      next: (r) => { this.dmMeta = r; },
+      error: (e) => console.error('Failed to refresh DM metadata:', e)
+    });
   }
 
   reload(): void {
@@ -109,7 +256,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
       complete: () => done()
     });
     this.adminApi.getDirectMessageMetadata().subscribe({
-      next: (r) => (this.dmMeta = r),
+      next: (r) => { this.dmMeta = r; },
       error: (e) => this.fail(e)
     });
 
@@ -175,20 +322,48 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     });
   }
 
-  // --- Community Manager Actions ---
-
-
-  switchView(v: 'health' | 'groups' | 'moderation' | 'announcements' | 'ai'): void {
+  switchView(v: 'health' | 'groups' | 'moderation' | 'announcements' | 'ai' | 'content'): void {
     this.currentView = v;
     this.error = '';
     if (v === 'groups') this.loadGroups();
-    if (v === 'moderation') this.reload(); 
+    if (v === 'moderation') this.reload();
     if (v === 'ai') {
       this.loadGroups();
       this.activeRetrospective = null;
     }
     if (v === 'health') setTimeout(() => this.loadChart(), 0);
     if (v === 'announcements') this.loadScheduledAnnouncements();
+    if (v === 'content') this.loadContent();
+  }
+
+  loadContent(): void {
+    this.contentLoading = true;
+    this.contentPage = 1;
+    this.adminApi.getRecentPosts().subscribe({
+      next: (r) => { this.contentPosts = r; this.contentLoading = false; },
+      error: (e) => { this.fail(e); this.contentLoading = false; }
+    });
+    this.adminApi.getRecentGroupMessages().subscribe({
+      next: (r) => { this.contentMessages = r; },
+      error: () => {}
+    });
+    this.reloadDmMetadata();
+  }
+
+  adminDeletePost(id: string): void {
+    if (!confirm('Permanently delete this post? This cannot be undone.')) return;
+    this.adminApi.adminDeletePost(id).subscribe({
+      next: () => { this.contentPosts = this.contentPosts.filter(p => p.id !== id); },
+      error: (e) => this.fail(e)
+    });
+  }
+
+  adminDeleteMessage(id: string): void {
+    if (!confirm('Permanently delete this message? This cannot be undone.')) return;
+    this.adminApi.adminDeleteMessage(id).subscribe({
+      next: () => { this.contentMessages = this.contentMessages.filter(m => m.id !== id); },
+      error: (e) => this.fail(e)
+    });
   }
 
   loadScheduledAnnouncements(): void {
@@ -213,6 +388,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
       case 'moderation': return 'Moderation Queue';
       case 'announcements': return 'Announcement Form';
       case 'ai': return 'Clinical Intelligence';
+      case 'content': return 'Content Management';
       case 'search': return 'Member Lookup';
       default: return v;
     }
@@ -242,6 +418,10 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
       next: (g) => { this.groups = g; this.loading = false; },
       error: (e) => this.fail(e)
     });
+    this.adminApi.getDefaultGroups().subscribe({
+      next: (g) => { this.defaultGroups = g; },
+      error: () => {}
+    });
   }
 
   deleteGroup(id: string): void {
@@ -260,6 +440,28 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     this.editingGroup = null;
   }
 
+  submitCreateGroup(): void {
+    if (!this.newGroupName.trim()) return;
+    this.adminApi.createGroup({
+      name: this.newGroupName.trim(),
+      description: this.newGroupDescription.trim(),
+      category: this.newGroupCategory,
+      isDefault: this.newGroupIsDefault,
+      defaultForRole: this.newGroupIsDefault ? this.newGroupDefaultRole : null
+    }).subscribe({
+      next: () => {
+        this.showCreateGroupForm = false;
+        this.newGroupName = '';
+        this.newGroupDescription = '';
+        this.newGroupCategory = 'MIXED';
+        this.newGroupIsDefault = false;
+        this.newGroupDefaultRole = '';
+        this.loadGroups();
+      },
+      error: (e) => this.fail(e)
+    });
+  }
+
   saveEdit(): void {
     if (!this.editingGroup) return;
     this.adminApi.updateGroup(this.editingGroup.id, this.editingGroup).subscribe({
@@ -274,7 +476,6 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   sendAnnouncement(): void {
     if (!this.announcementText.trim()) return;
     
-    // Convert local datetime to ISO if exists
     let scheduleIso: string | undefined = undefined;
     if (this.announcementScheduledAt) {
       scheduleIso = new Date(this.announcementScheduledAt).toISOString();
@@ -330,7 +531,7 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     this.activeRetrospective = null;
     this.adminApi.getRetrospective(this.retroGroupId, hours).subscribe({
       next: (res) => {
-        this.activeRetrospective = { ...res, window: hours };
+        this.activeRetrospective = { ...res, window: hours, parsedSections: this.parseHandover(res.summary) };
         this.retroLoading = false;
       },
       error: (e) => {
@@ -338,6 +539,45 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
         this.retroLoading = false;
       }
     });
+  }
+
+  /** Parses Gemini markdown into structured sections for display */
+  parseHandover(raw: string): { icon: string; title: string; color: string; bgColor: string; items: string[] }[] {
+    if (!raw) return [];
+    
+    const sectionDefs = [
+      { markers: ['PATIENT COGNITION', 'COGNITION', 'MOOD'], icon: '🧠', title: 'Patient Cognition & Mood', color: 'text-primary', bgColor: 'bg-soft-primary border-primary' },
+      { markers: ['CARE LOGISTICS', 'LOGISTICS', 'MEDICATION', 'ADL'], icon: '💊', title: 'Care Logistics', color: 'text-success', bgColor: 'bg-soft-success border-success' },
+      { markers: ['RECOMMENDATION', 'ACTION', 'ALERT', 'CONCERN'], icon: '🚨', title: 'Recommendations', color: 'text-danger', bgColor: 'bg-soft-danger border-danger' },
+    ];
+
+    const sectionSplitRegex = /(?=\*{0,2}#{0,3}\s*\d+[\.\)]\s)/;
+    const rawSections = raw.split(sectionSplitRegex).filter(s => s.trim().length > 0);
+
+    const result: { icon: string; title: string; color: string; bgColor: string; items: string[] }[] = [];
+
+    for (const rawSection of rawSections) {
+      const upperSection = rawSection.toUpperCase();
+      const def = sectionDefs.find(d => d.markers.some(m => upperSection.includes(m)));
+      if (!def) continue;
+
+      const lines = rawSection.split('\n')
+        .map(l => l.replace(/^\*{1,2}|\*{1,2}$/g, '').replace(/^[-•*]\s*/, '').trim())
+        .filter(l => l.length > 10 && !l.match(/^\d+[\.\)]/));
+
+      if (lines.length > 0) {
+        result.push({ ...def, items: lines });
+      }
+    }
+
+    if (result.length === 0) {
+      const lines = raw.split('\n')
+        .map(l => l.replace(/\*\*/g, '').replace(/^[-•*#]\s*/, '').trim())
+        .filter(l => l.length > 5);
+      result.push({ icon: '📋', title: 'Clinical Handover', color: 'text-primary', bgColor: 'bg-soft-primary border-primary', items: lines });
+    }
+
+    return result;
   }
 
   private loadChart(): void {
@@ -354,19 +594,19 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
               {
                 label: 'Total Activity',
                 data: t.totalActivitySeries,
-                backgroundColor: '#0d6efd', // Blue
+                backgroundColor: '#0d6efd',
                 borderRadius: 4
               },
               {
                 label: 'Agitation / Negative Tone',
                 data: t.negativeSentimentSeries,
-                backgroundColor: '#ff9800', // Orange
+                backgroundColor: '#ff9800',
                 borderRadius: 4
               },
               {
                 label: 'Critical Safety Alerts',
                 data: t.criticalAlertSeries,
-                backgroundColor: '#f44336', // Red
+                backgroundColor: '#f44336',
                 borderRadius: 4
               }
             ]

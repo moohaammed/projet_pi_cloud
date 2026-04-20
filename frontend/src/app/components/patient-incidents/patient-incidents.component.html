@@ -1,0 +1,89 @@
+<!-- patient-incidents.component.html -->
+<div class="pi-page">
+
+  <div class="pi-header">
+    <div class="pi-header-icon"><i class="fa-solid fa-bell-exclamation"></i></div>
+    <div>
+      <h1 class="pi-title">Mes Incidents</h1>
+      <p class="pi-sub">Alertes de sécurité détectées par l'IA sur votre chemin.</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="pi-loading" *ngIf="loading">
+    <div class="pi-spinner"></div>
+    Chargement des incidents…
+  </div>
+
+  <!-- Error -->
+  <div class="pi-error" *ngIf="error">
+    <i class="fa-solid fa-circle-xmark"></i> {{ error }}
+  </div>
+
+  <!-- Empty state -->
+  <div class="pi-empty" *ngIf="!loading && !error && incidents.length === 0">
+    <i class="fa-solid fa-shield-check"></i>
+    <p>Aucun incident enregistré. Votre chemin est sûr !</p>
+  </div>
+  <!-- Pas de zone définie -->
+<div *ngIf="!loading && !zoneDefinie" class="alert alert-warning text-center">
+  <i class="fa-solid fa-house-circle-exclamation fa-2x mb-2 d-block"></i>
+  <strong>Aucune zone définie</strong><br>
+  <small>Votre médecin n'a pas encore défini votre zone de sécurité.</small>
+</div>
+
+<!-- Zone définie mais aucun incident -->
+<div *ngIf="!loading && zoneDefinie && incidents.length === 0"
+     class="alert alert-success text-center">
+  <i class="fa-solid fa-shield-check fa-2x mb-2 d-block"></i>
+  ✅ Aucun incident dans votre zone ({{ rayonZone }}m autour de votre maison)
+</div>
+
+  <!-- Incident cards -->
+  <div class="pi-list" *ngIf="!loading && incidents.length > 0">
+    <div class="pi-card" *ngFor="let inc of incidents"
+         [class.pi-card--danger]="inc.status === 'EN_COURS'">
+
+      <div class="pi-card-left">
+        <div class="pi-type-icon">
+          <i class="fa-solid" [ngClass]="typeIcon(inc.type)"></i>
+        </div>
+      </div>
+
+      <div class="pi-card-body">
+        <div class="pi-card-header">
+          <span class="pi-card-title">{{ inc.title }}</span>
+          <span class="pi-badge" [ngClass]="statusClass(inc.status)">
+            {{ statusLabel(inc.status) }}
+          </span>
+        </div>
+        <p class="pi-card-desc">{{ inc.description }}</p>
+
+        <div class="pi-card-meta">
+          <span *ngIf="inc.aiAnalysis">
+            <i class="fa-solid fa-brain me-1"></i>
+            CLIP: <em>{{ inc.aiAnalysis }}</em>
+            <span *ngIf="inc.aiConfidence">
+              ({{ (inc.aiConfidence * 100).toFixed(0) }}%)
+            </span>
+          </span>
+
+          <span *ngIf="inc.reporterId">
+            <i class="fa-solid fa-user-doctor me-1"></i>
+            Signalé par le personnel soignant
+          </span>
+
+          <span *ngIf="inc.createdAt">
+            <i class="fa-regular fa-clock me-1"></i>
+            {{ inc.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+
+          <span *ngIf="inc.latitude">
+            <i class="fa-solid fa-location-dot me-1"></i>
+            {{ inc.latitude | number:'1.3-3' }}, {{ inc.longitude | number:'1.3-3' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

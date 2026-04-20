@@ -1,0 +1,141 @@
+<!-- image-analyzer.component.html -->
+<div class="analyzer-page">
+
+  <!-- ── HEADER ──────────────────────────────────────────────────────────── -->
+  <div class="analyzer-header">
+    <div class="analyzer-header-icon">
+      <i class="fa-solid fa-brain"></i>
+    </div>
+    <div>
+      <h1 class="analyzer-title">Analyse IA du chemin</h1>
+      <p class="analyzer-subtitle">
+        CLIP détecte les dangers en temps réel et alerte le patient automatiquement.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── MAIN CARD ───────────────────────────────────────────────────────── -->
+  <div class="analyzer-card">
+
+    <!-- Emplacement de l'incident -->
+    <div class="section-block">
+      <label class="section-label">
+        <i class="fa-solid fa-location-dot me-2"></i>Emplacement de l'incident
+      </label>
+
+      <input type="text" class="patient-select"
+             [(ngModel)]="locationName"
+             placeholder="Ex: Rue de la paix, Tunis...">
+
+      <!-- Bouton GPS automatique -->
+      <button class="upload-btn upload-btn--secondary mt-2"
+              (click)="captureGeolocation()">
+        <i class="fa-solid fa-crosshairs me-1"></i>
+        Utiliser ma position actuelle
+      </button>
+
+      <!-- Coordonnées GPS -->
+      <div class="geo-badge mt-2" *ngIf="latitude !== null">
+        <i class="fa-solid fa-location-dot"></i>
+        {{ latitude | number:'1.4-4' }}, {{ longitude | number:'1.4-4' }}
+      </div>
+      <div class="geo-badge geo-badge--off mt-2" *ngIf="latitude === null">
+        <i class="fa-solid fa-location-dot-slash"></i>
+        Géolocalisation non disponible
+      </div>
+    </div>
+
+    <!-- Upload buttons -->
+    <div class="section-block upload-row">
+      <label class="upload-btn upload-btn--primary" id="btn-camera">
+        <i class="fa-solid fa-camera"></i>
+        Prendre une photo
+        <input type="file" accept="image/*" capture="environment"
+               class="hidden-input" (change)="onImageSelected($event)">
+      </label>
+
+      <label class="upload-btn upload-btn--secondary" id="btn-gallery">
+        <i class="fa-solid fa-image"></i>
+        Choisir une image
+        <input type="file" accept="image/*"
+               class="hidden-input" (change)="onImageSelected($event)">
+      </label>
+    </div>
+
+    <!-- Image preview -->
+    <div class="preview-wrapper" *ngIf="imagePreview">
+      <img [src]="imagePreview" class="preview-img" alt="Image analysée">
+      <div class="preview-overlay" *ngIf="loading">
+        <div class="spinner-ring"></div>
+        <span>Analyse CLIP en cours…</span>
+      </div>
+    </div>
+
+    <!-- Loading (no preview yet) -->
+    <div class="loading-block" *ngIf="loading && !imagePreview">
+      <div class="spinner-ring"></div>
+      <p>Analyse CLIP en cours…</p>
+    </div>
+
+    <!-- ══ RESULT ══════════════════════════════════════════════════════════ -->
+    <div class="result-block" *ngIf="message && !loading"
+         [class.result-block--danger]="danger"
+         [class.result-block--safe]="!danger">
+
+      <div class="result-icon">
+        <i class="fa-solid"
+           [class.fa-triangle-exclamation]="danger"
+           [class.fa-circle-check]="!danger"></i>
+      </div>
+
+      <p class="result-message">{{ message }}</p>
+
+      <div class="result-actions">
+        <button class="action-btn action-btn--speak" id="btn-repeat"
+                (click)="lireMessage(message)">
+          <i class="fa-solid fa-volume-high"></i> Répéter
+        </button>
+
+        <!-- Manual incident button -->
+        <button class="action-btn action-btn--log"
+                *ngIf="!danger && !incidentCreated"
+                id="btn-log-manual"
+                (click)="createManualIncident()">
+          <i class="fa-solid fa-file-circle-plus"></i> Créer un incident
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ INCIDENT STATUS ════════════════════════════════════════════════ -->
+    <div class="incident-badge incident-badge--success"
+         *ngIf="incidentCreated" id="incident-created-badge">
+      <i class="fa-solid fa-check-circle"></i>
+      Incident créé ✅
+      <span *ngIf="createdIncidentId"> · #{{ createdIncidentId }}</span>
+      <span class="incident-badge-sub">
+        L'incident a été enregistré avec succès.
+      </span>
+    </div>
+
+    <div class="incident-badge incident-badge--error" *ngIf="incidentError">
+      <i class="fa-solid fa-circle-xmark"></i>
+      {{ incidentError }}
+    </div>
+
+    <!-- ══ CONFIDENCE SCORES ══════════════════════════════════════════════ -->
+    <div class="scores-block" *ngIf="predictions.length > 0 && !loading">
+      <h6 class="scores-title">Détails de l'analyse CLIP</h6>
+      <div class="score-row" *ngFor="let p of predictions">
+        <div class="score-row-header">
+          <span class="score-label">{{ p.label }}</span>
+          <span class="score-pct">{{ pct(p.score) }}</span>
+        </div>
+        <div class="score-bar-track">
+          <div class="score-bar-fill" [ngClass]="barClass(p.label)"
+               [style.width]="pct(p.score)"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /analyzer-card -->
+</div><!-- /analyzer-page -->

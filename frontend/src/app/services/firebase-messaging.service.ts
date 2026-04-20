@@ -31,7 +31,7 @@ export class FirebaseMessagingService {
       const app = initializeApp(this.firebaseConfig);
       this.messaging = getMessaging(app);
       
-      onMessage(this.messaging, (payload) => {
+      onMessage(this.messaging, (payload: any) => {
         console.log('Message received. ', payload);
         // Show a toast logic here if needed, but handled by the component or service
         this.showNotificationToast(payload);

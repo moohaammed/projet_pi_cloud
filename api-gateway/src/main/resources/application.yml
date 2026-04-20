@@ -13,13 +13,19 @@ spring:
             allowedOrigins: "http://localhost:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
-            allowCredentials: true
+            allowCredentials: false
             maxAge: 3600
+
       # Remove duplicate CORS headers coming from upstream services
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
 
       routes:
+        # ── Dedicated Media Routing (Must be first to avoid conflicts) ─────
+        - id: collab-media
+          uri: lb://collab-service
+          predicates:
+            - Path=/uploads/media/**
 
         # ── Collaboration service ──────────────────────────────────────────
         - id: collab-rest
@@ -32,6 +38,26 @@ spring:
           uri: lb://rendezvous-service
           predicates:
             - Path=/api/rendezvous/**
+
+        # ── Geo service ──────────────────────────────────────────────────────
+        # Must be declared BEFORE the backpi catch-all (/api/**) so these
+        # more-specific paths are matched first by Spring Cloud Gateway.
+        - id: geo-service
+          uri: lb://geo-service
+          predicates:
+            - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/patient-locations/**
+
+        - id: geo-service
+          uri: lb://geo-service
+          predicates:
+            - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/safezones/**,/api/patient-locations/**
+
+        # ── Main service (backpi) ──────────────────────────────────────────
+        # ── Education service ──────────────────────────────────────────
+        - id: education-rest
+          uri: lb://education-service
+          predicates:
+            - Path=/api/activities/**,/api/patient-activity/**,/api/events/**,/api/event-seats/**,/uploads/education/**,/api/audio-sessions/**
 
         # ── Donation service ──────────────────────────────────────────
         - id: donation-rest
@@ -52,6 +78,7 @@ spring:
             - Path=/api/patients/**,/api/analyses/**,/api/rappel-quotidien/**,/api/patient-notification/**,/api/jeux/**
 
         # ── Main service (backpi) ──────────────────────────────────────────
+        # ── Main service (backpi) ────────────────────────────────────────
         - id: main-service
           uri: lb://backpi
           predicates:
@@ -61,5 +88,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 5
   instance:
     prefer-ip-address: true

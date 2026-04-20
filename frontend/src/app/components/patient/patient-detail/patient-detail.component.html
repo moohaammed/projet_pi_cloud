@@ -4,13 +4,9 @@
   <nav class="mb-4">
     <ol class="breadcrumb">
       <li class="breadcrumb-item">
-        <a routerLink="/patient-profiles" class="text-decoration-none">
-          Patients
-        </a>
+        <a routerLink="/patient-profiles" class="text-decoration-none">Patients</a>
       </li>
-      <li class="breadcrumb-item active">
-        {{ patient.nom }} {{ patient.prenom }}
-      </li>
+      <li class="breadcrumb-item active">{{ patient.nom }} {{ patient.prenom }}</li>
     </ol>
   </nav>
 
@@ -22,11 +18,11 @@
 
         <!-- Header -->
         <div class="card-header p-4 text-white"
-             style="background: linear-gradient(135deg, #0d6efd, #0a58ca)">
+             style="background:linear-gradient(135deg,#0d6efd,#0a58ca)">
           <div class="d-flex align-items-center gap-3">
             <div class="rounded-circle bg-white d-flex align-items-center
                         justify-content-center fw-bold text-primary"
-                 style="width:60px; height:60px; font-size:20px; flex-shrink:0">
+                 style="width:60px;height:60px;font-size:20px;flex-shrink:0">
               {{ patient.nom.charAt(0) }}{{ patient.prenom.charAt(0) }}
             </div>
             <div>
@@ -59,9 +55,7 @@
             <div class="col-md-6">
               <div class="p-3 bg-light rounded-3">
                 <div class="text-muted small">Téléphone</div>
-                <div class="fw-semibold">
-                  {{ patient.telephone || 'Non renseigné' }}
-                </div>
+                <div class="fw-semibold">{{ patient.telephone || 'Non renseigné' }}</div>
               </div>
             </div>
             <div class="col-md-6">
@@ -94,8 +88,7 @@
 
           <!-- Contact d'urgence -->
           <h6 class="fw-bold text-muted text-uppercase small mb-3">
-            <i class="fa-solid fa-phone-volume text-danger me-1"></i>
-            Contact d'urgence
+            <i class="fa-solid fa-phone-volume text-danger me-1"></i>Contact d'urgence
           </h6>
           <div class="p-3 bg-danger bg-opacity-10 rounded-3
                       border border-danger border-opacity-25 mb-4">
@@ -115,6 +108,59 @@
             </div>
           </div>
 
+          <!-- ★ Compte RELATION lié ★ -->
+          <h6 class="fw-bold text-muted text-uppercase small mb-3">
+            <i class="fa-solid fa-people-arrows me-1" style="color:#6f42c1"></i>
+            Compte Relation lié
+          </h6>
+          <div *ngIf="relation"
+               class="p-3 rounded-3 border mb-4"
+               style="background:#f5f0ff; border-color:#d5b8ff !important">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="rounded-circle d-flex align-items-center justify-content-center
+                          fw-bold text-white"
+                   style="width:46px;height:46px;font-size:16px;
+                          background:linear-gradient(135deg,#6f42c1,#3c3489);flex-shrink:0">
+                {{ relation.prenom?.charAt(0) }}{{ relation.nom?.charAt(0) }}
+              </div>
+              <div>
+                <div class="fw-bold" style="color:#3c3489">{{ relationNomComplet }}</div>
+                <span class="badge rounded-pill"
+                      style="background:#e8d5ff;color:#4a2a8a;font-size:11px">
+                  {{ relationLien }}
+                </span>
+              </div>
+              <span class="ms-auto badge rounded-pill"
+                    [class.bg-success]="relation.actif"
+                    [class.bg-secondary]="!relation.actif">
+                {{ relation.actif ? 'Actif' : 'Inactif' }}
+              </span>
+            </div>
+            <div class="row g-2" style="font-size:13px">
+              <div class="col-md-6">
+                <div class="text-muted small">Email</div>
+                <div class="fw-semibold">{{ relationEmail }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">Téléphone</div>
+                <div class="fw-semibold">{{ relationTelephone }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!relation"
+               class="p-3 rounded-3 mb-4 d-flex align-items-center gap-2"
+               style="background:#f8f9fa; border:2px dashed #dee2e6">
+            <i class="fa-solid fa-user-slash text-muted"></i>
+            <span class="text-muted small">Aucun compte relation créé pour ce patient.</span>
+            <a *ngIf="isAdmin || isDoctor"
+               routerLink="/patient-profiles/creer"
+               class="btn btn-sm rounded-pill ms-auto"
+               style="background:#6f42c1;color:white;border:none;font-size:12px">
+              <i class="fa-solid fa-plus me-1"></i>Créer
+            </a>
+          </div>
+
           <!-- Notes -->
           <div *ngIf="notes">
             <h6 class="fw-bold text-muted text-uppercase small mb-2">
@@ -129,17 +175,26 @@
 
     <!-- Colonne droite -->
     <div class="col-lg-4">
-
-      <!-- Actions -->
       <div class="card border-0 shadow-sm rounded-4 mb-3">
         <div class="card-body p-3">
           <h6 class="fw-bold mb-3">Actions</h6>
           <div class="d-grid gap-2">
+
             <a *ngIf="isAdmin || isDoctor"
                [routerLink]="['/patient-profiles/edit', patient.id]"
                class="btn btn-warning">
               <i class="fa-solid fa-pen me-2"></i>Modifier la fiche
             </a>
+
+            <a *ngIf="isAdmin || isDoctor"
+               routerLink="/patient-profiles/creer"
+               class="btn fw-bold"
+               style="background:linear-gradient(135deg,#6f42c1,#3c3489);
+                      color:white;border:none;border-radius:8px">
+              <i class="fa-solid fa-people-arrows me-2"></i>
+              Créer compte relation
+            </a>
+
             <button class="btn"
                     [class.btn-outline-secondary]="patient.actif"
                     [class.btn-outline-success]="!patient.actif"
@@ -149,25 +204,23 @@
                  [class.fa-toggle-on]="!patient.actif"></i>
               {{ patient.actif ? 'Désactiver' : 'Activer' }}
             </button>
+
             <a routerLink="/map" class="btn btn-outline-primary">
               <i class="fa-solid fa-map-location-dot me-2"></i>
               Voir sur la carte
             </a>
+
           </div>
         </div>
       </div>
 
-      <!-- Retour -->
-      <a routerLink="/patient-profiles"
-         class="btn btn-outline-secondary w-100">
+      <a routerLink="/patient-profiles" class="btn btn-outline-secondary w-100">
         <i class="fa-solid fa-arrow-left me-2"></i>Retour à la liste
       </a>
-
     </div>
   </div>
 </div>
 
-<!-- Loading -->
 <div *ngIf="loading" class="text-center py-5">
   <div class="spinner-border text-primary"></div>
 </div>

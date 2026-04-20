@@ -1,0 +1,414 @@
+<!-- Loading -->
+<div *ngIf="loading" class="d-flex align-items-center justify-content-center"
+     style="height:60vh">
+  <div class="text-center">
+    <div class="spinner-border mb-3" style="color:#6f42c1; width:48px;height:48px"></div>
+    <div class="text-muted fw-semibold">Chargement du profil patient…</div>
+  </div>
+</div>
+
+<!-- Pas de patient lié -->
+<div *ngIf="!loading && !patient" class="d-flex flex-column align-items-center justify-content-center"
+     style="height:60vh">
+  <div class="text-center p-4">
+    <i class="fa-solid fa-user-slash d-block fs-1 mb-3" style="color:#d5b8ff"></i>
+    <h5 class="fw-bold" style="color:#3c3489">Aucun patient lié</h5>
+    <p class="text-muted">Votre compte n'est pas encore associé à un patient.<br>
+       Contactez l'administrateur.</p>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div *ngIf="!loading && patient" class="container-fluid py-4" style="max-width:900px">
+
+  <!-- ══ HERO CARD ══════════════════════════════════════════════ -->
+  <div class="rounded-4 overflow-hidden shadow mb-4 fade-up"
+       style="background:linear-gradient(135deg,#4a2a8a,#6f42c1,#9b59b6)">
+
+    <!-- Bannière -->
+    <div class="p-4 pb-0 position-relative">
+      <!-- Statut en ligne -->
+      <div class="position-absolute top-0 end-0 m-3">
+        <span class="badge rounded-pill px-3 py-2 d-flex align-items-center gap-2"
+              style="font-size:12px; font-weight:700"
+              [style.background]="isOnline ? 'rgba(40,167,69,.25)' : 'rgba(108,117,125,.25)'"
+              [style.border]="'1px solid ' + (isOnline ? '#8fd4a8' : '#adb5bd')"
+              [style.color]="isOnline ? '#d4edda' : '#e2e3e5'">
+          <i class="fa-solid fa-circle" style="font-size:7px"
+             [style.color]="isOnline ? '#8fd4a8' : '#adb5bd'"></i>
+          {{ isOnline ? 'En ligne' : 'Hors ligne' }}
+        </span>
+      </div>
+
+      <!-- Avatar + nom -->
+      <div class="d-flex align-items-end gap-4 pb-4">
+        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
+             style="width:90px;height:90px;background:rgba(255,255,255,0.2);
+                    border:4px solid rgba(255,255,255,0.4);
+                    font-size:32px;color:white;flex-shrink:0">
+          {{ initials }}
+        </div>
+        <div class="text-white pb-1">
+          <h2 class="fw-bold mb-0">{{ patient.prenom }} {{ patient.nom }}</h2>
+          <div class="opacity-75 mt-1 d-flex align-items-center gap-3 flex-wrap"
+               style="font-size:14px">
+            <span *ngIf="age"><i class="fa-solid fa-cake-candles me-1"></i>{{ age }} ans</span>
+            <span><i class="fa-solid fa-envelope me-1"></i>{{ patient.email }}</span>
+            <span *ngIf="$any(patient).telephone">
+              <i class="fa-solid fa-phone me-1"></i>{{ $any(patient).telephone }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats rapides -->
+    <div class="d-flex border-top"
+         style="background:rgba(0,0,0,0.2); border-color:rgba(255,255,255,0.15)!important">
+      <div class="flex-fill text-center py-3 border-end"
+           style="border-color:rgba(255,255,255,0.15)!important">
+        <div class="fw-bold text-white fs-4">{{ alerts.length }}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">Alertes total</div>
+      </div>
+      <div class="flex-fill text-center py-3 border-end"
+           style="border-color:rgba(255,255,255,0.15)!important">
+        <div class="fw-bold fs-4"
+             [style.color]="unresolvedAlerts.length > 0 ? '#ff8080' : 'white'">
+          {{ unresolvedAlerts.length }}
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">Non résolues</div>
+      </div>
+      <div class="flex-fill text-center py-3 border-end"
+           style="border-color:rgba(255,255,255,0.15)!important">
+        <div class="fw-bold text-white fs-4">{{ incidents.length }}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">Incidents IA</div>
+      </div>
+      <div class="flex-fill text-center py-3">
+        <div class="fw-bold fs-4"
+             [style.color]="activeIncidents.length > 0 ? '#ff8080' : 'white'">
+          {{ activeIncidents.length }}
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">En cours</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BOUTONS NAVIGATION RAPIDE ══════════════════════════════ -->
+  <div class="d-flex gap-3 mb-4 flex-wrap fade-up fade-up-1">
+    <a routerLink="/relation-map"
+       class="btn fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2"
+       style="background:linear-gradient(135deg,#6f42c1,#3c3489);
+              color:white;border:none;box-shadow:0 4px 14px rgba(111,66,193,.35)">
+      <i class="fa-solid fa-map-location-dot"></i>
+      Voir sur la carte
+    </a>
+    <a routerLink="/analyzer"
+       class="btn fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2"
+       style="background:linear-gradient(135deg,#0d6efd,#0a58ca);
+              color:white;border:none;box-shadow:0 4px 14px rgba(13,110,253,.3)">
+      <i class="fa-solid fa-brain"></i>
+      Analyser chemin IA
+    </a>
+  </div>
+
+  <!-- ══ ONGLETS SECTION ═════════════════════════════════════════ -->
+  <div class="d-flex gap-2 mb-4 flex-wrap fade-up fade-up-1">
+    <button *ngFor="let s of [
+      {key:'info',    label:'Informations',  icon:'fa-user'},
+      {key:'sante',   label:'Santé',         icon:'fa-heart-pulse'},
+      {key:'urgences',label:'Alertes',       icon:'fa-bell'},
+      {key:'activite',label:'Incidents IA',  icon:'fa-triangle-exclamation'}
+    ]"
+            class="btn btn-sm rounded-pill px-4 py-2 fw-semibold"
+            style="font-size:13px; transition:all .2s"
+            [style.background]="activeSection === s.key ? '#6f42c1' : '#f5f0ff'"
+            [style.color]="activeSection === s.key ? 'white' : '#4a2a8a'"
+            [style.border]="'1.5px solid ' + (activeSection === s.key ? '#6f42c1' : '#d5b8ff')"
+            (click)="activeSection = $any(s.key)">
+      <i class="fa-solid me-1" [class]="s.icon"></i>{{ s.label }}
+      <span *ngIf="s.key === 'urgences' && unresolvedAlerts.length > 0"
+            class="badge rounded-pill ms-1"
+            style="background:rgba(255,255,255,.3);color:inherit;font-size:10px">
+        {{ unresolvedAlerts.length }}
+      </span>
+      <span *ngIf="s.key === 'activite' && activeIncidents.length > 0"
+            class="badge rounded-pill ms-1"
+            style="background:rgba(255,255,255,.3);color:inherit;font-size:10px">
+        {{ activeIncidents.length }}
+      </span>
+    </button>
+  </div>
+
+  <!-- ══ INFORMATIONS GÉNÉRALES ══════════════════════════════════ -->
+  <div *ngIf="activeSection === 'info'" class="fade-up fade-up-2">
+    <div class="row g-3">
+
+      <!-- Identité -->
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3 d-flex align-items-center gap-2"
+                style="color:#6f42c1">
+              <div class="rounded-circle d-flex align-items-center justify-content-center"
+                   style="width:30px;height:30px;background:#f5f0ff">
+                <i class="fa-solid fa-id-card" style="font-size:13px;color:#6f42c1"></i>
+              </div>
+              Identité
+            </h6>
+            <div class="d-flex flex-column gap-2">
+              <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span class="text-muted small">Prénom</span>
+                <span class="fw-semibold">{{ patient.prenom }}</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span class="text-muted small">Nom</span>
+                <span class="fw-semibold">{{ patient.nom }}</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span class="text-muted small">Email</span>
+                <span class="fw-semibold small">{{ patient.email }}</span>
+              </div>
+              <div *ngIf="age" class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span class="text-muted small">Âge</span>
+                <span class="fw-semibold">{{ age }} ans</span>
+              </div>
+              <div *ngIf="$any(patient).telephone"
+                   class="d-flex justify-content-between align-items-center py-2">
+                <span class="text-muted small">Téléphone</span>
+                <span class="fw-semibold">{{ $any(patient).telephone }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localisation -->
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3 d-flex align-items-center gap-2"
+                style="color:#0d6efd">
+              <div class="rounded-circle d-flex align-items-center justify-content-center"
+                   style="width:30px;height:30px;background:#e8f4ff">
+                <i class="fa-solid fa-location-dot" style="font-size:13px;color:#0d6efd"></i>
+              </div>
+              Dernière position
+            </h6>
+
+            <div *ngIf="lastLocation" class="d-flex flex-column gap-2">
+              <div class="p-3 rounded-3 mb-1"
+                   [style.background]="isOnline ? '#f0fbf4' : '#f8f9fa'"
+                   [style.border]="'2px solid ' + (isOnline ? '#8fd4a8' : '#dee2e6')">
+                <div class="fw-bold mb-1"
+                     [style.color]="isOnline ? '#198754' : '#6c757d'">
+                  <i class="fa-solid fa-circle me-1" style="font-size:8px"></i>
+                  {{ isOnline ? 'En ligne' : 'Hors ligne' }}
+                </div>
+                <div class="text-muted small">{{ lastSeen }}</div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span class="text-muted small">Coordonnées</span>
+                <span class="fw-semibold small">
+                  {{ lastLocation.latitude | number:'1.4-4' }},
+                  {{ lastLocation.longitude | number:'1.4-4' }}
+                </span>
+              </div>
+              <div *ngIf="lastLocation.batterie"
+                   class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span class="text-muted small">Batterie</span>
+                <span class="fw-bold" [style.color]="batteryColor">
+                  🔋 {{ lastLocation.batterie }}%
+                </span>
+              </div>
+              <a [href]="'https://www.google.com/maps?q=' + lastLocation.latitude + ',' + lastLocation.longitude"
+                 target="_blank"
+                 class="btn btn-sm btn-outline-primary rounded-pill mt-1"
+                 style="font-size:12px">
+                <i class="fa-solid fa-map-location-dot me-1"></i>Ouvrir dans Maps
+              </a>
+            </div>
+
+            <div *ngIf="!lastLocation" class="text-center text-muted py-4">
+              <i class="fa-solid fa-location-dot-slash d-block fs-2 mb-2 opacity-40"></i>
+              <div class="small">Position non disponible</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SANTÉ ════════════════════════════════════════════════════ -->
+  <div *ngIf="activeSection === 'sante'" class="fade-up fade-up-2">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <h6 class="fw-bold mb-4 d-flex align-items-center gap-2" style="color:#6f42c1">
+          <div class="rounded-circle d-flex align-items-center justify-content-center"
+               style="width:32px;height:32px;background:#f5f0ff">
+            <i class="fa-solid fa-heart-pulse" style="color:#6f42c1;font-size:14px"></i>
+          </div>
+          Informations médicales
+        </h6>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="p-3 rounded-3" style="background:#f5f0ff;border:1px solid #e8d5ff">
+              <div class="text-muted small mb-1">Pathologie</div>
+              <div class="fw-bold" style="color:#3c3489">Maladie d'Alzheimer</div>
+            </div>
+          </div>
+          <div class="col-sm-6" *ngIf="$any(patient).stade">
+            <div class="p-3 rounded-3" style="background:#f5f0ff;border:1px solid #e8d5ff">
+              <div class="text-muted small mb-1">Stade</div>
+              <div class="fw-bold" style="color:#3c3489">{{ $any(patient).stade }}</div>
+            </div>
+          </div>
+          <div class="col-sm-6" *ngIf="$any(patient).medecin">
+            <div class="p-3 rounded-3" style="background:#e8f4ff;border:1px solid #b5d4f4">
+              <div class="text-muted small mb-1">Médecin référent</div>
+              <div class="fw-bold" style="color:#0a58ca">{{ $any(patient).medecin }}</div>
+            </div>
+          </div>
+          <div class="col-sm-6" *ngIf="$any(patient).dateNaissance">
+            <div class="p-3 rounded-3" style="background:#f5f0ff;border:1px solid #e8d5ff">
+              <div class="text-muted small mb-1">Date de naissance</div>
+              <div class="fw-bold" style="color:#3c3489">
+                {{ $any(patient).dateNaissance | date:'dd/MM/yyyy' }}
+              </div>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="$any(patient).notes">
+            <div class="p-3 rounded-3" style="background:#fffbee;border:1px solid #ffe082">
+              <div class="text-muted small mb-1">Notes médicales</div>
+              <div style="color:#92400e">{{ $any(patient).notes }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Si pas d'infos médicales supplémentaires -->
+        <div *ngIf="!$any(patient).stade && !$any(patient).medecin && !$any(patient).notes"
+             class="text-center text-muted py-4">
+          <i class="fa-solid fa-file-medical d-block fs-2 mb-2 opacity-40"></i>
+          <div class="small">Aucune information médicale complémentaire disponible</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ALERTES ══════════════════════════════════════════════════ -->
+  <div *ngIf="activeSection === 'urgences'" class="fade-up fade-up-2">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h6 class="fw-bold mb-0 d-flex align-items-center gap-2" style="color:#dc3545">
+            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                 style="width:32px;height:32px;background:#fff5f5">
+              <i class="fa-solid fa-bell" style="color:#dc3545;font-size:14px"></i>
+            </div>
+            Historique des alertes
+          </h6>
+          <span class="badge rounded-pill px-3"
+                style="background:#dc3545;font-size:12px">
+            {{ unresolvedAlerts.length }} non résolue(s)
+          </span>
+        </div>
+
+        <div *ngFor="let a of alerts"
+             class="d-flex align-items-start gap-3 p-3 rounded-3 mb-2"
+             [style.background]="a.resolue ? '#f8f9fa' : '#fff5f5'"
+             [style.border]="'1.5px solid ' + (a.resolue ? '#dee2e6' : '#f4a0b0')"
+             [style.opacity]="a.resolue ? '0.7' : '1'">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width:36px;height:36px;"
+               [style.background]="a.resolue ? '#e9ecef' : 'rgba(220,53,69,.12)'">
+            <i class="fa-solid"
+               [class]="alertIcon(a.typeAlerte)"
+               [style.color]="a.resolue ? '#6c757d' : alertColor(a.typeAlerte)"
+               style="font-size:14px"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold" [style.color]="a.resolue ? '#6c757d' : '#1e1b3a'">
+              {{ a.typeAlerte }}
+            </div>
+            <div class="text-muted small">{{ a.declencheeAt | date:'dd/MM/yyyy HH:mm' }}</div>
+            <div *ngIf="a.latitude && a.longitude" class="mt-1">
+              <a [href]="'https://www.google.com/maps?q=' + a.latitude + ',' + a.longitude"
+                 target="_blank"
+                 class="btn btn-sm btn-outline-primary rounded-pill py-0 px-2"
+                 style="font-size:10px">
+                <i class="fa-solid fa-map-location-dot me-1"></i>Voir position
+              </a>
+            </div>
+          </div>
+          <span *ngIf="a.resolue" class="badge bg-success rounded-pill">✓ Résolu</span>
+          <span *ngIf="!a.resolue" class="badge bg-danger rounded-pill">⚡ Actif</span>
+        </div>
+
+        <div *ngIf="alerts.length === 0" class="text-center text-muted py-4">
+          <i class="fa-solid fa-check-circle text-success d-block fs-1 mb-2"></i>
+          Aucune alerte enregistrée
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ INCIDENTS IA ═════════════════════════════════════════════ -->
+  <div *ngIf="activeSection === 'activite'" class="fade-up fade-up-2">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h6 class="fw-bold mb-0 d-flex align-items-center gap-2" style="color:#6f42c1">
+            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                 style="width:32px;height:32px;background:#f5f0ff">
+              <i class="fa-solid fa-brain" style="color:#6f42c1;font-size:14px"></i>
+            </div>
+            Incidents détectés par l'IA
+          </h6>
+          <span class="badge rounded-pill px-3"
+                style="background:#6f42c1;font-size:12px">
+            {{ activeIncidents.length }} en cours
+          </span>
+        </div>
+
+        <div *ngFor="let inc of incidents"
+             class="rounded-3 mb-2 overflow-hidden border"
+             style="border-color:rgba(111,66,193,0.2)!important">
+          <div class="d-flex align-items-center px-3 py-2 gap-3"
+               style="background:linear-gradient(135deg,#f5f0ff,#ede5ff)">
+            <span style="font-size:20px">{{ incidentEmoji(inc.type) }}</span>
+            <div class="flex-grow-1">
+              <div class="fw-semibold small" style="color:#3c3489">{{ inc.title }}</div>
+              <div class="text-muted" style="font-size:10px">
+                {{ inc.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </div>
+            </div>
+            <span class="badge rounded-pill"
+                  style="font-size:10px"
+                  [style.background]="inc.status === 'EN_COURS' ? '#dc3545' :
+                                      inc.status === 'RESOLU'   ? '#198754' : '#6c757d'">
+              {{ inc.status === 'EN_COURS' ? '⚡ En cours' :
+                 inc.status === 'RESOLU'   ? '✓ Résolu'   : 'Fermé' }}
+            </span>
+          </div>
+          <div class="px-3 py-2" style="font-size:12px">
+            <p class="text-muted mb-1">{{ inc.description }}</p>
+            <div *ngIf="inc.aiAnalysis"
+                 class="d-inline-flex align-items-center gap-1 px-2 py-1 rounded-2"
+                 style="font-size:10px;background:#fdf8ff;border:1px solid #d5b8ff;color:#6f42c1">
+              <i class="fa-solid fa-robot" style="font-size:9px"></i>
+              CLIP : {{ inc.aiAnalysis }}
+              <span *ngIf="inc.aiConfidence">({{ (inc.aiConfidence * 100).toFixed(0) }}%)</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="incidents.length === 0" class="text-center text-muted py-4">
+          <i class="fa-solid fa-shield-check d-block fs-1 mb-2" style="color:#6f42c1;opacity:.3"></i>
+          Aucun incident détecté
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -65,6 +65,14 @@ public class MessageService {
                 .map(this::mapToResponseDto).collect(Collectors.toList());
     }
 
+    public List<MessageResponseDto> getMessagesByGroupPaged(String groupId, int page, int size) {
+        List<Message> all = messageRepository.findByChatGroupIdOrderBySentAtDesc(groupId);
+        int from = page * size;
+        int to = Math.min(from + size, all.size());
+        if (from >= all.size()) return List.of();
+        return all.subList(from, to).stream().map(this::mapToResponseDto).collect(Collectors.toList());
+    }
+
     public List<MessageResponseDto> getDirectMessages(Long userId1, Long userId2) {
         return messageRepository.findDirectMessages(userId1, userId2).stream()
                 .map(this::mapToResponseDto).collect(Collectors.toList());
@@ -79,7 +87,15 @@ public class MessageService {
         return messageRepository.findById(id).map(this::mapToResponseDto).orElse(null);
     }
 
-    public MessageResponseDto createMessage(MessageCreateDto dto, String mediaUrl, String mimeType) {
+    public List<Long> getConversationPeers(Long userId) {
+        return messageRepository.findRawConversations(userId).stream()
+                .map(m -> m.getSenderId().equals(userId) ? m.getReceiverId() : m.getSenderId())
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public MessageResponseDto createMessage(MessageCreateDto dto, List<String> mediaUrls, List<String> mimeTypes) {
         ChatGroup group = null;
         if (dto.getChatGroupId() != null) {
             group = chatGroupRepository.findById(dto.getChatGroupId()).orElse(null);
@@ -91,8 +107,11 @@ public class MessageService {
         message.setReceiverId(dto.getReceiverId());
         if (group != null) message.setChatGroupId(group.getId());
         message.setSentAt(Instant.now());
-        message.setMediaUrl(mediaUrl);
-        message.setMimeType(mimeType);
+        
+        if (mediaUrls != null && !mediaUrls.isEmpty()) {
+            message.setMediaUrls(mediaUrls);
+            message.setMimeTypes(mimeTypes);
+        }
 
         if (dto.getType() != null) {
             message.setType(dto.getType());
@@ -120,7 +139,7 @@ public class MessageService {
 
         Double score = sentimentAnalysisService.calculateSentimentScore(message.getContent());
         message.setSentimentScore(score);
-        message.setDistressed(score <= -0.5);
+        message.setDistressed(score <= SentimentAnalysisService.DISTRESS_THRESHOLD);
 
         Message saved = messageRepository.save(message);
         MessageResponseDto responseDto = mapToResponseDto(saved);
@@ -152,10 +171,13 @@ public class MessageService {
         return responseDto;
     }
 
-    public MessageResponseDto updateMessage(String id, MessageCreateDto dto, String mediaUrl, String mimeType) {
+    public MessageResponseDto updateMessage(String id, MessageCreateDto dto, List<String> mediaUrls, List<String> mimeTypes) {
         return messageRepository.findById(id).map(existing -> {
             existing.setContent(dto.getContent());
-            if (mediaUrl != null) { existing.setMediaUrl(mediaUrl); existing.setMimeType(mimeType); }
+            if (mediaUrls != null && !mediaUrls.isEmpty()) { 
+                existing.setMediaUrls(mediaUrls); 
+                existing.setMimeTypes(mimeTypes); 
+            }
             Message saved = messageRepository.save(existing);
             MessageResponseDto responseDto = mapToResponseDto(saved);
             if (saved.getChatGroupId() != null)
@@ -185,12 +207,49 @@ public class MessageService {
         });
     }
 
+    
+    public void markAsRead(String messageId, Long userId) {
+        messageRepository.findById(messageId).ifPresent(m -> {
+            if (!m.getViewedByUserIds().contains(userId)) {
+                m.getViewedByUserIds().add(userId);
+                messageRepository.save(m);
+            }
+        });
+    }
+
+    public MessageResponseDto sendLiveComment(Long senderId, Long broadcasterId, String content) {
+        Message message = new Message();
+        message.setContent(content);
+        message.setSenderId(senderId);
+        message.setReceiverId(broadcasterId); // store broadcaster as receiver for reference
+        message.setSentAt(Instant.now());
+        message.setType(MessageType.LIVE_COMMENT);
+
+        Double score = sentimentAnalysisService.calculateSentimentScore(content);
+        message.setSentimentScore(score);
+        message.setDistressed(score <= SentimentAnalysisService.DISTRESS_THRESHOLD);
+
+        Message saved = messageRepository.save(message);
+        MessageResponseDto dto = mapToResponseDto(saved);
+
+        // Broadcast to all viewers of this live stream
+        messagingTemplate.convertAndSend("/topic/live/" + broadcasterId, dto);
+
+        careBotService.processMessageForSupport(saved);
+        return dto;
+    }
+
     public MessageResponseDto mapToResponseDto(Message message) {
         MessageResponseDto dto = new MessageResponseDto();
         dto.setId(message.getId());
         dto.setContent(message.getContent());
-        dto.setMediaUrl(message.getMediaUrl());
-        dto.setMimeType(message.getMimeType());
+        
+        // Support both new multi-media and legacy single media
+        dto.setMediaUrls(message.getMediaUrls());
+        dto.setMimeTypes(message.getMimeTypes());
+        dto.setMediaUrl(message.getMediaUrl()); // Backward compatibility
+        dto.setMimeType(message.getMimeType()); // Backward compatibility
+        
         dto.setSentAt(message.getSentAt());
         dto.setDistressed(message.isDistressed());
         dto.setSentimentScore(message.getSentimentScore());
@@ -269,17 +328,21 @@ public class MessageService {
 
     private void processMentions(String content, Long senderId) {
         if (content == null || !content.contains("@")) return;
+        // Match @FirstName LastName patterns (supports accented characters)
         Pattern p = Pattern.compile("@([a-zA-Z0-9À-ÿ._-]+(?:\\s[a-zA-Z0-9À-ÿ._-]+)*)");
         Matcher m = p.matcher(content);
         List<Map<String, Object>> allUsers = userClient.getAllUsers();
         while (m.find()) {
             String fullName = m.group(1).trim();
+            // Find the user whose full name matches the @mention
             allUsers.stream().filter(u -> userClient.getFullName(u).equalsIgnoreCase(fullName)).findFirst()
                 .ifPresent(tagged -> {
                     Long taggedId = ((Number) tagged.get("id")).longValue();
+                    // Don't notify the sender if they @mention themselves
                     if (!taggedId.equals(senderId)) {
                         Map<String, Object> su = userClient.getUserById(senderId);
-                        notificationService.createAndSend(taggedId, userClient.getFullName(su) + " tagged you in a message", "TAG_MENTION");
+                        notificationService.createAndSend(taggedId,
+                                userClient.getFullName(su) + " tagged you in a message", "TAG_MENTION");
                     }
                 });
         }

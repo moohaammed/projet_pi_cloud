@@ -1,0 +1,402 @@
+/**
+ * Collaboration Design System
+ * Professional medical-grade design inspired by DocWala template
+ * Version: 2.0
+ */
+
+:root {
+  // Primary Colors - Medical Purple Theme
+  --collab-primary: #800080;
+  --collab-primary-rgb: 128, 0, 128;
+  --collab-primary-light: #9933cc;
+  --collab-primary-dark: #660066;
+  --collab-primary-soft: rgba(128, 0, 128, 0.08);
+  --collab-primary-hover: rgba(128, 0, 128, 0.12);
+  
+  // Secondary Colors
+  --collab-secondary: #555a64;
+  --collab-secondary-light: #6c757d;
+  --collab-secondary-soft: rgba(85, 90, 100, 0.08);
+  
+  // Accent Colors
+  --collab-success: #28a745;
+  --collab-success-soft: rgba(40, 167, 69, 0.1);
+  --collab-warning: #ffc107;
+  --collab-warning-soft: rgba(255, 193, 7, 0.1);
+  --collab-danger: #dc3545;
+  --collab-danger-soft: rgba(220, 53, 69, 0.1);
+  --collab-info: #17a2b8;
+  --collab-info-soft: rgba(23, 162, 184, 0.1);
+  
+  // Neutral Colors
+  --collab-white: #ffffff;
+  --collab-light: #f8f9fa;
+  --collab-lighter: #fafbfc;
+  --collab-gray-100: #f1f3f5;
+  --collab-gray-200: #e9ecef;
+  --collab-gray-300: #dee2e6;
+  --collab-gray-400: #ced4da;
+  --collab-gray-500: #adb5bd;
+  --collab-gray-600: #6c757d;
+  --collab-gray-700: #495057;
+  --collab-gray-800: #343a40;
+  --collab-gray-900: #212529;
+  --collab-dark: #2c3038;
+  
+  // Typography
+  --collab-font-family: 'Quicksand', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --collab-font-size-base: 14px;
+  --collab-font-weight-normal: 500;
+  --collab-font-weight-semibold: 600;
+  --collab-font-weight-bold: 700;
+  --collab-line-height-base: 1.6;
+  
+  // Spacing
+  --collab-spacing-xs: 0.25rem;
+  --collab-spacing-sm: 0.5rem;
+  --collab-spacing-md: 1rem;
+  --collab-spacing-lg: 1.5rem;
+  --collab-spacing-xl: 2rem;
+  --collab-spacing-xxl: 3rem;
+  
+  // Border Radius
+  --collab-radius-sm: 0.375rem;
+  --collab-radius-md: 0.5rem;
+  --collab-radius-lg: 0.75rem;
+  --collab-radius-xl: 1rem;
+  --collab-radius-pill: 50rem;
+  
+  // Shadows
+  --collab-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --collab-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+  --collab-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.1);
+  --collab-shadow-hover: 0 0.75rem 1.5rem rgba(128, 0, 128, 0.15);
+  
+  // Transitions
+  --collab-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --collab-transition-fast: all 0.15s ease-in-out;
+}
+
+// Professional Card Styles
+.collab-card {
+  background: var(--collab-white);
+  border-radius: var(--collab-radius-lg);
+  box-shadow: var(--collab-shadow);
+  border: 1px solid var(--collab-gray-200);
+  transition: var(--collab-transition);
+  
+  &:hover {
+    box-shadow: var(--collab-shadow-hover);
+    transform: translateY(-2px);
+  }
+  
+  &-header {
+    padding: var(--collab-spacing-lg);
+    border-bottom: 1px solid var(--collab-gray-200);
+    background: var(--collab-lighter);
+    border-radius: var(--collab-radius-lg) var(--collab-radius-lg) 0 0;
+  }
+  
+  &-body {
+    padding: var(--collab-spacing-lg);
+  }
+  
+  &-footer {
+    padding: var(--collab-spacing-md) var(--collab-spacing-lg);
+    border-top: 1px solid var(--collab-gray-200);
+    background: var(--collab-light);
+    border-radius: 0 0 var(--collab-radius-lg) var(--collab-radius-lg);
+  }
+}
+
+// Professional Button Styles
+.collab-btn {
+  font-family: var(--collab-font-family);
+  font-weight: var(--collab-font-weight-semibold);
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--collab-radius-md);
+  transition: var(--collab-transition-fast);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  
+  &-primary {
+    background: var(--collab-primary);
+    color: var(--collab-white);
+    
+    &:hover {
+      background: var(--collab-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--collab-shadow);
+    }
+  }
+  
+  &-outline-primary {
+    background: transparent;
+    color: var(--collab-primary);
+    border: 2px solid var(--collab-primary);
+    
+    &:hover {
+      background: var(--collab-primary);
+      color: var(--collab-white);
+    }
+  }
+  
+  &-soft-primary {
+    background: var(--collab-primary-soft);
+    color: var(--collab-primary);
+    
+    &:hover {
+      background: var(--collab-primary-hover);
+    }
+  }
+  
+  &-pill {
+    border-radius: var(--collab-radius-pill);
+  }
+  
+  &-sm {
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  &-lg {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+// Professional Input Styles
+.collab-input {
+  font-family: var(--collab-font-family);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--collab-gray-300);
+  border-radius: var(--collab-radius-md);
+  transition: var(--collab-transition-fast);
+  font-size: var(--collab-font-size-base);
+  
+  &:focus {
+    outline: none;
+    border-color: var(--collab-primary);
+    box-shadow: 0 0 0 0.2rem var(--collab-primary-soft);
+  }
+  
+  &::placeholder {
+    color: var(--collab-gray-500);
+  }
+}
+
+// Professional Badge Styles
+.collab-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--collab-radius-pill);
+  font-size: 0.75rem;
+  font-weight: var(--collab-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &-primary {
+    background: var(--collab-primary-soft);
+    color: var(--collab-primary);
+  }
+  
+  &-success {
+    background: var(--collab-success-soft);
+    color: var(--collab-success);
+  }
+  
+  &-warning {
+    background: var(--collab-warning-soft);
+    color: #d97706;
+  }
+  
+  &-danger {
+    background: var(--collab-danger-soft);
+    color: var(--collab-danger);
+  }
+}
+
+// Professional Avatar Styles
+.collab-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--collab-white);
+  box-shadow: var(--collab-shadow-sm);
+  
+  &-sm {
+    width: 32px;
+    height: 32px;
+  }
+  
+  &-md {
+    width: 48px;
+    height: 48px;
+  }
+  
+  &-lg {
+    width: 64px;
+    height: 64px;
+  }
+  
+  &-xl {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+// Professional Typography
+.collab-heading {
+  font-family: var(--collab-font-family);
+  font-weight: var(--collab-font-weight-bold);
+  color: var(--collab-dark);
+  line-height: 1.3;
+  margin-bottom: var(--collab-spacing-md);
+  
+  &-1 {
+    font-size: 2.5rem;
+  }
+  
+  &-2 {
+    font-size: 2rem;
+  }
+  
+  &-3 {
+    font-size: 1.75rem;
+  }
+  
+  &-4 {
+    font-size: 1.5rem;
+  }
+  
+  &-5 {
+    font-size: 1.25rem;
+  }
+  
+  &-6 {
+    font-size: 1rem;
+  }
+}
+
+.collab-text {
+  font-family: var(--collab-font-family);
+  color: var(--collab-secondary);
+  line-height: var(--collab-line-height-base);
+  
+  &-muted {
+    color: var(--collab-gray-600);
+  }
+  
+  &-small {
+    font-size: 0.875rem;
+  }
+  
+  &-xs {
+    font-size: 0.75rem;
+  }
+}
+
+// Professional List Styles
+.collab-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  
+  &-item {
+    padding: var(--collab-spacing-md);
+    border-bottom: 1px solid var(--collab-gray-200);
+    transition: var(--collab-transition-fast);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    &:hover {
+      background: var(--collab-light);
+    }
+    
+    &-active {
+      background: var(--collab-primary-soft);
+      border-left: 3px solid var(--collab-primary);
+    }
+  }
+}
+
+// Professional Scrollbar
+.collab-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--collab-gray-400) var(--collab-gray-200);
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--collab-gray-200);
+    border-radius: var(--collab-radius-sm);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--collab-gray-400);
+    border-radius: var(--collab-radius-sm);
+    
+    &:hover {
+      background: var(--collab-gray-500);
+    }
+  }
+}
+
+// Professional Animations
+@keyframes collab-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes collab-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes collab-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.collab-animate-fade-in {
+  animation: collab-fade-in 0.4s ease-out;
+}
+
+.collab-animate-slide-in {
+  animation: collab-slide-in-right 0.4s ease-out;
+}
+
+// Utility Classes
+.collab-shadow-sm { box-shadow: var(--collab-shadow-sm); }
+.collab-shadow { box-shadow: var(--collab-shadow); }
+.collab-shadow-lg { box-shadow: var(--collab-shadow-lg); }
+.collab-rounded { border-radius: var(--collab-radius-md); }
+.collab-rounded-lg { border-radius: var(--collab-radius-lg); }
+.collab-rounded-pill { border-radius: var(--collab-radius-pill); }

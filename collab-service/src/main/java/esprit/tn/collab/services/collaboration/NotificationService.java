@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+
+    
     private final SimpMessagingTemplate messagingTemplate;
 
     public NotificationService(NotificationRepository notificationRepository,
@@ -21,20 +23,27 @@ public class NotificationService {
         this.messagingTemplate = messagingTemplate;
     }
 
+    
     public NotificationResponseDto createAndSend(Long userId, String content, String type) {
+        // Step 1: persist to MongoDB
         Notification notification = new Notification(userId, content, type);
         Notification saved = notificationRepository.save(notification);
+
+        // Step 2: push to the user's WebSocket queue in real time
         NotificationResponseDto dto = mapToResponseDto(saved);
         messagingTemplate.convertAndSendToUser(userId.toString(), "/queue/notifications", dto);
+
         return dto;
     }
 
+    
     public List<NotificationResponseDto> getNotificationsForUser(Long userId) {
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 
+    
     public void markAsRead(String id) {
         notificationRepository.findById(id).ifPresent(n -> {
             n.setRead(true);
@@ -42,10 +51,12 @@ public class NotificationService {
         });
     }
 
+    
     public void deleteNotification(String id) {
         notificationRepository.deleteById(id);
     }
 
+    
     private NotificationResponseDto mapToResponseDto(Notification n) {
         NotificationResponseDto dto = new NotificationResponseDto();
         dto.setId(n.getId());

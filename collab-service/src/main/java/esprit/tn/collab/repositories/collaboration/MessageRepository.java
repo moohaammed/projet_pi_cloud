@@ -30,4 +30,10 @@ public interface MessageRepository extends MongoRepository<Message, String> {
     // For admin DM stats — returns raw aggregation, handled in service
     @Query(value = "{ 'chatGroupId': null, 'senderId': { '$ne': null }, 'receiverId': { '$ne': null } }", fields = "{ 'senderId': 1, 'receiverId': 1, 'sentAt': 1, 'isDistressed': 1 }")
     List<Message> findDirectMessageRaw();
+
+    @Query("{ 'chatGroupId': null, '$or': [ { 'senderId': ?0, 'receiverId': { '$ne': null } }, { 'receiverId': ?0, 'senderId': { '$ne': null } } ] }")
+    List<Message> findRawConversations(Long userId);
+
+    
+    List<Message> findTop100ByChatGroupIdNotNullOrderBySentAtDesc();
 }

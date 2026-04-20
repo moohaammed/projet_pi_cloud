@@ -19,38 +19,45 @@ public class ChatGroupController {
 
     public ChatGroupController(ChatGroupService chatGroupService) { this.chatGroupService = chatGroupService; }
 
+    
     @GetMapping
     public List<ChatGroupResponseDto> getAllGroups() { return chatGroupService.getAllGroups(); }
 
+    
     @GetMapping("/{id}")
     public ResponseEntity<ChatGroupResponseDto> getGroupById(@PathVariable String id) {
         ChatGroupResponseDto g = chatGroupService.getGroupById(id);
         return g != null ? ResponseEntity.ok(g) : ResponseEntity.notFound().build();
     }
 
+    
     @PostMapping
     public ChatGroupResponseDto createGroup(@Valid @RequestBody ChatGroupCreateDto dto) {
         return chatGroupService.createGroup(dto);
     }
 
+    
     @PutMapping("/{id}")
     public ResponseEntity<ChatGroupResponseDto> updateGroup(@PathVariable String id, @Valid @RequestBody ChatGroupCreateDto dto) {
         ChatGroupResponseDto g = chatGroupService.updateGroup(id, dto);
         return g != null ? ResponseEntity.ok(g) : ResponseEntity.notFound().build();
     }
 
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGroup(@PathVariable String id) {
         chatGroupService.deleteGroup(id);
         return ResponseEntity.noContent().build();
     }
 
+    
     @PostMapping("/{groupId}/join/{userId}")
     public ResponseEntity<ChatGroupResponseDto> joinGroup(@PathVariable String groupId, @PathVariable Long userId) {
         ChatGroupResponseDto g = chatGroupService.joinGroup(groupId, userId);
         return g != null ? ResponseEntity.ok(g) : ResponseEntity.notFound().build();
     }
 
+    
     @PostMapping("/{groupId}/leave/{userId}")
     public ResponseEntity<ChatGroupResponseDto> leaveGroup(@PathVariable String groupId, @PathVariable Long userId) {
         ChatGroupResponseDto g = chatGroupService.leaveGroup(groupId, userId);

@@ -7,14 +7,26 @@ import java.time.Instant;
 @Document(collection = "group_join_requests")
 public class GroupJoinRequest {
 
+    
     @Id
     private String id;
 
+    
     private Long userId;
+
+    
     private String groupId;
+
+    
     private String groupName;
+
+    
     private Long groupOwnerId;
+
+    
     private JoinRequestStatus status = JoinRequestStatus.PENDING;
+
+    
     private Instant createdAt = Instant.now();
 
     public GroupJoinRequest() {}
@@ -33,20 +45,4 @@ public class GroupJoinRequest {
     public void setStatus(JoinRequestStatus status) { this.status = status; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-
-    // Compatibility helper
-    public ChatGroup getGroup() {
-        ChatGroup g = new ChatGroup();
-        g.setId(groupId);
-        g.setName(groupName);
-        g.setOwnerId(groupOwnerId);
-        return g;
-    }
-    public void setGroup(ChatGroup group) {
-        if (group != null) {
-            this.groupId = group.getId();
-            this.groupName = group.getName();
-            this.groupOwnerId = group.getOwnerId();
-        }
-    }
 }

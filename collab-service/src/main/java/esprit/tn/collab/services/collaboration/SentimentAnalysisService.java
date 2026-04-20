@@ -14,6 +14,8 @@ import java.util.Map;
 @Service
 public class SentimentAnalysisService {
 
+    public static final double DISTRESS_THRESHOLD = -0.5;
+
     @Value("${huggingface.api.url}")
     private String apiUrl;
 
@@ -37,6 +39,7 @@ public class SentimentAnalysisService {
         try {
             return getAiSentimentScore(content);
         } catch (Exception e) {
+            // API unavailable — use keyword fallback so the app never fails to save a post
             return calculateKeywordScore(content);
         }
     }
@@ -77,6 +80,6 @@ public class SentimentAnalysisService {
     }
 
     public boolean isWorryingContent(String content) {
-        return calculateSentimentScore(content) <= -0.5;
+        return calculateSentimentScore(content) <= DISTRESS_THRESHOLD;
     }
 }

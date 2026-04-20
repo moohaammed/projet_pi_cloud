@@ -31,6 +31,12 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
+    // GET BY IDS (BATCH)
+    @GetMapping("/batch")
+    public ResponseEntity<List<User>> getByIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(userService.findAllByIds(ids));
+    }
+
     // GET BY ID
     @GetMapping("/{id}")
     public ResponseEntity<User> getById(@PathVariable Long id) {
@@ -86,6 +92,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("User non trouvé id: " + id);
         }
+    }
+
+    /** POST /api/users/batch — returns multiple users by their IDs in one HTTP call */
+    @PostMapping("/batch")
+    public ResponseEntity<List<User>> getBatch(@RequestBody List<Long> ids) {
+        List<User> users = ids.stream()
+            .map(id -> { try { return userService.findById(id); } catch (Exception e) { return null; } })
+            .filter(u -> u != null)
+            .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(users);
     }
 
     // ── FCM TOKEN : save user fcm token ──────────────────────────────────────

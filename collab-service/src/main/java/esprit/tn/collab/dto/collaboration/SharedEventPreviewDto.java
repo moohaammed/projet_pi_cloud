@@ -2,15 +2,15 @@ package esprit.tn.collab.dto.collaboration;
 
 public class SharedEventPreviewDto {
 
-    private Long id;
+    private String id;
     private String title;
     private String startDateTime;
     private String location;
     private String description;
     private String imageUrl;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getStartDateTime() { return startDateTime; }

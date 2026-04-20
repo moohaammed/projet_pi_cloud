@@ -41,7 +41,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
                 [class.free]="seat.status === 'FREE'"
                 [class.booked]="isSomeoneElsesSeat(seat)"
                 [class.mine]="isMySeat(seat)"
-                [class.selected]="selectedSeat?.id === seat.id"
+                [class.selected]="isSelected(seat) || isMySeatSelected(seat)"
                 (click)="toggleSelect(seat)"
                 [title]="getSeatTooltip(seat)">
                 <i class="fa-solid fa-chair"></i>
@@ -57,29 +57,29 @@ import { CalendarEvent } from '../../../models/education/event.model';
           </div>
 
           <!-- Summary for Reservation -->
-          <div class="booking-summary mt-5 p-4 rounded-4 bg-light border d-flex justify-content-between align-items-center animate-fade-in" *ngIf="selectedSeat && selectedSeat.status === 'FREE'">
+          <div class="booking-summary mt-5 p-4 rounded-4 bg-light border d-flex justify-content-between align-items-center animate-fade-in" *ngIf="selectedSeats.length > 0">
             <div>
-              <span class="text-muted small text-uppercase fw-bold d-block mb-1">Siège sélectionné</span>
+              <span class="text-muted small text-uppercase fw-bold d-block mb-1">Sièges sélectionnés ({{selectedSeats.length}})</span>
               <div class="fs-4 fw-bold text-primary">
-                <i class="fa-solid fa-chair me-2"></i> Place n°{{ selectedSeat.seatNumber }}
+                <i class="fa-solid fa-chair me-2"></i> Places n° <span *ngFor="let s of selectedSeats; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span>
               </div>
             </div>
             <button class="btn btn-primary fw-bold rounded-pill px-5 py-2 shadow-sm" (click)="confirmBooking()" [disabled]="isLoading">
-              <span *ngIf="!isLoading">Réserver cette place</span>
+              <span *ngIf="!isLoading">Réserver ({{selectedSeats.length}})</span>
               <span *ngIf="isLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
             </button>
           </div>
 
           <!-- Summary for Cancellation -->
-          <div class="booking-summary mt-5 p-4 rounded-4 border border-info bg-soft-info d-flex justify-content-between align-items-center animate-fade-in" *ngIf="selectedSeat && isMySeat(selectedSeat)">
+          <div class="booking-summary mt-5 p-4 rounded-4 border border-info bg-soft-info d-flex justify-content-between align-items-center animate-fade-in" *ngIf="selectedMySeats.length > 0">
             <div>
-              <span class="text-info small text-uppercase fw-bold d-block mb-1">Votre place</span>
+              <span class="text-info small text-uppercase fw-bold d-block mb-1">Vos places sélectionnées ({{selectedMySeats.length}})</span>
               <div class="fs-4 fw-bold text-info">
-                <i class="fa-solid fa-circle-check me-2"></i> Place n°{{ selectedSeat.seatNumber }}
+                <i class="fa-solid fa-circle-check me-2"></i> Places n° <span *ngFor="let s of selectedMySeats; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span>
               </div>
             </div>
-            <button class="btn btn-outline-danger fw-bold rounded-pill px-4 py-2" (click)="cancelBooking(selectedSeat)" [disabled]="isLoading">
-              <span *ngIf="!isLoading"><i class="fa-solid fa-xmark me-2"></i> Annuler cette réservation</span>
+            <button class="btn btn-outline-danger fw-bold rounded-pill px-4 py-2" (click)="initiateCancel()" [disabled]="isLoading">
+              <span *ngIf="!isLoading"><i class="fa-solid fa-xmark me-2"></i> Annuler ces réservations ({{selectedMySeats.length}})</span>
               <span *ngIf="isLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
             </button>
           </div>
@@ -88,6 +88,24 @@ import { CalendarEvent } from '../../../models/education/event.model';
 
         <div class="card-footer bg-white border-top p-3 text-center">
           <button class="btn btn-link text-muted text-decoration-none fw-bold" (click)="close()">Fermer</button>
+        </div>
+      </div>
+
+      <!-- Custom Confirmation Modal -->
+      <div class="custom-confirm-overlay animate-fade-in" *ngIf="seatsToCancel.length > 0">
+        <div class="custom-confirm-card shadow-lg rounded-4 overflow-hidden border-0 p-4 text-center">
+          <div class="text-danger mb-3">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem;"></i>
+          </div>
+          <h4 class="fw-bold mb-2">Annuler les réservations ?</h4>
+          <p class="text-muted mb-4">Voulez-vous vraiment annuler vos réservations pour les places n°<strong><span *ngFor="let s of seatsToCancel; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span></strong> ? Cette action est irréversible.</p>
+          <div class="d-flex justify-content-center gap-3">
+            <button class="btn btn-light fw-bold px-4 py-2 rounded-pill border" (click)="closeCancelModal()" [disabled]="isLoading">Non, garder</button>
+            <button class="btn btn-danger fw-bold px-4 py-2 rounded-pill" (click)="confirmCancel()" [disabled]="isLoading">
+              <span *ngIf="!isLoading">Oui, annuler ({{seatsToCancel.length}})</span>
+              <span *ngIf="isLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -161,6 +179,22 @@ import { CalendarEvent } from '../../../models/education/event.model';
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    
+    .custom-confirm-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1060;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .custom-confirm-card {
+      background: white; width: 100%; max-width: 400px;
+      transform: scale(0.95); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes popIn {
+      to { transform: scale(1); }
+    }
   `]
 })
 export class EventSeatGridComponent implements OnInit {
@@ -168,9 +202,11 @@ export class EventSeatGridComponent implements OnInit {
   @Output() closed = new EventEmitter<void>();
 
   seats: EventSeat[] = [];
-  selectedSeat: EventSeat | null = null;
+  selectedSeats: EventSeat[] = [];
+  selectedMySeats: EventSeat[] = [];
   currentUser: any = null;
   isLoading = false;
+  seatsToCancel: EventSeat[] = [];
 
   constructor(
     private seatService: EventSeatService,
@@ -213,30 +249,57 @@ export class EventSeatGridComponent implements OnInit {
   }
 
   isMySeat(seat: EventSeat): boolean {
-    if (!seat.bookedBy || !this.currentUser) return false;
+    if (!seat.bookedByUserId || !this.currentUser) return false;
     // Comparaison d'ID robuste
-    return String(seat.bookedBy.id) === String(this.currentUser.id);
+    return String(seat.bookedByUserId) === String(this.currentUser.id);
   }
 
   getSeatTooltip(seat: EventSeat): string {
     if (this.isMySeat(seat)) return 'C’est votre place !';
-    if (seat.status === SeatStatus.BOOKED) return `Occupé par ${seat.bookedBy?.prenom || 'un utilisateur'}`;
+    if (seat.status === SeatStatus.BOOKED) return `Occupée`;
     return `Place n°${seat.seatNumber} (Libre)`;
+  }
+
+  isSelected(seat: EventSeat): boolean {
+    return this.selectedSeats.some(s => s.id === seat.id);
+  }
+
+  isMySeatSelected(seat: EventSeat): boolean {
+    return this.selectedMySeats.some(s => s.id === seat.id);
   }
 
   toggleSelect(seat: EventSeat) {
     if (this.isSeatDisabled(seat)) return;
-    this.selectedSeat = (this.selectedSeat?.id === seat.id) ? null : seat;
+    
+    if (this.isMySeat(seat)) {
+      this.selectedSeats = [];
+      const index = this.selectedMySeats.findIndex(s => s.id === seat.id);
+      if (index > -1) {
+        this.selectedMySeats.splice(index, 1);
+      } else {
+        this.selectedMySeats.push(seat);
+      }
+      return;
+    }
+    
+    this.selectedMySeats = [];
+    const index = this.selectedSeats.findIndex(s => s.id === seat.id);
+    if (index > -1) {
+      this.selectedSeats.splice(index, 1);
+    } else {
+      this.selectedSeats.push(seat);
+    }
   }
 
   confirmBooking() {
-    if (!this.selectedSeat || !this.currentUser?.id) return;
+    if (this.selectedSeats.length === 0 || !this.currentUser?.id) return;
     
     this.isLoading = true;
-    this.seatService.bookSeat(this.selectedSeat.id, this.currentUser.id).subscribe({
+    const seatIds = this.selectedSeats.map(s => s.id);
+    this.seatService.bookSeats(seatIds, this.currentUser.id).subscribe({
       next: () => {
         this.isLoading = false;
-        this.selectedSeat = null;
+        this.selectedSeats = [];
         this.loadSeats();
       },
       error: (err) => {
@@ -247,24 +310,34 @@ export class EventSeatGridComponent implements OnInit {
     });
   }
 
-  cancelBooking(seat: EventSeat) {
-    if (!this.currentUser?.id) return;
-    
-    if (confirm(`Voulez-vous vraiment annuler votre réservation pour la place n°${seat.seatNumber} ?`)) {
-      this.isLoading = true;
-      this.seatService.cancelBooking(seat.id, this.currentUser.id).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.selectedSeat = null;
-          this.loadSeats();
-        },
-        error: (err) => {
-          this.isLoading = false;
-          const msg = err.error?.message || err.error || 'Erreur lors de l’annulation';
-          alert(msg);
-        }
-      });
+  initiateCancel() {
+    this.seatsToCancel = [...this.selectedMySeats];
+  }
+
+  closeCancelModal() {
+    if (!this.isLoading) {
+      this.seatsToCancel = [];
     }
+  }
+
+  confirmCancel() {
+    if (!this.currentUser?.id || this.seatsToCancel.length === 0) return;
+    
+    this.isLoading = true;
+    const seatIds = this.seatsToCancel.map(s => s.id);
+    this.seatService.cancelBookings(seatIds, this.currentUser.id).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.selectedMySeats = [];
+        this.seatsToCancel = [];
+        this.loadSeats();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        const msg = err.error?.message || err.error || 'Erreur lors de l’annulation';
+        alert(msg);
+      }
+    });
   }
 
   close() {
