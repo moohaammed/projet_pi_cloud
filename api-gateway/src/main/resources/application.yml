@@ -13,7 +13,7 @@ spring:
             allowedOrigins: "http://localhost:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
-            allowCredentials: true
+            allowCredentials: false
             maxAge: 3600
       # Remove duplicate CORS headers coming from upstream services
       default-filters:
@@ -32,6 +32,19 @@ spring:
           uri: lb://rendezvous-service
           predicates:
             - Path=/api/rendezvous/**
+
+        # ── Geo service ──────────────────────────────────────────────────────
+        # Must be declared BEFORE the backpi catch-all (/api/**) so these
+        # more-specific paths are matched first by Spring Cloud Gateway.
+        - id: geo-service
+          uri: lb://geo-service
+          predicates:
+            - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/patient-locations/**
+
+        - id: geo-service
+          uri: lb://geo-service
+          predicates:
+            - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/safezones/**,/api/patient-locations/**
 
         # ── Main service (backpi) ──────────────────────────────────────────
         - id: main-service

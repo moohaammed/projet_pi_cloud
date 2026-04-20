@@ -60,7 +60,13 @@
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Collaboration</span>
               </a>
             </li>
-
+<li class="nav-item w-100" *ngIf="auth.getRole() === 'RELATION'">
+  <a routerLink="/mon-patient" routerLinkActive="active-purple fw-semibold shadow-sm"
+     class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1">
+    <i class="fa-solid fa-user-injured fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed" style="color:#9b59b6"></i>
+    <span *ngIf="!isSidebarCollapsed" class="fs-15 fw-semibold">Mon patient</span>
+  </a>
+</li>
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/admin/rendezvous"
@@ -75,34 +81,31 @@
             </li>
 
             <li class="nav-item w-100">
-  <!-- Education -->
-  <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-     routerLink="/admin/education"
-     routerLinkActive="active-purple fw-semibold shadow-sm"
-     style="cursor: pointer;"
-     [title]="isSidebarCollapsed ? 'Éducation' : ''">
+              <!-- Education -->
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/admin/education"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor: pointer;"
+                 [title]="isSidebarCollapsed ? 'Éducation' : ''">
+                <i class="fa-solid fa-graduation-cap fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Éducation</span>
+              </a>
 
-    <i class="fa-solid fa-graduation-cap fs-5"
-       [class.me-3]="!isSidebarCollapsed"
-       [class.mx-auto]="isSidebarCollapsed"></i>
+              <!-- Donations -->
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/admin/donations"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor: pointer;"
+                 [title]="isSidebarCollapsed ? 'Donations' : ''">
+                <i class="fa-solid fa-hand-holding-heart fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Donations</span>
+              </a>
+            </li>
 
-    <span *ngIf="!isSidebarCollapsed" class="fs-15">Éducation</span>
-  </a>
-
-  <!-- Donations -->
-  <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-     routerLink="/admin/donations"
-     routerLinkActive="active-purple fw-semibold shadow-sm"
-     style="cursor: pointer;"
-     [title]="isSidebarCollapsed ? 'Donations' : ''">
-
-    <i class="fa-solid fa-hand-holding-heart fs-5"
-       [class.me-3]="!isSidebarCollapsed"
-       [class.mx-auto]="isSidebarCollapsed"></i>
-
-    <span *ngIf="!isSidebarCollapsed" class="fs-15">Donations</span>
-  </a>
-</li>
             <li class="nav-item w-100 mt-2">
               <span class="text-uppercase text-muted extra-small fw-bold px-2 mb-2 d-block"
                 *ngIf="!isSidebarCollapsed"
@@ -120,7 +123,6 @@
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">User Access</span>
               </a>
             </li>
-
 
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
@@ -160,19 +162,68 @@
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Géolocalisation</span>
               </a>
             </li>
-            <!-- DASHBOARD MÉDECIN -->
-<li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR'">
-  <a class="nav-link" routerLink="/medecin-dashboard" routerLinkActive="active">
-    <i class="fa-solid fa-user-doctor me-1"></i>Dashboard
-  </a>
-</li>
 
-<!-- ALERTES MÉDECIN -->
-<li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR'">
-  <a class="nav-link text-danger fw-bold" routerLink="/medecin/alertes" routerLinkActive="active">
-    <i class="fa-solid fa-bell me-1"></i>Alertes
-  </a>
-</li>
+            <!-- ANALYSE CHEMIN — DOCTOR + RELATION -->
+            <li class="nav-item w-100"
+                *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'RELATION'">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/analyzer"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor: pointer;"
+                 [title]="isSidebarCollapsed ? 'Analyse IA' : ''">
+                <i class="fa-solid fa-brain fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Analyse chemin</span>
+              </a>
+            </li>
+
+            <!-- ★ SUIVI DE MON PATIENT — RELATION uniquement ★ -->
+            <li class="nav-item w-100" *ngIf="auth.getRole() === 'RELATION'">
+              <a class="nav-link w-100 py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/relation-map"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor:pointer; background:linear-gradient(135deg,#f5f0ff,#ede5ff);
+                        color:#4a2a8a; border:1px solid #d5b8ff !important"
+                 [title]="isSidebarCollapsed ? 'Suivi patient' : ''">
+                <i class="fa-solid fa-map-location-dot fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"
+                   style="color:#6f42c1"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15 fw-semibold">
+                  Suivi de mon patient
+                </span>
+              </a>
+            </li>
+
+            <!-- MES INCIDENTS — PATIENT -->
+            <li class="nav-item w-100" *ngIf="auth.getRole() === 'PATIENT'">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/patient/incidents"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor: pointer;"
+                 [title]="isSidebarCollapsed ? 'Mes Incidents' : ''">
+                <i class="fa-solid fa-bell-exclamation fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Mes Incidents</span>
+              </a>
+            </li>
+
+            <!-- DASHBOARD MÉDECIN -->
+            <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR'">
+              <a class="nav-link" routerLink="/medecin-dashboard" routerLinkActive="active">
+                <i class="fa-solid fa-user-doctor me-1"></i>Dashboard
+              </a>
+            </li>
+
+            <!-- ALERTES MÉDECIN -->
+            <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR'">
+              <a class="nav-link text-danger fw-bold" routerLink="/medecin/alertes" routerLinkActive="active">
+                <i class="fa-solid fa-bell me-1"></i>Alertes
+              </a>
+            </li>
+
           </ul>
         </div>
 
@@ -322,6 +373,11 @@
                       <i class="fa-solid fa-bed-pulse me-1"></i>Patients
                     </a>
                   </li>
+                  <li class="nav-item" *ngIf="auth.getRole() === 'RELATION'">
+  <a class="nav-link fw-bold" style="color:#9b59b6" routerLink="/mon-patient" routerLinkActive="active">
+    <i class="fa-solid fa-user-injured me-1"></i>Mon patient
+  </a>
+</li>
 
                   <!-- GÉOLOCALISATION — DOCTOR + ADMIN -->
                   <li class="nav-item"
@@ -333,7 +389,37 @@
                     </a>
                   </li>
 
-                  <!-- ← BOUTON SOS PATIENT — ajouté ici -->
+                  <!-- ANALYSE CHEMIN — DOCTOR + RELATION -->
+                  <li class="nav-item"
+                      *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'RELATION'">
+                    <a class="nav-link fw-bold"
+                       style="color: #7c3aed;"
+                       routerLink="/analyzer" routerLinkActive="active">
+                      <i class="fa-solid fa-brain me-1"></i>Analyse IA
+                    </a>
+                  </li>
+
+                  <!-- ★ SUIVI DE MON PATIENT — RELATION uniquement ★ -->
+                  <li class="nav-item" *ngIf="auth.getRole() === 'RELATION'">
+                    <a class="nav-link fw-bold d-flex align-items-center gap-1 px-3 py-1 rounded-pill"
+                       style="background:linear-gradient(135deg,#6f42c1,#3c3489);
+                              color:white; font-size:14px"
+                       routerLink="/relation-map"
+                       routerLinkActive="active">
+                      <i class="fa-solid fa-map-location-dot"></i>
+                      Suivi patient
+                    </a>
+                  </li>
+
+                  <!-- MES INCIDENTS — PATIENT -->
+                  <li class="nav-item" *ngIf="auth.getRole() === 'PATIENT'">
+                    <a class="nav-link fw-semibold text-danger"
+                       routerLink="/patient/incidents" routerLinkActive="active">
+                      <i class="fa-solid fa-bell-exclamation me-1"></i>Mes Incidents
+                    </a>
+                  </li>
+
+                  <!-- BOUTON SOS PATIENT -->
                   <li class="nav-item" *ngIf="auth.getRole() === 'PATIENT'">
                     <a routerLink="/patient-map"
                        class="btn btn-danger rounded-pill px-3 py-2 fw-bold
@@ -397,13 +483,20 @@
                 <a routerLink="/map"
                    class="text-muted text-decoration-none">Géolocalisation</a>
               </li>
+              <!-- ★ FOOTER — RELATION ★ -->
+              <li *ngIf="auth.getRole() === 'RELATION'">
+                <a routerLink="/relation-map"
+                   class="text-decoration-none fw-bold"
+                   style="color:#9b59b6">
+                  <i class="fa-solid fa-map-location-dot me-1"></i>Suivi de mon patient
+                </a>
+              </li>
               <li *ngIf="auth.getRole() === 'PATIENT'">
                 <a routerLink="/patient-map"
                    class="text-danger text-decoration-none fw-bold">
                   <i class="fa-solid fa-bell me-1"></i>Interface SOS
                 </a>
               </li>
-
             </ul>
           </div>
         </div>

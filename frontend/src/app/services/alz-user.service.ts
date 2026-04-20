@@ -12,28 +12,20 @@ export class AlzUserService {
   constructor(private http: HttpClient) {}
 
   fetchUsers(): void {
-    console.log('AlzUserService: Fetching all users from', this.apiUrl);
     this.http.get<User[]>(this.apiUrl).subscribe({
       next: (data) => {
-        console.log(`AlzUserService: Successfully fetched ${data.length} users.`);
         this.users.set(data);
-        if (data.length === 0) {
-          console.warn('AlzUserService: Backend returned an empty user list.');
-        }
+        if (data.length === 0) console.warn('AlzUserService: liste vide.');
       },
-      error: (err) => {
-        console.error('AlzUserService: Critical error fetching users from backend:', err);
-      }
+      error: (err) => console.error('AlzUserService: erreur fetch users:', err)
     });
   }
 
   updateUserLiveStatus(id: number, isLive: boolean) {
-    this.users.update(currentUsers => {
-      const copy = [...currentUsers];
-      const index = copy.findIndex(u => u.id === id);
-      if (index !== -1) {
-        copy[index] = { ...copy[index], isLive: isLive };
-      }
+    this.users.update(current => {
+      const copy = [...current];
+      const idx  = copy.findIndex(u => u.id === id);
+      if (idx !== -1) copy[idx] = { ...copy[idx], isLive };
       return copy;
     });
   }
@@ -41,25 +33,42 @@ export class AlzUserService {
   getAll(): Observable<User[]> {
     return this.http.get<User[]>(this.apiUrl);
   }
+
+  // ← une seule définition de getById
   getById(id: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
+
   getByRole(role: Role): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/role/${role}`);
   }
+
   create(user: User): Observable<User> {
     return this.http.post<User>(this.apiUrl, user);
   }
+
   update(id: number, user: User): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/${id}`, user);
   }
+
   toggleActif(id: number): Observable<User> {
     return this.http.patch<User>(`${this.apiUrl}/${id}/toggle`, {});
   }
+
   toggleLive(id: number): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/${id}/toggle-live`, {});
   }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Récupère le patient lié à une relation.
+   * Endpoint : GET /api/users/{relationId}/linked-patient
+   * ← this.apiUrl (pas baseUrl qui n'existe pas)
+   */
+  getLinkedPatient(relationId: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${relationId}/linked-patient`);
   }
 }
