@@ -4,6 +4,7 @@ import esprit.tn.collab.entities.collaboration.ModerationStatus;
 import esprit.tn.collab.entities.collaboration.Publication;
 import esprit.tn.collab.entities.collaboration.PublicationType;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,9 +17,10 @@ public interface PublicationRepository extends MongoRepository<Publication, Stri
 
     List<Publication> findByCreatedAtBeforeOrderByCreatedAtDesc(Instant now);
 
-    List<Publication> findByChatGroupIdAndCreatedAtBeforeOrderByCreatedAtDesc(String chatGroupId, Instant now);
+    
+    List<Publication> findTop50ByOrderByCreatedAtDesc();
 
-    List<Publication> findByChatGroupIdIsNullAndCreatedAtBeforeOrderByCreatedAtDesc(Instant now);
+    List<Publication> findByChatGroupIdAndCreatedAtBeforeOrderByCreatedAtDesc(String chatGroupId, Instant now);
 
     List<Publication> findByModerationStatusOrderByModerationFlaggedAtDesc(ModerationStatus moderationStatus);
 
@@ -26,5 +28,12 @@ public interface PublicationRepository extends MongoRepository<Publication, Stri
 
     long countByType(PublicationType type);
 
-    List<Publication> findByTypeAndCreatedAtAfterOrderByCreatedAtAsc(PublicationType type, Instant now);
+    @Query("{ $and: [ { $text: { $search: ?0 } }, { $or: [ { 'chatGroupId': null }, { 'chatGroupId': '' }, { 'chatGroupId': { $in: ?1 } } ] } ] }")
+    List<Publication> searchByText(String query, List<String> allowedGroupIds);
+
+    @Query("{ $and: [ { 'tags': { $in: ?0 } }, { $or: [ { 'chatGroupId': null }, { 'chatGroupId': '' }, { 'chatGroupId': { $in: ?1 } } ] } ] }")
+    List<Publication> findByTagsIn(List<String> tags, List<String> allowedGroupIds);
+
+    @Query("{ $and: [ { 'content': { $regex: ?0, $options: 'i' } }, { $or: [ { 'chatGroupId': null }, { 'chatGroupId': '' }, { 'chatGroupId': { $in: ?1 } } ] } ] }")
+    List<Publication> searchByRegex(String regex, List<String> allowedGroupIds);
 }

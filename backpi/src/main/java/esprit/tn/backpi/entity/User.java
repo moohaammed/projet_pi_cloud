@@ -38,7 +38,14 @@ public class User {
     private boolean isLive = false;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "patient_id")
+    private Long patientId;
 
+    @Column(name = "relation_id")
+    private Long relationId;
+
+    @Column(name = "lien_avec_patient")
+    private String lienAvecPatient;
 
     @Column(name = "fcm_token")
     private String fcmToken;
@@ -59,7 +66,14 @@ public class User {
     public void setActif(boolean actif) { this.actif = actif; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Long getPatientId() { return patientId; }
+    public void setPatientId(Long patientId) { this.patientId = patientId; }
 
+    public Long getRelationId() { return relationId; }
+    public void setRelationId(Long relationId) { this.relationId = relationId; }
+
+    public String getLienAvecPatient() { return lienAvecPatient; }
+    public void setLienAvecPatient(String lienAvecPatient) { this.lienAvecPatient = lienAvecPatient; }
     @com.fasterxml.jackson.annotation.JsonProperty("isLive")
     public boolean isLive() { return isLive; }
     public void setLive(boolean live) { isLive = live; }

@@ -9,9 +9,16 @@
       </h3>
       <p class="text-muted mb-0">{{ filtered.length }} patient(s)</p>
     </div>
-    <a *ngIf="isAdmin" routerLink="/patient-profiles/new"
-       class="btn btn-primary">
-      <i class="fa-solid fa-user-plus me-1"></i>Ajouter un patient
+
+    <!-- ★ Bouton Ajouter — wizard patient + relation ★ -->
+    <a *ngIf="isAdmin || isDoctor"
+       routerLink="/patient-profiles/creer"
+       class="btn fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2"
+       style="background:linear-gradient(135deg,#6f42c1,#3c3489);
+              color:white; border:none;
+              box-shadow:0 4px 14px rgba(111,66,193,.35)">
+      <i class="fa-solid fa-user-plus"></i>
+      Ajouter un patient
     </a>
   </div>
 
@@ -66,9 +73,7 @@
                   <i class="fa-solid fa-phone me-1 text-success"></i>
                   {{ p.telephone }}
                 </div>
-                <div class="text-muted small" *ngIf="!p.telephone">
-                  Non renseigné
-                </div>
+                <div class="text-muted small" *ngIf="!p.telephone">Non renseigné</div>
               </td>
               <td>
                 <span class="badge rounded-pill"

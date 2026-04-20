@@ -13,6 +13,7 @@ public class CareBotController {
 
     public CareBotController(CareBotService careBotService) { this.careBotService = careBotService; }
 
+    
     @PostMapping("/trigger-morning")
     public ResponseEntity<String> triggerMorningCheckIn(@RequestParam(required = false) Long userId) {
         if (userId != null) {
@@ -20,10 +21,12 @@ public class CareBotController {
             return ok ? ResponseEntity.ok("Medication reminder sent to patient " + userId + ".")
                       : ResponseEntity.badRequest().body("User not found or not a PATIENT role.");
         }
-        careBotService.sendMedicationRemindersToAllPatients();
+        // No userId provided — trigger the full morning check-in for all patients
+        careBotService.morningCheckIn();
         return ResponseEntity.ok("Medication reminder sent to all patients.");
     }
 
+    
     @PostMapping("/medication-response")
     public ResponseEntity<String> medicationResponse(@RequestParam Long userId, @RequestParam boolean tookMedication) {
         boolean ok = careBotService.handleMedicationAcknowledgment(userId, tookMedication);
@@ -31,6 +34,7 @@ public class CareBotController {
                   : ResponseEntity.badRequest().body("User not found or not a PATIENT role.");
     }
 
+    
     @PostMapping("/trigger-memory")
     public ResponseEntity<String> triggerMemoryAnchor() {
         careBotService.injectMemoryAnchor();

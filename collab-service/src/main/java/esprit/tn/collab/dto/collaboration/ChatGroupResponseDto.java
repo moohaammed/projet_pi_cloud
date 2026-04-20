@@ -14,6 +14,7 @@ public class ChatGroupResponseDto {
     private List<MemberDto> members;
     private Long ownerId;
     private String ownerName;
+    private List<String> tags;
 
     public ChatGroupResponseDto() {}
 
@@ -35,4 +36,6 @@ public class ChatGroupResponseDto {
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
     public String getOwnerName() { return ownerName; }
     public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
 }

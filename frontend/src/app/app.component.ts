@@ -8,6 +8,7 @@ import { NotificationService } from './services/collaboration/notification.servi
 import { VideoCallService } from './services/videocall.service';
 import { VideoCallComponent } from './components/videocall/videocall.component';
 import { Subscription } from 'rxjs';
+import { GuidanceService } from './services/collaboration/guidance.service';
 import { AlzheimerAccessibilityService } from './services/alz-accessibility.service';
 
 import { AccessibilityService } from './services/accessibility.service';
@@ -71,6 +72,12 @@ export class AppComponent implements OnDestroy {
         this.webSocketService.setUserId(user.id);
         this.videoCallService.connect(user.id.toString());
       }
+    }
+
+    // Restore dark mode preference
+    if (isPlatformBrowser(this.platformId) && localStorage.getItem('darkMode') === '1') {
+      this.isDarkMode = true;
+      document.body.classList.add('dark');
     }
 
     if (isPlatformBrowser(this.platformId)) {
@@ -194,6 +201,18 @@ export class AppComponent implements OnDestroy {
   // Global Admin Layout State
   isSidebarCollapsed = false;
   globalSearchQuery = '';
+  isDarkMode = false;
+
+  toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+    if (this.isDarkMode) {
+      document.body.classList.add('dark');
+      localStorage.setItem('darkMode', '1');
+    } else {
+      document.body.classList.remove('dark');
+      localStorage.removeItem('darkMode');
+    }
+  }
 
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
