@@ -152,6 +152,10 @@ export const routes: Routes = [
   data: { roles: ['PATIENT'] }
 },
 
+
+  // ===== COLLABORATION (Avec sous-routes lazy-loadées) =====
+
+
   // ===== COLLABORATION =====
 
   {
@@ -291,6 +295,16 @@ export const routes: Routes = [
   { path: 'my-donations', component: MyDonationsComponent, canActivate: [authGuard] },
   { path: 'donations/:campaignId', component: DonationFormComponent },
 
+
+
+  // SMARTWATCH — Heart Rate Monitor
+  {
+    path: 'heart-rate',
+    loadComponent: () =>
+      import('./components/live-heart-rate/live-heart-rate.component')
+        .then(m => m.LiveHeartRateComponent),
+    canActivate: [authGuard]
+  },
 
   { path: '**', redirectTo: 'auth/login' }
 ];

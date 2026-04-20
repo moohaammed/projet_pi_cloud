@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { UserService }    from '../../services/user.service';
 import { PatientService } from '../../services/patient.service';
+import { AssignmentService } from '../../services/assignment.service';
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
@@ -35,12 +36,27 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
   isEditMode  = false;
   isSubmitting = false;
   deletingDoc: any   = null;
-  activeTab: 'list'|'stats' = 'list';
+  activeTab: 'list'|'stats'|'assign' = 'list';
+
+  // Assignment section
+  selectedAssignMedecin: number | null = null;
+  selectedAssignPatient: number | null = null;
+  assignedPatients: any[] = [];
+  unassignedPatientsList: any[] = [];
+
+  // Reassignment section
+  showReassignModal = false;
+  movingPatient: any = null;
+  newDoctorId: number | null = null;
 
   dForm: any = {};
   private charts: Chart[] = [];
 
-  constructor(private userSvc: UserService, private patSvc: PatientService) {}
+  constructor(
+    private userSvc: UserService, 
+    private patSvc: PatientService,
+    private assignmentSvc: AssignmentService
+  ) {}
 
   ngOnInit(): void { this.loadAll(); }
   ngOnDestroy(): void { this.destroyCharts(); }
@@ -152,9 +168,104 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
   }
 
   // Charts
-  setTab(t:'list'|'stats'): void {
+  setTab(t:'list'|'stats'|'assign'): void {
     this.activeTab=t;
     if (t==='stats' && isPlatformBrowser(this.pid)) setTimeout(()=>this.initCharts(),250);
+    if (t==='assign') this.refreshAssignments();
+  }
+
+  // --- Assignment Logic ---
+  onMedecinSelectChange(): void {
+    this.refreshAssignments();
+  }
+
+  refreshAssignments(): void {
+    if (!this.selectedAssignMedecin) {
+      this.assignedPatients = [];
+      this.unassignedPatientsList = this.allPatients;
+      return;
+    }
+    this.isLoading = true;
+    this.assignmentSvc.getPatientsByMedecin(this.selectedAssignMedecin).subscribe({
+      next: (pts) => {
+        console.log('[AdminGestionMedecin] Assigned patients from API:', pts);
+        this.assignedPatients = pts || [];
+        // Map based on patient.user.id
+        const assignedIds = this.assignedPatients.map(p => p.user?.id);
+        this.unassignedPatientsList = this.allPatients.filter(p => !assignedIds.includes(p.user?.id || p.id));
+        this.isLoading = false;
+      },
+      error: () => { this.isLoading = false; }
+    });
+  }
+
+  assignPatient(): void {
+    if (!this.selectedAssignMedecin || !this.selectedAssignPatient) {
+      this.showError('Veuillez sélectionner un médecin et un patient.'); return;
+    }
+    this.isSubmitting = true;
+    this.assignmentSvc.assign(this.selectedAssignMedecin, this.selectedAssignPatient).subscribe({
+      next: () => {
+        this.showSuccess('Patient assigné avec succès.');
+        this.selectedAssignPatient = null;
+        this.isSubmitting = false;
+        this.refreshAssignments();
+      },
+      error: err => {
+        this.showError(err.error?.message || 'Erreur lors de l\'assignation.');
+        this.isSubmitting = false;
+      }
+    });
+  }
+
+  unassignPatient(patientId: number): void {
+    if (!this.selectedAssignMedecin) return;
+    if (!confirm('Voulez-vous vraiment retirer ce patient ?')) return;
+    this.assignmentSvc.unassign(this.selectedAssignMedecin, patientId).subscribe({
+      next: () => {
+        this.showSuccess('Patient retiré avec succès.');
+        this.refreshAssignments();
+      },
+      error: () => this.showError('Erreur d\'annulation.')
+    });
+  }
+
+  // --- Reassignment Logic ---
+  openReassignModal(p: any): void {
+    this.movingPatient = p;
+    this.newDoctorId = null;
+    this.showReassignModal = true;
+  }
+
+  closeReassignModal(): void {
+    this.showReassignModal = false;
+    this.movingPatient = null;
+    this.newDoctorId = null;
+  }
+
+  confirmReassign(): void {
+    if (!this.selectedAssignMedecin || !this.movingPatient || !this.newDoctorId) {
+      this.showError('Veuillez sélectionner un nouveau médecin.');
+      return;
+    }
+    if (this.newDoctorId === this.selectedAssignMedecin) {
+      this.showError('Le patient est déjà assigné à ce médecin.');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.assignmentSvc.reassign(this.selectedAssignMedecin, this.movingPatient.id, this.newDoctorId).subscribe({
+      next: () => {
+        this.showSuccess('Patient réassigné avec succès.');
+        this.closeReassignModal();
+        this.isSubmitting = false;
+        this.refreshAssignments();
+      },
+      error: (err) => {
+        this.showError(err.error?.message || 'Erreur lors de la réassignation.');
+        this.isSubmitting = false;
+      }
+    });
   }
   private destroyCharts(): void { this.charts.forEach(c=>{try{c.destroy();}catch{}}); this.charts=[]; }
 

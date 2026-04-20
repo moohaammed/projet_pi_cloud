@@ -15,6 +15,7 @@ spring:
             allowedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
+
       # Remove duplicate CORS headers coming from upstream services
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
@@ -37,9 +38,21 @@ spring:
         - id: education-rest
           uri: lb://education-service
           predicates:
-            - Path=/api/activities/**, /api/patient-activity/**, /api/events/**, /api/event-seats/**, /uploads/education/**
+            - Path=/api/activities/**,/api/patient-activity/**,/api/events/**,/api/event-seats/**,/uploads/education/**
 
-        # ── Main service (backpi) ──────────────────────────────────────────
+        # ── Donation service ──────────────────────────────────────────
+        - id: donation-rest
+          uri: lb://donation-service
+          predicates:
+            - Path=/api/donations/**,/api/campaigns/**
+
+        # ── Smartwatch service ──────────────────────────────────────────
+        - id: smartwatch-service
+          uri: lb://smartwatch-service
+          predicates:
+            - Path=/api/heart-rate/**
+
+        # ── Main service (backpi) ────────────────────────────────────────
         - id: main-service
           uri: lb://backpi
           predicates:
@@ -49,5 +62,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 5
   instance:
     prefer-ip-address: true

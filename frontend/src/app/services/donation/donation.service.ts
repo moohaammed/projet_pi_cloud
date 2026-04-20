@@ -21,7 +21,7 @@ export class DonationService {
     return this.http.get<DonationCampaign[]>(`${this.campaignApi}/active`);
   }
 
-  getCampaignById(id: number): Observable<DonationCampaign> {
+  getCampaignById(id: string): Observable<DonationCampaign> {
     return this.http.get<DonationCampaign>(`${this.campaignApi}/${id}`);
   }
 
@@ -29,15 +29,15 @@ export class DonationService {
     return this.http.post<DonationCampaign>(this.campaignApi, campaign);
   }
 
-  updateCampaign(id: number, campaign: DonationCampaign): Observable<DonationCampaign> {
+  updateCampaign(id: string, campaign: DonationCampaign): Observable<DonationCampaign> {
     return this.http.put<DonationCampaign>(`${this.campaignApi}/${id}`, campaign);
   }
 
-  deleteCampaign(id: number): Observable<void> {
+  deleteCampaign(id: string): Observable<void> {
     return this.http.delete<void>(`${this.campaignApi}/${id}`);
   }
 
-  uploadCampaignImage(campaignId: number, file: File): Observable<DonationCampaign> {
+  uploadCampaignImage(campaignId: string, file: File): Observable<DonationCampaign> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<DonationCampaign>(`${this.campaignApi}/${campaignId}/image`, formData);
@@ -49,11 +49,11 @@ export class DonationService {
     return this.http.get<Donation[]>(this.donationApi);
   }
 
-  getDonationById(id: number): Observable<Donation> {
+  getDonationById(id: string): Observable<Donation> {
     return this.http.get<Donation>(`${this.donationApi}/${id}`);
   }
 
-  getDonationsByCampaign(campaignId: number): Observable<Donation[]> {
+  getDonationsByCampaign(campaignId: string): Observable<Donation[]> {
     return this.http.get<Donation[]>(`${this.donationApi}/campaign/${campaignId}`);
   }
 
@@ -77,7 +77,7 @@ export class DonationService {
     return this.http.post<Donation>(`${this.donationApi}/verify`, { sessionId });
   }
 
-  deleteDonation(id: number): Observable<void> {
+  deleteDonation(id: string): Observable<void> {
     return this.http.delete<void>(`${this.donationApi}/${id}`);
   }
 }

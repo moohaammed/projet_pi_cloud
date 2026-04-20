@@ -17,7 +17,6 @@ public class PatientLocationService {
 
     @Autowired private PatientLocationRepository locationRepository;
     @Autowired private UserRepository userRepository;
-    @Autowired private SafeZoneRepository safeZoneRepository;
     @Autowired private GeoAlertRepository alertRepository;
 
     // Enregistrer position GPS
@@ -34,9 +33,6 @@ public class PatientLocationService {
         location.setTimestamp(LocalDateTime.now());
 
         PatientLocation saved = locationRepository.save(location);
-
-        // Vérification automatique des zones
-        checkZones(patient, lat, lng);
 
         // Alerte batterie faible
         if (batterie != null && batterie <= 20) {
@@ -59,6 +55,7 @@ public class PatientLocationService {
         return locationRepository.findByPatient_Id(patientId);
     }
 
+/* 
     private void checkZones(User patient, Double lat, Double lng) {
         // ← Remplace ifPresent par une boucle sur la liste
         List<SafeZone> zones = safeZoneRepository.findByPatient_IdAndActifTrue(patient.getId());
@@ -79,6 +76,7 @@ public class PatientLocationService {
             }
         }
     }
+*/
     // Calcul distance en mètres (formule Haversine)
     public double calculateDistance(double lat1, double lng1,
                                     double lat2, double lng2) {

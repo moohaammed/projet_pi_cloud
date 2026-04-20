@@ -225,7 +225,7 @@ export class AdminDonationComponent implements OnInit, AfterViewInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  deleteCampaign(id: number) {
+  deleteCampaign(id: string) {
     if (confirm('Supprimer cette campagne et tous ses dons associés ?')) {
       this.donationService.deleteCampaign(id).subscribe(() => this.loadAll());
     }
@@ -238,7 +238,7 @@ export class AdminDonationComponent implements OnInit, AfterViewInit {
     });
   }
 
-  deleteDonation(id: number) {
+  deleteDonation(id: string) {
     if (confirm('Supprimer ce don ?')) {
       this.donationService.deleteDonation(id).subscribe(() => {
         if (this.selectedCampaign) {
