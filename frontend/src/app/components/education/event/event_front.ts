@@ -351,14 +351,20 @@ import { AuthService } from '../../../services/auth.service';
       backdrop-filter: blur(8px);
     }
 
+    .card-share-btn {
       position: absolute;
-      top: 12px; right: 12px;
+      top: 12px;
+      right: 12px;
       z-index: 3;
-      width: 34px; height: 34px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       border: none;
       background: rgba(255,255,255,0.9);
-      display: flex; align-items: center; justify-content: center;
+      color: #800080;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       backdrop-filter: blur(6px);
@@ -707,43 +713,71 @@ import { AuthService } from '../../../services/auth.service';
       content: ''; flex: 1; height: 1px; background: #e0c8e0;
     }
 
-    .evt-share-preview {      background: linear-gradient(135deg, #f5e6f5, #fdf5fd);
+    .evt-share-preview {
+      background: linear-gradient(135deg, #f5e6f5, #fdf5fd);
       border: 1px solid #e0c8e0;
       border-radius: 12px;
       padding: 1rem 1.25rem;
       margin-bottom: 1rem;
     }
     .evt-preview-badge {
-      display: inline-flex; align-items: center;
-      border-radius: 50px; padding: 3px 10px;
-      font-size: .7rem; font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 50px;
+      padding: 3px 10px;
+      font-size: .7rem;
+      font-weight: 700;
       margin-bottom: .5rem;
     }
     .evt-preview-title {
-      font-weight: 700; font-size: .95rem; color: #2e152e; margin: 0 0 .25rem;
+      font-weight: 700;
+      font-size: .95rem;
+      color: #2e152e;
+      margin: 0 0 .25rem;
     }
     .evt-preview-meta { font-size: .78rem; color: #6b3e6b; margin: 0; }
-      display: flex; align-items: center; gap: .5rem;
-      background: #f5e6f5; border-radius: 50px;
-      padding: .5rem 1rem; margin-bottom: 1rem;
+    .evt-search-wrap {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: #f5e6f5;
+      border-radius: 50px;
+      padding: .5rem 1rem;
+      margin-bottom: 1rem;
     }
     .evt-search-wrap i { color: #b07ab0; font-size: .85rem; }
     .evt-search-input {
-      border: none; background: transparent; flex: 1;
-      font-size: .875rem; outline: none; color: #2e152e;
+      border: none;
+      background: transparent;
+      flex: 1;
+      font-size: .875rem;
+      outline: none;
+      color: #2e152e;
+    }
     .evt-search-input::placeholder { color: #b07ab0; }
     .evt-groups-list { display: flex; flex-direction: column; gap: .5rem; }
     .evt-empty { text-align: center; padding: 2rem; color: #b07ab0; font-size: .85rem; }
     .evt-group-item {
-      display: flex; align-items: center; gap: .75rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
       padding: .75rem 1rem;
-      border: 1px solid #f0e0f0; border-radius: 12px;
-      cursor: pointer; transition: all .15s;
+      border: 1px solid #f0e0f0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all .15s;
+    }
     .evt-group-item:hover { background: #fdf5fd; border-color: #e0c8e0; }
     .evt-group-avatar {
-      width: 40px; height: 40px; border-radius: 10px;
-      color: #fff; font-weight: 700; font-size: .8rem;
-      display: flex; align-items: center; justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 700;
+      font-size: .8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
     .evt-group-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -752,11 +786,17 @@ import { AuthService } from '../../../services/auth.service';
     .evt-share-btn {
       flex-shrink: 0;
       padding: .375rem .875rem;
-      border-radius: 50px; border: none;
-      background: #800080; color: #fff;
-      font-size: .78rem; font-weight: 700;
-      cursor: pointer; transition: all .15s;
-      display: flex; align-items: center; gap: .375rem;
+      border-radius: 50px;
+      border: none;
+      background: #800080;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: .375rem;
     }
     .evt-share-btn:hover:not(:disabled) { background: #660066; }
     .evt-share-btn:disabled { opacity: .5; cursor: not-allowed; }
