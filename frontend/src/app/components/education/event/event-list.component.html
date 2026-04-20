@@ -1,21 +1,162 @@
 <div class="container-fluid py-4 px-4">
 
+  <!-- Header Section (Collaboration Style) -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-black border-opacity-10 position-relative" style="z-index: 10;">
+    <div class="d-flex align-items-center gap-4">
+      <div class="section-header text-start mb-0">
+        <h2 class="fw-black mb-1 section-header__title text-capitalize fs-28 ls-n1">
+          Agenda des <span class="underline text-primary position-relative">Événements</span>
+        </h2>
+        <div class="sub-title fs-14 text-muted opacity-75">Planifiez les séances de groupe et gérez les réservations.</div>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button class="btn btn-primary fw-black rounded-pill shadow-sm d-flex justify-content-center align-items-center py-2 hov-grow" 
+              style="width: 180px;" (click)="showForm = true">
+        <i class="fa-solid fa-plus me-2"></i> Créer Événement
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Section Premium (Purple Palette) -->
+  <section class="stats-section mb-5 mt-4" *ngIf="!showForm && !showSeats">
+    <div class="stats-header">
+      <span class="stats-label">📊 Tableau de bord</span>
+    </div>
+    <div class="row g-3">
+
+      <!-- Total -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-purple">
+          <div class="stat-icon-wrap">📅</div>
+          <div class="stat-value">{{ totalEvents }}</div>
+          <div class="stat-title">Total</div>
+          <div class="stat-sub">événements créés</div>
+        </div>
+      </div>
+
+      <!-- Futurs -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-green">
+          <div class="stat-icon-wrap">🟢</div>
+          <div class="stat-value">{{ futureEvents }}</div>
+          <div class="stat-title">À venir</div>
+          <div class="stat-sub">sessions planifiées</div>
+        </div>
+      </div>
+
+      <!-- Passés -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-slate">
+          <div class="stat-icon-wrap">✔️</div>
+          <div class="stat-value">{{ pastEvents }}</div>
+          <div class="stat-title">Passés</div>
+          <div class="stat-sub">sessions terminées</div>
+        </div>
+      </div>
+
+      <!-- Total Réservations -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-indigo">
+          <div class="stat-icon-wrap">🪑</div>
+          <div class="stat-value">{{ bookedTotal }}</div>
+          <div class="stat-title">Réservations</div>
+          <div class="stat-sub">places confirmées</div>
+        </div>
+      </div>
+
+      <!-- Capacité totale -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-blue">
+          <div class="stat-icon-wrap">📦</div>
+          <div class="stat-value">{{ totalCapacity }}</div>
+          <div class="stat-title">Capacité</div>
+          <div class="stat-sub">places au total</div>
+        </div>
+      </div>
+
+      <!-- Taux de remplissage -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-amber">
+          <div class="stat-icon-wrap">📈</div>
+          <div class="stat-value">{{ fillRate }}%</div>
+          <div class="stat-title">Remplissage</div>
+          <div class="stat-sub">taux d'occupation</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Occupation Bar -->
+    <div class="stades-bar-wrap mt-4" *ngIf="totalCapacity > 0">
+      <div class="stade-bar-label">Occupation globale — {{ bookedTotal }} / {{ totalCapacity }} places réservées</div>
+      <div class="stades-bar">
+        <div class="stade-segment seg-booked"
+             [style.width.%]="fillRate"
+             title="Réservé: {{ bookedTotal }}">
+          <span *ngIf="fillRate > 10">{{ bookedTotal }} réservés</span>
+        </div>
+        <div class="stade-segment seg-free"
+             [style.width.%]="100 - fillRate"
+             title="Libre: {{ totalCapacity - bookedTotal }}">
+          <span *ngIf="(100 - fillRate) > 10">{{ totalCapacity - bookedTotal }} libres</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prochaine date -->
+    <div class="next-event-banner mt-3 mb-4" *ngIf="nextEventDate">
+      <span class="next-label">⏰ Prochain événement :</span>
+      <span class="next-date">{{ nextEventDate | date:'EEEE d MMMM yyyy à HH:mm':'':'fr' }}</span>
+      <span class="next-pill">Dans {{ daysUntilNext }} jours</span>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="row g-4 mt-2">
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-chart-pie me-2 text-primary" style="color: #800080 !important"></i>Taux d'Occupation</h6>
+          <div style="height: 230px; position: relative;">
+            <canvas #chartCanvas></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-chart-line me-2 text-primary" style="color: #8b5cf6 !important"></i>Évolution (par mois)</h6>
+          <div style="height: 230px; position: relative;">
+            <canvas #chartCanvas></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-chart-column me-2 text-primary" style="color: #0ea5e9 !important"></i>Top Capacité</h6>
+          <div style="height: 230px; position: relative;">
+            <canvas #chartCanvas></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
   <!-- Formulaire -->
-  <div class="card border-0 shadow rounded-4 overflow-hidden bg-white mb-5 animate-fade-in" *ngIf="showForm">
+  <div class="card border-0 shadow-doc rounded-4 overflow-hidden bg-white mb-5 animate-fade-in" *ngIf="showForm">
     <div class="card-header bg-soft-primary border-0 p-4 d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
         <button class="btn btn-sm btn-white rounded-circle shadow-sm me-3 text-primary bg-white px-2 py-1" (click)="reset()" title="Retour à la liste">
           <i class="fa-solid fa-arrow-left"></i>
         </button>
-        <span class="fw-bold fs-5 text-primary"><i class="fa-solid fa-calendar-plus me-2"></i> {{ isEditing ? 'Modifier l\'événement' : 'Nouvel événement' }}</span>
+        <span class="fw-black fs-20 text-primary ls-n1"><i class="fa-solid fa-calendar-plus me-2"></i> {{ isEditing ? 'Modifier l\'événement' : 'Nouvel événement' }}</span>
       </div>
     </div>
     <div class="card-body p-4 pt-4">
       <div class="row g-4">
 
         <div class="col-md-6">
-          <label class="form-label fw-bold text-muted small text-uppercase">Titre *</label>
-          <input class="form-control form-control-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" 
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Titre de la session *</label>
+          <input class="form-control-doc w-100 ps-3" 
                  [class.is-invalid]="errors['title']"
                  [(ngModel)]="newEvent.title"
                  placeholder="ex : Séance du matin, Visite famille">
@@ -23,8 +164,8 @@
         </div>
 
         <div class="col-md-6">
-          <label class="form-label fw-bold text-muted small text-uppercase">Date et heure *</label>
-          <input class="form-control form-control-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15 text-center" 
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Date et heure *</label>
+          <input class="form-control-doc w-100 ps-3" 
                  [class.is-invalid]="errors['startDateTime']"
                  type="datetime-local"
                  [(ngModel)]="newEvent.startDateTime">
@@ -32,47 +173,45 @@
         </div>
 
         <div class="col-md-6">
-          <label class="form-label fw-bold text-muted small text-uppercase">Lieu *</label>
-          <input class="form-control form-control-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" 
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Lieu / Salle *</label>
+          <input class="form-control-doc w-100 ps-3" 
                  [class.is-invalid]="errors['location']"
                  [(ngModel)]="newEvent.location"
                  placeholder="ex : Domicile, EHPAD, Cabinet...">
           <div class="invalid-feedback" *ngIf="errors['location']">{{ errors['location'] }}</div>
         </div>
 
-
-
-        <div class="col-12">
-          <label class="form-label fw-bold text-muted small text-uppercase">Description *</label>
-          <textarea class="form-control form-control-lg bg-light border-0 rounded-4 p-3 shadow-sm fs-15" 
-                 [class.is-invalid]="errors['description']"
-                 rows="3" [(ngModel)]="newEvent.description" style="resize:none;"
-                 placeholder="Détails de l'événement..."></textarea>
-          <div class="invalid-feedback" *ngIf="errors['description']">{{ errors['description'] }}</div>
-        </div>
-
         <div class="col-md-6">
-          <label class="form-label fw-bold text-muted small text-uppercase">Image de couverture *</label>
-          <input class="form-control form-control-lg bg-light border-0 rounded-4 shadow-sm fs-15" 
-                 [class.is-invalid]="errors['image']"
-                 type="file" (change)="onFileSelected($event)">
-          <div class="invalid-feedback" *ngIf="errors['image']">{{ errors['image'] }}</div>
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label fw-bold text-muted small text-uppercase">Capacité (Nombre de places) *</label>
-          <input type="number" class="form-control form-control-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" 
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Places disponibles (Capacité) *</label>
+          <input type="number" class="form-control-doc w-100 ps-3" 
                  [class.is-invalid]="errors['capacity']"
                  [(ngModel)]="newEvent.capacity" min="1"
                  placeholder="ex : 50">
           <div class="invalid-feedback" *ngIf="errors['capacity']">{{ errors['capacity'] }}</div>
         </div>
 
+        <div class="col-12">
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Détails & Instructions *</label>
+          <textarea class="form-control-doc w-100 p-3" 
+                 [class.is-invalid]="errors['description']"
+                 rows="3" [(ngModel)]="newEvent.description" style="resize:none; height: auto;"
+                 placeholder="Précisez le déroulement de la session..."></textarea>
+          <div class="invalid-feedback" *ngIf="errors['description']">{{ errors['description'] }}</div>
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label fw-black text-primary small text-uppercase letter-spacing-1">Visuel de couverture *</label>
+          <input class="form-control-doc w-100 p-2" 
+                 [class.is-invalid]="errors['image']"
+                 type="file" (change)="onFileSelected($event)">
+          <div class="invalid-feedback" *ngIf="errors['image']">{{ errors['image'] }}</div>
+        </div>
+
       </div>
 
       <div class="mt-4 d-flex gap-2">
-        <button class="btn btn-primary fw-bold rounded-pill px-4" (click)="save()">
-          <i class="fa-solid fa-check me-2"></i> {{ isEditing ? 'Sauvegarder' : 'Créer l\'événement' }}
+        <button class="btn btn-primary fw-black rounded-pill px-5 shadow transition-all hov-grow" (click)="save()">
+          <i class="fa-solid fa-check me-2"></i> {{ isEditing ? 'Mettre à jour' : 'Publier l\'événement' }}
         </button>
         <button class="btn btn-soft-secondary fw-bold rounded-pill px-4" (click)="reset()" *ngIf="isEditing">
           Annuler
@@ -82,74 +221,86 @@
   </div>
 
   <!-- Liste -->
-  <div class="card border-0 shadow rounded-4 overflow-hidden bg-white animate-fade-in" *ngIf="!showForm">
-    <div class="card-header bg-white border-0 p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
-      <div class="d-flex align-items-center flex-grow-1" style="max-width: 400px;">
-        <div class="input-group bg-light rounded-pill px-3 py-1 shadow-sm border">
-          <span class="input-group-text bg-transparent border-0 text-muted">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </span>
-          <input type="text" class="form-control bg-transparent border-0 fs-14" 
-                 placeholder="Rechercher un événement..." 
-                 [(ngModel)]="searchTerm">
-        </div>
-      </div>
-      <div class="d-flex align-items-center gap-3">
-        <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold" *ngIf="allEvents.length > 0">
-           {{ filteredEvents.length }} / {{ allEvents.length }}
-        </span>
-        <button class="btn btn-primary btn-sm fw-bold rounded-pill px-4" (click)="showForm = true">
-          <i class="fa-solid fa-plus me-2"></i> Créer Événement
-        </button>
-      </div>
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 animate-fade-in" *ngIf="!showForm">
+    <div class="d-flex align-items-center gap-2">
+        <h6 class="mb-0 fw-black text-muted text-uppercase letter-spacing-1 small">Filtres de recherche</h6>
     </div>
+
+    <!-- Search -->
+    <div class="input-group search-form rounded-pill bg-white px-3 py-1 shadow-sm border border-black border-opacity-10" style="max-width: 400px;">
+      <span class="input-group-text bg-transparent border-0 text-muted">
+        <i class="fa-solid fa-magnifying-glass fs-14"></i>
+      </span>
+      <input type="text" class="form-control bg-transparent border-0 fs-14 fw-medium" 
+             placeholder="Rechercher un événement..." 
+             [(ngModel)]="searchTerm">
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-doc rounded-4 overflow-hidden bg-white animate-fade-in" *ngIf="!showForm">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
-        <thead class="bg-grey border-bottom border-black border-opacity-10">
+        <thead>
           <tr>
-            <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">ID / Titre</th>
-            <th class="py-3 text-uppercase small fw-bold text-muted">Date</th>
-            <th class="py-3 text-uppercase small fw-bold text-muted">Lieu</th>
-            <th class="text-end pe-4 py-3 text-uppercase small fw-bold text-muted">Actions</th>
+            <th class="ps-4 py-3 text-uppercase small fw-black text-muted letter-spacing-1">Session / Identifiant</th>
+            <th class="py-3 text-uppercase small fw-black text-muted letter-spacing-1 text-center">Occupation</th>
+            <th class="py-3 text-uppercase small fw-black text-muted letter-spacing-1">Date & Lieu</th>
+            <th class="text-end pe-4 py-3 text-uppercase small fw-black text-muted letter-spacing-1">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let e of filteredEvents">
-            <td class="ps-4 py-3">
+            <td class="ps-4 py-4">
               <div class="d-flex align-items-center">
-                <img *ngIf="e.imageUrl" [src]="getImageUrl(e.imageUrl)" alt="Event" class="rounded-circle shadow-sm me-3" width="42" height="42" style="object-fit:cover;">
-                <div *ngIf="!e.imageUrl" class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 42px; height: 42px;">
-                  <i class="fa-solid fa-calendar"></i>
+                <img *ngIf="e.imageUrl" [src]="getImageUrl(e.imageUrl)" alt="Event" class="rounded-circle shadow-sm me-3 border" width="48" height="48" style="object-fit:cover;">
+                <div *ngIf="!e.imageUrl" class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3 shadow-sm border" style="width: 48px; height: 48px;">
+                  <i class="fa-solid fa-calendar fs-5"></i>
                 </div>
                 <div>
-                  <div class="fw-bold text-dark">{{ e.title }}</div>
-                  <div class="d-flex align-items-center gap-2 mt-1">
-                    <span class="badge bg-soft-info text-info rounded-pill px-2 py-1" style="font-size: 10px;">
-                      <i class="fa-solid fa-chair me-1"></i> {{ e.availablePlaces }} / {{ e.capacity }} places
-                    </span>
-                    <span class="text-muted small">ID: #{{ e.id }}</span>
-                  </div>
+                  <div class="fw-black text-dark fs-15 mb-0 ls-n1">{{ e.title }}</div>
+                  <div class="text-muted extra-small fw-bold opacity-50">E_UID: #{{ e.id }}</div>
                 </div>
               </div>
             </td>
-            <td><div class="small fw-medium"><i class="fa-regular fa-clock me-1 text-muted"></i> {{ e.startDateTime | date:'dd/MM/yyyy HH:mm' }}</div></td>
-            <td><div class="small fw-medium"><i class="fa-solid fa-location-dot me-1 text-muted"></i> {{ e.location }}</div></td>
+            <td class="text-center px-4">
+                <div class="progress rounded-pill mb-2 shadow-sm" style="height: 6px; background-color: #f1f5f9;">
+                    <div class="progress-bar rounded-pill" 
+                         [class.bg-success]="(e.capacity! - e.availablePlaces!) / e.capacity! < 0.7"
+                         [class.bg-warning]="(e.capacity! - e.availablePlaces!) / e.capacity! >= 0.7 && (e.capacity! - e.availablePlaces!) / e.capacity! < 0.9"
+                         [class.bg-danger]="(e.capacity! - e.availablePlaces!) / e.capacity! >= 0.9"
+                         [style.width.%]="(e.capacity! - e.availablePlaces!) / (e.capacity!) * 100">
+                    </div>
+                </div>
+                <span class="badge bg-soft-primary text-primary rounded-pill px-2 py-1 fs-11 fw-black">
+                   {{ e.capacity! - e.availablePlaces! }} / {{ e.capacity }} réservés
+                </span>
+            </td>
+            <td>
+                <div class="small fw-black text-doc-heading fs-13 mb-1"><i class="fa-regular fa-clock me-1 text-primary"></i> {{ e.startDateTime | date:'dd/MM/yyyy HH:mm' }}</div>
+                <div class="extra-small fw-bold text-muted text-uppercase letter-spacing-1"><i class="fa-solid fa-location-dot me-1"></i> {{ e.location }}</div>
+            </td>
             <td class="text-end pe-4">
-              <button class="btn btn-sm btn-soft-primary rounded-pill px-3 me-1 fw-bold" (click)="viewSeats(e)" title="Réserver des places">
-                <i class="fa-solid fa-chair me-1"></i> Sièges
-              </button>
-              <button class="btn btn-sm btn-light rounded-circle me-1" (click)="edit(e)" title="Modifier">
-                <i class="fa-solid fa-pen-to-square text-primary"></i>
-              </button>
-              <button class="btn btn-sm btn-light rounded-circle text-danger" (click)="delete(e.id!)" title="Supprimer">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
+              <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-sm btn-white border shadow-sm rounded-pill px-3 fw-black fs-11 text-uppercase hov-info" (click)="viewAttendees(e)" title="Voir les participants">
+                    <i class="fa-solid fa-users me-1 text-info"></i> Inscrits
+                </button>
+                <button class="btn btn-sm btn-white border shadow-sm rounded-pill px-3 fw-black fs-11 text-uppercase hov-primary" (click)="viewSeats(e)" title="Réserver des places">
+                    <i class="fa-solid fa-chair me-1 text-primary"></i> Sièges
+                </button>
+                <button class="btn btn-sm btn-white border shadow-sm rounded-circle hov-primary" (click)="edit(e)" title="Modifier">
+                    <i class="fa-solid fa-pen-to-square text-primary"></i>
+                </button>
+                <button class="btn btn-sm btn-white border shadow-sm rounded-circle text-danger hov-danger" (click)="delete(e.id!)" title="Supprimer">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
             </td>
           </tr>
           <tr *ngIf="filteredEvents.length === 0">
-            <td colspan="4" class="text-center py-5 text-muted">
-              <i class="fa-solid fa-calendar-xmark fs-2 opacity-25 mb-2 d-block"></i>
-              Aucun événement ne correspond à votre recherche.
+            <td colspan="4" class="text-center py-5 text-muted bg-light">
+              <i class="fa-solid fa-calendar-xmark fs-1 opacity-25 mb-3 d-block"></i>
+              <div class="fw-black text-uppercase letter-spacing-1 small">Aucun événement trouvé</div>
+              <p class="mb-0 small">Commencez par créer un nouvel événement thérapeutique.</p>
             </td>
           </tr>
         </tbody>
@@ -164,4 +315,243 @@
     (closed)="onSeatsClosed()">
   </app-event-seat-grid>
 
+  <!-- Attendees Modal Overlay (Collaboration Style) -->
+  <div class="attendees-overlay animate-fade-in" *ngIf="showAttendeesModal">
+    <div class="attendees-card shadow-doc rounded-4 overflow-hidden border-0 bg-white border-top border-4 border-primary">
+      <div class="card-header bg-soft-primary border-0 p-4 d-flex justify-content-between align-items-center">
+        <div>
+          <h4 class="mb-1 fw-black text-primary ls-n1 fs-20"><i class="fa-solid fa-users me-2"></i> Participants Inscrits</h4>
+          <p class="text-muted extra-small fw-bold text-uppercase letter-spacing-1 mb-0">{{ currentEvent?.title }} — Liste officielle</p>
+        </div>
+        <button class="btn-close-custom shadow-sm" (click)="closeAttendeesModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <div class="card-body p-4">
+        <!-- Loading State -->
+        <div class="text-center py-5" *ngIf="isLoadingAttendees">
+          <div class="spinner-border text-primary mb-3" role="status"></div>
+          <p class="text-muted small fw-bold">Récupération des profils participants...</p>
+        </div>
+
+        <!-- Attendees List -->
+        <div class="list-group list-group-flush" *ngIf="!isLoadingAttendees && attendees.length > 0">
+          <div class="list-group-item border shadow-sm rounded-4 mb-3 bg-white d-flex align-items-center p-3 hov-grow" *ngFor="let user of attendees">
+            <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-black fs-14 me-3 border border-primary border-opacity-10" style="width: 44px; height: 44px;">
+              {{ user.nom?.charAt(0) }}{{ user.prenom?.charAt(0) }}
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-black text-doc-heading fs-14 mb-0">{{ user.prenom }} {{ user.nom }}</div>
+              <div class="text-muted extra-small fw-bold opacity-75"><i class="fa-regular fa-envelope me-1"></i> {{ user.email }}</div>
+            </div>
+            <span class="badge bg-soft-success text-success rounded-pill fw-black extra-small">Inscrit</span>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="text-center py-5 bg-light rounded-4 border border-dashed" *ngIf="!isLoadingAttendees && attendees.length === 0">
+          <i class="fa-solid fa-user-slash fs-1 text-muted opacity-25 mb-3 d-block"></i>
+          <p class="text-muted small fw-bold mb-0">Aucun participant n'a encore réservé de place.</p>
+        </div>
+      </div>
+
+      <div class="card-footer bg-white border-0 p-4 pt-0 text-center">
+        <button class="btn btn-soft-secondary fw-black rounded-pill px-5 py-2 fs-12 text-uppercase letter-spacing-1" (click)="closeAttendeesModal()">Fermer la liste</button>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<!-- Styles additionnels (Collaboration System) -->
+<style>
+  .fw-black { font-weight: 800 !important; }
+  .ls-n1 { letter-spacing: -0.02em !important; }
+  .letter-spacing-1 { letter-spacing: 0.05em !important; }
+  .fs-28 { font-size: 1.75rem !important; }
+  .fs-20 { font-size: 1.25rem !important; }
+  .fs-13 { font-size: 0.8125rem !important; }
+  .fs-11 { font-size: 0.7rem !important; }
+  .extra-small { font-size: 0.65rem !important; }
+
+  .underline::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: var(--doc-primary-soft);
+    z-index: -1;
+    border-radius: 4px;
+  }
+
+  .shadow-doc { box-shadow: var(--doc-shadow) !important; }
+  
+  .transition-hover {
+    transition: var(--doc-transition);
+  }
+  .transition-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--doc-shadow) !important;
+  }
+
+  .hov-grow {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hov-grow:hover {
+    transform: scale(1.02);
+  }
+
+  .hov-primary:hover {
+    background-color: var(--doc-primary-soft) !important;
+    border-color: var(--doc-primary) !important;
+  }
+  .hov-info:hover {
+    background-color: #eff6ff !important;
+    border-color: #3b82f6 !important;
+  }
+  .hov-danger:hover {
+    background-color: #fef2f2 !important;
+    border-color: #ef4444 !important;
+  }
+
+  .attendees-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    z-index: 1200;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .attendees-card {
+    width: 100%; max-width: 550px;
+    max-height: 90vh; overflow-y: auto;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .btn-close-custom {
+    background: white; border: 1px solid rgba(0,0,0,0.05); width: 44px; height: 44px;
+    border-radius: 50%; color: #64748b; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-close-custom:hover { transform: rotate(90deg); color: #ef4444; }
+
+  .bg-soft-primary { background-color: var(--doc-primary-soft) !important; }
+  .bg-soft-success { background-color: #ecfdf5 !important; }
+  .bg-soft-info { background-color: #eff6ff !important; }
+  .bg-soft-warning { background-color: #fffbeb !important; }
+  .text-primary { color: var(--doc-primary) !important; }
+  .text-success { color: #10b981 !important; }
+  .text-info { color: #3b82f6 !important; }
+  .text-warning { color: #f59e0b !important; }
+
+  .form-control-doc {
+    height: 52px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--doc-heading);
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
+    &:focus {
+      background-color: #fff;
+      border-color: var(--doc-primary);
+      box-shadow: 0 0 0 4px rgba(var(--doc-primary-rgb), 0.1);
+      outline: none;
+    }
+  }
+
+  .search-form {
+    transition: all 0.2s ease;
+    &:focus-within {
+      background: white !important;
+      border-color: var(--doc-primary) !important;
+      box-shadow: var(--doc-shadow) !important;
+    }
+  }
+
+  table thead {
+    background-color: #faf5ff;
+    border-bottom: 1px solid #e9d5ff;
+  }
+
+  /* ── Stats Premium ── */
+  .stats-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .stats-label {
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #800080;
+    background: rgba(128,0,128,0.07); padding: 5px 14px; border-radius: 50px;
+  }
+
+  .stat-card {
+    border-radius: 20px; padding: 22px 18px;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 4px; position: relative; overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: default; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(128,0,128,0.15); }
+  .stat-card::before {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); transition: transform 0.4s ease;
+  }
+  .stat-card:hover::before { transform: scale(2.2); }
+
+  .stat-icon-wrap { font-size: 1.8rem; margin-bottom: 4px; }
+  .stat-value { font-size: 2.4rem; font-weight: 900; line-height: 1; color: white; letter-spacing: -0.03em; }
+  .stat-title { font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.9); }
+  .stat-sub { font-size: 0.68rem; color: rgba(255,255,255,0.65); font-weight: 600; }
+
+  .stat-purple { background: linear-gradient(135deg, #800080, #5c0057); }
+  .stat-green  { background: linear-gradient(135deg, #059669, #047857); }
+  .stat-slate  { background: linear-gradient(135deg, #475569, #334155); }
+  .stat-indigo { background: linear-gradient(135deg, #6c2bd9, #5b21b6); }
+  .stat-blue   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+  .stat-amber  { background: linear-gradient(135deg, #d97706, #b45309); }
+
+  /* Occupation Bar */
+  .stades-bar-wrap {
+    background: white; border-radius: 16px; padding: 18px 24px;
+    box-shadow: 0 4px 20px rgba(128,0,128,0.06); border: 1px solid rgba(128,0,128,0.08);
+  }
+  .stade-bar-label {
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.07em; color: #5c0057; margin-bottom: 12px;
+  }
+  .stades-bar {
+    display: flex; border-radius: 50px; overflow: hidden; height: 32px;
+    background: #f3e8ff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+  }
+  .stade-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem; font-weight: 800; color: white;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1); min-width: 0;
+  }
+  .seg-booked { background: linear-gradient(90deg, #800080, #5c0057); }
+  .seg-free   { background: linear-gradient(90deg, #e9d5ff, #f3e8ff); color: #800080; }
+
+  /* Next Event Banner */
+  .next-event-banner {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: linear-gradient(135deg, rgba(128,0,128,0.04), rgba(92,0,87,0.07));
+    border: 1px solid rgba(128,0,128,0.12); border-radius: 50px;
+    padding: 10px 20px;
+  }
+  .next-label { font-size: 0.75rem; font-weight: 800; color: #800080; text-transform: uppercase; letter-spacing: 0.05em; }
+  .next-date  { font-size: 0.85rem; font-weight: 700; color: #3d0040; }
+  .next-pill  {
+    font-size: 0.68rem; font-weight: 800; background: #800080; color: white;
+    padding: 3px 12px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+</style>

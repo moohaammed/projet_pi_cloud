@@ -75,34 +75,44 @@
             </li>
 
             <li class="nav-item w-100">
-  <!-- Education -->
-  <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-     routerLink="/admin/education"
-     routerLinkActive="active-purple fw-semibold shadow-sm"
-     style="cursor: pointer;"
-     [title]="isSidebarCollapsed ? 'Éducation' : ''">
+              <!-- Activities -->
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/admin/activities"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor: pointer;"
+                 [title]="isSidebarCollapsed ? 'Activités' : ''">
+                <i class="fa-solid fa-gamepad fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Activités</span>
+              </a>
 
-    <i class="fa-solid fa-graduation-cap fs-5"
-       [class.me-3]="!isSidebarCollapsed"
-       [class.mx-auto]="isSidebarCollapsed"></i>
+              <!-- Events -->
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/admin/events"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor: pointer;"
+                 [title]="isSidebarCollapsed ? 'Événements' : ''">
+                <i class="fa-regular fa-calendar-days fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Événements</span>
+              </a>
+            </li>
 
-    <span *ngIf="!isSidebarCollapsed" class="fs-15">Éducation</span>
-  </a>
-
-  <!-- Donations -->
-  <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-     routerLink="/admin/donations"
-     routerLinkActive="active-purple fw-semibold shadow-sm"
-     style="cursor: pointer;"
-     [title]="isSidebarCollapsed ? 'Donations' : ''">
-
-    <i class="fa-solid fa-hand-holding-heart fs-5"
-       [class.me-3]="!isSidebarCollapsed"
-       [class.mx-auto]="isSidebarCollapsed"></i>
-
-    <span *ngIf="!isSidebarCollapsed" class="fs-15">Donations</span>
-  </a>
-</li>
+            <li class="nav-item w-100">
+              <!-- Donations -->
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/admin/donations"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor: pointer;"
+                 [title]="isSidebarCollapsed ? 'Donations' : ''">
+                <i class="fa-solid fa-hand-holding-heart fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Donations</span>
+              </a>
+            </li>
             <li class="nav-item w-100 mt-2">
               <span class="text-uppercase text-muted extra-small fw-bold px-2 mb-2 d-block"
                 *ngIf="!isSidebarCollapsed"
@@ -209,6 +219,15 @@
           </div>
 
           <div class="d-flex align-items-center gap-4 ms-3 h-100">
+            <!-- ── BOUTON GUIDE VOCAL (Admin) ── -->
+            <div class="voice-nav-btn-admin"
+                 *ngIf="auth.getRole() === 'PATIENT'"
+                 [class.active]="alzAccessibility.voiceEnabled()"
+                 (click)="alzAccessibility.toggleVoice()"
+                 [title]="alzAccessibility.voiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'"
+                 style="cursor:pointer">
+              <i class="fa-solid fs-5" [class.fa-volume-high]="alzAccessibility.voiceEnabled()" [class.fa-volume-xmark]="!alzAccessibility.voiceEnabled()"></i>
+            </div>
             <div class="position-relative cursor-pointer text-muted hover-primary">
               <i class="fa-regular fa-bell fs-5"></i>
               <span class="position-absolute top-0 start-100 translate-middle p-1
@@ -344,9 +363,14 @@
                     </a>
                   </li>
 
-                  <li class="nav-item ms-lg-3" *ngIf="auth.isLoggedIn()">
-                    <a [routerLink]="getAccountLink()"
-                      class="btn btn-primary btn-sm rounded-pill px-4">Compte</a>
+                  <!-- ── BOUTON GUIDE VOCAL ── -->
+                  <li class="nav-item" *ngIf="auth.isLoggedIn() && auth.getRole() === 'PATIENT'">
+                    <button class="voice-nav-btn"
+                            [class.active]="alzAccessibility.voiceEnabled()"
+                            (click)="alzAccessibility.toggleVoice()"
+                            [title]="alzAccessibility.voiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'">
+                      <i class="fa-solid" [class.fa-volume-high]="alzAccessibility.voiceEnabled()" [class.fa-volume-xmark]="!alzAccessibility.voiceEnabled()"></i>
+                    </button>
                   </li>
 
                 </ul>

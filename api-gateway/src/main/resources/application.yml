@@ -33,6 +33,12 @@ spring:
           predicates:
             - Path=/api/rendezvous/**
 
+        # ── Education service ──────────────────────────────────────────
+        - id: education-rest
+          uri: lb://education-service
+          predicates:
+            - Path=/api/activities/**, /api/patient-activity/**, /api/events/**, /api/event-seats/**, /uploads/education/**
+
         # ── Main service (backpi) ──────────────────────────────────────────
         - id: main-service
           uri: lb://backpi

@@ -18,6 +18,11 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    // GET ALL BY IDS
+    public List<User> findAllByIds(List<Long> ids) {
+        return userRepository.findAllById(ids);
+    }
+
     // GET BY ID
     public User findById(Long id) {
         return userRepository.findById(id)

@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from './auth.service';
 import { RendezVousService } from './rendezvous.service';
@@ -21,6 +21,9 @@ export class AlzheimerAccessibilityService {
   private ignoreVoiceCommands: boolean = false;
   private hasInteracted: boolean = false;
 
+  /** Whether the navigation voice guide is active (persisted in sessionStorage) */
+  readonly voiceEnabled = signal<boolean>(this.loadVoiceEnabled());
+
   constructor(
     private authService: AuthService,
     private rendezvousService: RendezVousService,
@@ -32,6 +35,57 @@ export class AlzheimerAccessibilityService {
       this.initReminderLoop();
       this.initSpeechRecognition();
       this.initPageRouteListener();
+    }
+  }
+
+  // ── Public API ────────────────────────────────────────────────
+
+  /** Toggle the navigation voice guide on/off */
+  toggleVoice(): void {
+    const next = !this.voiceEnabled();
+    this.voiceEnabled.set(next);
+    sessionStorage.setItem('nav_voice_enabled', next ? '1' : '0');
+    if (!next) {
+      // Immediately stop any in-progress speech
+      if (this.isBrowser && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    } else {
+      // Announce the feature is on
+      this.speak('Guide vocal activé.');
+    }
+  }
+
+  /** Stop all navigation voice immediately (called by other pages on destroy) */
+  stopNavSpeech(): void {
+    if (this.isBrowser && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
+  /** Pause the global listening so another service (like an AI audio session) can use the microphone */
+  pauseGlobalListening(): void {
+    if (!this.isBrowser || !this.recognition) return;
+    this.ignoreVoiceCommands = true;
+    this.stopListening();
+    console.log('AlzheimerAccessibility: Global listening paused.');
+  }
+
+  /** Resume the global listening after the external process finishes */
+  resumeGlobalListening(): void {
+    if (!this.isBrowser || !this.recognition) return;
+    this.ignoreVoiceCommands = false;
+    this.startListening();
+    console.log('AlzheimerAccessibility: Global listening resumed.');
+  }
+
+  // ── Private helpers ───────────────────────────────────────────
+
+  private loadVoiceEnabled(): boolean {
+    try {
+      return sessionStorage.getItem('nav_voice_enabled') !== '0';
+    } catch {
+      return true;
     }
   }
 
@@ -60,6 +114,8 @@ export class AlzheimerAccessibilityService {
 
   private describeCurrentPage() {
     if (!this.isBrowser || !window.speechSynthesis) return;
+    // Respect the voice toggle
+    if (!this.voiceEnabled()) return;
 
     // Interrupt any ongoing speech when navigating to a new page
     window.speechSynthesis.cancel();
@@ -69,9 +125,9 @@ export class AlzheimerAccessibilityService {
     let description = '';
 
     if (url.includes('/home')) {
-      description = "Welcome home. This is your main dashboard where you can find an overview of your health status.";
+      description = "Bienvenue sur la page d'accueil. Voici votre tableau de bord principal.";
     } else if (url.includes('/rendezvous')) {
-      description = "You are on the appointments page. Here you can see your scheduled meetings with doctors.";
+      description = "Vous êtes sur la page des rendez-vous. Vous pouvez voir vos consultations planifiées.";
       const user = this.authService.getCurrentUser();
       if (user && user.id) {
         this.rendezvousService.getByPatient(user.id).subscribe(apps => {
@@ -80,7 +136,7 @@ export class AlzheimerAccessibilityService {
           if (active.length > 0) {
             const next = active.sort((a, b) => new Date(a.dateHeure).getTime() - new Date(b.dateHeure).getTime())[0];
             const date = new Date(next.dateHeure);
-            this.speak(`${description} Your next appointment is on ${date.toLocaleDateString('en-US')} at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}.`);
+            this.speak(`${description} Votre prochain rendez-vous est le ${date.toLocaleDateString('fr-FR')} à ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}.`);
           } else {
             this.speak(description);
           }
@@ -88,19 +144,19 @@ export class AlzheimerAccessibilityService {
         return;
       }
     } else if (url.includes('/patient-dashboard')) {
-      description = "This is your personal health center. You can manage your profile and see your medical history here.";
+      description = "Voici votre espace personnel. Vous pouvez gérer votre profil et consulter votre historique médical.";
     } else if (url.includes('/messenger')) {
-      description = "You are in the messages section. You can talk to your doctors or family members from here.";
+      description = "Vous êtes dans la messagerie. Vous pouvez communiquer avec vos médecins ou vos proches.";
     } else if (url.includes('/collaboration/feed') || url.includes('/collaboration')) {
-      description = "You are on the community page. Here you can see updates from other members and share your own news.";
+      description = "Vous êtes sur la page communauté. Découvrez les actualités des autres membres.";
     } else if (url.includes('/education') || url.includes('/activities')) {
-      description = "This is the education area. You can find activities and useful information to help you every day.";
-    } else if (url.includes('/events')) {
-      description = "You are looking at upcoming events and group sessions. Join a session to stay active.";
+      description = "Voici l'espace éducation. Vous trouverez ici des activités et des vidéos utiles.";
+    } else if (url.includes('/eventfront') || url.includes('/events')) {
+      description = "Vous consultez les événements à venir. Rejoignez une session pour rester actif.";
     } else if (url.includes('/donations')) {
-      description = "You are on the donations page. Here you can see active campaigns and contribute to the community if you wish.";
-    } else if (url.includes('/map')) {
-      description = "This is the map. You can find nearby hospitals and doctors' offices here.";
+      description = "Vous êtes sur la page des dons. Vous pouvez contribuer aux campagnes en cours.";
+    } else if (url.includes('/map') || url.includes('/patient-map')) {
+      description = "Voici la carte. Vous pouvez trouver les hôpitaux et médecins proches de vous.";
     }
 
     if (description) {
@@ -119,7 +175,7 @@ export class AlzheimerAccessibilityService {
 
     this.recognition = new SpeechRecognition();
     this.recognition.continuous = true;
-    this.recognition.lang = 'en-US';
+    this.recognition.lang = 'fr-FR';
     this.recognition.interimResults = false;
     this.recognition.maxAlternatives = 1;
 
@@ -169,7 +225,7 @@ export class AlzheimerAccessibilityService {
       this.isListening = true;
       try {
         this.recognition.start();
-        console.log('Started listening for voice commands (English)...');
+        console.log('Started listening for voice commands...');
       } catch (e: any) { }
     }
   }
@@ -184,55 +240,47 @@ export class AlzheimerAccessibilityService {
   private handleVoiceCommand(command: string) {
     const currentUrl = this.router.url;
 
-    if (command.includes('appointment') || command.includes('meeting')) {
+    if (command.includes('rendez-vous') || command.includes('consultation')) {
       if (!currentUrl.includes('/rendezvous')) {
-        this.speak("Opening your appointments.");
+        this.speak("J'ouvre vos rendez-vous.");
         this.router.navigate(['/rendezvous']);
       }
-    }
-    else if (command.includes('home') || command.includes('main page')) {
+    } else if (command.includes('accueil') || command.includes('home')) {
       if (!currentUrl.includes('/home')) {
-        this.speak("Going to the home page.");
+        this.speak("Retour à l'accueil.");
         this.router.navigate(['/home']);
       }
-    }
-    else if (command.includes('dashboard')) {
+    } else if (command.includes('tableau de bord') || command.includes('dashboard')) {
       if (!currentUrl.includes('/patient-dashboard')) {
-        this.speak("Opening your dashboard.");
+        this.speak("Ouverture de votre tableau de bord.");
         this.router.navigate(['/patient-dashboard']);
       }
-    }
-    else if (command.includes('activity') || command.includes('education')) {
+    } else if (command.includes('activité') || command.includes('éducation') || command.includes('education')) {
       if (!currentUrl.includes('/education')) {
-        this.speak("Showing educational activities.");
+        this.speak("Voici les activités éducatives.");
         this.router.navigate(['/education']);
       }
-    }
-    else if (command.includes('message') || command.includes('chat')) {
+    } else if (command.includes('message') || command.includes('messagerie')) {
       if (!currentUrl.includes('/messenger')) {
-        this.speak("Opening your messages.");
+        this.speak("Ouverture de vos messages.");
         this.router.navigate(['/collaboration/messenger']);
       }
-    }
-    else if (command.includes('event')) {
-      if (!currentUrl.includes('/events')) {
-        this.speak("Checking upcoming events.");
-        this.router.navigate(['/events']);
+    } else if (command.includes('événement') || command.includes('event')) {
+      if (!currentUrl.includes('/eventfront')) {
+        this.speak("Voici les événements à venir.");
+        this.router.navigate(['/eventfront']);
       }
-    }
-    else if (command.includes('community') || command.includes('feed')) {
+    } else if (command.includes('communauté') || command.includes('community')) {
       if (!currentUrl.includes('/collaboration/feed')) {
-        this.speak("Opening the community feed.");
+        this.speak("Ouverture de la communauté.");
         this.router.navigate(['/collaboration/feed']);
       }
-    }
-    else if (command.includes('donation') || command.includes('give')) {
+    } else if (command.includes('don') || command.includes('donation')) {
       if (!currentUrl.includes('/donations')) {
-        this.speak("Opening the donations page.");
+        this.speak("Ouverture de la page des dons.");
         this.router.navigate(['/donations']);
       }
-    }
-    else {
+    } else {
       this.processAICommand(command);
     }
   }
@@ -260,6 +308,7 @@ export class AlzheimerAccessibilityService {
         }
       });
   }
+
   private async processAICommand(command: string) {
     if (this.ignoreVoiceCommands || window.speechSynthesis.speaking) {
       return;
@@ -267,23 +316,17 @@ export class AlzheimerAccessibilityService {
     const result = await this.aiService.sendCommand(command);
 
     if (!result) {
-      this.speak("I did not understand. Please repeat.");
+      this.speak("Je n'ai pas compris. Veuillez répéter.");
       return;
     }
 
     const allowedRoutes = [
-      '/home',
-      '/rendezvous',
-      '/patient-dashboard',
-      '/education',
-      '/collaboration/messenger',
-      '/events',
-      '/collaboration/feed',
-      '/donations'
+      '/home', '/rendezvous', '/patient-dashboard', '/education',
+      '/collaboration/messenger', '/eventfront', '/collaboration/feed', '/donations'
     ];
 
     if (result.action === 'navigate' && allowedRoutes.includes(result.target)) {
-      this.speak('Okay, I am taking you there now.'); this.router.navigate([result.target]);
+      this.speak("D'accord, je vous y emmène."); this.router.navigate([result.target]);
       return;
     }
 
@@ -292,8 +335,9 @@ export class AlzheimerAccessibilityService {
       return;
     }
 
-    this.speak("I did not understand. Please repeat.");
+    this.speak("Je n'ai pas compris. Veuillez répéter.");
   }
+
   private stopReminders() {
     this.reminderSubscription?.unsubscribe();
     this.reminderSubscription = undefined;
@@ -319,6 +363,9 @@ export class AlzheimerAccessibilityService {
   }
 
   private speakAppointment(app: any) {
+    // Only speak reminders if voice is enabled
+    if (!this.voiceEnabled()) return;
+
     const now = new Date();
     const appDate = app.date;
     const diffMs = appDate.getTime() - now.getTime();
@@ -326,19 +373,19 @@ export class AlzheimerAccessibilityService {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     let message = '';
-    const timeStr = appDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const timeStr = appDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
     if (diffDays === 0) {
       if (diffHours < 1) {
-        message = `Reminder: You have an appointment very soon, at ${timeStr}.`;
+        message = `Rappel : vous avez un rendez-vous très bientôt, à ${timeStr}.`;
       } else {
-        message = `Reminder: You have an appointment today at ${timeStr}.`;
+        message = `Rappel : vous avez un rendez-vous aujourd'hui à ${timeStr}.`;
       }
     } else if (diffDays === 1) {
-      message = `Reminder: You have an appointment tomorrow at ${timeStr}.`;
+      message = `Rappel : vous avez un rendez-vous demain à ${timeStr}.`;
     } else {
-      const dateStr = appDate.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' });
-      message = `Reminder: You have an appointment on ${dateStr} at ${timeStr}.`;
+      const dateStr = appDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+      message = `Rappel : vous avez un rendez-vous le ${dateStr} à ${timeStr}.`;
     }
 
     this.speak(message);
@@ -346,6 +393,8 @@ export class AlzheimerAccessibilityService {
 
   private speak(text: string) {
     if (!this.isBrowser || !window.speechSynthesis) return;
+    // Respect the voice toggle for navigation speech
+    if (!this.voiceEnabled()) return;
 
     this.ignoreVoiceCommands = true;
 
@@ -354,13 +403,13 @@ export class AlzheimerAccessibilityService {
     }
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US'; // Switched to English
+    utterance.lang = 'fr-FR';
     utterance.rate = 0.85;
     utterance.pitch = 1;
 
     const voices = window.speechSynthesis.getVoices();
-    const enVoice = voices.find(v => v.lang.startsWith('en'));
-    if (enVoice) utterance.voice = enVoice;
+    const frVoice = voices.find(v => v.lang.startsWith('fr'));
+    if (frVoice) utterance.voice = frVoice;
 
     const resumeRec = () => {
       setTimeout(() => {
@@ -375,6 +424,6 @@ export class AlzheimerAccessibilityService {
     utterance.onerror = resumeRec;
 
     window.speechSynthesis.speak(utterance);
-    console.log('AlzheimerAccessibility (EN): Speaking - ', text);
+    console.log('AlzheimerAccessibility: Speaking -', text);
   }
 }

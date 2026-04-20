@@ -26,6 +26,12 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
+    // GET BY IDS (BATCH)
+    @GetMapping("/batch")
+    public ResponseEntity<List<User>> getByIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(userService.findAllByIds(ids));
+    }
+
     // GET BY ID
     @GetMapping("/{id}")
     public ResponseEntity<User> getById(@PathVariable Long id) {

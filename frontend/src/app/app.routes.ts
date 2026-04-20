@@ -209,7 +209,19 @@ export const routes: Routes = [
 
       },
 
-      // ✅ MERGE FIXÉ ICI
+      // ✅ EDUCATION MODULE REFACTOR
+      {
+        path: 'activities',
+        loadComponent: () =>
+          import('./components/education/activity/activity-list.component')
+            .then(m => m.ActivityListComponent)
+      },
+      {
+        path: 'events',
+        loadComponent: () =>
+          import('./components/education/event/event-list.component')
+            .then(m => m.EventListComponent)
+      },
       {
         path: 'education',
         loadComponent: () =>
