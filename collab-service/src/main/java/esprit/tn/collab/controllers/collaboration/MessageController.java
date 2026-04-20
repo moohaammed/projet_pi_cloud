@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,15 @@ public class MessageController {
         return messageService.getMessagesByGroup(groupId);
     }
 
+    
+    @GetMapping("/group/{groupId}/page")
+    public List<MessageResponseDto> getMessagesByGroupPaged(
+            @PathVariable String groupId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size) {
+        return messageService.getMessagesByGroupPaged(groupId, page, size);
+    }
+
     @GetMapping("/direct/{u1}/{u2}")
     public List<MessageResponseDto> getDirectMessages(@PathVariable Long u1, @PathVariable Long u2) {
         return messageService.getDirectMessages(u1, u2);
@@ -42,6 +52,11 @@ public class MessageController {
         return messageService.getBotMessages(userId);
     }
 
+    @GetMapping("/peers/{userId}")
+    public List<Long> getConversationPeers(@PathVariable Long userId) {
+        return messageService.getConversationPeers(userId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<MessageResponseDto> getMessageById(@PathVariable String id) {
         MessageResponseDto msg = messageService.getMessageById(id);
@@ -50,19 +65,45 @@ public class MessageController {
 
     @PostMapping(consumes = "multipart/form-data")
     public MessageResponseDto createMessage(@Valid @ModelAttribute MessageCreateDto dto,
-                                            @RequestParam(value = "file", required = false) MultipartFile file) {
-        String mediaUrl = null, mimeType = null;
-        if (file != null && !file.isEmpty()) { mediaUrl = fileStorageService.storeFile(file); mimeType = file.getContentType(); }
-        return messageService.createMessage(dto, mediaUrl, mimeType);
+                                            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+        List<String> mediaUrls = new ArrayList<>();
+        List<String> mimeTypes = new ArrayList<>();
+        
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String url = fileStorageService.storeFile(file);
+                    if (url != null) {
+                        mediaUrls.add(url);
+                        mimeTypes.add(file.getContentType());
+                    }
+                }
+            }
+        }
+        
+        return messageService.createMessage(dto, mediaUrls, mimeTypes);
     }
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String id,
                                                             @Valid @ModelAttribute MessageCreateDto dto,
-                                                            @RequestParam(value = "file", required = false) MultipartFile file) {
-        String mediaUrl = null, mimeType = null;
-        if (file != null && !file.isEmpty()) { mediaUrl = fileStorageService.storeFile(file); mimeType = file.getContentType(); }
-        MessageResponseDto msg = messageService.updateMessage(id, dto, mediaUrl, mimeType);
+                                                            @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+        List<String> mediaUrls = new ArrayList<>();
+        List<String> mimeTypes = new ArrayList<>();
+        
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String url = fileStorageService.storeFile(file);
+                    if (url != null) {
+                        mediaUrls.add(url);
+                        mimeTypes.add(file.getContentType());
+                    }
+                }
+            }
+        }
+        
+        MessageResponseDto msg = messageService.updateMessage(id, dto, mediaUrls, mimeTypes);
         return msg != null ? ResponseEntity.ok(msg) : ResponseEntity.notFound().build();
     }
 
@@ -82,5 +123,21 @@ public class MessageController {
     @PostMapping("/{id}/pin")
     public MessageResponseDto togglePin(@PathVariable String id) {
         return messageService.togglePin(id);
+    }
+
+    
+    @PostMapping("/live-comment")
+    public ResponseEntity<MessageResponseDto> sendLiveComment(
+            @RequestParam Long senderId,
+            @RequestParam Long broadcasterId,
+            @RequestParam String content) {
+        return ResponseEntity.ok(messageService.sendLiveComment(senderId, broadcasterId, content));
+    }
+
+    
+    @PostMapping("/{id}/read")
+    public ResponseEntity<Void> markAsRead(@PathVariable String id, @RequestParam Long userId) {
+        messageService.markAsRead(id, userId);
+        return ResponseEntity.ok().build();
     }
 }

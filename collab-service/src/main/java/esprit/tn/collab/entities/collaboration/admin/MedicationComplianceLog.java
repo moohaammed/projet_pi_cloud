@@ -7,11 +7,17 @@ import java.time.Instant;
 @Document(collection = "medication_compliance_logs")
 public class MedicationComplianceLog {
 
+    
     @Id
     private String id;
 
+    
     private Long patientId;
+
+    
     private boolean tookMedication;
+
+    
     private Instant createdAt = Instant.now();
 
     public String getId() { return id; }

@@ -191,3 +191,200 @@ textarea.form-control-doc {
   background-position: right 1rem center;
   background-size: 16px 12px;
 }
+
+// Pagination Styles
+.pagination {
+  .page-item {
+    margin: 0 0.125rem;
+    
+    .page-link {
+      border: none;
+      background: transparent;
+      color: var(--doc-secondary);
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.15s ease-in-out;
+      
+      &:hover {
+        background: var(--doc-primary-soft);
+        color: var(--doc-primary);
+        transform: translateY(-1px);
+      }
+      
+      &:focus {
+        box-shadow: none;
+      }
+    }
+    
+    &.active .page-link {
+      background: var(--doc-primary);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 0.125rem 0.25rem rgba(128, 0, 128, 0.3);
+    }
+    
+    &.disabled .page-link {
+      opacity: 0.4;
+      cursor: not-allowed;
+      
+      &:hover {
+        background: transparent;
+        transform: none;
+      }
+    }
+  }
+}
+
+// Cursor pointer for clickable labels
+.cursor-pointer {
+  cursor: pointer;
+}
+
+// Avatar styles
+.avatar-xs {
+  width: 32px;
+  height: 32px;
+  font-size: 0.75rem;
+}
+
+// Clinical Handover Section Cards
+.bg-soft-primary { background-color: rgba(128, 0, 128, 0.06) !important; }
+.bg-soft-success { background-color: rgba(16, 185, 129, 0.06) !important; }
+.bg-soft-danger  { background-color: rgba(239, 68, 68, 0.06) !important; }
+.bg-soft-info    { background-color: rgba(59, 130, 246, 0.06) !important; }
+
+.border-primary { border-color: rgba(128, 0, 128, 0.2) !important; }
+.border-success { border-color: rgba(16, 185, 129, 0.2) !important; }
+.border-danger  { border-color: rgba(239, 68, 68, 0.2) !important; }
+.border-info    { border-color: rgba(59, 130, 246, 0.2) !important; }
+
+.text-primary { color: #800080 !important; }
+.text-success { color: #10b981 !important; }
+.text-danger  { color: #ef4444 !important; }
+.text-info    { color: #3b82f6 !important; }
+
+// Soft row tints for content management
+.content-row-distressed {
+  background-color: rgba(239, 68, 68, 0.04) !important;
+}
+
+.content-row-flagged {
+  background-color: rgba(245, 158, 11, 0.04) !important;
+}
+
+.dm-row-distressed {
+  background-color: rgba(239, 68, 68, 0.04) !important;
+}
+
+// ── Dark Mode ─────────────────────────────────────────────────────────────────
+.admin-dark {
+  --dark-bg: #0f1117;
+  --dark-surface: #1a1d27;
+  --dark-surface-2: #22263a;
+  --dark-border: rgba(255,255,255,0.07);
+  --dark-text: #e2e8f0;
+  --dark-muted: #94a3b8;
+
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+  min-height: 100vh;
+  padding: 1.5rem;
+  border-radius: 1rem;
+
+  // Cards
+  .card, .bg-white {
+    background-color: var(--dark-surface) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text) !important;
+  }
+
+  // Text
+  .text-doc-heading, .text-dark, h1, h2, h3, h4, h5, h6 {
+    color: var(--dark-text) !important;
+  }
+  .text-muted, .text-doc-secondary, .opacity-75 {
+    color: var(--dark-muted) !important;
+  }
+
+  // Borders
+  .border-bottom, .border-top, .border {
+    border-color: var(--dark-border) !important;
+  }
+
+  // Table
+  .table {
+    color: var(--dark-text);
+    --bs-table-bg: transparent;
+    --bs-table-hover-bg: rgba(255,255,255,0.04);
+  }
+  thead.bg-soft-primary, thead.bg-light, .bg-soft-primary {
+    background-color: rgba(128, 0, 128, 0.15) !important;
+  }
+  .bg-light {
+    background-color: var(--dark-surface-2) !important;
+  }
+
+  // Inputs
+  .form-control, .form-select, input, textarea, select {
+    background-color: var(--dark-surface-2) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text) !important;
+    &::placeholder { color: var(--dark-muted); }
+  }
+  .input-group-text {
+    background-color: var(--dark-surface-2) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-muted) !important;
+  }
+
+  // Buttons
+  .btn-light {
+    background-color: var(--dark-surface-2) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text) !important;
+  }
+  .btn-white {
+    background-color: var(--dark-surface) !important;
+    border-color: var(--dark-border) !important;
+    color: var(--dark-text) !important;
+  }
+
+  // Dropdown
+  .dropdown-menu {
+    background-color: var(--dark-surface) !important;
+    border-color: var(--dark-border) !important;
+    .dropdown-item {
+      color: var(--dark-text) !important;
+      &:hover { background-color: var(--dark-surface-2) !important; }
+    }
+  }
+
+  // Badges
+  .bg-grey, .bg-soft-secondary {
+    background-color: var(--dark-surface-2) !important;
+  }
+
+  // Sidebar nav buttons
+  .btn-light.active, .btn-light:hover {
+    background-color: rgba(128, 0, 128, 0.12) !important;
+  }
+
+  // Chart wrapper
+  .chart-wrapper canvas {
+    filter: brightness(0.9);
+  }
+
+  // Section headers
+  .section-header__title {
+    color: var(--dark-text) !important;
+  }
+  .sub-title {
+    color: var(--dark-muted) !important;
+  }
+
+  // Soft tints in dark mode
+  .content-row-distressed { background-color: rgba(239, 68, 68, 0.08) !important; }
+  .content-row-flagged { background-color: rgba(245, 158, 11, 0.08) !important; }
+  .dm-row-distressed { background-color: rgba(239, 68, 68, 0.08) !important; }
+}

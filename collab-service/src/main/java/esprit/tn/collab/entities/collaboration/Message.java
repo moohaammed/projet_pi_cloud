@@ -2,7 +2,6 @@ package esprit.tn.collab.entities.collaboration;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,30 +13,44 @@ public class Message {
     private String id;
 
     private String content;
+
+    private List<String> mediaUrls = new ArrayList<>();
+
+    private List<String> mimeTypes = new ArrayList<>();
+
+    @Deprecated
     private String mediaUrl;
+
+    @Deprecated
     private String mimeType;
+
     private Instant sentAt;
+
     private Long senderId;
+
     private Long receiverId;
 
-    /** Store group id as String reference */
     private String chatGroupId;
 
-    /** Parent message id for replies */
     private String parentMessageId;
+
+    
     private String parentMessageContent;
 
-    /** Shared publication id */
     private String sharedPublicationId;
 
     private boolean isDistressed;
+
     private Double sentimentScore = 0.0;
+
     private boolean isPinned = false;
+
     private List<Long> viewedByUserIds = new ArrayList<>();
+
     private MessageType type = MessageType.TEXT;
+
     private String pollQuestion;
 
-    /** Embedded poll options — no separate collection */
     private List<MessagePollOption> pollOptions = new ArrayList<>();
 
     public Message() {}
@@ -46,10 +59,36 @@ public class Message {
     public void setId(String id) { this.id = id; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
-    public String getMediaUrl() { return mediaUrl; }
-    public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
-    public String getMimeType() { return mimeType; }
-    public void setMimeType(String mimeType) { this.mimeType = mimeType; }
+    
+    public List<String> getMediaUrls() { return mediaUrls; }
+    public void setMediaUrls(List<String> mediaUrls) { this.mediaUrls = mediaUrls; }
+    public List<String> getMimeTypes() { return mimeTypes; }
+    public void setMimeTypes(List<String> mimeTypes) { this.mimeTypes = mimeTypes; }
+    
+    @Deprecated
+    public String getMediaUrl() { 
+        return mediaUrls != null && !mediaUrls.isEmpty() ? mediaUrls.get(0) : mediaUrl; 
+    }
+    @Deprecated
+    public void setMediaUrl(String mediaUrl) { 
+        this.mediaUrl = mediaUrl;
+        if (mediaUrl != null && !mediaUrl.isEmpty()) {
+            if (this.mediaUrls == null) this.mediaUrls = new ArrayList<>();
+            if (!this.mediaUrls.contains(mediaUrl)) this.mediaUrls.add(mediaUrl);
+        }
+    }
+    @Deprecated
+    public String getMimeType() { 
+        return mimeTypes != null && !mimeTypes.isEmpty() ? mimeTypes.get(0) : mimeType; 
+    }
+    @Deprecated
+    public void setMimeType(String mimeType) { 
+        this.mimeType = mimeType;
+        if (mimeType != null && !mimeType.isEmpty()) {
+            if (this.mimeTypes == null) this.mimeTypes = new ArrayList<>();
+            if (!this.mimeTypes.contains(mimeType)) this.mimeTypes.add(mimeType);
+        }
+    }
     public Instant getSentAt() { return sentAt; }
     public void setSentAt(Instant sentAt) { this.sentAt = sentAt; }
     public Long getSenderId() { return senderId; }

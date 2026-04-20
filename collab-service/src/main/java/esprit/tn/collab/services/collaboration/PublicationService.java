@@ -5,7 +5,6 @@ import esprit.tn.collab.dto.collaboration.*;
 import esprit.tn.collab.entities.collaboration.*;
 import esprit.tn.collab.repositories.collaboration.ChatGroupRepository;
 import esprit.tn.collab.repositories.collaboration.MessageRepository;
-import esprit.tn.collab.repositories.collaboration.PublicationPollOptionRepository;
 import esprit.tn.collab.repositories.collaboration.PublicationRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,6 @@ public class PublicationService {
     private String mainServiceUrl;
 
     public PublicationService(PublicationRepository publicationRepository,
-                              PublicationPollOptionRepository pollOptionRepository,
                               SentimentAnalysisService sentimentAnalysisService,
                               NotificationService notificationService,
                               UserClient userClient,
@@ -71,15 +69,20 @@ public class PublicationService {
         return publicationRepository.findById(id).map(this::mapToResponseDto).orElse(null);
     }
 
-    public PublicationResponseDto createPublication(PublicationCreateDto dto, String mediaUrl, String mimeType) {
+    public PublicationResponseDto createPublication(PublicationCreateDto dto, List<String> mediaUrls, List<String> mimeTypes) {
         Publication publication = new Publication();
         publication.setContent(dto.getContent() != null ? dto.getContent() : "");
         publication.setType(dto.getType());
         publication.setAuthorId(dto.getAuthorId());
         publication.setCreatedAt(Instant.now());
-        publication.setMediaUrl(mediaUrl);
-        publication.setMimeType(mimeType);
+        
+        if (mediaUrls != null && !mediaUrls.isEmpty()) {
+            publication.setMediaUrls(mediaUrls);
+            publication.setMimeTypes(mimeTypes);
+        }
+        
         publication.setAnonymous(dto.isAnonymous());
+        if (dto.getTags() != null) publication.setTags(dto.getTags());
 
         if (dto.getGroupId() != null) {
             chatGroupRepository.findById(dto.getGroupId()).ifPresent(publication::setChatGroup);
@@ -106,7 +109,7 @@ public class PublicationService {
 
         Double score = sentimentAnalysisService.calculateSentimentScore(publication.getContent());
         publication.setSentimentScore(score);
-        publication.setDistressed(score <= -0.5);
+        publication.setDistressed(score <= SentimentAnalysisService.DISTRESS_THRESHOLD);
 
         boolean misinfo = MISINFORMATION_PATTERN.matcher(publication.getContent()).matches();
         if (misinfo) {
@@ -125,6 +128,15 @@ public class PublicationService {
             notificationService.createAndSend(dto.getAuthorId(),
                 "CareBot: I noticed your post might reflect some distress. Remember, you're not alone. ❤️", "CAREBOT");
             careBotService.sendReassurance(dto.getAuthorId());
+
+            // Alert all DOCTOR and CAREGIVER users about the distressed post
+            String authorName = userClient.getFullName(userClient.getUserById(dto.getAuthorId()));
+            String alertMsg = "⚠️ " + authorName + " posted something that may indicate distress. Please check in with them.";
+            userClient.getAllUsers().stream()
+                .filter(u -> userClient.isRole(u, "DOCTOR") || userClient.isRole(u, "CAREGIVER"))
+                .filter(u -> ((Number) u.get("id")).longValue() != dto.getAuthorId())
+                .forEach(u -> notificationService.createAndSend(
+                    ((Number) u.get("id")).longValue(), alertMsg, "PATIENT_DISTRESS_POST"));
         } else {
             notificationService.createAndSend(dto.getAuthorId(), "Your post was published successfully!", "POST_PUBLISHED");
         }
@@ -132,12 +144,16 @@ public class PublicationService {
         return mapToResponseDto(saved);
     }
 
-    public PublicationResponseDto updatePublication(String id, PublicationCreateDto dto, String mediaUrl, String mimeType) {
+    public PublicationResponseDto updatePublication(String id, PublicationCreateDto dto, List<String> mediaUrls, List<String> mimeTypes) {
         return publicationRepository.findById(id).map(existing -> {
             existing.setContent(dto.getContent());
             existing.setType(dto.getType());
             existing.setAnonymous(dto.isAnonymous());
-            if (mediaUrl != null) { existing.setMediaUrl(mediaUrl); existing.setMimeType(mimeType); }
+            if (dto.getTags() != null) existing.setTags(dto.getTags());
+            if (mediaUrls != null && !mediaUrls.isEmpty()) { 
+                existing.setMediaUrls(mediaUrls); 
+                existing.setMimeTypes(mimeTypes); 
+            }
             return mapToResponseDto(publicationRepository.save(existing));
         }).orElse(null);
     }
@@ -177,13 +193,19 @@ public class PublicationService {
         PublicationResponseDto dto = new PublicationResponseDto();
         dto.setId(publication.getId());
         dto.setContent(publication.getContent());
-        dto.setMediaUrl(publication.getMediaUrl());
-        dto.setMimeType(publication.getMimeType());
+        
+        // Support both new multi-media and legacy single media
+        dto.setMediaUrls(publication.getMediaUrls());
+        dto.setMimeTypes(publication.getMimeTypes());
+        dto.setMediaUrl(publication.getMediaUrl()); // Backward compatibility
+        dto.setMimeType(publication.getMimeType()); // Backward compatibility
+        
         dto.setType(publication.getType());
         dto.setCreatedAt(publication.getCreatedAt());
         dto.setDistressed(publication.isDistressed());
         dto.setSentimentScore(publication.getSentimentScore());
         dto.setAnonymous(publication.isAnonymous());
+        dto.setTags(publication.getTags());
         dto.setPollQuestion(publication.getPollQuestion());
         dto.setSupportIds(publication.getSupportIds());
 

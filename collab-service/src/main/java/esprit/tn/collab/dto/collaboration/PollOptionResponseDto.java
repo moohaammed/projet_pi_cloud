@@ -3,9 +3,17 @@ package esprit.tn.collab.dto.collaboration;
 import java.util.Set;
 
 public class PollOptionResponseDto {
+
+    
     private String id;
+
+    
     private String text;
+
+    
     private int votes;
+
+    
     private Set<Long> voterIds;
 
     public PollOptionResponseDto() {}

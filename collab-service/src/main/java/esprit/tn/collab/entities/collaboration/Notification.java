@@ -7,18 +7,29 @@ import java.time.Instant;
 @Document(collection = "notifications")
 public class Notification {
 
+    
     @Id
     private String id;
 
+    
     private Long userId;
+
+    
     private String content;
+
+    
     private String type;
+
+    
     @com.fasterxml.jackson.annotation.JsonProperty("isRead")
     private boolean isRead = false;
+
+    
     private Instant createdAt = Instant.now();
 
     public Notification() {}
 
+    
     public Notification(Long userId, String content, String type) {
         this.userId = userId;
         this.content = content;

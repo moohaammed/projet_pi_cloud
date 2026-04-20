@@ -20,6 +20,11 @@ spring:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
 
       routes:
+        # ── Dedicated Media Routing (Must be first to avoid conflicts) ─────
+        - id: collab-media
+          uri: lb://collab-service
+          predicates:
+            - Path=/uploads/media/**
 
         # ── Collaboration service ──────────────────────────────────────────
         - id: collab-rest

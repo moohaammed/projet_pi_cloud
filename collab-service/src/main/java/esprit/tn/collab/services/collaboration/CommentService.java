@@ -61,9 +61,8 @@ public class CommentService {
         }).orElse(null);
     }
 
-    public void deleteComment(String commentId) {
-        // Find the publication containing this comment and remove it
-        publicationRepository.findAll().forEach(pub -> {
+    public void deleteComment(String commentId, String publicationId) {
+        publicationRepository.findById(publicationId).ifPresent(pub -> {
             boolean removed = pub.getComments().removeIf(c -> c.getId().equals(commentId));
             if (removed) publicationRepository.save(pub);
         });

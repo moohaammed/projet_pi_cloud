@@ -1,5 +1,6 @@
 package esprit.tn.collab.services.collaboration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,9 +11,10 @@ import java.util.UUID;
 @Service
 public class FileStorageService {
 
-    private final Path fileStorageLocation = Paths.get("uploads/media").toAbsolutePath().normalize();
+    private final Path fileStorageLocation;
 
-    public FileStorageService() {
+    public FileStorageService(@Value("${app.upload.dir}") String uploadDir) {
+        this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {

@@ -7,27 +7,74 @@ import java.util.List;
 
 public class MessageResponseDto {
 
+    
     private String id;
+
+    
     private String content;
+
+    
+    private List<String> mediaUrls;
+
+    
+    private List<String> mimeTypes;
+    
+    
     private String mediaUrl;
+
+    
     private String mimeType;
+
+    
     private Instant sentAt;
+
+    
     private Long senderId;
+
+    
     private String senderName;
+
+    
     private Long receiverId;
+
+    
     private String chatGroupId;
+
+    
     private String parentMessageId;
+
+    
     private String parentMessageContent;
+
+    
     private String parentMessageSenderName;
+
+    
     private PublicationResponseDto sharedPublication;
+
+    
     private boolean isDistressed;
+
+    
     private Double sentimentScore;
+
+    
     @JsonProperty("isPinned")
     private boolean isPinned;
+
+    
     private List<Long> viewedByUserIds;
+
+    
     private MessageType type;
+
+    
     private String pollQuestion;
+
+    
     private List<PollOptionResponseDto> pollOptions;
+
+    
     private boolean fromBot;
 
     public MessageResponseDto() {}
@@ -36,6 +83,12 @@ public class MessageResponseDto {
     public void setId(String id) { this.id = id; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
+    
+    public List<String> getMediaUrls() { return mediaUrls; }
+    public void setMediaUrls(List<String> mediaUrls) { this.mediaUrls = mediaUrls; }
+    public List<String> getMimeTypes() { return mimeTypes; }
+    public void setMimeTypes(List<String> mimeTypes) { this.mimeTypes = mimeTypes; }
+    
     public String getMediaUrl() { return mediaUrl; }
     public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
     public String getMimeType() { return mimeType; }

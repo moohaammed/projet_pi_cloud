@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,25 +60,52 @@ public class PublicationController {
                                                     @RequestParam(value = "pollOptions", required = false) List<String> pollOptions,
                                                     @RequestParam(value = "pollQuestion", required = false) String pollQuestion,
                                                     @RequestParam(value = "linkedEventId", required = false) Long linkedEventId,
-                                                    @RequestParam(value = "file", required = false) MultipartFile file) {
+                                                    @RequestParam(value = "files", required = false) List<MultipartFile> files) {
         if (linkedEventId != null) dto.setLinkedEventId(linkedEventId);
         if (typeStr != null && dto.getType() == null) {
             try { dto.setType(PublicationType.valueOf(typeStr.toUpperCase())); } catch (Exception ignored) {}
         }
         if (pollOptions != null) dto.setPollOptions(pollOptions);
         if (pollQuestion != null) dto.setPollQuestion(pollQuestion);
-        String mediaUrl = null, mimeType = null;
-        if (file != null && !file.isEmpty()) { mediaUrl = fileStorageService.storeFile(file); mimeType = file.getContentType(); }
-        return publicationService.createPublication(dto, mediaUrl, mimeType);
+        
+        List<String> mediaUrls = new ArrayList<>();
+        List<String> mimeTypes = new ArrayList<>();
+        
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String url = fileStorageService.storeFile(file);
+                    if (url != null) {
+                        mediaUrls.add(url);
+                        mimeTypes.add(file.getContentType());
+                    }
+                }
+            }
+        }
+        
+        return publicationService.createPublication(dto, mediaUrls, mimeTypes);
     }
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<PublicationResponseDto> updatePublication(@PathVariable String id,
                                                                     @Valid @ModelAttribute PublicationCreateDto dto,
-                                                                    @RequestParam(value = "file", required = false) MultipartFile file) {
-        String mediaUrl = null, mimeType = null;
-        if (file != null && !file.isEmpty()) { mediaUrl = fileStorageService.storeFile(file); mimeType = file.getContentType(); }
-        PublicationResponseDto p = publicationService.updatePublication(id, dto, mediaUrl, mimeType);
+                                                                    @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+        List<String> mediaUrls = new ArrayList<>();
+        List<String> mimeTypes = new ArrayList<>();
+        
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String url = fileStorageService.storeFile(file);
+                    if (url != null) {
+                        mediaUrls.add(url);
+                        mimeTypes.add(file.getContentType());
+                    }
+                }
+            }
+        }
+        
+        PublicationResponseDto p = publicationService.updatePublication(id, dto, mediaUrls, mimeTypes);
         return p != null ? ResponseEntity.ok(p) : ResponseEntity.notFound().build();
     }
 

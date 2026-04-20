@@ -14,6 +14,7 @@ export interface PollOptionDto {
   id?: string;
   text: string;
   votes?: number;
+  /** User IDs who voted for this option — used to highlight the current user's choice */
   voterIds?: number[];
 }
 
@@ -27,14 +28,19 @@ export interface SharedEventPreviewDto {
 }
 
 export interface PublicationDto {
-  id: string;           // MongoDB ObjectId string
+  id: string;
   content: string;
   type: string;
   authorId: number;
   authorName?: string;
   createdAt: string;
+  
+  mediaUrls?: string[];
+  mimeTypes?: string[];
+  
   mediaUrl?: string;
   mimeType?: string;
+  
   distressed?: boolean;
   sentimentScore?: number;
   anonymous?: boolean;
@@ -66,8 +72,9 @@ export interface PublicationCreateRequest {
 export class PublicationService {
   private http = inject(HttpClient);
   private baseUrl = 'http://localhost:8080/api/publications';
-  public publications = signal<PublicationDto[]>([]);
 
+  /** Currently loaded publications for the active feed view */
+  public publications = signal<PublicationDto[]>([]);
   fetchPublications() {
     this.http.get<PublicationDto[]>(this.baseUrl).subscribe(data => this.publications.set(data));
   }
@@ -80,7 +87,7 @@ export class PublicationService {
     this.http.get<PublicationDto[]>(`${this.baseUrl}/group/${groupId}`).subscribe(data => this.publications.set(data));
   }
 
-  createPublication(req: PublicationCreateRequest, file?: File) {
+  createPublication(req: PublicationCreateRequest, files?: File[]) {
     const formData = new FormData();
     formData.append('content', req.content ?? '');
     formData.append('type', req.type);
@@ -90,7 +97,11 @@ export class PublicationService {
     if (req.pollOptions) req.pollOptions.forEach(opt => formData.append('pollOptions', opt));
     if (req.groupId) formData.append('groupId', req.groupId);
     if (req.linkedEventId != null) formData.append('linkedEventId', String(req.linkedEventId));
-    if (file) formData.append('file', file);
+    
+    if (files && files.length > 0) {
+      files.forEach(file => formData.append('files', file));
+    }
+    
     return this.http.post<PublicationDto>(this.baseUrl, formData);
   }
 
@@ -102,13 +113,17 @@ export class PublicationService {
     return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/support`, { userId });
   }
 
-  updatePublication(id: string, req: PublicationCreateRequest, file?: File) {
+  updatePublication(id: string, req: PublicationCreateRequest, files?: File[]) {
     const formData = new FormData();
     formData.append('content', req.content ?? '');
     formData.append('type', req.type);
     formData.append('authorId', req.authorId.toString());
     formData.append('anonymous', (req.anonymous || false).toString());
-    if (file) formData.append('file', file);
+    
+    if (files && files.length > 0) {
+      files.forEach(file => formData.append('files', file));
+    }
+    
     return this.http.put<PublicationDto>(`${this.baseUrl}/${id}`, formData);
   }
 

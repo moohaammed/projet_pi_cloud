@@ -150,12 +150,22 @@
           </div>
 
           <div class="d-flex align-items-center gap-4 ms-3 h-100">
-            <!-- Notifications -->
-            <div class="position-relative cursor-pointer text-muted hover-primary">
-              <i class="fa-regular fa-bell fs-5"></i>
-              <span
-                class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+            <!-- Voice Toggle -->
+            <div class="cursor-pointer transition-all" 
+                 [ngClass]="guidanceService.voiceUnlocked() ? 'text-success' : 'text-muted'"
+                 (click)="guidanceService.toggleVoice()"
+                 title="Toggle Voice Assistance">
+              <i class="fa-solid fs-5" [ngClass]="guidanceService.voiceUnlocked() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
             </div>
+
+            <!-- Dark Mode Toggle -->
+            <button class="btn rounded-circle d-flex align-items-center justify-content-center border-0 transition-all"
+                    style="width: 36px; height: 36px;"
+                    [ngClass]="isDarkMode ? 'bg-soft-primary' : 'bg-grey'"
+                    (click)="toggleDarkMode()"
+                    [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
+              <i class="fa-solid fs-14" [ngClass]="isDarkMode ? 'fa-sun text-warning' : 'fa-moon text-muted'"></i>
+            </button>
 
             <!-- Profile -->
             <div class="d-flex align-items-center gap-3">
@@ -202,6 +212,16 @@
           <div class="col-lg-6 col-md-7 col-12 d-flex justify-content-end align-items-center gap-3">
             <span class="small text-muted" *ngIf="auth.isLoggedIn()">Logged as: <strong>{{ auth.getRole()
                 }}</strong></span>
+            
+            <!-- Global Voice Toggle -->
+            <button class="btn btn-sm rounded-pill px-3 border-0 transition-all d-flex align-items-center gap-2"
+              [ngClass]="guidanceService.voiceUnlocked() ? 'btn-soft-success' : 'btn-soft-secondary'"
+              (click)="guidanceService.toggleVoice()"
+              title="Toggle Voice Assistance">
+              <i class="fa-solid" [ngClass]="guidanceService.voiceUnlocked() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
+              <span class="fw-bold fs-11">VOICE</span>
+            </button>
+
             <button class="btn btn-sm btn-outline-danger" *ngIf="auth.isLoggedIn()"
               (click)="auth.logout()">Logout</button>
             <a routerLink="/auth/login" class="btn btn-sm btn-primary" *ngIf="!auth.isLoggedIn()">Login</a>
