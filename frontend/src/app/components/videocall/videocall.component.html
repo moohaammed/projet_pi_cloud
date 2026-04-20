@@ -27,8 +27,20 @@
     <div class="call-container shadow-lg animate-fade-in">
 
       <!-- Main Video (Remote) -->
-      <div class="video-wrapper remote-video">
+      <div class="video-wrapper remote-video" [style.transform]="'scale(' + zoomFactor + ')'">
         <video #remoteVideo autoplay playsinline class="w-100 h-100"></video>
+        <canvas #drawingCanvas class="drawing-overlay" 
+          (mousedown)="onMouseDown($event)" 
+          (mousemove)="onMouseMove($event)" 
+          (mouseup)="onMouseUp()"
+          (mouseleave)="onMouseUp()">
+        </canvas>
+
+        <!-- Virtual Hand Cursor -->
+        <div class="virtual-hand" [style.left.px]="mouseX" [style.top.px]="mouseY" *ngIf="isHandsEnabled">
+          <i class="fa-solid fa-hand-pointer text-white shadow-sm"></i>
+          <span class="hand-pulse" *ngIf="isMouseDown"></span>
+        </div>
         <div class="remote-placeholder" *ngIf="connectionStatus !== 'Connecté'">
           <div class="pulse-loader mb-3"></div>
           <span>{{ connectionStatus }}</span>
@@ -61,6 +73,15 @@
           *ngIf="connectionStatus.includes('Prêt')" (click)="startCall()">
           <i class="fa-solid fa-phone-flip"></i>
           DÉMARRER L'APPEL
+        </button>
+
+        <button [class]="isHandsEnabled ? 'btn btn-success btn-circle shadow' : 'btn btn-dark btn-outline-light btn-circle shadow'"
+          (click)="toggleHands()" title="Mode Dessin à la souris">
+          <i class="fa-solid fa-pen-nib"></i>
+        </button>
+
+        <button class="btn btn-warning btn-circle shadow" (click)="clearCanvas(true)" *ngIf="isHandsEnabled" title="Effacer tout">
+          <i class="fa-solid fa-trash-can"></i>
         </button>
 
         <button class="btn btn-danger d-flex align-items-center gap-2 px-4 rounded-pill shadow" (click)="hangup()">

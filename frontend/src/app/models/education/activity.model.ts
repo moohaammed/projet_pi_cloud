@@ -33,7 +33,7 @@ export interface ExerciceData {
 }
 
 export interface ActivityModel {
-  id?:               number;
+  id?:               string;
   title:             string;
   type:              ActivityType;
   stade:             Stade;

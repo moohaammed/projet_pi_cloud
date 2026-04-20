@@ -181,7 +181,9 @@ export const routes: Routes = [
   canActivate: [authGuard, roleGuard],
   data: { roles: ['PATIENT'] }
 },
-  // ===== COLLABORATION =====
+
+
+
 
   {
     path: 'collaboration',
@@ -238,7 +240,19 @@ export const routes: Routes = [
 
       },
 
-      // ✅ MERGE FIXÉ ICI
+      // ✅ EDUCATION MODULE REFACTOR
+      {
+        path: 'activities',
+        loadComponent: () =>
+          import('./components/education/activity/activity-list.component')
+            .then(m => m.ActivityListComponent)
+      },
+      {
+        path: 'events',
+        loadComponent: () =>
+          import('./components/education/event/event-list.component')
+            .then(m => m.EventListComponent)
+      },
       {
         path: 'education',
         loadComponent: () =>
@@ -308,6 +322,16 @@ export const routes: Routes = [
   { path: 'my-donations', component: MyDonationsComponent, canActivate: [authGuard] },
   { path: 'donations/:campaignId', component: DonationFormComponent },
 
+
+
+  // SMARTWATCH — Heart Rate Monitor
+  {
+    path: 'heart-rate',
+    loadComponent: () =>
+      import('./components/live-heart-rate/live-heart-rate.component')
+        .then(m => m.LiveHeartRateComponent),
+    canActivate: [authGuard]
+  },
 
   { path: '**', redirectTo: 'auth/login' }
 ];

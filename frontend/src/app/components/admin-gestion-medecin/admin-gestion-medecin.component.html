@@ -24,6 +24,9 @@
     <button [class.tab-active]="activeTab==='stats'" (click)="setTab('stats')">
       <i class="fa-solid fa-chart-pie me-2"></i>Statistiques
     </button>
+    <button [class.tab-active]="activeTab==='assign'" (click)="setTab('assign')">
+      <i class="fa-solid fa-link me-2"></i>Assignation
+    </button>
   </div>
 
   <!-- ===================== LIST ===================== -->
@@ -168,6 +171,113 @@
     </div>
   </div>
 
+  <!-- ===================== ASSIGNATION ===================== -->
+  <div *ngIf="activeTab==='assign'">
+    <div class="kpi-row" style="margin-bottom: 24px;">
+      <div class="kpi-card" style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+        <h4 style="margin: 0; color: var(--text-dark);"><i class="fa-solid fa-user-doctor me-2"></i>Sélecteur Médecin</h4>
+        <select class="gp-input" [(ngModel)]="selectedAssignMedecin" (ngModelChange)="onMedecinSelectChange()">
+          <option [ngValue]="null">-- Sélectionner un Médecin --</option>
+          <option *ngFor="let m of allDoctors" [ngValue]="m.id">Dr. {{ m.prenom }} {{ m.nom }} ({{m.email}})</option>
+        </select>
+      </div>
+      <div class="kpi-card" style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: start;">
+        <h4 style="margin: 0; color: var(--text-dark);"><i class="fa-solid fa-user me-2"></i>Assigner Patient</h4>
+        <div style="display: flex; gap: 12px; width: 100%;">
+          <select class="gp-input" style="flex: 1" [(ngModel)]="selectedAssignPatient" [disabled]="!selectedAssignMedecin">
+             <option [ngValue]="null">-- Sélectionner Patient (non assigné) --</option>
+             <option *ngFor="let p of unassignedPatientsList" [ngValue]="p.id">{{ p.prenom }} {{ p.nom }}</option>
+          </select>
+          <button class="btn-primary-purple" (click)="assignPatient()" [disabled]="!selectedAssignMedecin || !selectedAssignPatient || isSubmitting">
+            <i class="fa-solid fa-link"></i> Assigner
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card" *ngIf="selectedAssignMedecin">
+      <h4 style="padding: 20px; margin: 0; border-bottom: 1px solid var(--border-light);"><i class="fa-solid fa-list-check me-2"></i>Patients Actuellement Assignés</h4>
+      <div *ngIf="isLoading" class="loading-state"><div class="spinner"></div><span>Chargement…</span></div>
+      <table class="gp-table" *ngIf="!isLoading">
+        <thead>
+          <tr>
+            <th>Patient</th><th>Email</th><th>Téléphone</th><th>Sexe</th><th>Réassigner</th><th>Retirer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of assignedPatients">
+             <td>
+              <div class="patient-cell" *ngIf="p">
+                <div class="avatar-circle">
+                  {{ (p.prenom||'?')[0] }}{{ (p.nom||'?')[0] }}
+                </div>
+                <div>
+                  <div class="patient-name">{{ p.prenom || 'N/A' }} {{ p.nom || 'N/A' }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="text-muted-sm">{{ p?.user?.email || '—' }}</td>
+            <td class="text-muted-sm">{{ p?.user?.telephone || '—' }}</td>
+            <td class="text-muted-sm">{{ p?.sexe || '—' }}</td>
+            <td>
+              <button class="act-btn" style="background: #6c757d; color: white; border-radius: 6px; padding: 6px 12px; font-size: 0.8rem;" (click)="openReassignModal(p)">
+                <i class="fa-solid fa-arrows-rotate me-1"></i> Réassigner
+              </button>
+            </td>
+            <td>
+              <button class="act-btn btn-danger" style="color: white; border-radius: 6px; padding: 6px 12px; font-size: 0.8rem;" (click)="unassignPatient(p?.id)">
+                <i class="fa-solid fa-trash me-1"></i> Retirer
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="assignedPatients.length === 0">
+             <td colspan="6" class="empty-row text-center"><i class="fa-solid fa-user-xmark me-2"></i>Aucun patient assigné à ce médecin.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="kpi-card text-center" style="padding: 40px; color: var(--text-muted);" *ngIf="!selectedAssignMedecin">
+        <i class="fa-solid fa-arrow-pointer" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5;"></i>
+        <p>Veuillez sélectionner un médecin ci-dessus pour gérer ses patients.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ REASSIGN MODAL ============ -->
+<div class="modal-backdrop" *ngIf="showReassignModal" (click)="closeReassignModal()">
+  <div class="modal-box modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <span><i class="fa-solid fa-arrows-rotate me-2"></i>Réassigner Patient</span>
+      <button class="modal-close" (click)="closeReassignModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" *ngIf="movingPatient">
+      <div class="text-center mb-4">
+        <div class="detail-avatar mx-auto">{{ (movingPatient.prenom||'?')[0] }}{{ (movingPatient.nom||'?')[0] }}</div>
+        <h5 class="mt-2">{{ movingPatient.prenom }} {{ movingPatient.nom }}</h5>
+        <p class="text-muted small">Réassigner ce patient à un autre médecin</p>
+      </div>
+
+      <div class="form-group">
+        <label>Nouveau Médecin</label>
+        <select class="gp-input" [(ngModel)]="newDoctorId">
+          <option [ngValue]="null">-- Choisir un Médecin --</option>
+          <ng-container *ngFor="let m of allDoctors">
+            <option *ngIf="m.id !== selectedAssignMedecin" [ngValue]="m.id">
+              Dr. {{ m.prenom }} {{ m.nom }}
+            </option>
+          </ng-container>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeReassignModal()" [disabled]="isSubmitting">Annuler</button>
+      <button class="btn-primary-purple" (click)="confirmReassign()" [disabled]="!newDoctorId || isSubmitting">
+        <span *ngIf="isSubmitting"><i class="fa-solid fa-spinner fa-spin me-2"></i></span>
+        Confirmer
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- ============ DETAIL MODAL ============ -->

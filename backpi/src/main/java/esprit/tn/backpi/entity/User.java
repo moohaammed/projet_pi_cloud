@@ -46,6 +46,10 @@ public class User {
 
     @Column(name = "lien_avec_patient")
     private String lienAvecPatient;
+
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNom() { return nom; }
@@ -77,6 +81,10 @@ public class User {
     public void setTelephone(String telephone) { this.telephone = telephone; }
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
+
+
+    public String getFcmToken() { return fcmToken; }
+    public void setFcmToken(String fcmToken) { this.fcmToken = fcmToken; }
 
     @Override
     public boolean equals(Object o) {

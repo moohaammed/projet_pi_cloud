@@ -222,172 +222,316 @@ import { CalendarEvent } from '../../../models/education/event.model';
     }
     .stat-divider { width: 1px; height: 28px; background: var(--border); }
 
+    /* ─── EVENTS GRID ─── */
     .events-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
+      gap: 26px;
     }
 
+    /* ─── CARD BASE ─── */
     .event-card {
       background: var(--card-bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: var(--shadow-card);
-      transition: transform .28s cubic-bezier(.34,1.56,.64,1), box-shadow .28s ease;
+      box-shadow: 0 4px 24px rgba(128,0,128,0.09);
+      transition: transform .32s cubic-bezier(.34,1.4,.64,1), box-shadow .32s ease;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
+    .event-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(128,0,128,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+    .event-card:hover::before { opacity: 1; }
     .event-card:hover {
-      box-shadow: 0 12px 36px rgba(128, 0, 128, 0.15);
-      transform: translateY(-4px);
+      box-shadow: 0 20px 48px rgba(128,0,128,0.18);
+      transform: translateY(-6px);
     }
-    .event-card:hover .card-image { transform: scale(1.06); }
+    .event-card:hover .card-image { transform: scale(1.07); }
 
+    /* ─── IMAGE AREA ─── */
     .card-image-wrapper {
       position: relative;
-      height: 195px;
+      height: 220px;
       overflow: hidden;
-      background: var(--primary-mid);
+      background: linear-gradient(135deg, var(--primary-mid) 0%, var(--primary-light) 100%);
     }
     .card-image {
       width: 100%; height: 100%;
       object-fit: cover;
-      transition: transform .45s ease;
+      transition: transform .5s cubic-bezier(.25,.46,.45,.94);
     }
     .card-image-wrapper::after {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(46,21,46,.3) 0%, transparent 55%);
+      background: linear-gradient(to top, rgba(46,21,46,.55) 0%, rgba(46,21,46,.1) 45%, transparent 70%);
       pointer-events: none;
     }
 
-    .card-badge {
+    /* Fallback when no image */
+    .img-fallback {
       position: absolute;
-      top: 12px; left: 12px;
-      z-index: 1;
-      padding: 4px 12px;
-      border-radius: 50px;
-      font-size: .65rem;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-    .card-badge.upcoming { background: var(--primary); color: var(--white); }
-    .card-badge.past     { background: rgba(0,0,0,.42); color: var(--white); }
-
-    .card-body {
-      padding: 18px 20px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 11px;
-      flex: 1;
-    }
-
-    .card-date-row { display: flex; gap: 6px; flex-wrap: wrap; }
-
-    .date-pill, .time-pill {
+      inset: 0;
       display: flex;
       align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-mid) 100%);
+    }
+    .img-fallback svg {
+      width: 80px; height: 80px;
+      opacity: 0.8;
+    }
+
+    /* ─── STATUS BADGE (glassmorphism) ─── */
+    .card-badge {
+      position: absolute;
+      top: 14px; left: 14px;
+      z-index: 2;
+      padding: 5px 14px;
+      border-radius: 50px;
+      font-size: .62rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .card-badge.upcoming {
+      background: rgba(128,0,128,0.82);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.28);
+      box-shadow: 0 4px 14px rgba(128,0,128,0.35);
+    }
+    .card-badge.past {
+      background: rgba(20,0,20,0.55);
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    .card-badge.past .badge-dot { animation: none; opacity: 0.6; }
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; transform: scale(1); }
+      50% { opacity:.5; transform: scale(0.7); }
+    }
+
+    /* ─── FLOATING DATE CHIP ─── */
+    .card-date-chip {
+      position: absolute;
+      bottom: 14px; right: 14px;
+      z-index: 2;
+      background: rgba(255,255,255,0.95);
+      border-radius: 12px;
+      padding: 6px 12px;
+      text-align: center;
+      border: 1px solid rgba(128,0,128,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+      min-width: 48px;
+      backdrop-filter: blur(8px);
+    }
+    .chip-day {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .chip-month {
+      font-size: 0.58rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      color: var(--text-mid);
+      margin-top: 2px;
+    }
+
+    /* ─── CARD BODY ─── */
+    .card-body {
+      padding: 20px 22px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── META ROW (time + location) ─── */
+    .card-meta-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
       gap: 5px;
-      font-size: .68rem;
-      font-weight: 600;
+      font-size: 0.7rem;
+      font-weight: 700;
       background: var(--primary-light);
       color: var(--primary-dark);
       border-radius: 50px;
-      padding: 4px 10px;
+      padding: 4px 11px;
+      letter-spacing: 0.02em;
     }
-    .date-pill svg, .time-pill svg { width: 11px; height: 11px; }
+    .meta-chip svg { width: 11px; height: 11px; flex-shrink: 0; }
+    .location-chip { background: #f3f0ff; color: #5b21b6; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+    /* ─── COUNTDOWN ─── */
+    .countdown-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+      color: #9d174d;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      border: 1px solid #fbcfe8;
+    }
+    .countdown-pill svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ─── TITLE ─── */
     .card-title {
       font-family: 'Fraunces', serif;
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.15rem;
+      font-weight: 800;
       color: var(--text-dark);
       margin: 0;
-      line-height: 1.35;
+      line-height: 1.3;
       word-break: break-word;
-      letter-spacing: -.01em;
+      letter-spacing: -.02em;
     }
 
+    /* ─── DESCRIPTION ─── */
     .card-description {
-      font-size: .81rem;
+      font-size: .8rem;
       color: var(--text-mid);
       margin: 0;
-      line-height: 1.6;
+      line-height: 1.65;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
+    /* ─── CAPACITY ─── */
+    .capacity-section { display: flex; flex-direction: column; gap: 6px; }
+    .capacity-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .capacity-count {
+      font-family: 'Fraunces', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .capacity-bar {
+      width: 100%;
+      height: 5px;
+      background: var(--primary-light);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .capacity-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 0%, #c026d3 100%);
+      border-radius: 10px;
+      transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    }
+    .capacity-fill.full { background: linear-gradient(90deg, #dc2626, #b91c1c); }
+
+    /* ─── SEPARATOR ─── */
     .card-separator { height: 1px; background: var(--border); margin-top: auto; }
 
-    .card-footer {
+    /* ─── ACTIONS ROW ─── */
+    .card-actions-bottom {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 10px;
     }
-
-    .card-location {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: .79rem;
-      color: var(--text-mid);
-      font-weight: 500;
-      min-width: 0;
-    }
-    .card-location svg { width: 13px; height: 13px; flex-shrink: 0; color: var(--primary); }
-    .card-location span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .card-remind {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 5px;
-      font-size: .7rem;
+      font-size: .68rem;
       font-weight: 700;
       color: var(--primary-dark);
       background: var(--primary-light);
-      padding: 3px 10px;
+      padding: 5px 12px;
       border-radius: 50px;
       white-space: nowrap;
+      flex-shrink: 0;
     }
     .card-remind svg { width: 11px; height: 11px; }
 
-    .card-actions {
-      display: flex;
-      margin-top: 10px;
-    }
-
+    /* ─── PARTICIPATE BUTTON ─── */
     .btn-participate {
-      width: 100%;
-      background: var(--primary);
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary) 0%, #a21caf 100%);
       color: white;
       border: none;
       border-radius: 12px;
-      padding: 12px;
-      font-weight: 700;
-      font-size: 0.9rem;
+      padding: 11px 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 4px 12px rgba(128, 0, 128, 0.2);
+      box-shadow: 0 4px 14px rgba(128,0,128,0.28);
+      position: relative;
+      overflow: hidden;
     }
-
-    .btn-participate:hover {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(128, 0, 128, 0.3);
+    .btn-participate::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity .2s ease;
     }
-
-    .btn-participate:active {
-      transform: translateY(0);
+    .btn-participate:hover:not(:disabled)::before { opacity: 1; }
+    .btn-participate:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 8px 22px rgba(128,0,128,0.38);
+    }
+    .btn-participate:active:not(:disabled) { transform: translateY(0) scale(0.99); }
+    .btn-participate:disabled {
+      background: #e2e2e2;
+      color: #9ca3af;
+      cursor: not-allowed;
+      box-shadow: none;
     }
 
     .pagination {
@@ -536,8 +680,20 @@ export class EventFrontComponent implements OnInit {
   onSearchChange() { this.currentPage = 1; }
 
   getImageUrl(imageUrl?: string): string {
-    if (!imageUrl) return 'assets/images/event-placeholder.jpg';
+    if (!imageUrl) return '';
+    if (imageUrl.startsWith('http')) return imageUrl;
     return 'http://localhost:8080' + imageUrl;
+  }
+
+  getDay(dateStr?: string): string {
+    if (!dateStr) return '--';
+    return new Date(dateStr).getDate().toString().padStart(2, '0');
+  }
+
+  getMonth(dateStr?: string): string {
+    if (!dateStr) return '';
+    const months = ['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
+    return months[new Date(dateStr).getMonth()];
   }
 
   formatDate(dateStr?: string): string {
@@ -593,5 +749,23 @@ export class EventFrontComponent implements OnInit {
     this.load(); // Rafraîchir pour voir les places dispo (si affichées un jour sur la card)
   }
 
-  onImgError(event: any) { event.target.src = 'assets/images/event-placeholder.jpg'; }
+  onImgError(evt: any) {
+    // Inline SVG fallback — no missing file dependency
+    evt.target.style.display = 'none';
+    const wrapper = evt.target.closest('.card-image-wrapper');
+    if (wrapper && !wrapper.querySelector('.img-fallback')) {
+      const fallback = document.createElement('div');
+      fallback.className = 'img-fallback';
+      fallback.innerHTML = `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="80" height="80" rx="16" fill="#f5e6f5"/>
+        <rect x="20" y="16" width="40" height="40" rx="4" stroke="#800080" stroke-width="2.5" fill="none"/>
+        <line x1="30" y1="12" x2="30" y2="23" stroke="#800080" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="50" y1="12" x2="50" y2="23" stroke="#800080" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="20" y1="32" x2="60" y2="32" stroke="#800080" stroke-width="2" opacity="0.4"/>
+        <circle cx="40" cy="52" r="8" fill="#800080" opacity="0.15"/>
+        <text x="40" y="57" text-anchor="middle" fill="#800080" font-size="10" font-weight="700">EVENT</text>
+      </svg>`;
+      wrapper.appendChild(fallback);
+    }
+  }
 }

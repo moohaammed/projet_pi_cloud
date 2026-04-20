@@ -1,3 +1,5 @@
+
+
 <ng-container *ngIf="isAuthPage(); else mainLayout">
   <router-outlet></router-outlet>
 </ng-container>
@@ -41,6 +43,11 @@
                 routerLinkActive="active-purple fw-semibold shadow-sm"
                 [routerLinkActiveOptions]="{exact:true}" style="cursor: pointer;"
                 [title]="isSidebarCollapsed ? 'Overview' : ''">
+                <div class="d-flex flex-column align-items-center w-100">
+                  <i class="fa-solid fa-gauge-high fs-5" [class.me-3]="!isSidebarCollapsed && !accService.simplifiedMode()"
+                    [class.mx-auto]="isSidebarCollapsed || accService.simplifiedMode()"></i>
+                  <span *ngIf="!isSidebarCollapsed || accService.simplifiedMode()" class="fs-15" [class.mt-1]="accService.simplifiedMode()">Dashboard</span>
+                </div>
                 <i class="fa-solid fa-gauge-high fs-5"
                   [class.me-3]="!isSidebarCollapsed"
                   [class.mx-auto]="isSidebarCollapsed"></i>
@@ -81,18 +88,32 @@
             </li>
 
             <li class="nav-item w-100">
-              <!-- Education -->
+              <!-- Activities -->
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                 routerLink="/admin/education"
+                 routerLink="/admin/activities"
                  routerLinkActive="active-purple fw-semibold shadow-sm"
                  style="cursor: pointer;"
-                 [title]="isSidebarCollapsed ? 'Éducation' : ''">
-                <i class="fa-solid fa-graduation-cap fs-5"
+                 [title]="isSidebarCollapsed ? 'Activités' : ''">
+                <i class="fa-solid fa-gamepad fs-5"
                    [class.me-3]="!isSidebarCollapsed"
                    [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Éducation</span>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Activités</span>
               </a>
 
+              <!-- Events -->
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/admin/events"
+                 routerLinkActive="active-purple fw-semibold shadow-sm"
+                 style="cursor: pointer;"
+                 [title]="isSidebarCollapsed ? 'Événements' : ''">
+                <i class="fa-regular fa-calendar-days fs-5"
+                   [class.me-3]="!isSidebarCollapsed"
+                   [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Événements</span>
+              </a>
+            </li>
+
+            <li class="nav-item w-100">
               <!-- Donations -->
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                  routerLink="/admin/donations"
@@ -105,7 +126,6 @@
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Donations</span>
               </a>
             </li>
-
             <li class="nav-item w-100 mt-2">
               <span class="text-uppercase text-muted extra-small fw-bold px-2 mb-2 d-block"
                 *ngIf="!isSidebarCollapsed"
@@ -121,6 +141,19 @@
                   [class.me-3]="!isSidebarCollapsed"
                   [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">User Access</span>
+              </a>
+            </li>
+
+            <li class="nav-item w-100">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/heart-rate"
+                routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;"
+                [title]="isSidebarCollapsed ? 'Heart Rate' : ''">
+                <i class="fa-solid fa-heart-pulse fs-5"
+                  [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Heart Rate</span>
               </a>
             </li>
 
@@ -260,8 +293,22 @@
           </div>
 
           <div class="d-flex align-items-center gap-4 ms-3 h-100">
+            <!-- ── BOUTON GUIDE VOCAL (Admin) ── -->
+            <div class="voice-nav-btn-admin"
+                 *ngIf="auth.getRole() === 'PATIENT'"
+                 [class.active]="alzAccessibility.voiceEnabled()"
+                 (click)="alzAccessibility.toggleVoice()"
+                 [title]="alzAccessibility.voiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'"
+                 style="cursor:pointer">
+              <i class="fa-solid fs-5" [class.fa-volume-high]="alzAccessibility.voiceEnabled()" [class.fa-volume-xmark]="!alzAccessibility.voiceEnabled()"></i>
+            </div>
             <div class="position-relative cursor-pointer text-muted hover-primary">
               <i class="fa-regular fa-bell fs-5"></i>
+              <span *ngIf="notificationPermissionDenied()"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="font-size: 8px; padding: 3px 5px;">1</span>
+              <span *ngIf="!notificationPermissionDenied()"
+                class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
               <span class="position-absolute top-0 start-100 translate-middle p-1
                            bg-danger border border-light rounded-circle"></span>
             </div>
@@ -287,8 +334,17 @@
           </div>
         </header>
 
-        <main class="flex-grow-1 p-4 p-lg-5 overflow-auto bg-gradient-primary">
+        <main class="flex-grow-1 p-4 p-lg-5 overflow-auto bg-grey">
           <div class="container-fluid p-0">
+            <!-- Simplified Mode Instructions -->
+            <div *ngIf="accService.simplifiedMode()" class="mb-4">
+              <div class="simplified-breadcrumb mb-2">
+                Vous êtes ici : {{ getBreadcrumbs() }}
+              </div>
+              <div class="alert alert-info border-0 shadow-sm rounded-4">
+                <strong>Instruction :</strong> {{ getInstructionPhrase() }}
+              </div>
+            </div>
             <router-outlet></router-outlet>
           </div>
         </main>
@@ -356,6 +412,8 @@
                       routerLinkActive="active">Community</a></li>
                   <li class="nav-item"><a class="nav-link" routerLink="/donations"
                       routerLinkActive="active">Donations</a></li>
+                  <li class="nav-item"><a class="nav-link" routerLink="/heart-rate"
+                      routerLinkActive="active"><i class="fa-solid fa-heart-pulse me-1"></i>Heart Rate</a></li>
                   <li class="nav-item ms-lg-3 d-flex gap-2" *ngIf="auth.isLoggedIn()">
                     <a routerLink="/my-donations" class="btn btn-outline-primary btn-sm rounded-pill px-3">Mes Dons</a>
                     <a [routerLink]="getAccountLink()" class="btn btn-primary btn-sm rounded-pill px-4">Compte</a>
@@ -429,11 +487,17 @@
                       <span>SOS</span>
                     </a>
                   </li>
-
-                  <li class="nav-item ms-lg-3" *ngIf="auth.isLoggedIn()">
-                    <a [routerLink]="getAccountLink()"
-                      class="btn btn-primary btn-sm rounded-pill px-4">Compte</a>
+                  <!-- ── BOUTON GUIDE VOCAL ── -->
+                  <li class="nav-item" *ngIf="auth.isLoggedIn() && auth.getRole() === 'PATIENT'">
+                    <button class="voice-nav-btn"
+                            [class.active]="alzAccessibility.voiceEnabled()"
+                            (click)="alzAccessibility.toggleVoice()"
+                            [title]="alzAccessibility.voiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'">
+                      <i class="fa-solid" [class.fa-volume-high]="alzAccessibility.voiceEnabled()" [class.fa-volume-xmark]="!alzAccessibility.voiceEnabled()"></i>
+                    </button>
                   </li>
+
+
 
                 </ul>
               </div>
@@ -444,6 +508,14 @@
     </header>
 
     <main style="min-height: 70vh;">
+      <div class="container py-4" *ngIf="accService.simplifiedMode()">
+        <div class="simplified-breadcrumb mb-2">
+          Vous êtes ici : {{ getBreadcrumbs() }}
+        </div>
+        <div class="alert alert-info border-0 shadow-sm rounded-4">
+          <strong>Instruction :</strong> {{ getInstructionPhrase() }}
+        </div>
+      </div>
       <router-outlet></router-outlet>
     </main>
 

@@ -1,0 +1,142 @@
+<div class="heart-rate-dashboard">
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="dashboard-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <i class="fa-solid fa-heart-pulse"></i>
+      </div>
+      <div>
+        <h1 class="dashboard-title">Heart Rate Monitor</h1>
+        <p class="dashboard-subtitle">Real-time smartwatch BPM tracking</p>
+      </div>
+    </div>
+    <div class="connection-badge" [class.connected]="status === 'connected'" [class.disconnected]="status === 'disconnected'">
+      <span class="status-dot"></span>
+      {{ status === 'connected' ? 'Device Connected' : 'Disconnected' }}
+    </div>
+  </div>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="dashboard-grid">
+
+    <!-- ── BPM Card ── -->
+    <div class="card bpm-card" [class]="getBpmClass()">
+      <div class="card-glow"></div>
+      <div class="bpm-display">
+        <div class="bpm-value-container">
+          <span class="bpm-value" *ngIf="currentBpm; else noBpm">{{ currentBpm }}</span>
+          <ng-template #noBpm><span class="bpm-value bpm-na">--</span></ng-template>
+          <span class="bpm-unit">BPM</span>
+        </div>
+        <div class="bpm-heartbeat" *ngIf="status === 'connected'">
+          <i class="fa-solid fa-heart"></i>
+        </div>
+      </div>
+      <div class="bpm-zone">{{ getBpmZone() }}</div>
+      <div class="bpm-meta">
+        <span><i class="fa-solid fa-watch me-1"></i>{{ deviceName }}</span>
+        <span><i class="fa-regular fa-clock me-1"></i>{{ formatTimestamp(lastRecordedAt) }}</span>
+      </div>
+    </div>
+
+    <!-- ── ECG Canvas Card ── -->
+    <div class="card ecg-card">
+      <div class="card-header-mini">
+        <span><i class="fa-solid fa-wave-square me-1"></i>Live ECG Waveform</span>
+        <span class="ecg-live-badge" *ngIf="status === 'connected'">
+          <span class="live-dot"></span> LIVE
+        </span>
+      </div>
+      <div class="ecg-canvas-container">
+        <canvas #ecgCanvas width="900" height="250" class="ecg-canvas"></canvas>
+        <div class="ecg-overlay-disconnected" *ngIf="status === 'disconnected'">
+          <i class="fa-solid fa-link-slash"></i>
+          <span>Waiting for device signal…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Stats Row ── -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon avg"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Average</span>
+          <span class="stat-value">{{ getAverageBpm() || '--' }} <small>BPM</small></span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon min"><i class="fa-solid fa-arrow-down"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Min</span>
+          <span class="stat-value">{{ getMinBpm() || '--' }} <small>BPM</small></span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon max"><i class="fa-solid fa-arrow-up"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Max</span>
+          <span class="stat-value">{{ getMaxBpm() || '--' }} <small>BPM</small></span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon readings"><i class="fa-solid fa-database"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Readings</span>
+          <span class="stat-value">{{ bpmHistory.length }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── History Table ── -->
+    <div class="card history-card">
+      <div class="card-header-mini">
+        <span><i class="fa-solid fa-clock-rotate-left me-1"></i>Recent History</span>
+        <span class="history-count">{{ history.length }} records</span>
+      </div>
+      <div class="table-container" *ngIf="history.length > 0; else noHistory">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>BPM</th>
+              <th>Device</th>
+              <th>Zone</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of history; let i = index" [class.latest]="i === 0">
+              <td>{{ formatTimestamp(record.recordedAt) }}</td>
+              <td>
+                <span class="bpm-badge"
+                  [class.low]="record.bpm < 60"
+                  [class.normal]="record.bpm >= 60 && record.bpm <= 100"
+                  [class.high]="record.bpm > 100">
+                  {{ record.bpm }}
+                </span>
+              </td>
+              <td>{{ record.deviceName || '—' }}</td>
+              <td>
+                <span class="zone-tag"
+                  [class.low]="record.bpm < 60"
+                  [class.normal]="record.bpm >= 60 && record.bpm <= 100"
+                  [class.high]="record.bpm > 100">
+                  {{ record.bpm < 60 ? 'Brady' : record.bpm > 100 ? 'Tachy' : 'Normal' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noHistory>
+        <div class="empty-state">
+          <i class="fa-solid fa-heart-crack"></i>
+          <p>No heart-rate data recorded yet.</p>
+          <small>Connect your smartwatch to start monitoring.</small>
+        </div>
+      </ng-template>
+    </div>
+
+  </div>
+</div>

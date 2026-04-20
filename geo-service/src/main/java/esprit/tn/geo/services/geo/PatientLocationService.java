@@ -17,7 +17,9 @@ import java.util.Optional;
 public class PatientLocationService {
 
     @Autowired private PatientLocationRepository locationRepository;
+
     @Autowired private SafeZoneRepository safeZoneRepository;
+
     @Autowired private GeoAlertRepository alertRepository;
 
     /**
@@ -76,7 +78,6 @@ public class PatientLocationService {
             }
         }
     }
-
     // Calcul distance en mètres (formule Haversine)
     public double calculateDistance(double lat1, double lng1,
                                     double lat2, double lng2) {
