@@ -16,6 +16,9 @@ public class KafkaConfig {
     @Value("${heartrate.topic.raw}")
     private String rawTopic;
 
+    @Value("${heartrate.topic.alerts}")
+    private String alertsTopic;
+
     /**
      * Primary topic for raw heart-rate events.
      * All internal consumers subscribe to this topic.
@@ -28,5 +31,16 @@ public class KafkaConfig {
                 .build();
     }
 
-    // Future: heartrate.alerts topic can be added here
+    /**
+     * Topic for structured heart-rate alert events.
+     * Published by HeartRateAlertProducer when danger conditions are detected.
+     * Consumed by backpi's HeartRateHelpNotificationConsumer.
+     */
+    @Bean
+    public NewTopic heartRateAlertsTopic() {
+        return TopicBuilder.name(alertsTopic)
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 }
