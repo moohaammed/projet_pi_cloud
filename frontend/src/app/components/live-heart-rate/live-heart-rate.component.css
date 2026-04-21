@@ -191,6 +191,15 @@
   background-clip: text;
 }
 
+.disconnected-text {
+  display: inline-block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ff4d4f;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .bpm-low .bpm-value {
   background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%);
   -webkit-background-clip: text;

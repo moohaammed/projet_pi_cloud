@@ -157,7 +157,7 @@ async def main():
     print(f"Backend  = {BACKEND_URL}")
 
     await run_normal_phase()
-    await run_selected_scenario()
+    # await run_selected_scenario()
 
     print("\nSimulation finished.")
 
