@@ -4,14 +4,9 @@ export enum SeatStatus {
 }
 
 export interface EventSeat {
-  id: number;
+  id: string;
   seatNumber: string;
   status: SeatStatus;
   bookedAt?: string;
-  // Note: On évite de passer tout l'objet User pour des raisons de légèreté
-  bookedBy?: {
-    id: number;
-    nom: string;
-    prenom: string;
-  };
+  bookedByUserId?: number;
 }

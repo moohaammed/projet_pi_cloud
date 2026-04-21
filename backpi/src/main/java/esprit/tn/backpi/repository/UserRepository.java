@@ -18,6 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByActif(boolean actif);
 
+
     @Query("SELECT u FROM User u WHERE LOWER(u.nom) = LOWER(:fullName) OR LOWER(u.prenom) = LOWER(:fullName) OR LOWER(CONCAT(u.nom, ' ', u.prenom)) = LOWER(:fullName)")
     Optional<User> findByFullName(@Param("fullName") String fullName);
 }

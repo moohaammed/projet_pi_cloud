@@ -57,3 +57,234 @@ body {
   border-color: var(--doc-primary) !important;
 }
 
+
+/* ── Global Dark Mode ─────────────────────────────────────────────────────── */
+body.dark {
+  --doc-bg: #0f1117;
+  --doc-heading: #e2e8f0;
+  --doc-secondary: #94a3b8;
+
+  background-color: #0f1117 !important;
+  color: #e2e8f0;
+}
+
+body.dark .card,
+body.dark .bg-white {
+  background-color: #1a1d27 !important;
+  border-color: rgba(255,255,255,0.07) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark .bg-light,
+body.dark .bg-grey {
+  background-color: #22263a !important;
+}
+
+body.dark .bg-soft-primary { background-color: rgba(128,0,128,0.18) !important; }
+body.dark .bg-soft-success { background-color: rgba(16,185,129,0.12) !important; }
+body.dark .bg-soft-danger  { background-color: rgba(239,68,68,0.12) !important; }
+body.dark .bg-soft-warning { background-color: rgba(245,158,11,0.12) !important; }
+body.dark .bg-soft-info    { background-color: rgba(59,130,246,0.12) !important; }
+body.dark .bg-soft-secondary { background-color: rgba(148,163,184,0.1) !important; }
+
+body.dark h1, body.dark h2, body.dark h3,
+body.dark h4, body.dark h5, body.dark h6,
+body.dark .text-dark, body.dark .text-doc-heading,
+body.dark .fw-black, body.dark .fw-bold {
+  color: #e2e8f0 !important;
+}
+
+body.dark .text-muted,
+body.dark .text-doc-secondary,
+body.dark .opacity-75 {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+body.dark .border-bottom,
+body.dark .border-top,
+body.dark .border,
+body.dark .border-start {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+body.dark .table {
+  color: #e2e8f0;
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: rgba(255,255,255,0.04);
+  --bs-table-border-color: rgba(255,255,255,0.07);
+}
+
+body.dark thead.bg-soft-primary,
+body.dark thead.bg-light {
+  background-color: rgba(128,0,128,0.18) !important;
+}
+
+body.dark .form-control,
+body.dark .form-select,
+body.dark input:not([type=checkbox]):not([type=radio]),
+body.dark textarea,
+body.dark select {
+  background-color: #22263a !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark .form-control::placeholder,
+body.dark input::placeholder { color: #64748b; }
+
+body.dark .input-group-text {
+  background-color: #22263a !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #94a3b8 !important;
+}
+
+body.dark .btn-light {
+  background-color: #22263a !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark .btn-white {
+  background-color: #1a1d27 !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark .dropdown-menu {
+  background-color: #1a1d27 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+body.dark .dropdown-item {
+  color: #e2e8f0 !important;
+}
+
+body.dark .dropdown-item:hover,
+body.dark .dropdown-item:focus {
+  background-color: #22263a !important;
+}
+
+body.dark .modal-content {
+  background-color: #1a1d27 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark .modal-header,
+body.dark .modal-footer {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+body.dark .list-group-item {
+  background-color: #1a1d27 !important;
+  border-color: rgba(255,255,255,0.07) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark .pagination .page-link {
+  background-color: #22263a !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: #94a3b8 !important;
+}
+
+body.dark .pagination .page-item.active .page-link {
+  background-color: #800080 !important;
+  color: #fff !important;
+}
+
+body.dark .shadow-doc { box-shadow: 2px 2px 20px 0 rgba(0,0,0,0.4) !important; }
+body.dark .shadow-sm  { box-shadow: 0 1px 4px rgba(0,0,0,0.3) !important; }
+/* --- ACCESSIBILITY: SIMPLIFIED MODE --- */
+body.simplified-mode {
+  font-size: 20px !important;
+}
+
+body.simplified-mode h1, 
+body.simplified-mode h2, 
+body.simplified-mode .h1, 
+body.simplified-mode .h2 {
+  font-size: 28px !important;
+}
+
+body.simplified-mode .btn,
+body.simplified-mode button {
+  font-size: 18px !important;
+  min-height: 56px !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  margin-bottom: 16px !important; /* Spacing between clickable elements */
+}
+
+/* Breadcrumbs text for simplified mode */
+.simplified-breadcrumb {
+  background: #f8f9fa;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Master/Primary Action Highlight in Simplified Mode */
+body.simplified-mode .primary-action-highlight {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 40px 0 !important;
+}
+
+body.simplified-mode .btn-primary-large {
+  background-color: #008080 !important;
+  color: white !important;
+  padding: 20px 40px !important;
+  font-size: 24px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 20px rgba(0, 128, 128, 0.2) !important;
+  border: none !important;
+  width: auto !important;
+  min-width: 300px !important;
+}
+
+/* --- ACCESSIBILITY: HIGH CONTRAST MODE --- */
+body.high-contrast {
+  background-color: #000 !important;
+  color: #FFD700 !important;
+}
+
+body.high-contrast .card,
+body.high-contrast .modal-content,
+body.high-contrast .navbar,
+body.high-contrast header,
+body.high-contrast aside,
+body.high-contrast footer,
+body.high-contrast main {
+  background-color: #000 !important;
+  color: #FFD700 !important;
+  border: 1px solid #FFD700 !important;
+}
+
+body.high-contrast .btn,
+body.high-contrast button,
+body.high-contrast .nav-link,
+body.high-contrast a {
+  background-color: #000 !important;
+  color: #FFD700 !important;
+  border: 2px solid #FFD700 !important;
+}
+
+body.high-contrast i,
+body.high-contrast .fa,
+body.high-contrast .fas,
+body.high-contrast .fa-solid {
+  color: #FFD700 !important;
+}
+
+body.high-contrast input,
+body.high-contrast textarea,
+body.high-contrast select {
+  background-color: #000 !important;
+  color: #FFD700 !important;
+  border: 1px solid #FFD700 !important;
+}
+

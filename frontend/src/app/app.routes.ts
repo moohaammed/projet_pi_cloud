@@ -16,13 +16,17 @@ import { PatientDashboardComponent } from './patient-dashboard/patient-dashboard
 import { MedecinDashboardComponent } from './medecin-dashboard/medecin-dashboard.component';
 import { HomeComponent } from './components/home/home.component';
 import { AlertDashboardComponent } from './components/medecin/alert-dashboard/alert-dashboard.component';
-
+import { RelationMapComponent } from './components/relation-map/relation-map.component';
 // Donation
 import { DonationListComponent } from './components/donation/donation-list/donation-list.component';
 import { DonationFormComponent } from './components/donation/donation-form/donation-form.component';
 import { DonationSuccessComponent } from './components/donation/donation-success/donation-success.component';
 import { DonationCancelComponent } from './components/donation/donation-cancel/donation-cancel.component';
 import { MyDonationsComponent } from './components/donation/my-donations/my-donations.component';
+import { ImageAnalyzerComponent } from './components/image-analyzer/image-analyzer.component';
+import { PatientIncidentsComponent } from './components/patient-incidents/patient-incidents.component';
+import { RelationPatientProfileComponent } from './components/relation-patient-profile/relation-patient-profile.component';
+import { PatientCreateComponent } from './components/patient/patient-create/patient-create.component';
 
 export const routes: Routes = [
 
@@ -83,6 +87,12 @@ export const routes: Routes = [
     data: { roles: ['ADMIN', 'DOCTOR'] }  // ← DOCTOR peut ajouter
   },
   {
+  path: 'mon-patient',
+  component: RelationPatientProfileComponent,
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['RELATION'] }
+},
+  {
     path: 'hospitals/edit/:id',
     loadComponent: () =>
       import('./components/hospital/hospital-form/hospital-form.component')
@@ -131,6 +141,8 @@ export const routes: Routes = [
   canActivate: [authGuard, roleGuard],
   data: { roles: ['ADMIN', 'DOCTOR'] }
 },
+{ path: 'patient-profiles/creer', component: PatientCreateComponent,
+  canActivate: [authGuard, roleGuard], data: { roles: ['DOCTOR', 'ADMIN'] } },
 {
   path: 'medecin/alertes',
   component: AlertDashboardComponent
@@ -151,8 +163,27 @@ export const routes: Routes = [
   canActivate: [authGuard, roleGuard],
   data: { roles: ['PATIENT'] }
 },
+{
+  path: 'analyzer',
+  component: ImageAnalyzerComponent,
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['DOCTOR', 'RELATION'] }
+},
+{
+  path: 'relation-map',
+  component: RelationMapComponent,
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['RELATION'] }
+},
+{
+  path: 'patient/incidents',
+  component: PatientIncidentsComponent,
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['PATIENT'] }
+},
 
-  // ===== COLLABORATION =====
+
+
 
   {
     path: 'collaboration',
@@ -209,7 +240,19 @@ export const routes: Routes = [
 
       },
 
-      // ✅ MERGE FIXÉ ICI
+      // ✅ EDUCATION MODULE REFACTOR
+      {
+        path: 'activities',
+        loadComponent: () =>
+          import('./components/education/activity/activity-list.component')
+            .then(m => m.ActivityListComponent)
+      },
+      {
+        path: 'events',
+        loadComponent: () =>
+          import('./components/education/event/event-list.component')
+            .then(m => m.EventListComponent)
+      },
       {
         path: 'education',
         loadComponent: () =>

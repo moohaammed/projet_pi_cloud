@@ -7,11 +7,18 @@ import { AlzUserService } from '../../../services/alz-user.service';
 import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.component';
 import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/collaboration/notification.service';
+import { GuidanceService } from '../../../services/collaboration/guidance.service';
+import { VoiceConversationService } from '../../../services/collaboration/voice-conversation.service';
+import { SpeakOnHoverDirective } from '../../../directives/speak-on-hover.directive';
+import { VoiceWelcomeComponent } from '../voice-welcome/voice-welcome.component';
+import { VoiceConversationComponent } from '../voice-conversation/voice-conversation.component';
+import { AdminCollaborationService } from '../../../services/collaboration/admin-collaboration.service';
+import { FloatingAssistantComponent } from '../floating-assistant/floating-assistant.component';
 
 @Component({
   selector: 'app-groups-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MiniChatWidgetComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MiniChatWidgetComponent, SpeakOnHoverDirective, VoiceWelcomeComponent, VoiceConversationComponent, FloatingAssistantComponent],
   templateUrl: './groups-list.component.html',
   styleUrls: ['./groups-list.component.scss']
 })
@@ -22,6 +29,9 @@ export class GroupsListComponent implements OnInit {
   router = inject(Router);
   platformId = inject(PLATFORM_ID);
   notificationService = inject(NotificationService);
+  guidanceService = inject(GuidanceService);
+  convService = inject(VoiceConversationService);
+  adminApi = inject(AdminCollaborationService);
 
   currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1);
   notifications = computed(() => this.notificationService.notifications());
@@ -30,37 +40,51 @@ export class GroupsListComponent implements OnInit {
   selectedCategory = signal<string>('ALL');
   sortBy = signal<string>('NAME_ASC');
   showOnlyMyGroups = signal<boolean>(false);
+  /** Extra keyword tags the user can toggle to narrow results */
+  activeTopics = signal<string[]>([]);
+
+  /** All unique topics derived from group names + descriptions */
+  availableTopics = computed(() => {
+    const words = new Set<string>();
+    this.chatGroupService.groups().forEach(g => {
+      [g.name, g.description].forEach(text => {
+        text?.toLowerCase().split(/\W+/).filter(w => w.length > 3).forEach(w => words.add(w));
+      });
+    });
+    return Array.from(words).slice(0, 20); // cap at 20 topic chips
+  });
 
   filteredGroups = computed(() => {
     let list = this.chatGroupService.groups();
-    const cat = this.selectedCategory();
-    const q = this.searchQuery().toLowerCase();
-    const sort = this.sortBy();
+    const cat    = this.selectedCategory();
+    const q      = this.searchQuery().toLowerCase();
+    const sort   = this.sortBy();
     const onlyMy = this.showOnlyMyGroups();
+    const topics = this.activeTopics();
 
-    // 0. Membership Filter (Optional toggle)
-    if (onlyMy) {
-      list = list.filter(g => this.isMember(g));
-    }
+    if (onlyMy)       list = list.filter(g => this.isMember(g));
+    if (cat !== 'ALL') list = list.filter(g => g.theme === cat);
 
-    // 1. Theme Filter
-    if (cat !== 'ALL') {
-      list = list.filter(g => g.theme === cat);
-    }
-    
-    // 2. Search Query
     if (q) {
-      list = list.filter(g => 
-        g.name.toLowerCase().includes(q) || 
-        g.description.toLowerCase().includes(q)
+      list = list.filter(g =>
+        g.name.toLowerCase().includes(q) ||
+        g.description?.toLowerCase().includes(q)
       );
     }
 
-    // 3. Sorting
+    if (topics.length > 0) {
+      list = list.filter(g =>
+        topics.every(t =>
+          g.name.toLowerCase().includes(t) ||
+          g.description?.toLowerCase().includes(t)
+        )
+      );
+    }
+
     list = [...list].sort((a, b) => {
-      if (sort === 'NAME_ASC') return a.name.localeCompare(b.name);
-      if (sort === 'NAME_DESC') return b.name.localeCompare(a.name);
-      if (sort === 'MEMBERS_DESC') return (b.members?.length || 0) - (a.members?.length || 0);
+      if (sort === 'NAME_ASC')      return a.name.localeCompare(b.name);
+      if (sort === 'NAME_DESC')     return b.name.localeCompare(a.name);
+      if (sort === 'MEMBERS_DESC')  return (b.members?.length || 0) - (a.members?.length || 0);
       return 0;
     });
 
@@ -90,6 +114,14 @@ export class GroupsListComponent implements OnInit {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.refreshData();
+      this.guidanceService.loadAndSpeak('groups');
+      const user = this.authService.getCurrentUser();
+      if (user?.id && user?.role) {
+        this.adminApi.autoJoinDefaultGroups(user.id, user.role).subscribe({
+          next: () => this.chatGroupService.fetchGroups(), // refresh after auto-join
+          error: () => {} // silent fail — not critical
+        });
+      }
     }
   }
 
@@ -112,12 +144,30 @@ export class GroupsListComponent implements OnInit {
   }
 
   requestJoin(groupId: string) {
-    this.chatGroupService.requestJoin(groupId, this.currentUserId()).subscribe({
-      next: () => {
-        alert('Join request sent successfully!');
-        this.refreshData();
-      },
-      error: (err) => alert(err.error?.message || err.message || 'Failed to send request')
+    const grp = this.chatGroupService.groups().find(g => g.id === groupId);
+    const name = grp?.name || 'this group';
+    this.convService.ask({
+      question: `Would you like to send a request to join ${name}?`,
+      actions: [
+        {
+          label: 'Yes, join',
+          keyword: ['yes', 'sure', 'okay', 'join', 'send'],
+          callback: () => {
+            this.chatGroupService.requestJoin(groupId, this.currentUserId()).subscribe({
+              next: () => {
+                this.guidanceService.speakImmediate(`Your request to join ${name} has been sent.`);
+                this.refreshData();
+              },
+              error: () => this.guidanceService.speakImmediate('Sorry, the request could not be sent.')
+            });
+          }
+        },
+        {
+          label: 'No, cancel',
+          keyword: ['no', 'cancel', 'skip'],
+          callback: () => this.guidanceService.speakImmediate('Okay, no request sent.')
+        }
+      ]
     });
   }
 
@@ -174,6 +224,18 @@ export class GroupsListComponent implements OnInit {
       case 'EMERGENCY': return '#ef4444';
       default: return '#6b7280';
     }
+  }
+
+  toggleTopic(topic: string) {
+    this.activeTopics.update(topics =>
+      topics.includes(topic) ? topics.filter(t => t !== topic) : [...topics, topic]
+    );
+  }
+
+  clearSearch() {
+    this.searchQuery.set('');
+    this.activeTopics.set([]);
+    this.selectedCategory.set('ALL');
   }
 
   toggleUserSelection(id: number, event: Event) {

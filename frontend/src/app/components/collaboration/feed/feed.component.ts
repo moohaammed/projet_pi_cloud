@@ -10,14 +10,21 @@ import { WebSocketService } from '../../../services/collaboration/websocket.serv
 import { MessageService } from '../../../services/collaboration/message.service';
 import { ChatGroupService, ChatGroupDto } from '../../../services/collaboration/chat-group.service';
 import { WebRtcService } from '../../../services/collaboration/webrtc.service';
-
+import { GuidanceService } from '../../../services/collaboration/guidance.service';
+import { VoiceWelcomeComponent } from '../voice-welcome/voice-welcome.component';
+import { SpeakOnHoverDirective } from '../../../directives/speak-on-hover.directive';
+import { VoiceConversationComponent } from '../voice-conversation/voice-conversation.component';
+import { VoiceConversationService } from '../../../services/collaboration/voice-conversation.service';
+import { SpeechToTextService } from '../../../services/collaboration/speech-to-text.service';
 import { AuthService } from '../../../services/auth.service';
 import { MiniChatWidgetComponent } from '../mini-chat-widget/mini-chat-widget.component';
+import { FloatingAssistantComponent } from '../floating-assistant/floating-assistant.component';
+import { GlobalSearchService, SearchResponseDto } from '../../../services/collaboration/global-search.service';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MiniChatWidgetComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MiniChatWidgetComponent, VoiceWelcomeComponent, SpeakOnHoverDirective, VoiceConversationComponent, FloatingAssistantComponent],
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.scss']
 })
@@ -31,6 +38,10 @@ export class FeedComponent implements OnInit {
   webRtcService = inject(WebRtcService);
   messageService = inject(MessageService);
   chatGroupService = inject(ChatGroupService);
+  guidanceService = inject(GuidanceService);
+  convService = inject(VoiceConversationService);
+  sttService = inject(SpeechToTextService);
+  globalSearchService = inject(GlobalSearchService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   platformId = inject(PLATFORM_ID);
@@ -43,6 +54,63 @@ export class FeedComponent implements OnInit {
   publications = computed(() => this.publicationService.publications());
   notifications = computed(() => this.notificationService.notifications());
   unreadCount = computed(() => this.notificationService.unreadCount());
+
+  globalSearchQuery = signal<string>('');
+  globalSearchTags = signal<string>('');
+  globalSearchResults = signal<SearchResponseDto[]>([]);
+  isGlobalSearchLoading = signal<boolean>(false);
+  showGlobalSearchDropdown = signal<boolean>(false);
+
+  executeGlobalSearch() {
+    const q = this.globalSearchQuery().trim();
+    const t = this.globalSearchTags().trim();
+    if (!q && !t) {
+      this.globalSearchResults.set([]);
+      this.showGlobalSearchDropdown.set(false);
+      return;
+    }
+
+    this.isGlobalSearchLoading.set(true);
+    this.showGlobalSearchDropdown.set(true);
+    
+    const tagsArr = t ? t.split(',').map(tag => tag.trim()).filter(tag => tag !== '') : [];
+
+    this.globalSearchService.search(q, tagsArr).subscribe({
+      next: (res) => {
+        this.globalSearchResults.set(res);
+        this.isGlobalSearchLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Global search error:', err);
+        this.isGlobalSearchLoading.set(false);
+      }
+    });
+  }
+
+  feedSearchType = signal<string>('ALL');
+
+  filteredPublications = computed(() => {
+    const type = this.feedSearchType();
+    const currentGroupId = this.groupId();
+    let list = this.publicationService.publications();
+
+    if (currentGroupId) {
+      list = list.filter(p => p.groupId === currentGroupId);
+    }
+
+    if (type !== 'ALL') {
+      list = list.filter(p => p.type === type);
+    }
+    
+    return list;
+  });
+
+  countByType(type: string): number {
+    const currentGroupId = this.groupId();
+    let list = this.publicationService.publications();
+    if (currentGroupId) list = list.filter(p => p.groupId === currentGroupId);
+    return list.filter(p => p.type === type).length;
+  }
   
   isLiveNow = signal<boolean>(false);
   
@@ -50,25 +118,33 @@ export class FeedComponent implements OnInit {
     return this.userService.users().filter(u => u.isLive && u.id !== this.currentUserId());
   });
 
+  liveComments = signal<{authorName: string; content: string; sentAt: string}[]>([]);
+  liveCommentInput = '';
+  private liveSubscribedTo = new Set<number>();
+
+  sendLiveComment(broadcasterId: number) {
+    if (!this.liveCommentInput.trim()) return;
+    this.messageService.sendLiveComment(this.currentUserId(), broadcasterId, this.liveCommentInput.trim())
+      .subscribe({ error: (e) => console.error('Live comment error', e) });
+    this.liveCommentInput = '';
+  }
+
   @ViewChild('liveVideo') liveVideo?: ElementRef<HTMLVideoElement>;
   userMediaStream: MediaStream | null = null;
   
   getUserName(userId: number): string {
-    // 1. Try to find in the fetched users list
     const user = this.userService.users().find(u => u.id === userId);
     if (user) {
       const fullName = [user.prenom, user.nom].filter(Boolean).join(' ');
       return fullName || 'User ' + userId;
     }
 
-    // 2. Fallback: If it's the current user, use AuthService data
     const current = this.currentUser();
     if (current && current.id === userId) {
       const fullName = [current.prenom, current.nom].filter(Boolean).join(' ');
       return fullName || 'User ' + userId;
     }
 
-    // 3. Last resort fallback
     return 'User ' + userId;
   }
  
@@ -79,14 +155,12 @@ export class FeedComponent implements OnInit {
   }
 
   getUserImage(userId: number): string | null {
-    // 1. Try to find in the fetched users list
     const user = this.userService.users().find(u => u.id === userId);
     let imageUrl = null;
     if (user && user.image) {
       imageUrl = user.image;
     }
 
-    // 2. Fallback: If it's the current user, use AuthService data
     if (!imageUrl) {
       const current = this.currentUser();
       if (current && current.id === userId && current.image) {
@@ -105,7 +179,7 @@ export class FeedComponent implements OnInit {
   newPubAnonymous = false;
   newPollQuestion = '';
   newPollOptions: { text: string }[] = [{ text: '' }, { text: '' }];
-  selectedFile: File | null = null;
+  selectedFiles: File[] = [];
   newCommentContent: { [key: string]: string } = {};
 
   editingItemId: string | null = null;
@@ -113,13 +187,23 @@ export class FeedComponent implements OnInit {
   editingContent: string = '';
   editingType: string = 'EXPERIENCE';
   editingAnonymous: boolean = false;
+  editingPublicationId: string = '';
   openDropdownId: string | null = null;
+  showNotifDropdown = false;
 
   // --- SHARING LOGIC ---
   showShareModal = signal<boolean>(false);
   sharingPost = signal<PublicationDto | null>(null);
   chatGroups = computed(() => this.chatGroupService.groups());
   shareSearchQuery = signal<string>('');
+  
+  // --- MEDIA VIEWER LOGIC ---
+  showMediaViewer = signal<boolean>(false);
+  viewingMediaUrl = signal<string>('');
+  
+  // --- COMMENTS MODAL LOGIC ---
+  showCommentsModal = signal<boolean>(false);
+  commentsForPost = signal<PublicationDto | null>(null);
   
   filteredGroups = computed(() => {
     const query = this.shareSearchQuery().toLowerCase();
@@ -132,13 +216,33 @@ export class FeedComponent implements OnInit {
   openShareModal(pub: PublicationDto) {
     this.sharingPost.set(pub);
     this.showShareModal.set(true);
-    this.chatGroupService.fetchGroups(); // Ensure groups are loaded
+    this.chatGroupService.fetchGroups();
   }
 
   closeShareModal() {
     this.showShareModal.set(false);
     this.sharingPost.set(null);
     this.shareSearchQuery.set('');
+  }
+  
+  openMedia(url: string) {
+    this.viewingMediaUrl.set(url);
+    this.showMediaViewer.set(true);
+  }
+  
+  closeMediaViewer() {
+    this.showMediaViewer.set(false);
+    this.viewingMediaUrl.set('');
+  }
+  
+  openCommentsModal(pub: PublicationDto) {
+    this.commentsForPost.set(pub);
+    this.showCommentsModal.set(true);
+  }
+  
+  closeCommentsModal() {
+    this.showCommentsModal.set(false);
+    this.commentsForPost.set(null);
   }
 
   sharePostToGroup(groupId: string) {
@@ -155,7 +259,7 @@ export class FeedComponent implements OnInit {
       next: () => {
         alert('Post shared successfully!');
         this.closeShareModal();
-        this.refreshData(); // Refresh to update share count
+        this.refreshData();
       },
       error: (err) => {
         console.error(err);
@@ -181,6 +285,28 @@ export class FeedComponent implements OnInit {
       if (notif) {
         untracked(() => {
           this.notificationService.addNotification(notif);
+          this.guidanceService.speakNotification(notif.content, notif.type);
+
+          if (notif.type === 'CAREBOT' || notif.type === 'VOICE_PROMPT') {
+            setTimeout(() => {
+              this.convService.ask({
+                question: notif.content,
+                actions: [
+                  {
+                    label: 'Okay, I understand',
+                    keyword: ['okay', 'ok', 'yes', 'understood', 'thanks', 'thank'],
+                    callback: () => this.guidanceService.speakImmediate('Good. Take care of yourself.')
+                  },
+                  {
+                    label: 'Read again',
+                    keyword: ['again', 'repeat', 'what', 'pardon'],
+                    callback: () => this.guidanceService.speakImmediate(notif.content)
+                  }
+                ],
+                timeoutMs: 20000
+              });
+            }, 2000);
+          }
         });
       }
     }, { allowSignalWrites: true });
@@ -194,9 +320,7 @@ export class FeedComponent implements OnInit {
           } else {
             this.userService.updateUserLiveStatus(liveMsg.userId, liveMsg.status === 'Live Started');
           }
-          // Show a notification if someone went live
           if (liveMsg.status === 'Live Started') {
-            // we create a transient notification that looks like a snackbar
             const liveBadge = {
               id: Date.now().toString(),
               receiverId: this.currentUserId(),
@@ -221,7 +345,19 @@ export class FeedComponent implements OnInit {
     }, { allowSignalWrites: true });
 
     effect(() => {
-      // Whenever users are updated, if any live member goes offline, end watch automatically
+      const comment = this.webSocketService.liveComment();
+      if (comment) {
+        untracked(() => {
+          this.liveComments.update(list => [...list.slice(-99), {
+            authorName: comment.senderName || ('User ' + comment.senderId),
+            content: comment.content,
+            sentAt: comment.sentAt || new Date().toISOString()
+          }]);
+        });
+      }
+    }, { allowSignalWrites: true });
+
+    effect(() => {
       const liveUsers = this.liveCommunityMembers();
       untracked(() => {
         const remoteStreams = this.webRtcService.remoteStreams();
@@ -242,8 +378,12 @@ export class FeedComponent implements OnInit {
         this.isLiveNow.set(isNowLive);
         if (isNowLive) {
           this.startCamera();
+          this.liveComments.set([]);
+          this.liveSubscribedTo.add(this.currentUserId());
+          this.webSocketService.subscribeToLiveComments(this.currentUserId());
         } else {
           this.stopCamera();
+          this.liveSubscribedTo.delete(this.currentUserId());
         }
       },
       error: (err) => console.error('Failed to toggle live state', err)
@@ -255,7 +395,7 @@ export class FeedComponent implements OnInit {
       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(stream => {
           this.userMediaStream = stream;
-          this.webRtcService.localStream = stream; // Provide to WebRtcService
+          this.webRtcService.localStream = stream;
           if (this.liveVideo && this.liveVideo.nativeElement) {
             this.liveVideo.nativeElement.srcObject = stream;
           }
@@ -281,10 +421,18 @@ export class FeedComponent implements OnInit {
   watchCommunityStream(broadcasterId: number) {
     if (broadcasterId) {
       this.webRtcService.watchStream(broadcasterId, this.currentUserId());
+      if (!this.liveSubscribedTo.has(broadcasterId)) {
+        this.liveSubscribedTo.add(broadcasterId);
+        this.liveComments.set([]);
+        this.webSocketService.subscribeToLiveComments(broadcasterId);
+      }
     }
   }
 
   ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.guidanceService.loadAndSpeak('feed');
+    }
     this.route.params.subscribe(params => {
       if (params['groupId']) {
         this.groupId.set(params['groupId'] as string);
@@ -307,8 +455,7 @@ export class FeedComponent implements OnInit {
 
     if (gid) {
       this.publicationService.fetchGroupFeed(gid);
-      this.chatGroupService.fetchGroups(); // Refresh all just in case
-      // Find the specific group
+      this.chatGroupService.fetchGroups();
       this.chatGroupService.getGroupById(gid).subscribe(grp => this.currentGroup.set(grp));
     } else if (uid) {
       this.publicationService.fetchPersonalizedFeed(uid);
@@ -318,14 +465,13 @@ export class FeedComponent implements OnInit {
 
     this.notificationService.fetchNotifications(uid);
     this.userService.fetchUsers();
-    
-    // Check initial live status
+
     if (uid) {
       this.userService.getById(uid).subscribe(u => {
         const isNowLive = u.isLive || false;
         this.isLiveNow.set(isNowLive);
         if (isNowLive) {
-          setTimeout(() => this.startCamera(), 300); // Give view time to init
+          setTimeout(() => this.startCamera(), 300);
         }
       });
     }
@@ -347,7 +493,9 @@ export class FeedComponent implements OnInit {
       this.showPostEmojiPicker.set(!this.showPostEmojiPicker());
     } else if (type === 'COMMENT' && id !== undefined) {
       const current = this.showCommentEmojiPicker();
-      this.showCommentEmojiPicker.set({ ...current, [id]: !current[id] });
+      const newState = { ...current, [id]: !current[id] };
+      console.log('Toggling emoji picker for comment:', id, 'New state:', newState);
+      this.showCommentEmojiPicker.set(newState);
     }
   }
 
@@ -357,16 +505,20 @@ export class FeedComponent implements OnInit {
     } else if (type === 'COMMENT' && id !== undefined) {
       const currentVal = this.newCommentContent[id] || '';
       this.newCommentContent[id] = currentVal + emoji;
+      console.log('Added emoji to comment:', id, 'New content:', this.newCommentContent[id]);
     }
   }
   // --- END EMOJI LOGIC ---
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      this.selectedFile = file;
+    if (input.files) {
+      this.selectedFiles = Array.from(input.files);
     }
+  }
+  
+  removeSelectedFile(index: number) {
+    this.selectedFiles.splice(index, 1);
   }
 
   addPollOption() {
@@ -380,11 +532,43 @@ export class FeedComponent implements OnInit {
   }
 
   trackByOption(index: number, option: any) {
-    return index; // Tracking by index is safe here because we use object identity for the text
+    return index;
   }
 
   trackByPub(index: number, pub: PublicationDto) {
     return pub.id;
+  }
+
+  /**
+   * Listens for the user's voice and fills the post textarea with what they say.
+   * After dictation, asks them to confirm before posting.
+   */
+  startVoicePost() {
+    if (!this.sttService.isSupported) {
+      this.guidanceService.speakImmediate('Voice input is not supported in your browser.');
+      return;
+    }
+    this.sttService.askAndListen('What would you like to share with the community? Speak now.').then(transcript => {
+      if (!transcript.trim()) return;
+      this.newPubContent = transcript;
+      this.convService.ask({
+        question: `You said: "${transcript.substring(0, 80)}". Would you like to post this?`,
+        actions: [
+          {
+            label: 'Yes, post it',
+            keyword: ['yes', 'post', 'share', 'send', 'sure', 'okay'],
+            callback: () => this.doSubmitPublication(transcript, false, [])
+          },
+          {
+            label: 'No, let me edit',
+            keyword: ['no', 'edit', 'change', 'cancel'],
+            callback: () => this.guidanceService.speakImmediate('Okay, your text is in the box. You can change it before posting.')
+          }
+        ]
+      });
+    }).catch(() => {
+      this.guidanceService.speakImmediate('I could not hear you. Please try again.');
+    });
   }
 
   submitPublication() {
@@ -392,7 +576,6 @@ export class FeedComponent implements OnInit {
     const hasContent = this.newPubContent && this.newPubContent.trim().length > 0;
     const hasQuestion = this.newPollQuestion && this.newPollQuestion.trim().length > 0;
 
-    // Guard: Must have either content or a poll question if it's a vote
     if (!hasContent && !hasQuestion) {
       alert('Please enter some content or a poll question.');
       return;
@@ -414,9 +597,31 @@ export class FeedComponent implements OnInit {
       }
     }
 
-    // If it's a vote and user didn't write extra content, use the question as content
     const finalContent = hasContent ? this.newPubContent : (isVote ? this.newPollQuestion : '');
 
+    if (this.guidanceService.voiceUnlocked()) {
+      const preview = finalContent.substring(0, 60);
+      this.convService.ask({
+        question: `You are about to post: "${preview}". Would you like to share this with the community?`,
+        actions: [
+          {
+            label: 'Yes, post it',
+            keyword: ['yes', 'post', 'share', 'send', 'sure', 'okay'],
+            callback: () => this.doSubmitPublication(finalContent, isVote, validOptions)
+          },
+          {
+            label: 'No, cancel',
+            keyword: ['no', 'cancel', 'delete', 'stop'],
+            callback: () => this.guidanceService.speakImmediate('Post cancelled. Your text is still here if you want to change it.')
+          }
+        ]
+      });
+    } else {
+      this.doSubmitPublication(finalContent, isVote, validOptions);
+    }
+  }
+
+  private doSubmitPublication(finalContent: string, isVote: boolean, validOptions: string[]) {
     this.publicationService.createPublication({
       content: finalContent,
       type: this.newPubType as any,
@@ -425,20 +630,18 @@ export class FeedComponent implements OnInit {
       pollQuestion: isVote ? this.newPollQuestion : undefined,
       pollOptions: isVote ? validOptions : undefined,
       groupId: this.groupId() || undefined
-    }, this.selectedFile || undefined).subscribe({
+    }, this.selectedFiles.length > 0 ? this.selectedFiles : undefined).subscribe({
       next: () => {
-        // Reset form
         this.newPubContent = '';
         this.newPollQuestion = '';
         this.newPollOptions = [{ text: '' }, { text: '' }];
-        this.selectedFile = null;
+        this.selectedFiles = [];
         this.newPubType = 'EXPERIENCE';
         this.newPubAnonymous = false;
-        
+        this.guidanceService.speakImmediate('Your post has been shared with the community.');
         this.refreshData();
       },
       error: (err) => {
-        console.error('Error creating publication:', err);
         alert('Failed to post: ' + (err.error?.message || err.message || 'Please try again.'));
       }
     });
@@ -452,10 +655,40 @@ export class FeedComponent implements OnInit {
   }
 
   toggleSupport(pubId: string) {
-    this.publicationService.toggleSupport(pubId, this.currentUserId()).subscribe({
-      next: () => this.refreshData(),
-      error: (err) => alert('Error: ' + (err.error?.message || err.message))
-    });
+    const pub = this.publicationService.publications().find(p => p.id === pubId);
+    const alreadySupported = this.isSupportedByMe(pub!);
+
+    if (!alreadySupported && this.guidanceService.voiceUnlocked()) {
+      const authorName = pub?.authorName || 'this person';
+      this.convService.ask({
+        question: `Would you like to show support for ${authorName}'s post?`,
+        actions: [
+          {
+            label: 'Yes, support',
+            keyword: ['yes', 'sure', 'support', 'okay'],
+            callback: () => {
+              this.publicationService.toggleSupport(pubId, this.currentUserId()).subscribe({
+                next: () => {
+                  this.guidanceService.speakImmediate(`You supported ${authorName}'s post.`);
+                  this.refreshData();
+                },
+                error: () => {}
+              });
+            }
+          },
+          {
+            label: 'No',
+            keyword: ['no', 'cancel', 'skip'],
+            callback: () => this.guidanceService.speakImmediate('Okay, no problem.')
+          }
+        ]
+      });
+    } else {
+      this.publicationService.toggleSupport(pubId, this.currentUserId()).subscribe({
+        next: () => this.refreshData(),
+        error: (err) => alert('Error: ' + (err.error?.message || err.message))
+      });
+    }
   }
 
   isSupportedByMe(pub: PublicationDto): boolean {
@@ -493,20 +726,81 @@ export class FeedComponent implements OnInit {
   submitComment(pubId: string) {
     const content = this.newCommentContent[pubId];
     if (!content?.trim()) return;
-    this.commentService.createComment({
-      content,
-      publicationId: pubId,
-      authorId: this.currentUserId()
-    }).subscribe({
-      next: () => {
-        this.newCommentContent[pubId] = '';
-        this.refreshData();
-      },
-      error: (err) => alert('Error posting comment: ' + (err.error?.message || err.message))
-    });
+
+    if (this.guidanceService.voiceUnlocked()) {
+      this.convService.ask({
+        question: `You wrote: "${content.substring(0, 60)}". Would you like to post this comment?`,
+        actions: [
+          {
+            label: 'Yes, post it',
+            keyword: ['yes', 'post', 'send', 'sure', 'okay'],
+            callback: () => {
+              this.commentService.createComment({
+                content,
+                publicationId: pubId,
+                authorId: this.currentUserId()
+              }).subscribe({
+                next: (newComment) => {
+                  this.newCommentContent[pubId] = '';
+                  this.guidanceService.speakImmediate('Your comment has been posted.');
+                  
+                  if (this.showCommentsModal() && this.commentsForPost()?.id === pubId) {
+                    const currentPost = this.commentsForPost();
+                    if (currentPost) {
+                      const updatedPost: PublicationDto = {
+                        ...currentPost,
+                        comments: [...(currentPost.comments || []), newComment as any],
+                        commentCount: (currentPost.commentCount || 0) + 1
+                      };
+                      this.commentsForPost.set(updatedPost);
+                    }
+                  }
+                  
+                  this.refreshData();
+                },
+                error: (err) => alert('Error posting comment: ' + (err.error?.message || err.message))
+              });
+            }
+          },
+          {
+            label: 'No, cancel',
+            keyword: ['no', 'cancel', 'delete', 'remove'],
+            callback: () => {
+              this.newCommentContent[pubId] = '';
+              this.guidanceService.speakImmediate('Comment cancelled.');
+            }
+          }
+        ]
+      });
+    } else {
+      this.commentService.createComment({
+        content,
+        publicationId: pubId,
+        authorId: this.currentUserId()
+      }).subscribe({
+        next: (newComment) => {
+          this.newCommentContent[pubId] = '';
+          
+          if (this.showCommentsModal() && this.commentsForPost()?.id === pubId) {
+            const currentPost = this.commentsForPost();
+            if (currentPost) {
+              const updatedPost: PublicationDto = {
+                ...currentPost,
+                comments: [...(currentPost.comments || []), newComment as any],
+                commentCount: (currentPost.commentCount || 0) + 1
+              };
+              this.commentsForPost.set(updatedPost);
+            }
+          }
+          
+          this.refreshData();
+        },
+        error: (err) => alert('Error posting comment: ' + (err.error?.message || err.message))
+      });
+    }
   }
 
-  deleteItem(id: string, type: 'PUBLICATION' | 'COMMENT') {
+  deleteItem(id: string, type: 'PUBLICATION' | 'COMMENT', publicationId?: string) {
     this.openDropdownId = null;
     if (type === 'PUBLICATION') {
       this.publicationService.deletePublication(id).subscribe({
@@ -514,18 +808,20 @@ export class FeedComponent implements OnInit {
         error: (err) => alert('Error deleting publication: ' + (err.error?.message || err.message))
       });
     } else {
-      this.commentService.deleteComment(id).subscribe({
+      this.commentService.deleteComment(id, publicationId!).subscribe({
         next: () => this.refreshData(),
         error: (err) => alert('Error deleting comment: ' + (err.error?.message || err.message))
       });
     }
   }
 
-  startEdit(id: string, type: 'PUBLICATION' | 'COMMENT', content: string, pub?: PublicationDto) {
+  startEdit(id: string, type: 'PUBLICATION' | 'COMMENT', content: string, pub?: PublicationDto, parentPubId?: string) {
     this.openDropdownId = null;
     this.editingItemId = id;
     this.editingItemType = type;
     this.editingContent = content;
+    this.editingPublicationId = parentPubId || '';
+    this.selectedFiles = [];
     if (type === 'PUBLICATION' && pub) {
       this.editingType = pub.type || 'EXPERIENCE';
       this.editingAnonymous = pub.anonymous || false;
@@ -540,7 +836,7 @@ export class FeedComponent implements OnInit {
         type: this.editingType as any,
         authorId: this.currentUserId(),
         anonymous: this.editingAnonymous
-      }, this.selectedFile || undefined).subscribe({
+      }, undefined).subscribe({
         next: () => {
           this.cancelEdit();
           this.refreshData();
@@ -554,7 +850,7 @@ export class FeedComponent implements OnInit {
       this.commentService.updateComment(this.editingItemId, {
         content: this.editingContent,
         authorId: this.currentUserId(),
-        publicationId: '' // not needed for update
+        publicationId: this.editingPublicationId
       }).subscribe({
         next: () => {
           this.cancelEdit();
@@ -572,7 +868,8 @@ export class FeedComponent implements OnInit {
     this.editingItemId = null;
     this.editingItemType = null;
     this.editingContent = '';
-    this.selectedFile = null;
+    this.editingPublicationId = '';
+    this.selectedFiles = [];
   }
 
   toggleDropdown(id: string) {
@@ -583,13 +880,17 @@ export class FeedComponent implements OnInit {
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     
-    // Dropdown handling
     if (!target.closest('.dropdown')) {
       this.openDropdownId = null;
     }
 
-    // Emoji picker handling
-    if (!target.closest('.emoji-picker-container') && !target.closest('.btn-emoji-toggle')) {
+    if (!target.closest('[data-notif-bell]')) {
+      this.showNotifDropdown = false;
+    }
+
+    if (!target.closest('.emoji-picker-container') && 
+        !target.closest('.emoji-picker-comment') && 
+        !target.closest('.btn-emoji-toggle')) {
       this.showPostEmojiPicker.set(false);
       this.showCommentEmojiPicker.set({});
     }

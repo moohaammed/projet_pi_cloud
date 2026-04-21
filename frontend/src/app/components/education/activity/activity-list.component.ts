@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, ViewChildren, QueryList, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivityService } from '../../../services/education/activity.service';
 import { ActivityModel } from '../../../models/education/activity.model';
 import { ActivityDataFormComponent } from './activity-data-form.component';
+import { Chart, registerables } from 'chart.js';
 
 @Component({
   selector: 'app-activity-list',
@@ -12,7 +13,9 @@ import { ActivityDataFormComponent } from './activity-data-form.component';
   imports: [CommonModule, FormsModule, ActivityDataFormComponent],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ActivityListComponent implements OnInit {
+export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChildren('chartCanvas') chartCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
+  charts: Chart[] = [];
 
   allActivities: ActivityModel[] = [];
   selected: ActivityModel | null = null;
@@ -33,16 +36,35 @@ export class ActivityListComponent implements OnInit {
     active: true
   };
 
-  constructor(private activityService: ActivityService, private cdr: ChangeDetectorRef) { }
+  constructor(private activityService: ActivityService, private cdr: ChangeDetectorRef) { 
+    Chart.register(...registerables);
+  }
 
   ngOnInit(): void {
     this.load();
   }
 
+  ngAfterViewInit(): void {
+    setTimeout(() => { if (this.allActivities.length > 0) this.buildCharts(); }, 500);
+  }
+
+  ngOnDestroy(): void {
+    this.charts.forEach(c => c.destroy());
+  }
+
   load(): void {
-    this.activityService.getAll().subscribe(data => {
-      this.allActivities = data;
-      this.cdr.markForCheck();
+    this.activityService.getAll().subscribe({
+      next: (data) => {
+        this.allActivities = data;
+        if (this.chartCanvases && this.chartCanvases.length > 0) {
+          this.buildCharts();
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        const msg = err.error?.message || err.message || 'Erreur lors du chargement des activités';
+        alert(msg);
+      }
     });
   }
 
@@ -95,15 +117,27 @@ export class ActivityListComponent implements OnInit {
 
     if (this.isEditing && this.selected?.id) {
       this.activityService.update(this.selected.id, this.newActivity)
-        .subscribe(() => {
-          this.load();
-          this.reset();
+        .subscribe({
+          next: () => {
+            this.load();
+            this.reset();
+          },
+          error: (err) => {
+            const msg = err.error?.message || err.message || 'Erreur lors de la modification';
+            alert(msg);
+          }
         });
     } else {
       this.activityService.create(this.newActivity)
-        .subscribe(() => {
-          this.load();
-          this.reset();
+        .subscribe({
+          next: () => {
+            this.load();
+            this.reset();
+          },
+          error: (err) => {
+            const msg = err.error?.message || err.message || 'Erreur lors de la création';
+            alert(msg);
+          }
         });
     }
   }
@@ -117,10 +151,18 @@ export class ActivityListComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  delete(id: number): void {
-    this.activityService.delete(id).subscribe(() => {
-      this.load();
-    });
+  delete(id: string): void {
+    if (confirm('Voulez-vous vraiment supprimer cette activité ?')) {
+      this.activityService.delete(id).subscribe({
+        next: () => {
+          this.load();
+        },
+        error: (err) => {
+          const msg = err.error?.message || err.message || 'Erreur lors de la suppression';
+          alert(msg);
+        }
+      });
+    }
   }
 
   onTimerChange(minutes: number): void {
@@ -157,4 +199,78 @@ export class ActivityListComponent implements OnInit {
 
     return map[type] || 'badge bg-secondary';
   }
-}
+
+  // --- Stats Getters ---
+  get totalActivities(): number { return this.allActivities.length; }
+  get activeCount():     number { return this.allActivities.filter(a => a.active).length; }
+  get inactiveCount():   number { return this.allActivities.filter(a => !a.active).length; }
+  get quizCount():       number { return this.allActivities.filter(a => a.type === 'QUIZ').length; }
+  get gameCount():       number { return this.allActivities.filter(a => a.type === 'GAME').length; }
+  get contentCount():    number { return this.allActivities.filter(a => a.type === 'CONTENT').length; }
+  get exerciceCount():   number { return this.allActivities.filter(a => a.type === 'EXERCICE').length; }
+  get legerCount():      number { return this.allActivities.filter(a => a.stade === 'LEGER').length; }
+  get modereCount():     number { return this.allActivities.filter(a => a.stade === 'MODERE').length; }
+  get severeCount():     number { return this.allActivities.filter(a => a.stade === 'SEVERE').length; }
+
+  // ==== CHARTS ====
+  private buildCharts(): void {
+    this.charts.forEach(c => c.destroy());
+    this.charts = [];
+
+    if (!this.chartCanvases) return;
+    const canvases = this.chartCanvases.toArray();
+    if (canvases.length === 0) return;
+
+    // 1. Répartition par Type (Pie)
+    if (canvases[0]) {
+      const ctx1 = canvases[0].nativeElement;
+      this.charts.push(new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels: ['Quiz', 'Jeux', 'Contenus', 'Exercices'],
+          datasets: [{
+            data: [this.quizCount, this.gameCount, this.contentCount, this.exerciceCount],
+            backgroundColor: ['#059669', '#6c2bd9', '#d97706', '#e11d48'],
+            borderWidth: 0
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      }));
+    }
+
+    // 2. Répartition par Stade (Pie)
+    if (canvases[1]) {
+      const ctx2 = canvases[1].nativeElement;
+      this.charts.push(new Chart(ctx2, {
+        type: 'pie',
+        data: {
+          labels: ['Léger', 'Modéré', 'Sévère'],
+          datasets: [{
+            data: [this.legerCount, this.modereCount, this.severeCount],
+            backgroundColor: ['#9333ea', '#7c3aed', '#6d28d9'],
+            borderWidth: 0
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      }));
+    }
+
+    // 3. Statut (Bar ou Doughnut)
+    if (canvases[2]) {
+      const ctx3 = canvases[2].nativeElement;
+      this.charts.push(new Chart(ctx3, {
+        type: 'doughnut',
+        data: {
+          labels: ['Actives', 'Inactives'],
+          datasets: [{
+            data: [this.activeCount, this.inactiveCount],
+            backgroundColor: ['#10b981', '#94a3b8'],
+            borderWidth: 0
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+      }));
+    }
+    this.cdr.markForCheck();
+  }
+}

@@ -59,7 +59,6 @@ export class WebRtcService {
     }
   }
 
-  // Broadcaster receives a request from Viewer
   private async handleRequestWatch(viewerId: number, broadcasterId: number) {
     console.log(`%c[WebRTC BROADCASTER]`, `background: #000; color: #ff0000`, `Processing request-watch from Viewer ${viewerId}`);
     
@@ -71,7 +70,6 @@ export class WebRtcService {
     try {
       const pc = this.createPeerConnection(viewerId, broadcasterId);
       
-      // Add local tracks to send to the viewer
       this.localStream.getTracks().forEach(track => {
         pc.addTrack(track, this.localStream!);
       });
@@ -93,7 +91,6 @@ export class WebRtcService {
     }
   }
 
-  // Viewer receives an Offer from Broadcaster
   private async handleOffer(broadcasterId: number, sdpStr: string, viewerId: number) {
     console.log(`%c[WebRTC VIEWER]`, `background: #111; color: #00ff00`, `Received SDP Offer from Broadcaster ${broadcasterId}`);
     try {
@@ -118,7 +115,6 @@ export class WebRtcService {
     }
   }
 
-  // Broadcaster receives Answer from Viewer
   private async handleAnswer(viewerId: number, sdpStr: string) {
     console.log(`%c[WebRTC BROADCASTER]`, `background: #000; color: #ff0000`, `Received SDP Answer from Viewer ${viewerId}`);
     const pc = this.peerConnections.get(viewerId);
@@ -134,7 +130,6 @@ export class WebRtcService {
     }
   }
 
-  // Both sides receive ICE candidates and add them
   private async handleIceCandidate(peerId: number, candidateObj: any) {
     console.log(`[WebRTC] Received ICE Candidate from ${peerId}`);
     const pc = this.peerConnections.get(peerId);
@@ -147,11 +142,7 @@ export class WebRtcService {
     }
   }
 
-  // Viewer requests to watch
   public watchStream(broadcasterId: number, viewerId: number) {
-    console.log(`%c[WebRTC COMMAND]`, `background: #333; color: #fff`, `Viewer ${viewerId} wants to watch Broadcaster ${broadcasterId}`);
-    
-    // Mark as connecting initially
     this.remoteStreamStatus.update(s => ({ ...s, [broadcasterId]: 'CONNECTING' }));
 
     this.ws.sendWebRtcSignal({
@@ -201,12 +192,10 @@ export class WebRtcService {
 
     pc.ontrack = (event) => {
       console.log(`WebRTC: Received remote track from peer ${peerId}`, event.track.kind);
-      // Ensure we build a MediaStream even if event.streams is missing properties in some browsers
       const stream = (event.streams && event.streams[0]) ? event.streams[0] : new MediaStream([event.track]);
       
       const currentStreams = this.remoteStreams();
       
-      // If the stream already exists, we might just be getting the audio track after the video track
       if (currentStreams[peerId]) {
          currentStreams[peerId].addTrack(event.track);
          this.remoteStreams.set({ ...currentStreams });

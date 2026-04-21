@@ -6,10 +6,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Calls the main backpi service for user data.
- * Uses lb://backpi so Eureka resolves the actual host:port — no hardcoded URL.
- */
 @Component
 public class UserClient {
 
@@ -17,7 +13,6 @@ public class UserClient {
 
     private final RestTemplate restTemplate;
 
-    // Inject the @LoadBalanced RestTemplate from RestTemplateConfig
     public UserClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
@@ -27,6 +22,7 @@ public class UserClient {
         try {
             return restTemplate.getForObject(BASE + "/" + userId, Map.class);
         } catch (Exception e) {
+            // Graceful degradation — show "User 42" instead of crashing
             return Map.of("id", userId, "nom", "", "prenom", "User " + userId, "role", "UNKNOWN", "actif", true);
         }
     }
@@ -66,5 +62,36 @@ public class UserClient {
         if (user == null) return false;
         Object actif = user.get("actif");
         return actif instanceof Boolean b ? b : Boolean.parseBoolean(String.valueOf(actif));
+    }
+
+    public void suspendUser(Long userId) {
+        if (userId == null) return;
+        try {
+            // First check current state — only toggle if currently active
+            Map<String, Object> user = getUserById(userId);
+            if (isActive(user)) {
+                restTemplate.patchForObject(BASE + "/" + userId + "/toggle", null, Map.class);
+            }
+        } catch (Exception e) {
+            System.err.println("UserClient.suspendUser: failed to suspend user " + userId + ": " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<Long, Map<String, Object>> getUsersByIds(java.util.Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) return Map.of();
+        try {
+            List<Map<String, Object>> users = restTemplate.postForObject(
+                BASE + "/batch", new java.util.ArrayList<>(ids), List.class);
+            if (users == null) return Map.of();
+            Map<Long, Map<String, Object>> result = new java.util.HashMap<>();
+            for (Map<String, Object> u : users) {
+                Object idObj = u.get("id");
+                if (idObj != null) result.put(((Number) idObj).longValue(), u);
+            }
+            return result;
+        } catch (Exception e) {
+            return Map.of();
+        }
     }
 }

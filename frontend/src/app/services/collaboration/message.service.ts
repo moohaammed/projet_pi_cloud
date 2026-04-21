@@ -11,8 +11,13 @@ export interface PollOptionDto {
 export interface MessageDto {
   id: string;
   content: string;
+  
+  mediaUrls?: string[];
+  mimeTypes?: string[];
+  
   mediaUrl?: string;
   mimeType?: string;
+  
   sentAt: string;
   senderId: number;
   senderName: string;
@@ -32,8 +37,10 @@ export interface MessageDto {
   isPinned?: boolean;
   sentimentScore?: number;
   fromBot?: boolean;
+  viewedByUserIds?: number[];
 }
 
+/** Alias kept for backward compatibility with older component code */
 export type MessageResponseDto = MessageDto;
 
 export interface MessageCreateRequest {
@@ -52,6 +59,7 @@ export interface MessageCreateRequest {
 export class MessageService {
   private http = inject(HttpClient);
   private baseUrl = 'http://localhost:8080/api/messages';
+
   public messages = signal<MessageDto[]>([]);
 
   fetchMessagesByUser(uid: number) {
@@ -62,11 +70,17 @@ export class MessageService {
     this.http.get<MessageDto[]>(`${this.baseUrl}/group/${gid}`).subscribe(data => this.messages.set(data));
   }
 
+  fetchMessagesByGroupPaged(gid: string, page = 0, size = 30) {
+    return this.http.get<MessageDto[]>(`${this.baseUrl}/group/${gid}/page`, {
+      params: { page: String(page), size: String(size) }
+    });
+  }
+
   fetchMessagesByGroupSync(gid: string) {
     return this.http.get<MessageDto[]>(`${this.baseUrl}/group/${gid}`);
   }
 
-  createMessage(req: MessageCreateRequest, file?: File) {
+  createMessage(req: MessageCreateRequest, files?: File[]) {
     const formData = new FormData();
     formData.append('content', req.content);
     formData.append('senderId', req.senderId.toString());
@@ -77,7 +91,11 @@ export class MessageService {
     if (req.type) formData.append('type', req.type);
     if (req.pollQuestion) formData.append('pollQuestion', req.pollQuestion);
     if (req.pollOptions) req.pollOptions.forEach(opt => formData.append('pollOptions', opt));
-    if (file) formData.append('file', file);
+    
+    if (files && files.length > 0) {
+      files.forEach(file => formData.append('files', file));
+    }
+    
     return this.http.post<MessageDto>(this.baseUrl, formData);
   }
 
@@ -87,6 +105,10 @@ export class MessageService {
 
   fetchBotMessages(userId: number) {
     return this.http.get<MessageDto[]>(`${this.baseUrl}/bot/${userId}`);
+  }
+
+  fetchDirectMessagePeers(userId: number) {
+    return this.http.get<number[]>(`${this.baseUrl}/peers/${userId}`);
   }
 
   deleteMessage(id: string) {
@@ -109,8 +131,20 @@ export class MessageService {
     });
   }
 
+  markAsRead(messageId: string, userId: number) {
+    return this.http.post<void>(`${this.baseUrl}/${messageId}/read`, null, {
+      params: { userId: String(userId) }
+    });
+  }
+
   togglePin(messageId: string) {
     return this.http.post<MessageDto>(`${this.baseUrl}/${messageId}/pin`, {});
+  }
+
+  sendLiveComment(senderId: number, broadcasterId: number, content: string) {
+    return this.http.post<MessageDto>(`${this.baseUrl}/live-comment`, null, {
+      params: { senderId: String(senderId), broadcasterId: String(broadcasterId), content }
+    });
   }
 
   getAiHandoverSummary(groupId: string) {

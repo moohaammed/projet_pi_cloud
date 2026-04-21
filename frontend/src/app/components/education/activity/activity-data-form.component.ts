@@ -202,13 +202,6 @@ export interface ExerciceData {
                      placeholder="Collez ici l'URL du contenu (ex: https://youtube.com/...)" 
                      (input)="updateContentSource($event)">
            </div>
-           <div>
-              <label class="form-label fw-bold text-muted small text-uppercase"><i class="fa-solid fa-comment-dots me-2 text-warning"></i>Résumé court</label>
-              <textarea class="form-control border-0 bg-white rounded-3 p-3 shadow-sm" rows="4" 
-                        [value]="contentData.description" 
-                        placeholder="Décrivez brièvement le but de ce contenu pour le patient..." 
-                        (input)="updateContentDescription($event)"></textarea>
-           </div>
          </div>
       </ng-container>
 
@@ -455,11 +448,6 @@ export class ActivityDataFormComponent implements OnInit, OnChanges {
 
   updateContentSource(event: any): void {
     this.contentData.videoUrl = event.target.value;
-    this.emitChange();
-  }
-
-  updateContentDescription(event: any): void {
-    this.contentData.description = event.target.value;
     this.emitChange();
   }
 

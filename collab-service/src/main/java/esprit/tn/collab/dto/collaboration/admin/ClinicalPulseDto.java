@@ -3,9 +3,17 @@ package esprit.tn.collab.dto.collaboration.admin;
 import java.util.List;
 
 public class ClinicalPulseDto {
+
+    
     private List<String> topThemes;
+
+    
     private String aiSummary;
+
+    
     private String sentimentVelocity;
+
+    
     private long totalAnalyzed;
 
     public List<String> getTopThemes() { return topThemes; }

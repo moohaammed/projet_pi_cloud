@@ -49,11 +49,26 @@ public class ChatGroupService {
         group.setName(dto.getName());
         group.setDescription(dto.getDescription());
         group.setTheme(dto.getTheme());
+        if (dto.getTags() != null) group.setTags(dto.getTags());
         group.setCreatedAt(Instant.now());
         group.setOwnerId(dto.getOwnerId());
+        group.setDefault(dto.isDefault());
+        group.setDefaultForRole(dto.getDefaultForRole());
         if (dto.getMemberIds() != null) group.setMemberIds(new HashSet<>(dto.getMemberIds()));
         if (dto.getOwnerId() != null) group.getMemberIds().add(dto.getOwnerId());
         return mapToResponseDto(chatGroupRepository.save(group));
+    }
+
+    
+    public void autoJoinDefaultGroups(Long userId, String role) {
+        if (userId == null || role == null) return;
+        List<ChatGroup> defaults = chatGroupRepository.findByIsDefaultTrueAndDefaultForRole(role.toUpperCase());
+        for (ChatGroup group : defaults) {
+            if (!group.getMemberIds().contains(userId)) {
+                group.getMemberIds().add(userId);
+                chatGroupRepository.save(group);
+            }
+        }
     }
 
     public ChatGroupResponseDto updateGroup(String id, ChatGroupCreateDto dto) {
@@ -61,6 +76,7 @@ public class ChatGroupService {
             group.setName(dto.getName());
             group.setDescription(dto.getDescription());
             group.setTheme(dto.getTheme());
+            if (dto.getTags() != null) group.setTags(dto.getTags());
             return mapToResponseDto(chatGroupRepository.save(group));
         }).orElse(null);
     }
@@ -88,7 +104,9 @@ public class ChatGroupService {
         ChatGroup group = chatGroupRepository.findById(groupId).orElseThrow();
         GroupJoinRequest req = new GroupJoinRequest();
         req.setUserId(userId);
-        req.setGroup(group);
+        req.setGroupId(group.getId());
+        req.setGroupName(group.getName());
+        req.setGroupOwnerId(group.getOwnerId());
         groupJoinRequestRepository.save(req);
         if (group.getOwnerId() != null) {
             notificationService.createAndSend(group.getOwnerId(), "User " + userId + " requested to join \"" + group.getName() + "\"", "JOIN_REQUEST");
@@ -124,6 +142,7 @@ public class ChatGroupService {
         dto.setName(group.getName());
         dto.setDescription(group.getDescription());
         dto.setTheme(group.getTheme());
+        dto.setTags(group.getTags());
         dto.setCategory(group.getCategory() != null ? group.getCategory().name() : GroupCategory.MIXED.name());
         dto.setCreatedAt(group.getCreatedAt());
         dto.setOwnerId(group.getOwnerId());

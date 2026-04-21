@@ -45,7 +45,7 @@ export class HandTrackingService {
 
   public async initialize(videoElement: HTMLVideoElement, onResults: (results: Results) => void) {
     this.hands = new Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+      locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
     });
 
     this.hands.setOptions({
