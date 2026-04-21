@@ -7,7 +7,7 @@ import java.util.Map;
 @Service
 public class AiPredictionService {
 
-    private final String API_URL = "http://127.0.0.1:8000/predict";
+    private final String API_URL = "http://127.0.0.1:8000/predict-cdr";
     private final String RISK_API_URL = "http://127.0.0.1:8000/predict-risk";
 
 
