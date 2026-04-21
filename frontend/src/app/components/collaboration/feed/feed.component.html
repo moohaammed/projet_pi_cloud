@@ -541,40 +541,41 @@
 
         <!-- Shared education event (card + link to /eventfront) -->
         <ng-container *ngIf="pub.type === 'EVENT'">
-          <p class="fs-16 leading-relaxed mb-4 text-doc-secondary" *ngIf="pub.content?.trim()">{{ pub.content }}</p>
+          <p class="fs-16 leading-relaxed mb-3 text-doc-secondary" *ngIf="pub.content?.trim()">{{ pub.content }}</p>
 
-          <a *ngIf="pub.linkedEvent as ev" routerLink="/eventfront" [queryParams]="{ highlight: ev.id }"
+          <a *ngIf="pub.linkedEvent as ev" routerLink="/eventfront"
             class="feed-event-link text-decoration-none d-block">
-            <div class="feed-event-card rounded-4 overflow-hidden border-0 shadow-doc bg-white">
-              <div class="row g-0 align-items-stretch">
-                <div class="col-md-4 feed-event-card-media position-relative">
-                  <img [src]="sharedEventImageUrl(ev)" [alt]="ev.title || 'Event'" class="feed-event-card-img w-100 h-100"
-                    loading="lazy" (error)="onSharedEventImageError($event)" />
-                  <div class="position-absolute top-0 start-0 m-2">
-                     <span class="badge bg-primary rounded-pill shadow-sm py-1 px-2 fs-10">UPCOMING</span>
-                  </div>
-                </div>
-                <div class="col-md-8 p-4 d-flex flex-column bg-white">
-                  <span class="text-primary fs-11 fw-black text-uppercase letter-spacing-1 mb-2">
-                    <i class="fa-regular fa-calendar-check me-1"></i> Community Event
-                  </span>
-                  <h5 class="fw-bold text-doc-heading mb-3">{{ ev.title || 'Event' }}</h5>
-                  <div class="d-flex flex-wrap gap-3 mb-3">
-                    <span class="fs-13 text-muted"><i class="fa-regular fa-clock me-1 text-primary"></i> {{ formatSharedEventDate(ev.startDateTime) }}</span>
-                    <span class="fs-13 text-muted"><i class="fa-solid fa-location-dot me-1 text-primary"></i> {{ ev.location }}</span>
-                  </div>
-                  <p class="fs-14 text-secondary mb-4 feed-event-desc text-doc-secondary" *ngIf="ev.description">{{ ev.description }}</p>
-                  <div class="mt-auto d-flex align-items-center gap-2 text-primary fw-bold fs-14">
-                    View Details <i class="fa-solid fa-arrow-right-long transition-all"></i>
-                  </div>
-                </div>
+            <div class="feed-event-card rounded-3 border overflow-hidden"
+                 style="display:flex; flex-direction:row; height:90px; background:#fff;">
+              <!-- Thumbnail -->
+              <img [src]="sharedEventImageUrl(ev)" [alt]="ev.title || 'Event'"
+                style="width:110px; min-width:110px; height:90px; object-fit:cover; display:block; flex-shrink:0;"
+                loading="lazy" (error)="onSharedEventImageError($event)" />
+              <!-- Info -->
+              <div style="flex:1; min-width:0; padding:10px 12px; display:flex; flex-direction:column; justify-content:center; overflow:hidden;">
+                <span style="font-size:10px; font-weight:700; color:#800080; text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px;">
+                  <i class="fa-regular fa-calendar-check me-1"></i>Événement
+                </span>
+                <span style="font-weight:700; font-size:14px; color:#1c1e21; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block;">
+                  {{ ev.title }}
+                </span>
+                <span style="font-size:11px; color:#65676b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; margin-top:2px;">
+                  <i class="fa-regular fa-clock me-1"></i>{{ formatSharedEventDate(ev.startDateTime) }}
+                </span>
+                <span *ngIf="ev.location" style="font-size:11px; color:#65676b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block;">
+                  <i class="fa-solid fa-location-dot me-1"></i>{{ ev.location }}
+                </span>
+              </div>
+              <!-- Arrow -->
+              <div style="display:flex; align-items:center; padding:0 12px; flex-shrink:0;">
+                <i class="fa-solid fa-chevron-right" style="color:#b0b3b8; font-size:12px;"></i>
               </div>
             </div>
           </a>
 
           <div *ngIf="!pub.linkedEvent && pub.linkedEventId"
             class="alert bg-soft-secondary border-0 rounded-4 mb-0 fs-13 text-muted d-flex align-items-center gap-2">
-            <i class="fa-solid fa-circle-exclamation"></i> This collaboration event is no longer active in the community.
+            <i class="fa-solid fa-circle-exclamation"></i> Cet événement n'est plus disponible.
           </div>
         </ng-container>
 

@@ -258,4 +258,25 @@ export class AppComponent implements OnDestroy {
     if (url.includes('rendezvous')) return 'Sur cette page, vous pouvez demander un rendez-vous.';
     return 'Utilisez les boutons ci-dessous pour naviguer.';
   }
+
+  // ── Unified Voice Toggle ───────────────────────────────────────────────────
+  
+  isVoiceEnabled(): boolean {
+    // Returns true if either service is enabled (they should stay in sync now)
+    return this.guidanceService.voiceUnlocked() || this.alzAccessibility.voiceEnabled();
+  }
+
+  toggleUnifiedVoice(): void {
+    const newState = !this.isVoiceEnabled();
+    
+    // Toggle Guidance Service
+    if (this.guidanceService.voiceUnlocked() !== newState) {
+      this.guidanceService.toggleVoice();
+    }
+    
+    // Toggle Alzheimer Accessibility Service
+    if (this.alzAccessibility.voiceEnabled() !== newState) {
+      this.alzAccessibility.toggleVoice();
+    }
+  }
 }

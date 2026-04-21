@@ -68,6 +68,13 @@ spring:
           predicates:
             - Path=/api/heart-rate/**
 
+        # ── Patient Medecin service ──────────────────────────────────────────
+        - id: patient-medecin-service
+          uri: lb://patient-medecin-service
+          predicates:
+            - Path=/api/patients/**,/api/analyses/**,/api/rappel-quotidien/**,/api/patient-notification/**,/api/jeux/**
+
+        # ── Main service (backpi) ──────────────────────────────────────────
         # ── Main service (backpi) ────────────────────────────────────────
         - id: main-service
           uri: lb://backpi
