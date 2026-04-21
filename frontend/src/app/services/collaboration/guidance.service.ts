@@ -25,12 +25,14 @@ export interface VoicePromptRequest {
   caregiverId: number;
 }
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({ providedIn: 'root' })
 export class GuidanceService {
   private http          = inject(HttpClient);
   private platformId    = inject(PLATFORM_ID);
-  private baseUrl       = 'http://localhost:8081/api/guidance';
-  private aiUrl         = 'http://localhost:8081/api/voice-assistant/describe';
+  private baseUrl       = `${environment.apiUrl}/api/guidance`;
+  private aiUrl         = `${environment.apiUrl}/api/voice-assistant/describe`;
 
   // ── Public signals ────────────────────────────────────────────────────────
   currentGuidance  = signal<GuidanceResponseDto | null>(null);

@@ -10,10 +10,13 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "http://localhost:4200"
+            allowedOrigins: 
+              - "http://localhost:4200"
+              - "http://127.0.0.1:4200"
+              - "http://192.168.1.169:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
-            allowCredentials: false
+            allowCredentials: true
             maxAge: 3600
 
       # Remove duplicate CORS headers coming from upstream services
@@ -45,14 +48,8 @@ spring:
         - id: geo-service
           uri: lb://geo-service
           predicates:
-            - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/patient-locations/**
-
-        - id: geo-service
-          uri: lb://geo-service
-          predicates:
             - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/safezones/**,/api/patient-locations/**
 
-        # ── Main service (backpi) ──────────────────────────────────────────
         # ── Education service ──────────────────────────────────────────
         - id: education-rest
           uri: lb://education-service

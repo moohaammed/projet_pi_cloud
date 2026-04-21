@@ -398,10 +398,6 @@
               <span class="fw-bold fs-11">VOICE</span>
             </button>
 
-            <button class="btn btn-sm btn-outline-danger" *ngIf="auth.isLoggedIn()"
-            <span class="small text-muted" *ngIf="auth.isLoggedIn()">
-              Logged as: <strong>{{ auth.getRole() }}</strong>
-            </span>
             <button class="btn btn-sm btn-outline-danger"
               *ngIf="auth.isLoggedIn()"
               (click)="auth.logout()">Logout</button>

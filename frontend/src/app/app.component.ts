@@ -32,6 +32,7 @@ export class AppComponent implements OnDestroy {
   platformId = inject(PLATFORM_ID);
   accService = inject(AccessibilityService);
   alzAccessibility = inject(AlzheimerAccessibilityService);
+  guidanceService = inject(GuidanceService);
 
   // Video Call State
   showVideoCall = inject(VideoCallService).showCallOverlay;
