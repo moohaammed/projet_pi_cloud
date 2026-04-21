@@ -1,25 +1,28 @@
 package esprit.tn.backpi.helpnotification.kafka;
 
 import esprit.tn.backpi.helpnotification.dto.HeartRateAlertEvent;
-import esprit.tn.backpi.helpnotification.service.HelpNotificationService;
+import esprit.tn.backpi.helpnotification.service.AlertConfirmationService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 /**
  * Kafka consumer that receives heart-rate alert events from the
- * "heartrate.alerts" topic and triggers the existing help notification
- * workflow automatically.
+ * "heartrate.alerts" topic and routes them through the 10-second
+ * confirmation service before triggering notifications.
  *
  * This is the bridge between smartwatch-service's condition detection
  * and backpi's notification delivery (WebSocket + email).
+ *
+ * VERSION 1.1 change: alerts are now routed through AlertConfirmationService
+ * for a 10-second confirmation delay before notification is sent.
  */
 @Component
 public class HeartRateHelpNotificationConsumer {
 
-    private final HelpNotificationService helpNotificationService;
+    private final AlertConfirmationService alertConfirmationService;
 
-    public HeartRateHelpNotificationConsumer(HelpNotificationService helpNotificationService) {
-        this.helpNotificationService = helpNotificationService;
+    public HeartRateHelpNotificationConsumer(AlertConfirmationService alertConfirmationService) {
+        this.alertConfirmationService = alertConfirmationService;
     }
 
     @KafkaListener(
@@ -33,17 +36,13 @@ public class HeartRateHelpNotificationConsumer {
                 + ", bpm=" + alert.getBpm() + ", severity=" + alert.getSeverity());
 
         try {
-            helpNotificationService.sendHelpNotification(
-                    alert.getUserId(),
-                    alert.getMessage(),
-                    "HEART_RATE_ALERT",
-                    alert.getConditionType()
-            );
+            // Route through 10-second confirmation before notification
+            alertConfirmationService.submitForConfirmation(alert);
 
-            System.out.println("🚨 [HEART-RATE ALERT CONSUMER] Help notification triggered successfully for userId="
+            System.out.println("🚨 [HEART-RATE ALERT CONSUMER] Alert submitted for confirmation: userId="
                     + alert.getUserId() + ", condition=" + alert.getConditionType());
         } catch (Exception e) {
-            System.err.println("🚨 [HEART-RATE ALERT CONSUMER] Failed to send help notification for userId="
+            System.err.println("🚨 [HEART-RATE ALERT CONSUMER] Failed to submit alert for userId="
                     + alert.getUserId() + ": " + e.getMessage());
         }
     }
