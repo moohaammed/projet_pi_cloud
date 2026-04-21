@@ -1,9 +1,10 @@
 package esprit.tn.collab.controllers.collaboration;
 
 import esprit.tn.collab.dto.collaboration.HandoverDTO;
+import esprit.tn.collab.dto.collaboration.ChatGroupCreateDto;
 import esprit.tn.collab.dto.collaboration.admin.*;
 import esprit.tn.collab.services.collaboration.AdminCollaborationService;
-import org.springframework.http.ResponseEntity;
+import esprit.tn.collab.services.collaboration.ChatGroupService;import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -15,11 +16,16 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:4200")
 public class AdminCollaborationController {
 
+    
     public static final String ADMIN_USER_HEADER = "X-Admin-User-Id";
-    private final AdminCollaborationService adminCollaborationService;
 
-    public AdminCollaborationController(AdminCollaborationService adminCollaborationService) {
+    private final AdminCollaborationService adminCollaborationService;
+    private final ChatGroupService chatGroupService;
+
+    public AdminCollaborationController(AdminCollaborationService adminCollaborationService,
+                                        ChatGroupService chatGroupService) {
         this.adminCollaborationService = adminCollaborationService;
+        this.chatGroupService = chatGroupService;
     }
 
     @GetMapping("/health/kpis")
@@ -55,6 +61,7 @@ public class AdminCollaborationController {
         return ResponseEntity.ok().build();
     }
 
+    
     @GetMapping("/analytics/stress-trend")
     public ResponseEntity<PlatformStressTrendDto> stressTrend(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
                                                                @RequestParam(defaultValue = "7") int days) {
@@ -85,6 +92,7 @@ public class AdminCollaborationController {
         return ResponseEntity.ok().build();
     }
 
+    
     @PostMapping("/announcement")
     public ResponseEntity<Void> postAnnouncement(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
                                                  @RequestBody Map<String, Object> payload) {
@@ -105,18 +113,21 @@ public class AdminCollaborationController {
         return ResponseEntity.ok(adminCollaborationService.getUserGroups(adminUserId, userId));
     }
 
+    
     @PostMapping("/moderation/{publicationId}/approve")
     public ResponseEntity<Void> approvePost(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable String publicationId) {
         adminCollaborationService.dismissModerationFlag(adminUserId, publicationId);
         return ResponseEntity.ok().build();
     }
 
+    
     @PostMapping("/moderation/users/{userId}/ban")
     public ResponseEntity<Void> banUser(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId, @PathVariable Long userId) {
         adminCollaborationService.suspendUser(adminUserId, userId);
         return ResponseEntity.ok().build();
     }
 
+    
     @GetMapping("/privacy/direct-messages/metadata")
     public ResponseEntity<List<DirectMessageMetadataDto>> dmMetadata(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
         return ResponseEntity.ok(adminCollaborationService.getDirectMessageMetadata(adminUserId));
@@ -142,10 +153,64 @@ public class AdminCollaborationController {
         return ResponseEntity.ok(adminCollaborationService.getClinicalPulse(adminUserId));
     }
 
+    
     @GetMapping("/analytics/retrospective")
     public ResponseEntity<HandoverDTO> getRetrospective(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
                                                          @RequestParam String groupId,
                                                          @RequestParam(defaultValue = "24") int hours) {
         return ResponseEntity.ok(adminCollaborationService.getRetrospective(adminUserId, groupId, hours));
+    }
+
+    
+    @PostMapping("/groups/create")
+    public ResponseEntity<Void> createGroup(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
+                                            @RequestBody ChatGroupCreateDto dto) {
+        adminCollaborationService.requireAdmin(adminUserId);
+        dto.setOwnerId(adminUserId);
+        chatGroupService.createGroup(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    
+    @PostMapping("/users/{userId}/auto-join")
+    public ResponseEntity<Void> autoJoin(@PathVariable Long userId, @RequestParam String role) {
+        chatGroupService.autoJoinDefaultGroups(userId, role);
+        return ResponseEntity.ok().build();
+    }
+
+    
+    @GetMapping("/groups/default")
+    public ResponseEntity<List<ChatGroupAdminDto>> getDefaultGroups(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
+        return ResponseEntity.ok(adminCollaborationService.getDefaultGroups(adminUserId));
+    }
+
+    // ── Content Management ────────────────────────────────────────────────────
+
+    
+    @GetMapping("/content/posts")
+    public ResponseEntity<List<ContentItemDto>> getRecentPosts(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
+        return ResponseEntity.ok(adminCollaborationService.getRecentPosts(adminUserId));
+    }
+
+    
+    @GetMapping("/content/messages")
+    public ResponseEntity<List<ContentItemDto>> getRecentGroupMessages(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId) {
+        return ResponseEntity.ok(adminCollaborationService.getRecentGroupMessages(adminUserId));
+    }
+
+    
+    @DeleteMapping("/content/posts/{id}")
+    public ResponseEntity<Void> adminDeletePost(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
+                                                @PathVariable String id) {
+        adminCollaborationService.adminDeletePost(adminUserId, id);
+        return ResponseEntity.ok().build();
+    }
+
+    
+    @DeleteMapping("/content/messages/{id}")
+    public ResponseEntity<Void> adminDeleteMessage(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
+                                                   @PathVariable String id) {
+        adminCollaborationService.adminDeleteMessage(adminUserId, id);
+        return ResponseEntity.ok().build();
     }
 }

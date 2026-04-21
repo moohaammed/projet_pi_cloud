@@ -7,6 +7,7 @@ import { VideoCallComponent } from '../videocall/videocall.component';
 import { AuthService } from '../../services/auth.service';
 import { VideoCallService, SignalMessage } from '../../services/videocall.service';
 import { filter, take } from 'rxjs/operators';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-rendezvous-detail',
@@ -21,6 +22,7 @@ export class RendezVousDetailComponent implements OnInit {
   private service = inject(RendezVousService);
   private authService = inject(AuthService);
   private videoCallService = inject(VideoCallService);
+  private userService = inject(UserService);
 
   rv: RendezVous | null = null;
   loading = true;
@@ -63,6 +65,31 @@ export class RendezVousDetailComponent implements OnInit {
 
           this.rv = data;
           this.loading = false;
+
+          // Charger les détails du patient
+          if (this.rv?.patientId) {
+            this.userService.getById(this.rv.patientId).subscribe({
+              next: (patient) => {
+                if (this.rv) {
+                  this.rv.nomPatient = ((patient.prenom || '') + ' ' + (patient.nom || patient.username || '')).trim();
+                }
+              }
+            });
+          }
+
+          // Charger les détails du médecin
+          if (this.rv?.medecinId) {
+            this.userService.getById(this.rv.medecinId).subscribe({
+              next: (doctor) => {
+                if (this.rv) {
+                  this.rv.medecinNom = ((doctor.prenom || '') + ' ' + (doctor.nom || doctor.username || '')).trim();
+                  if (doctor.hopital) {
+                    this.rv.hopitalNom = doctor.hopital;
+                  }
+                }
+              }
+            });
+          }
         },
         error: () => {
           this.error = 'Rendez-vous introuvable.';

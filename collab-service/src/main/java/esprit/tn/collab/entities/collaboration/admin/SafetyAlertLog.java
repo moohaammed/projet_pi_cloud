@@ -7,14 +7,21 @@ import java.time.Instant;
 @Document(collection = "safety_alert_logs")
 public class SafetyAlertLog {
 
+    
     @Id
     private String id;
 
+    
     private Long patientId;
+
+    
     private SafetyAlertType alertType;
+
+    
     private SafetyAlertStatus status = SafetyAlertStatus.OPEN;
+
+    
     private Instant createdAt = Instant.now();
-    private Long relatedMessageId;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -26,6 +33,4 @@ public class SafetyAlertLog {
     public void setStatus(SafetyAlertStatus status) { this.status = status; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-    public Long getRelatedMessageId() { return relatedMessageId; }
-    public void setRelatedMessageId(Long relatedMessageId) { this.relatedMessageId = relatedMessageId; }
 }

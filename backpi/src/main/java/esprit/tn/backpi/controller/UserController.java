@@ -94,6 +94,16 @@ public class UserController {
         }
     }
 
+    /** POST /api/users/batch — returns multiple users by their IDs in one HTTP call */
+    @PostMapping("/batch")
+    public ResponseEntity<List<User>> getBatch(@RequestBody List<Long> ids) {
+        List<User> users = ids.stream()
+            .map(id -> { try { return userService.findById(id); } catch (Exception e) { return null; } })
+            .filter(u -> u != null)
+            .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(users);
+    }
+
     // ── FCM TOKEN : save user fcm token ──────────────────────────────────────
     @PatchMapping("/{id}/fcm-token")
     public ResponseEntity<?> saveFcmToken(@PathVariable Long id, @RequestBody Map<String, String> body) {

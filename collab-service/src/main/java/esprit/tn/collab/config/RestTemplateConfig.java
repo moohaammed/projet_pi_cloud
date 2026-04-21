@@ -8,8 +8,9 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfig {
 
+    
     @Bean
-    @LoadBalanced  // resolves lb://backpi via Eureka
+    @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }

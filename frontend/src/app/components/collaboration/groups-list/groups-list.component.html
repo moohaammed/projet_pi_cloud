@@ -1,5 +1,8 @@
 <div class="groups-discovery-container animate-fade-in py-4">
 
+  <!-- Voice overlays -->
+  <app-voice-conversation></app-voice-conversation>
+
   <!-- Hero Section -->
   <div class="discovery-hero-clean mb-4 p-5 position-relative overflow-hidden">
     <div class="hero-content position-relative" style="z-index: 2;">
@@ -15,10 +18,26 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <button class="btn btn-primary rounded-pill px-4 fw-black shadow-sm h-100" data-bs-toggle="modal"
-            data-bs-target="#createGroupModal">
+            data-bs-target="#createGroupModal"
+            speakOnHover="Join New" hoverContextType="button" hoverPage="groups">
             <i class="fa-solid fa-plus-circle me-2"></i> Join New
           </button>
         </div>
+      </div>
+
+      <!-- Topic chips — dynamic keywords from group names/descriptions -->
+      <div *ngIf="availableTopics().length > 0" class="d-flex flex-wrap gap-2 mt-3 justify-content-center">
+        <button *ngFor="let topic of availableTopics()"
+          class="btn btn-xs rounded-pill px-3 py-1 fw-bold fs-11 border transition-all"
+          [ngClass]="activeTopics().includes(topic) ? 'btn-primary' : 'btn-light text-muted'"
+          (click)="toggleTopic(topic)">
+          #{{ topic }}
+        </button>
+        <button *ngIf="activeTopics().length > 0"
+          class="btn btn-xs rounded-pill px-3 py-1 fw-bold fs-11 btn-soft-danger border-0"
+          (click)="clearSearch()">
+          <i class="fa-solid fa-xmark me-1"></i> Clear
+        </button>
       </div>
     </div>
     <div class="hero-accent-circle position-absolute bg-primary rounded-circle"
@@ -121,6 +140,7 @@
           <!-- Card Footer Bar -->
           <div
             class="p-4 px-4 border-top d-flex justify-content-between align-items-center cursor-pointer group-footer-action transition-all"
+            [speakOnHover]="grp.name" hoverContextType="group" hoverPage="groups"
             (click)="isMember(grp) ? enterGroup(grp) : requestJoin(grp.id)">
             <div class="d-flex flex-column">
               <span class="fs-12 fw-black text-primary tracking-wider text-uppercase" *ngIf="isMember(grp)">Enter Community</span>
@@ -149,7 +169,7 @@
   </div>
 </div>
 
-<<div class="modal fade" id="createGroupModal" tabindex="-1">
+<div class="modal fade" id="createGroupModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg animate-slide-up">
       <div class="modal-header border-0 p-4 pb-0">
@@ -166,28 +186,25 @@
           <label class="form-label fs-11 fw-black text-muted text-uppercase letter-spacing-1 mb-2">Focus Area</label>
           <div class="row g-2 group-theme-radio">
             <div class="col-4">
-              <input type="radio" class="btn-check" name="theme_final" id="tf-support" [(ngModel)]="newGroupTheme"
-                value="SUPPORT">
-              <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-support">
-                <i class="fa-solid fa-user-doctor d-block mb-1 fs-20"></i>
-                <small class="fw-black text-uppercase fs-10">Clinical</small>
-              </label>
+               <input type="radio" class="btn-check" name="theme_final" id="tf-support" [(ngModel)]="newGroupTheme" value="SUPPORT">
+               <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-support">
+                 <i class="fa-solid fa-user-doctor d-block mb-1 fs-20"></i>
+                 <small class="fw-black text-uppercase fs-10">Clinical</small>
+               </label>
             </div>
             <div class="col-4">
-              <input type="radio" class="btn-check" name="theme_final" id="tf-social" [(ngModel)]="newGroupTheme"
-                value="SOCIAL">
-              <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-social">
-                <i class="fa-solid fa-comments d-block mb-1 fs-20"></i>
-                <small class="fw-black text-uppercase fs-10">Network</small>
-              </label>
+               <input type="radio" class="btn-check" name="theme_final" id="tf-social" [(ngModel)]="newGroupTheme" value="SOCIAL">
+               <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-social">
+                 <i class="fa-solid fa-comments d-block mb-1 fs-20"></i>
+                 <small class="fw-black text-uppercase fs-10">Network</small>
+               </label>
             </div>
             <div class="col-4">
-              <input type="radio" class="btn-check" name="theme_final" id="tf-regional" [(ngModel)]="newGroupTheme"
-                value="REGIONAL">
-              <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-regional">
-                <i class="fa-solid fa-earth-americas d-block mb-1 fs-20"></i>
-                <small class="fw-black text-uppercase fs-10">Regional</small>
-              </label>
+               <input type="radio" class="btn-check" name="theme_final" id="tf-regional" [(ngModel)]="newGroupTheme" value="REGIONAL">
+               <label class="btn btn-outline-primary w-100 py-3 rounded-4 border-2 shadow-sm" for="tf-regional">
+                 <i class="fa-solid fa-earth-americas d-block mb-1 fs-20"></i>
+                 <small class="fw-black text-uppercase fs-10">Regional</small>
+               </label>
             </div>
           </div>
         </div>
@@ -204,3 +221,6 @@
     </div>
   </div>
 </div>
+
+<!-- PATIENT VOICE ASSISTANT -->
+<app-floating-assistant></app-floating-assistant>

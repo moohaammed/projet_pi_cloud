@@ -1,9 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/education/event.service';
 import { EventSeatGridComponent } from './event-seat-grid.component';
 import { CalendarEvent } from '../../../models/education/event.model';
+import { PublicationService } from '../../../services/collaboration/publication.service';
+import { MessageService } from '../../../services/collaboration/message.service';
+import { ChatGroupService } from '../../../services/collaboration/chat-group.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-event-front',
@@ -346,6 +350,32 @@ import { CalendarEvent } from '../../../models/education/event.model';
       min-width: 48px;
       backdrop-filter: blur(8px);
     }
+
+    .card-share-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 3;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      color: #800080;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      backdrop-filter: blur(6px);
+      transition: all 0.2s;
+      font-size: 0.875rem;
+    }
+    .card-share-btn:hover:not(:disabled) {
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .card-share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .chip-day {
       font-family: 'Fraunces', serif;
       font-size: 1.4rem;
@@ -620,6 +650,163 @@ import { CalendarEvent } from '../../../models/education/event.model';
       .header-right { width: 100%; }
       .search-input { width: 100%; }
     }
+
+    /* ─── SHARE MODAL ─── */
+    .evt-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+      animation: fadeIn .2s ease;
+    }
+    .evt-modal-container {
+      background: #fff;
+      border-radius: 20px;
+      width: 90%; max-width: 520px;
+      max-height: 85vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 60px rgba(128,0,128,.2);
+      overflow: hidden;
+      animation: slideUp .25s cubic-bezier(.16,1,.3,1);
+    }
+    .evt-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #f0e0f0;
+      flex-shrink: 0;
+    }
+    .evt-modal-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: none; background: #f5e6f5; color: #800080;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s;
+    }
+    .evt-modal-close:hover { background: #800080; color: #fff; }
+    .evt-modal-body { padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1; }
+
+    .evt-caption-input {
+      width: 100%; border: 1px solid #e0c8e0; border-radius: 12px;
+      padding: .75rem 1rem; font-size: .9rem; resize: none; outline: none;
+      margin-bottom: 1rem; font-family: inherit; color: #2e152e;
+      background: #fdf5fd;
+    }
+    .evt-caption-input:focus { border-color: #800080; }
+
+    .evt-destination-section { display: flex; flex-direction: column; gap: .75rem; }
+    .evt-dest-label { font-size: .78rem; font-weight: 700; color: #b07ab0; text-transform: uppercase; letter-spacing: .5px; margin: 0; }
+    .evt-global-item { border: 2px solid #e0c8e0; }
+    .evt-global-item:hover { border-color: #800080; background: #fdf5fd; }
+    .evt-global-avatar {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #800080, #9933cc);
+      color: #fff; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .evt-divider {
+      display: flex; align-items: center; gap: .75rem;
+      color: #b07ab0; font-size: .75rem; font-weight: 600;
+    }
+    .evt-divider::before, .evt-divider::after {
+      content: ''; flex: 1; height: 1px; background: #e0c8e0;
+    }
+
+    .evt-share-preview {
+      background: linear-gradient(135deg, #f5e6f5, #fdf5fd);
+      border: 1px solid #e0c8e0;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .evt-preview-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 50px;
+      padding: 3px 10px;
+      font-size: .7rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+    .evt-preview-title {
+      font-weight: 700;
+      font-size: .95rem;
+      color: #2e152e;
+      margin: 0 0 .25rem;
+    }
+    .evt-preview-meta { font-size: .78rem; color: #6b3e6b; margin: 0; }
+    .evt-search-wrap {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: #f5e6f5;
+      border-radius: 50px;
+      padding: .5rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .evt-search-wrap i { color: #b07ab0; font-size: .85rem; }
+    .evt-search-input {
+      border: none;
+      background: transparent;
+      flex: 1;
+      font-size: .875rem;
+      outline: none;
+      color: #2e152e;
+    }
+    .evt-search-input::placeholder { color: #b07ab0; }
+    .evt-groups-list { display: flex; flex-direction: column; gap: .5rem; }
+    .evt-empty { text-align: center; padding: 2rem; color: #b07ab0; font-size: .85rem; }
+    .evt-group-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .75rem 1rem;
+      border: 1px solid #f0e0f0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .evt-group-item:hover { background: #fdf5fd; border-color: #e0c8e0; }
+    .evt-group-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 700;
+      font-size: .8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .evt-group-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .evt-group-name { font-weight: 700; font-size: .875rem; color: #2e152e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .evt-group-sub { font-size: .72rem; color: #b07ab0; }
+    .evt-share-btn {
+      flex-shrink: 0;
+      padding: .375rem .875rem;
+      border-radius: 50px;
+      border: none;
+      background: #800080;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: .375rem;
+    }
+    .evt-share-btn:hover:not(:disabled) { background: #660066; }
+    .evt-share-btn:disabled { opacity: .5; cursor: not-allowed; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
   `]
 })
 export class EventFrontComponent implements OnInit {
@@ -632,6 +819,28 @@ export class EventFrontComponent implements OnInit {
   showBooking = false;
   selectedEvent: CalendarEvent | null = null;
   todayDateStr: string = '';
+
+  //Share 
+  isSharing = signal<boolean>(false);
+  successMessage = signal<string>('');
+  errorMessage = signal<string>('');
+
+  showShareModal = signal<boolean>(false);
+  sharingEvent = signal<CalendarEvent | null>(null);
+  shareSearchQuery = signal<string>('');
+  shareCaption = '';
+
+  private publicationService = inject(PublicationService);
+  private messageService = inject(MessageService);
+  private chatGroupService = inject(ChatGroupService);
+  private authService = inject(AuthService);
+
+  filteredGroups = computed(() => {
+    const q = this.shareSearchQuery().toLowerCase();
+    return this.chatGroupService.groups().filter(g =>
+      !q || g.name.toLowerCase().includes(q) || (g.description || '').toLowerCase().includes(q)
+    );
+  });
 
   constructor(private eventService: EventService) {}
 
@@ -768,4 +977,76 @@ export class EventFrontComponent implements OnInit {
       wrapper.appendChild(fallback);
     }
   }
+
+  shareEvent(event: CalendarEvent) {
+    if (!this.authService.isLoggedIn()) {
+      this.errorMessage.set('Veuillez vous connecter pour partager un Ã©vÃ©nement.');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+    this.sharingEvent.set(event);
+    this.showShareModal.set(true);
+    this.chatGroupService.fetchGroups();
+  }
+
+  closeShareModal() {
+    this.showShareModal.set(false);
+    this.sharingEvent.set(null);
+    this.shareSearchQuery.set('');
+    this.shareCaption = '';
+  }
+
+  shareEventGlobal() {
+    const event = this.sharingEvent();
+    const userId = this.authService.getCurrentUser()?.id;
+    if (!event || !userId) return;
+    this.isSharing.set(true);
+    const content = this.shareCaption.trim() || `Regardez cet evenement : ${event.title}`;
+    this.publicationService.createPublicationJson({
+      type: 'EVENT',
+      content,
+      authorId: userId,
+      linkedEventId: event.id
+    }).subscribe({
+      next: () => {
+        this.isSharing.set(false);
+        this.closeShareModal();
+        this.successMessage.set('Evenement partage sur le fil communautaire !');
+        setTimeout(() => this.successMessage.set(''), 4000);
+      },
+      error: (err) => {
+        this.isSharing.set(false);
+        this.errorMessage.set('Erreur : ' + (err.error?.message || 'Reessayez plus tard.'));
+        setTimeout(() => this.errorMessage.set(''), 4000);
+      }
+    });
+  }
+
+  shareEventToGroup(groupId: string) {
+    const event = this.sharingEvent();
+    const userId = this.authService.getCurrentUser()?.id;
+    if (!event || !userId) return;
+    this.isSharing.set(true);
+    const content = this.shareCaption.trim() || `Regardez cet evenement : ${event.title}`;
+    this.publicationService.createPublicationJson({
+      type: 'EVENT',
+      content,
+      authorId: userId,
+      linkedEventId: event.id,
+      groupId
+    }).subscribe({
+      next: () => {
+        this.isSharing.set(false);
+        this.closeShareModal();
+        this.successMessage.set('Evenement partage avec succes !');
+        setTimeout(() => this.successMessage.set(''), 4000);
+      },
+      error: (err) => {
+        this.isSharing.set(false);
+        this.errorMessage.set('Erreur : ' + (err.error?.message || 'Reessayez plus tard.'));
+        setTimeout(() => this.errorMessage.set(''), 4000);
+      }
+    });
+  }
 }
+

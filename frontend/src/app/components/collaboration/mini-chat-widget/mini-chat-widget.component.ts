@@ -29,7 +29,6 @@ export class MiniChatWidgetComponent implements OnInit {
 
   currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1); 
 
-  // Mini Chat State
   isMiniChatOpen = signal(false);
   activeMiniChatType = signal<'users' | 'groups'>('users');
   activeMiniChatUserId = signal<number | null>(null);
@@ -38,21 +37,18 @@ export class MiniChatWidgetComponent implements OnInit {
   miniChatInput = '';
   
   replyingTo: MessageDto | null = null;
-  selectedMessageFile: File | null = null;
+  selectedMessageFiles: File[] = [];
   medicationReminderAnsweredIds = signal<Set<string>>(new Set());
   medReminderAckLoading = signal<boolean>(false);
 
-  // Poll State
   isPollMode = signal<boolean>(false);
   pollQuestion = '';
   pollOptions = signal<string[]>(['', '']);
 
-  // Mention State
   mentionQuery = signal<string>('');
   showMentionDropdown = signal<boolean>(false);
-  
-  // Emoji State
   showEmojiPicker = signal<boolean>(false);
+  unreadCount = signal<number>(0);
 
   readonly EMOJI_LIST = [
     '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😻','😼','😽','🙀','😿','😾',
@@ -152,7 +148,7 @@ export class MiniChatWidgetComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.emoji-picker-container') && !target.closest('.btn-emoji-toggle')) {
+    if (!target.closest('.mc-emoji-picker-container') && !target.closest('.mc-emoji-toggle')) {
       this.showEmojiPicker.set(false);
     }
   }
@@ -162,7 +158,6 @@ export class MiniChatWidgetComponent implements OnInit {
   }
 
   constructor() {
-    // Mini-chat WebSocket effect
     effect(() => {
       const newMsg = this.webSocketService.realtimeMessage() as any;
       if (newMsg) {
@@ -172,7 +167,6 @@ export class MiniChatWidgetComponent implements OnInit {
             return;
           }
 
-          // Handle pinning update (message updated in place)
           const indexGroup = this.messageService.messages().findIndex(m => m.id === newMsg.id);
           if (indexGroup !== -1) {
             this.messageService.messages.update(msgs => {
@@ -187,24 +181,11 @@ export class MiniChatWidgetComponent implements OnInit {
           const activeGrp = this.activeMiniChatGroupId();
           const uid = this.currentUserId();
           
-          // --- AUTO-OPEN LOGIC (Facebook Style) ---
           if (newMsg.senderId !== uid) {
-            const isOnMessenger = this.router.url.includes('/collaboration/messenger');
-            if (!isOnMessenger) {
-              this.isMiniChatOpen.set(true);
-            }
-            
-            if (newMsg.chatGroupId) {
-              if (activeGrp !== newMsg.chatGroupId) {
-                this.openMiniChatGroup(newMsg.chatGroupId);
-              }
-            } else if (newMsg.receiverId === uid) {
-              if (activeDm !== newMsg.senderId) {
-                this.openMiniChatConversation(newMsg.senderId);
-              }
+            if (!this.isMiniChatOpen()) {
+              this.unreadCount.update(n => n + 1);
             }
           }
-          // ------------------------------------------
 
           let shouldAdd = false;
           if (this.activeMiniChatGroupId() && newMsg.chatGroupId === this.activeMiniChatGroupId()) {
@@ -233,6 +214,9 @@ export class MiniChatWidgetComponent implements OnInit {
 
   toggleMiniChat() {
     this.isMiniChatOpen.update(v => !v);
+    if (this.isMiniChatOpen()) {
+      this.unreadCount.set(0);
+    }
   }
 
   openMiniChatConversation(userId: number) {
@@ -240,7 +224,6 @@ export class MiniChatWidgetComponent implements OnInit {
     this.activeMiniChatGroupId.set(null);
     this.messageService.fetchDirectMessages(this.currentUserId(), userId)
       .subscribe(msgs => {
-        // Ensure the triggering message isn't lost if fetch happens too fast
         const realtime = this.webSocketService.realtimeMessage() as any;
         if (realtime && !realtime.chatGroupId && (realtime.senderId === userId || realtime.receiverId === userId)) {
           if (!msgs.some(m => m.id === realtime.id)) {
@@ -306,8 +289,13 @@ export class MiniChatWidgetComponent implements OnInit {
 
   onMessageFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) this.selectedMessageFile = file;
+    if (input.files) {
+      this.selectedMessageFiles = Array.from(input.files);
+    }
+  }
+
+  removeSelectedMessageFile(index: number) {
+    this.selectedMessageFiles = this.selectedMessageFiles.filter((_, i) => i !== index);
   }
 
   togglePollMode() {
@@ -370,7 +358,7 @@ export class MiniChatWidgetComponent implements OnInit {
     }
     const activeUserId = this.activeMiniChatUserId();
     const activeGroupId = this.activeMiniChatGroupId();
-    if (!this.miniChatInput.trim() && !this.selectedMessageFile) return;
+    if (!this.miniChatInput.trim() && this.selectedMessageFiles.length === 0) return;
     
     this.messageService.createMessage({
       content: this.miniChatInput,
@@ -379,9 +367,9 @@ export class MiniChatWidgetComponent implements OnInit {
       chatGroupId: activeGroupId || undefined,
       parentMessageId: this.replyingTo?.id,
       type: 'TEXT'
-    }, this.selectedMessageFile || undefined).subscribe(() => {
+    }, this.selectedMessageFiles.length > 0 ? this.selectedMessageFiles : undefined).subscribe(() => {
       this.miniChatInput = '';
-      this.selectedMessageFile = null;
+      this.selectedMessageFiles = [];
       this.cancelReply();
       if (activeGroupId) {
         this.messageService.fetchMessagesByGroup(activeGroupId);
@@ -425,8 +413,6 @@ export class MiniChatWidgetComponent implements OnInit {
       if (grp) this.chatGroupService.activeGroup.set(grp);
       this.router.navigate(['/collaboration/messenger']);
     } else if (uid) {
-      // In full messenger, there's no direct route param for DM yet, 
-      // but we can set up the service if MessengerComponent respects it.
       this.router.navigate(['/collaboration/messenger'], { queryParams: { dm: uid } });
     } else {
       this.router.navigate(['/collaboration/messenger']);

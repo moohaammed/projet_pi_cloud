@@ -16,6 +16,9 @@ public class ChatGroupCreateDto {
     private String theme;
     private List<Long> memberIds;
     private Long ownerId;
+    private List<String> tags;
+    private boolean isDefault = false;
+    private String defaultForRole;
 
     public ChatGroupCreateDto() {}
 
@@ -29,4 +32,10 @@ public class ChatGroupCreateDto {
     public void setMemberIds(List<Long> memberIds) { this.memberIds = memberIds; }
     public Long getOwnerId() { return ownerId; }
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
+    public boolean isDefault() { return isDefault; }
+    public void setDefault(boolean aDefault) { isDefault = aDefault; }
+    public String getDefaultForRole() { return defaultForRole; }
+    public void setDefaultForRole(String defaultForRole) { this.defaultForRole = defaultForRole; }
 }
