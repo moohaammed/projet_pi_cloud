@@ -7,8 +7,7 @@ import { RendezVous, StatutRendezVous } from '../models/rendezvous.model';
   providedIn: 'root'
 })
 export class RendezVousService {
-  private readonly apiUrl = 'http://localhost:8080/api/rendezvous';
-
+  private readonly apiUrl = '/api/rendezvous';
   constructor(private http: HttpClient) { }
 
   getAll(): Observable<RendezVous[]> {
