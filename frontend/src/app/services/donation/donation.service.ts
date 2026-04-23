@@ -80,4 +80,9 @@ export class DonationService {
   deleteDonation(id: string): Observable<void> {
     return this.http.delete<void>(`${this.donationApi}/${id}`);
   }
+
+  // ── AI Analysis ────────────────────────────────
+  analyzeCampaign(id: string): Observable<any> {
+    return this.http.get<any>(`http://localhost:8080/api/ai/analyze-campaign/${id}`);
+  }
 }

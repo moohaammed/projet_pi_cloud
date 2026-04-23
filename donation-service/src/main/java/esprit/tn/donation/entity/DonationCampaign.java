@@ -23,6 +23,8 @@ public class DonationCampaign {
 
     private Boolean active = true;
 
+    private String aiSummary;
+
     private LocalDateTime createdAt;
 
     public DonationCampaign() {
@@ -41,6 +43,9 @@ public class DonationCampaign {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getAiSummary() { return aiSummary; }
+    public void setAiSummary(String aiSummary) { this.aiSummary = aiSummary; }
 
     public Double getGoalAmount() { return goalAmount; }
     public void setGoalAmount(Double goalAmount) { this.goalAmount = goalAmount; }
