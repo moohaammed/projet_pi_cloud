@@ -37,7 +37,7 @@ spring:
         - id: donation-rest
           uri: lb://donation-service
           predicates:
-            - Path=/api/donations/**,/api/campaigns/**
+            - Path=/api/donations/**,/api/campaigns/**,/api/ai/**
 
         # ── Main service (backpi) ──────────────────────────────────────────
         - id: main-service

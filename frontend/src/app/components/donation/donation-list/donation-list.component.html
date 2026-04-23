@@ -120,16 +120,13 @@
         <div class="card-separator"></div>
 
         <div class="card-footer">
-          <span class="donor-count">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          <button class="ai-explain-btn" (click)="explainWithAi(campaign.id)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
             </svg>
-            Soutenir cette cause
-          </span>
-          <a class="donate-btn" [routerLink]="['/donations', campaign.id]">
+            Expliquer ✨
+          </button>
+          <a class="donate-btn" [routerLink]="['/donations', campaign.id!]">
             Faire un don
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="5" y1="12" x2="19" y2="12"/>
@@ -160,6 +157,64 @@
         <polyline points="9 18 15 12 9 6"/>
       </svg>
     </button>
+  </div>
+
+  <!-- AI MODAL -->
+  <div class="ai-modal-overlay" *ngIf="showAiModal" (click)="closeAiModal()">
+    <div class="ai-modal" (click)="$event.stopPropagation()">
+      <button class="ai-modal-close" (click)="closeAiModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="16">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+
+      <div class="ai-header">
+        <div class="ai-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+          </svg>
+        </div>
+        <div class="ai-title-group">
+          <h2>Analyse de l'IA</h2>
+          <p class="ai-subtitle">Propulsé par Llama 3 (Ollama)</p>
+        </div>
+      </div>
+
+      <!-- LOADING STATE -->
+      <div class="ai-loading" *ngIf="analyzing">
+        <div class="spinner"></div>
+        <p>L'IA analyse l'impact de votre don...</p>
+      </div>
+
+      <!-- RESULT STATE -->
+      <div class="ai-content" *ngIf="!analyzing && aiResult">
+        <div class="ai-pitch-card">
+          {{ aiResult.pitch }}
+        </div>
+
+        <div class="ai-tags-grid">
+          <div class="ai-tag-item">
+            <span class="tag-label">Catégorie</span>
+            <span class="tag-value">{{ aiResult.category }}</span>
+          </div>
+          <div class="ai-tag-item">
+            <span class="tag-label">Région</span>
+            <span class="tag-value">{{ aiResult.region }}</span>
+          </div>
+          <div class="ai-tag-item">
+            <span class="tag-label">Impact</span>
+            <span class="tag-value">{{ aiResult.beneficiaries }}</span>
+          </div>
+          <div class="ai-tag-item">
+            <span class="tag-label">Urgence</span>
+            <span class="tag-value urgency">
+              <span class="urgency-dot" [ngClass]="aiResult.urgency?.toLowerCase() === 'haute' ? 'haute' : (aiResult.urgency?.toLowerCase() === 'moyenne' ? 'moyenne' : 'basse')"></span>
+              {{ aiResult.urgency }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
