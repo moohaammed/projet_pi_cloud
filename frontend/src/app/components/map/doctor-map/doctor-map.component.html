@@ -1,16 +1,16 @@
 <div class="d-flex" style="height: calc(100vh - 60px)">
- 
+
   <!-- ===== SIDEBAR GAUCHE ===== -->
-  <div class="border-end bg-white d-flex flex-column"
-       style="width:260px; flex-shrink:0">
- 
+  <div class="border-end bg-white d-flex flex-column" style="width:260px; flex-shrink:0">
+
     <div class="p-3 border-bottom">
       <h6 class="fw-bold mb-1">
         <i class="fa-solid fa-users text-primary me-2"></i>Mes patients
       </h6>
       <small class="text-muted">{{ patients.length }} patients suivis</small>
     </div>
- 
+
+    <!-- Liste patients -->
     <div class="overflow-auto flex-grow-1 p-2">
       <div *ngFor="let p of patients"
            class="d-flex align-items-center p-2 rounded-3 mb-1"
@@ -37,18 +37,55 @@
           {{ p.actif ? 'A' : 'I' }}
         </span>
       </div>
- 
       <div *ngIf="patients.length === 0" class="text-center text-muted py-4">
         <i class="fa-solid fa-user-slash d-block fs-3 mb-2"></i>
         Aucun patient
       </div>
     </div>
- 
-    <!-- Liste hôpitaux -->
+
+    <!-- Incidents IA sidebar -->
     <div class="border-top p-2" style="max-height:180px; overflow-y:auto">
       <div class="d-flex justify-content-between align-items-center mb-2 px-1">
-        <small class="fw-bold text-muted text-uppercase"
-               style="letter-spacing:0.5px">
+        <small class="fw-bold text-uppercase" style="letter-spacing:0.5px; color:#6f42c1">
+          <i class="fa-solid fa-triangle-exclamation me-1"></i>Incidents IA
+          <span *ngIf="incidentCount > 0" class="badge bg-danger rounded-pill ms-1">{{ incidentCount }}</span>
+        </small>
+        <button class="btn py-0 px-2"
+                style="font-size:10px; border-radius:20px"
+                [style.background]="showIncidents ? '#6f42c1' : ''"
+                [style.color]="showIncidents ? 'white' : ''"
+                [class.btn-outline-secondary]="!showIncidents"
+                (click)="toggleIncidents()">
+          {{ showIncidents ? 'Masquer' : 'Afficher' }}
+        </button>
+      </div>
+      <ng-container *ngIf="showIncidents">
+        <div *ngFor="let inc of incidents.slice(0,5)"
+             class="p-2 rounded-2 mb-1 d-flex align-items-start gap-2"
+             style="font-size:11px; background:#f5f0ff; border-left:3px solid #6f42c1; cursor:pointer"
+             (click)="focusIncidentOnMap(inc)">
+          <i class="fa-solid fa-location-dot mt-1 flex-shrink-0" style="color:#6f42c1"></i>
+          <div class="overflow-hidden">
+            <div class="fw-semibold text-truncate" style="color:#3c3489">{{ inc.title }}</div>
+            <div class="text-muted text-truncate">{{ inc.type }}</div>
+          </div>
+        </div>
+        <div *ngIf="incidents.length === 0" class="text-center py-2" style="font-size:11px; color:#9490b0">
+          Aucun incident détecté
+        </div>
+        <button *ngIf="incidents.length > 5"
+                class="btn btn-sm w-100 mt-1 py-0"
+                style="font-size:10px; color:#6f42c1; border-color:#6f42c1"
+                (click)="goToIncidentsTab()">
+          Voir tous ({{ incidents.length }}) →
+        </button>
+      </ng-container>
+    </div>
+
+    <!-- Hôpitaux -->
+    <div class="border-top p-2" style="max-height:160px; overflow-y:auto">
+      <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+        <small class="fw-bold text-muted text-uppercase" style="letter-spacing:0.5px">
           Hôpitaux ({{ hospitals.length }})
         </small>
         <button class="btn btn-xs py-0 px-1"
@@ -67,45 +104,54 @@
       </div>
     </div>
   </div>
- 
+
   <!-- ===== CARTE PRINCIPALE ===== -->
   <div class="flex-grow-1 position-relative">
     <div id="doctor-map" style="width:100%; height:100%"></div>
- 
-    <!-- Message si mode édition zone -->
-    <div *ngIf="editingZone"
+
+    <!-- Bandeau mode placement incident -->
+    <div *ngIf="addingIncident"
+         class="position-absolute top-0 start-50 translate-middle-x mt-3"
+         style="z-index:1001">
+      <div class="d-flex align-items-center gap-3 px-4 py-2 rounded-pill shadow"
+           style="background:linear-gradient(135deg,#6f42c1,#3c3489); color:white; font-weight:700; font-size:13px">
+        <i class="fa-solid fa-hand-pointer fa-beat"></i>
+        Cliquez sur la carte pour positionner l'incident
+        <button class="btn btn-sm rounded-pill px-3 py-0"
+                style="background:rgba(255,255,255,0.25); color:white; border:1px solid rgba(255,255,255,0.4); font-size:12px"
+                (click)="cancelAddIncident()">
+          <i class="fa-solid fa-xmark me-1"></i>Annuler
+        </button>
+      </div>
+    </div>
+
+    <!-- Bandeau mode édition zone -->
+    <div *ngIf="editingZone && !addingIncident"
          class="position-absolute top-0 start-50 translate-middle-x mt-3"
          style="z-index:1000">
       <div class="alert alert-warning shadow-sm py-2 px-3 mb-0 d-flex align-items-center gap-2">
         <i class="fa-solid fa-hand-pointer"></i>
-        <span class="small fw-medium">
-          Cliquez sur la carte pour déplacer le centre de la zone
-        </span>
+        <span class="small fw-medium">Cliquez sur la carte pour déplacer le centre de la zone</span>
       </div>
     </div>
- 
+
     <!-- Alertes actives -->
     <div *ngIf="unresolvedAlerts.length > 0"
          class="position-absolute top-0 end-0 m-3"
          style="z-index:1000; max-width:280px">
       <div class="card border-0 shadow-sm">
-        <div class="card-header bg-danger text-white py-2 d-flex
-                    align-items-center justify-content-between">
+        <div class="card-header bg-danger text-white py-2 d-flex align-items-center justify-content-between">
           <span class="small fw-bold">
-            <i class="fa-solid fa-bell me-1"></i>
-            {{ unresolvedAlerts.length }} alerte(s)
+            <i class="fa-solid fa-bell me-1"></i>{{ unresolvedAlerts.length }} alerte(s)
           </span>
         </div>
         <div style="max-height:180px; overflow-y:auto">
           <div *ngFor="let alert of unresolvedAlerts"
                class="d-flex align-items-start p-2 border-bottom">
-            <i class="fa-solid me-2 mt-1 text-danger small"
-               [class]="getAlertIcon(alert.typeAlerte)"></i>
+            <i class="fa-solid me-2 mt-1 text-danger small" [class]="getAlertIcon(alert.typeAlerte)"></i>
             <div class="flex-grow-1">
               <div style="font-size:11px" class="fw-medium">{{ alert.typeAlerte }}</div>
-              <div class="text-muted" style="font-size:10px">
-                {{ alert.declencheeAt | date:'dd/MM HH:mm' }}
-              </div>
+              <div class="text-muted" style="font-size:10px">{{ alert.declencheeAt | date:'dd/MM HH:mm' }}</div>
             </div>
             <button class="btn btn-sm btn-outline-success py-0 px-1"
                     style="font-size:10px"
@@ -114,61 +160,66 @@
         </div>
       </div>
     </div>
- 
+
     <!-- Légende -->
     <div class="position-absolute bottom-0 start-0 m-3 bg-white rounded-3 shadow-sm p-3"
-         style="z-index:1000; font-size:11px; min-width:150px">
+         style="z-index:1000; font-size:11px; min-width:160px">
       <div class="fw-bold mb-2 text-muted">Légende</div>
       <div class="d-flex align-items-center mb-1">
-        <div style="width:12px; height:12px; background:#0d6efd;
-                    border-radius:50%; margin-right:6px"></div>
-        Patient en ligne
+        <div style="width:12px;height:12px;background:#0d6efd;border-radius:50%;margin-right:6px"></div>Patient en ligne
       </div>
       <div class="d-flex align-items-center mb-1">
-        <div style="width:12px; height:12px; background:#6c757d;
-                    border-radius:50%; margin-right:6px; opacity:0.5"></div>
-        Patient hors ligne
+        <div style="width:12px;height:12px;background:#6c757d;border-radius:50%;margin-right:6px;opacity:.5"></div>Patient hors ligne
       </div>
       <div class="d-flex align-items-center mb-1">
-        <div style="width:12px; height:12px; background:#dc3545;
-                    border-radius:4px; margin-right:6px"></div>
-        Hôpital
+        <div style="width:12px;height:12px;background:#dc3545;border-radius:4px;margin-right:6px"></div>Hôpital
       </div>
       <div class="d-flex align-items-center mb-1">
-        <div style="width:14px; height:3px; background:#28a745;
-                    margin-right:6px"></div>
-        Zone verte
+        <div style="width:14px;height:3px;background:#28a745;margin-right:6px"></div>Zone verte
+      </div>
+      <div class="d-flex align-items-center mb-1">
+        <div style="width:14px;height:3px;background:#dc3545;margin-right:6px"></div>Zone rouge
       </div>
       <div class="d-flex align-items-center mb-2">
-        <div style="width:14px; height:3px; background:#dc3545;
-                    margin-right:6px"></div>
-        Zone rouge
-      </div>
-      <div class="d-flex align-items-center mb-2">
-        <div style="width:14px; height:3px; background:#6f42c1;
-                    border-top:2px dashed #6f42c1; margin-right:6px"></div>
-        Historique
+        <div style="width:12px;height:12px;background:#6f42c1;border-radius:50%;margin-right:6px"></div>Incident IA ⚠️
       </div>
       <button class="btn btn-outline-primary btn-sm w-100 py-0"
-              style="font-size:11px"
-              (click)="refreshAllPositions()">
+              style="font-size:11px" (click)="refreshAllPositions()">
         <i class="fa-solid fa-rotate me-1"></i>Actualiser
       </button>
     </div>
+
+    <!-- ===== BOUTONS FLOTTANTS (bas droite) ===== -->
+    <div class="position-absolute d-flex flex-column gap-2"
+         style="z-index:1000; bottom:20px; right:20px"
+         [style.opacity]="addingIncident ? '0.3' : '1'"
+         [style.pointerEvents]="addingIncident ? 'none' : 'auto'">
+
+      <!-- Bouton Ajouter un incident -->
+      <button class="btn d-flex align-items-center gap-2 shadow"
+              style="background:linear-gradient(135deg,#6f42c1,#3c3489);
+                     color:white; border:none; border-radius:50px;
+                     padding:11px 20px; font-weight:700; font-size:13px;
+                     box-shadow:0 4px 18px rgba(111,66,193,0.45) !important"
+              (click)="startAddIncident()">
+        <i class="fa-solid fa-plus"></i>
+        Ajouter un incident
+      </button>
+    </div>
   </div>
- 
+
   <!-- ===== SIDEBAR DROITE ===== -->
-  <div *ngIf="selectedPatient"
+  <div *ngIf="selectedPatient || viewingAllIncidents"
        class="border-start bg-white overflow-auto"
        style="width:320px; flex-shrink:0">
- 
-    <!-- Header patient -->
-    <div class="p-3 text-white"
-         style="background: linear-gradient(135deg, #0d6efd, #0a58ca)">
+
+    <!-- Header patient (si patient sélectionné) -->
+    <div *ngIf="selectedPatient" class="p-3 text-white"
+         style="background:linear-gradient(135deg,#0d6efd,#0a58ca)">
       <div class="d-flex align-items-center gap-2">
         <div class="rounded-circle bg-white d-flex align-items-center justify-content-center
                     fw-bold text-primary flex-shrink-0"
-             style="width:40px; height:40px; font-size:14px">
+             style="width:40px;height:40px;font-size:14px">
           {{ selectedPatient.nom.charAt(0) }}{{ selectedPatient.prenom.charAt(0) }}
         </div>
         <div>
@@ -177,22 +228,45 @@
         </div>
       </div>
     </div>
- 
-    <!-- Onglets -->
-    <div class="d-flex border-bottom">
+
+    <!-- Header "tous les incidents" (si pas de patient sélectionné) -->
+    <div *ngIf="!selectedPatient && viewingAllIncidents"
+         class="p-3 text-white d-flex align-items-center justify-content-between"
+         style="background:linear-gradient(135deg,#6f42c1,#3c3489)">
+      <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle d-flex align-items-center justify-content-center"
+             style="width:40px;height:40px;background:rgba(255,255,255,0.2)">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <div class="fw-bold">Tous les incidents</div>
+          <div class="small opacity-75">{{ incidents.length }} incidents détectés</div>
+        </div>
+      </div>
+      <button class="btn p-1" style="color:white;background:rgba(255,255,255,0.15);border-radius:8px"
+              (click)="viewingAllIncidents = false">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Onglets (masqués en mode "tous incidents" sans patient) -->
+    <div *ngIf="selectedPatient" class="d-flex border-bottom" style="overflow-x:auto">
       <button class="flex-fill btn btn-sm py-2 rounded-0 border-0"
+              style="min-width:55px; font-size:11px"
               [class.btn-primary]="activeTab === 'zone'"
               [class.text-muted]="activeTab !== 'zone'"
               (click)="activeTab = 'zone'">
         <i class="fa-solid fa-circle-dot me-1"></i>Zones
       </button>
       <button class="flex-fill btn btn-sm py-2 rounded-0 border-0 border-start border-end"
+              style="min-width:55px; font-size:11px"
               [class.btn-primary]="activeTab === 'history'"
               [class.text-muted]="activeTab !== 'history'"
               (click)="activeTab = 'history'">
         <i class="fa-solid fa-route me-1"></i>Trajets
       </button>
-      <button class="flex-fill btn btn-sm py-2 rounded-0 border-0"
+      <button class="flex-fill btn btn-sm py-2 rounded-0 border-0 border-end"
+              style="min-width:55px; font-size:11px"
               [class.btn-primary]="activeTab === 'alerts'"
               [class.text-muted]="activeTab !== 'alerts'"
               (click)="activeTab = 'alerts'">
@@ -202,18 +276,28 @@
           {{ unresolvedAlerts.length }}
         </span>
       </button>
+      <button class="flex-fill btn btn-sm py-2 rounded-0 border-0"
+              style="min-width:65px; font-size:11px"
+              [class.text-muted]="activeTab !== 'incidents'"
+              [style.background]="activeTab === 'incidents' ? '#6f42c1' : ''"
+              [style.color]="activeTab === 'incidents' ? 'white' : ''"
+              (click)="openIncidentsTab()">
+        <i class="fa-solid fa-triangle-exclamation me-1"></i>
+        Incidents
+        <span *ngIf="incidentTabCount > 0"
+              class="badge rounded-pill ms-1"
+              style="font-size:9px; background:rgba(255,255,255,0.3); color:inherit">
+          {{ incidentTabCount }}
+        </span>
+      </button>
     </div>
- 
+
     <div class="p-3">
- 
-      <!-- ===== ONGLET ZONES ===== -->
+
+      <!-- ══ ONGLET ZONES ══ -->
       <div *ngIf="activeTab === 'zone'">
- 
-        <!-- Zone existante - affichage -->
         <div *ngIf="selectedZone && !editingZone">
           <h6 class="fw-semibold mb-3">Zone de sécurité active</h6>
- 
-          <!-- Info maison -->
           <div class="mb-3 p-2 bg-light rounded-3 d-flex align-items-center gap-2">
             <i class="fa-solid fa-house text-primary"></i>
             <div class="small">
@@ -224,12 +308,10 @@
               </div>
             </div>
             <button class="btn btn-outline-primary btn-sm ms-auto py-0 px-1"
-                    style="font-size:10px"
-                    (click)="centrerSurMaison()">
+                    style="font-size:10px" (click)="centrerSurMaison()">
               <i class="fa-solid fa-crosshairs"></i>
             </button>
           </div>
- 
           <div class="mb-2 p-3 rounded-3 border border-success bg-success bg-opacity-10">
             <div class="d-flex justify-content-between align-items-center">
               <div>
@@ -239,7 +321,6 @@
               <span class="badge bg-success fs-6">{{ selectedZone.rayonVert }}m</span>
             </div>
           </div>
- 
           <div class="mb-3 p-3 rounded-3 border border-danger bg-danger bg-opacity-10">
             <div class="d-flex justify-content-between align-items-center">
               <div>
@@ -249,14 +330,11 @@
               <span class="badge bg-danger fs-6">{{ selectedZone.rayonRouge }}m</span>
             </div>
           </div>
- 
-          <button class="btn btn-outline-primary btn-sm w-100"
-                  (click)="startEditZone()">
+          <button class="btn btn-outline-primary btn-sm w-100" (click)="startEditZone()">
             <i class="fa-solid fa-pen me-1"></i>Modifier la zone
           </button>
         </div>
- 
-        <!-- Formulaire zone -->
+
         <div *ngIf="!selectedZone || editingZone">
           <h6 class="fw-semibold mb-1">
             <i class="fa-solid fa-draw-polygon text-primary me-1"></i>
@@ -266,94 +344,69 @@
             <i class="fa-solid fa-hand-pointer me-1"></i>
             Cliquez sur la carte pour positionner le centre
           </p>
- 
-          <!-- ← BOUTON POSITION ACTUELLE -->
-          <button class="btn btn-outline-primary btn-sm w-100 mb-3"
-                  (click)="utiliserPositionActuelle()">
-            <i class="fa-solid fa-house me-1"></i>
-            Utiliser position actuelle comme maison
+          <button class="btn btn-outline-primary btn-sm w-100 mb-3" (click)="utiliserPositionActuelle()">
+            <i class="fa-solid fa-house me-1"></i>Utiliser position actuelle comme maison
           </button>
- 
           <div class="mb-2">
             <label class="form-label small fw-medium">Latitude centre</label>
             <input type="number" class="form-control form-control-sm"
-                   [(ngModel)]="newZone.latitudeCentre"
-                   step="0.0001"
+                   [(ngModel)]="newZone.latitudeCentre" step="0.0001"
                    (ngModelChange)="updatePreviewZone()">
           </div>
- 
           <div class="mb-3">
             <label class="form-label small fw-medium">Longitude centre</label>
             <input type="number" class="form-control form-control-sm"
-                   [(ngModel)]="newZone.longitudeCentre"
-                   step="0.0001"
+                   [(ngModel)]="newZone.longitudeCentre" step="0.0001"
                    (ngModelChange)="updatePreviewZone()">
           </div>
- 
           <div class="mb-2">
             <label class="form-label small fw-medium d-flex justify-content-between">
               <span class="text-success fw-bold">🟢 Zone verte</span>
               <span class="badge bg-success">{{ newZone.rayonVert }}m</span>
             </label>
             <input type="range" class="form-range"
-                   [(ngModel)]="newZone.rayonVert"
-                   min="50" max="2000" step="50"
+                   [(ngModel)]="newZone.rayonVert" min="50" max="2000" step="50"
                    (input)="updatePreviewZone()">
-            <div class="d-flex justify-content-between text-muted"
-                 style="font-size:10px">
+            <div class="d-flex justify-content-between text-muted" style="font-size:10px">
               <span>50m</span><span>2000m</span>
             </div>
           </div>
- 
           <div class="mb-3">
             <label class="form-label small fw-medium d-flex justify-content-between">
               <span class="text-danger fw-bold">🔴 Zone rouge</span>
               <span class="badge bg-danger">{{ newZone.rayonRouge }}m</span>
             </label>
             <input type="range" class="form-range"
-                   [(ngModel)]="newZone.rayonRouge"
-                   min="100" max="5000" step="100"
+                   [(ngModel)]="newZone.rayonRouge" min="100" max="5000" step="100"
                    (input)="updatePreviewZone()">
-            <div class="d-flex justify-content-between text-muted"
-                 style="font-size:10px">
+            <div class="d-flex justify-content-between text-muted" style="font-size:10px">
               <span>100m</span><span>5000m</span>
             </div>
           </div>
- 
           <div class="d-flex gap-2">
-            <button class="btn btn-primary btn-sm flex-grow-1"
-                    (click)="saveZone()">
+            <button class="btn btn-primary btn-sm flex-grow-1" (click)="saveZone()">
               <i class="fa-solid fa-floppy-disk me-1"></i>
               {{ selectedZone ? 'Modifier' : 'Enregistrer' }}
             </button>
-            <button *ngIf="editingZone"
-                    class="btn btn-outline-secondary btn-sm"
-                    (click)="cancelEdit()">
-              Annuler
-            </button>
+            <button *ngIf="editingZone" class="btn btn-outline-secondary btn-sm"
+                    (click)="cancelEdit()">Annuler</button>
           </div>
         </div>
- 
-        <!-- Hôpital le plus proche -->
+
         <hr class="my-3">
         <h6 class="fw-semibold mb-2 small">
-          <i class="fa-solid fa-hospital text-danger me-1"></i>
-          Hôpital le plus proche
+          <i class="fa-solid fa-hospital text-danger me-1"></i>Hôpital le plus proche
         </h6>
         <div *ngIf="nearestHospital" class="card border-danger border-opacity-25">
           <div class="card-body p-2">
             <div class="fw-semibold small text-danger">{{ nearestHospital.nom }}</div>
-            <div class="text-muted" style="font-size:11px">
-              {{ nearestHospital.adresse }}, {{ nearestHospital.ville }}
-            </div>
+            <div class="text-muted" style="font-size:11px">{{ nearestHospital.adresse }}, {{ nearestHospital.ville }}</div>
             <div *ngIf="nearestHospital.telephone" style="font-size:11px" class="mt-1">
-              <i class="fa-solid fa-phone me-1 text-success"></i>
-              {{ nearestHospital.telephone }}
+              <i class="fa-solid fa-phone me-1 text-success"></i>{{ nearestHospital.telephone }}
             </div>
             <a [href]="'https://maps.google.com/?q=' + nearestHospital.latitude + ',' + nearestHospital.longitude"
                target="_blank"
-               class="btn btn-outline-danger btn-sm w-100 mt-2 py-0"
-               style="font-size:11px">
+               class="btn btn-outline-danger btn-sm w-100 mt-2 py-0" style="font-size:11px">
               <i class="fa-solid fa-compass me-1"></i>Itinéraire
             </a>
           </div>
@@ -362,26 +415,42 @@
           Aucun hôpital avec coordonnées GPS
         </div>
       </div>
- 
-      <!-- ===== ONGLET HISTORIQUE ===== -->
+
+      <!-- ══ ONGLET HISTORIQUE ══ -->
       <div *ngIf="activeTab === 'history'">
         <h6 class="fw-semibold mb-2">
           <i class="fa-solid fa-route me-1" style="color:#6f42c1"></i>
           Historique des 7 derniers jours
         </h6>
- 
+
         <button class="btn w-100 mb-3"
                 [class.btn-outline-secondary]="!showHistory"
+                [disabled]="historyLoading"
                 (click)="toggleHistory()"
                 [style.background]="showHistory ? '#6f42c1' : ''"
                 [style.color]="showHistory ? 'white' : ''">
-          <i class="fa-solid me-1"
-             [class.fa-eye-slash]="showHistory"
-             [class.fa-eye]="!showHistory"></i>
-          {{ showHistory ? 'Masquer le trajet' : 'Afficher le trajet' }}
+          <span *ngIf="historyLoading">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Calcul de l'itinéraire…
+          </span>
+          <span *ngIf="!historyLoading">
+            <i class="fa-solid me-1"
+               [class.fa-eye-slash]="showHistory"
+               [class.fa-eye]="!showHistory"></i>
+            {{ showHistory ? 'Masquer le trajet' : 'Afficher le trajet' }}
+          </span>
         </button>
- 
-        <div *ngIf="showHistory && history.length > 0"
+
+        <!-- Info source du tracé -->
+        <div *ngIf="showHistory && !historyLoading && history.length > 0"
+             class="d-flex align-items-center gap-2 mb-2 px-1"
+             style="font-size:10px; color:#6f42c1">
+          <i class="fa-solid fa-map-signs"></i>
+          <span>Tracé calculé via <strong>OSRM</strong> (routes réelles)</span>
+        </div>
+
+        <!-- Stats -->
+        <div *ngIf="showHistory && !historyLoading && history.length > 0"
              class="card border-0 bg-light rounded-3 mb-3">
           <div class="card-body p-3">
             <div class="row g-2 text-center">
@@ -396,16 +465,40 @@
             </div>
           </div>
         </div>
- 
-        <div *ngIf="showHistory && history.length === 0"
+
+        <!-- Légende marqueurs -->
+        <div *ngIf="showHistory && !historyLoading && history.length > 0"
+             class="d-flex gap-3 mb-3 px-1">
+          <div class="d-flex align-items-center gap-1" style="font-size:11px">
+            <div style="width:18px;height:18px;border-radius:50%;background:#6f42c1;
+                        color:white;display:flex;align-items:center;justify-content:center;
+                        font-size:9px;font-weight:700;border:2px solid white;
+                        box-shadow:0 1px 4px rgba(0,0,0,.2)">D</div>
+            Départ
+          </div>
+          <div class="d-flex align-items-center gap-1" style="font-size:11px">
+            <div style="width:18px;height:18px;border-radius:50%;background:#28a745;
+                        color:white;display:flex;align-items:center;justify-content:center;
+                        font-size:9px;font-weight:700;border:2px solid white;
+                        box-shadow:0 1px 4px rgba(0,0,0,.2)">A</div>
+            Arrivée
+          </div>
+          <div class="d-flex align-items-center gap-1" style="font-size:11px">
+            <div style="width:24px;height:4px;background:#6f42c1;border-radius:2px"></div>
+            Route
+          </div>
+        </div>
+
+        <div *ngIf="showHistory && !historyLoading && history.length === 0"
              class="text-center text-muted py-3">
           <i class="fa-solid fa-route d-block fs-2 mb-2 opacity-50"></i>
           Aucun trajet enregistré
         </div>
- 
-        <div *ngIf="showHistory && history.length > 0">
+
+        <!-- Dernières positions -->
+        <div *ngIf="showHistory && !historyLoading && history.length > 0">
           <h6 class="fw-semibold small text-muted mb-2">Dernières positions</h6>
-          <div *ngFor="let loc of history.slice(0, 5)"
+          <div *ngFor="let loc of history.slice(0,5)"
                class="d-flex align-items-center gap-2 p-2 border-bottom small">
             <i class="fa-solid fa-location-dot text-primary flex-shrink-0"></i>
             <div>
@@ -418,14 +511,12 @@
           </div>
         </div>
       </div>
- 
-      <!-- ===== ONGLET ALERTES ===== -->
+
+      <!-- ══ ONGLET ALERTES ══ -->
       <div *ngIf="activeTab === 'alerts'">
         <h6 class="fw-semibold mb-3">
-          <i class="fa-solid fa-bell text-warning me-1"></i>
-          Historique des alertes
+          <i class="fa-solid fa-bell text-warning me-1"></i>Historique des alertes
         </h6>
- 
         <div *ngFor="let alert of alerts"
              class="mb-2 p-2 rounded-3 border small"
              [class.border-danger]="alert.typeAlerte === 'HORS_ZONE_ROUGE' || alert.typeAlerte === 'SOS'"
@@ -434,8 +525,7 @@
              [class.opacity-50]="alert.resolue">
           <div class="d-flex justify-content-between">
             <div>
-              <i class="fa-solid me-1"
-                 [class]="getAlertIcon(alert.typeAlerte)"
+              <i class="fa-solid me-1" [class]="getAlertIcon(alert.typeAlerte)"
                  [class.text-danger]="alert.typeAlerte === 'HORS_ZONE_ROUGE' || alert.typeAlerte === 'SOS'"
                  [class.text-warning]="alert.typeAlerte === 'HORS_ZONE_VERTE'"
                  [class.text-secondary]="alert.typeAlerte === 'BATTERIE_FAIBLE'"></i>
@@ -443,41 +533,212 @@
             </div>
             <span *ngIf="alert.resolue" class="badge bg-success py-0">✓</span>
             <button *ngIf="!alert.resolue"
-                    class="btn btn-sm btn-outline-success py-0 px-1"
-                    style="font-size:10px"
-                    (click)="resolveAlert(alert.id!)">
-              Résoudre
-            </button>
+                    class="btn btn-sm btn-outline-success py-0 px-1" style="font-size:10px"
+                    (click)="resolveAlert(alert.id!)">Résoudre</button>
           </div>
-          <div class="text-muted mt-1" style="font-size:10px">
-            {{ alert.declencheeAt | date:'dd/MM/yyyy HH:mm' }}
-          </div>
-          <!-- Position GPS de l'alerte -->
-          <div *ngIf="alert.latitude && alert.longitude"
-               class="mt-1">
+          <div class="text-muted mt-1" style="font-size:10px">{{ alert.declencheeAt | date:'dd/MM/yyyy HH:mm' }}</div>
+          <div *ngIf="alert.latitude && alert.longitude" class="mt-1">
             <a [href]="'https://www.google.com/maps?q=' + alert.latitude + ',' + alert.longitude"
                target="_blank"
-               class="btn btn-outline-primary btn-sm py-0 px-1 w-100"
-               style="font-size:10px">
-              <i class="fa-solid fa-map-location-dot me-1"></i>
-              Voir position GPS
+               class="btn btn-outline-primary btn-sm py-0 px-1 w-100" style="font-size:10px">
+              <i class="fa-solid fa-map-location-dot me-1"></i>Voir position GPS
             </a>
           </div>
         </div>
- 
         <div *ngIf="alerts.length === 0" class="text-center text-muted py-4">
           <i class="fa-solid fa-check-circle text-success d-block fs-2 mb-2"></i>
           Aucune alerte
         </div>
       </div>
- 
+
+      <!-- ══ ONGLET INCIDENTS ══ -->
+      <div *ngIf="activeTab === 'incidents' || (viewingAllIncidents && !selectedPatient)">
+
+        <!-- Titre contextuel -->
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div style="font-size:12px; font-weight:700; color:#6f42c1">
+            <i class="fa-solid fa-triangle-exclamation me-1"></i>
+            <span *ngIf="viewingAllIncidents">Tous les incidents</span>
+            <span *ngIf="!viewingAllIncidents">
+              Incidents de {{ selectedPatient?.prenom }} {{ selectedPatient?.nom }}
+            </span>
+          </div>
+          <!-- Basculer entre tous / patient -->
+          <button *ngIf="selectedPatient"
+                  class="btn btn-sm rounded-pill py-0 px-2"
+                  style="font-size:10px; border:1px solid #d5b8ff; color:#6f42c1; background:#f5f0ff"
+                  (click)="viewingAllIncidents ? openIncidentsTab() : goToIncidentsTab()">
+            {{ viewingAllIncidents ? 'Ce patient' : 'Tous' }}
+          </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-2 mb-3">
+          <div class="col-4 text-center p-2 rounded-3" style="background:#f5f0ff">
+            <div class="fw-bold fs-5" style="color:#6f42c1">{{ incidentTabCount }}</div>
+            <div class="text-muted" style="font-size:10px">Total</div>
+          </div>
+          <div class="col-4 text-center p-2 rounded-3" style="background:#fff5f5">
+            <div class="fw-bold fs-5 text-danger">{{ countByStatus('EN_COURS') }}</div>
+            <div class="text-muted" style="font-size:10px">En cours</div>
+          </div>
+          <div class="col-4 text-center p-2 rounded-3" style="background:#f0fbf4">
+            <div class="fw-bold fs-5 text-success">{{ countByStatus('RESOLU') }}</div>
+            <div class="text-muted" style="font-size:10px">Résolus</div>
+          </div>
+        </div>
+
+        <!-- Bouton action -->
+        <div class="mb-3">
+          <button class="btn btn-sm w-100 fw-bold"
+                  style="background:linear-gradient(135deg,#6f42c1,#3c3489); color:white; border:none; border-radius:10px; font-size:12px; padding:8px"
+                  (click)="startAddIncident()">
+            <i class="fa-solid fa-plus me-1"></i>Ajouter un incident
+          </button>
+        </div>
+
+        <!-- Filtres -->
+        <div class="d-flex gap-1 mb-3 flex-wrap">
+          <button class="btn btn-sm rounded-pill px-3"
+                  style="font-size:11px"
+                  [style.background]="incidentFilter === 'ALL' ? '#6f42c1' : ''"
+                  [style.color]="incidentFilter === 'ALL' ? 'white' : ''"
+                  [class.btn-outline-secondary]="incidentFilter !== 'ALL'"
+                  (click)="incidentFilter = 'ALL'">Tous</button>
+          <button class="btn btn-sm rounded-pill px-3"
+                  style="font-size:11px"
+                  [class.btn-outline-danger]="incidentFilter !== 'EN_COURS'"
+                  [class.btn-danger]="incidentFilter === 'EN_COURS'"
+                  (click)="incidentFilter = 'EN_COURS'">En cours</button>
+          <button class="btn btn-sm rounded-pill px-3"
+                  style="font-size:11px"
+                  [class.btn-outline-success]="incidentFilter !== 'RESOLU'"
+                  [class.btn-success]="incidentFilter === 'RESOLU'"
+                  (click)="incidentFilter = 'RESOLU'">Résolus</button>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="loadingIncidents" class="text-center py-4">
+          <div class="spinner-border spinner-border-sm me-2" style="color:#6f42c1"></div>
+          <span class="text-muted small">Chargement…</span>
+        </div>
+
+        <!-- Liste -->
+        <ng-container *ngIf="!loadingIncidents">
+          <div *ngFor="let inc of filteredPatientIncidents"
+               class="mb-2 rounded-3 border overflow-hidden"
+               style="border-color:rgba(111,66,193,0.25) !important">
+            <div class="d-flex align-items-center px-3 py-2 gap-2"
+                 style="background:linear-gradient(135deg,#f5f0ff,#ede5ff)">
+              <i class="fa-solid fa-triangle-exclamation flex-shrink-0" style="color:#6f42c1"></i>
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="fw-semibold text-truncate small" style="color:#3c3489">{{ inc.title }}</div>
+                <div class="text-muted" style="font-size:10px">{{ inc.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+              </div>
+              <span class="badge rounded-pill flex-shrink-0"
+                    style="font-size:10px"
+                    [style.background]="inc.status === 'EN_COURS' ? '#dc3545' : inc.status === 'RESOLU' ? '#198754' : '#6c757d'">
+                {{ inc.status === 'EN_COURS' ? '⚡ En cours' : inc.status === 'RESOLU' ? '✓ Résolu' : 'Fermé' }}
+              </span>
+            </div>
+            <div class="px-3 py-2" style="font-size:12px">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="badge rounded-pill" style="font-size:10px; background:#e8d5ff; color:#4a2a8a">{{ inc.type }}</span>
+                <span *ngIf="inc.aiConfidence" class="text-muted" style="font-size:10px">
+                  IA : {{ (inc.aiConfidence * 100).toFixed(0) }}%
+                </span>
+              </div>
+              <p class="text-muted mb-1" style="font-size:11px; line-height:1.4">{{ inc.description }}</p>
+              <div *ngIf="inc.aiAnalysis"
+                   class="d-inline-flex align-items-center gap-1 px-2 py-1 rounded-2 mb-2"
+                   style="font-size:10px; background:#fdf8ff; border:1px solid #d5b8ff; color:#6f42c1">
+                <i class="fa-solid fa-brain" style="font-size:9px"></i>
+                CLIP : {{ inc.aiAnalysis }}
+              </div>
+              <div *ngIf="inc.latitude && inc.longitude" class="d-flex align-items-center gap-2 mt-1">
+                <i class="fa-solid fa-location-dot text-danger" style="font-size:11px"></i>
+                <span class="text-muted" style="font-size:10px">
+                  {{ inc.latitude | number:'1.4-4' }}, {{ inc.longitude | number:'1.4-4' }}
+                </span>
+              </div>
+              <!-- Actions utilitaires -->
+              <div class="d-flex gap-1 mt-2 mb-2">
+                <button *ngIf="inc.latitude && inc.longitude"
+                        class="btn btn-sm rounded-pill px-2 py-0"
+                        style="font-size:10px; background:#e8d5ff; color:#4a2a8a; border:none"
+                        (click)="focusIncidentOnMap(inc)">
+                  <i class="fa-solid fa-map-location-dot me-1"></i>Carte
+                </button>
+                <button *ngIf="inc.media"
+                        class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-0"
+                        style="font-size:10px"
+                        (click)="viewIncidentMedia(inc)">
+                  <i class="fa-solid fa-image me-1"></i>Photo
+                </button>
+              </div>
+
+              <!-- Sélecteur de statut -->
+              <div class="border-top pt-2 mt-1">
+                <div class="small fw-bold mb-1" style="color:#6f42c1; font-size:10px; letter-spacing:.5px; text-transform:uppercase">
+                  <i class="fa-solid fa-sliders me-1"></i>Changer le statut
+                </div>
+                <div class="d-flex gap-1">
+
+                  <!-- EN_COURS -->
+                  <button class="btn btn-sm flex-fill py-1"
+                          style="font-size:10px; border-radius:8px; transition:all .15s"
+                          [style.background]="inc.status === 'EN_COURS' ? '#dc3545' : '#fff5f5'"
+                          [style.color]="inc.status === 'EN_COURS' ? 'white' : '#dc3545'"
+                          [style.border]="'1.5px solid ' + (inc.status === 'EN_COURS' ? '#dc3545' : '#f4a0b0')"
+                          [disabled]="inc.status === 'EN_COURS'"
+                          (click)="changeIncidentStatus(inc, 'EN_COURS')">
+                    <i class="fa-solid fa-bolt me-1" style="font-size:9px"></i>En cours
+                  </button>
+
+                  <!-- RESOLU -->
+                  <button class="btn btn-sm flex-fill py-1"
+                          style="font-size:10px; border-radius:8px; transition:all .15s"
+                          [style.background]="inc.status === 'RESOLU' ? '#198754' : '#f0fbf4'"
+                          [style.color]="inc.status === 'RESOLU' ? 'white' : '#198754'"
+                          [style.border]="'1.5px solid ' + (inc.status === 'RESOLU' ? '#198754' : '#8fd4a8')"
+                          [disabled]="inc.status === 'RESOLU'"
+                          (click)="changeIncidentStatus(inc, 'RESOLU')">
+                    <i class="fa-solid fa-check me-1" style="font-size:9px"></i>Résolu
+                  </button>
+
+                  <!-- FERME -->
+                  <button class="btn btn-sm flex-fill py-1"
+                          style="font-size:10px; border-radius:8px; transition:all .15s"
+                          [style.background]="inc.status === 'FERME' ? '#6c757d' : '#f8f9fa'"
+                          [style.color]="inc.status === 'FERME' ? 'white' : '#6c757d'"
+                          [style.border]="'1.5px solid ' + (inc.status === 'FERME' ? '#6c757d' : '#dee2e6')"
+                          [disabled]="inc.status === 'FERME'"
+                          (click)="changeIncidentStatus(inc, 'FERME')">
+                    <i class="fa-solid fa-xmark me-1" style="font-size:9px"></i>Fermé
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="filteredPatientIncidents.length === 0" class="text-center py-4">
+            <i class="fa-solid fa-shield-check d-block fs-2 mb-2" style="color:#6f42c1; opacity:.4"></i>
+            <div class="fw-semibold text-muted">Aucun incident</div>
+            <div *ngIf="incidentFilter !== 'ALL'" class="small text-muted mt-1">
+              Aucun incident "{{ incidentFilter }}"
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <!-- FIN ONGLET INCIDENTS -->
+
     </div>
   </div>
- 
-  <!-- Message si aucun patient sélectionné -->
-  <div *ngIf="!selectedPatient"
-       class="border-start bg-light d-flex flex-column align-items-center
-              justify-content-center text-muted"
+
+  <!-- Message si aucun patient ET pas en mode "tous incidents" -->
+  <div *ngIf="!selectedPatient && !viewingAllIncidents"
+       class="border-start bg-light d-flex flex-column align-items-center justify-content-center text-muted"
        style="width:320px; flex-shrink:0">
     <i class="fa-solid fa-hand-pointer fs-1 mb-3 text-primary opacity-50"></i>
     <div class="fw-semibold">Sélectionnez un patient</div>
@@ -485,6 +746,396 @@
       Cliquez sur un patient dans la liste pour gérer ses zones et voir son historique
     </div>
   </div>
- 
+
 </div>
- 
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALE ANALYSEUR IA (ouverte par openAiAnalyzer())
+     ═══════════════════════════════════════════════════════════ -->
+<div *ngIf="showAiAnalyzer"
+     class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+     style="z-index:3000; background:rgba(38,33,92,0.55); backdrop-filter:blur(3px)">
+  <div class="bg-white rounded-4 shadow-lg overflow-hidden"
+       style="width:480px; max-width:95vw; max-height:90vh; overflow-y:auto;
+              animation:slideInUp 0.3s cubic-bezier(.4,0,.2,1)">
+
+    <!-- Header modale -->
+    <div class="p-3 text-white d-flex align-items-center justify-content-between"
+         style="background:linear-gradient(135deg,#0d6efd,#6f42c1)">
+      <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle d-flex align-items-center justify-content-center"
+             style="width:36px;height:36px;background:rgba(255,255,255,0.2)">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <div>
+          <div class="fw-bold">Analyse IA du chemin</div>
+          <div class="opacity-75" style="font-size:11px">CLIP détecte les dangers automatiquement</div>
+        </div>
+      </div>
+      <button class="btn p-1"
+              style="color:white; background:rgba(255,255,255,0.15); border-radius:8px"
+              (click)="closeAiAnalyzer()">
+        <i class="fa-solid fa-xmark fa-lg"></i>
+      </button>
+    </div>
+
+    <div class="p-4">
+
+      <!-- Sélection patient dans la modale -->
+      <div class="mb-3">
+        <label class="form-label small fw-bold" style="color:#6f42c1">
+          <i class="fa-solid fa-user me-1"></i>Patient concerné
+        </label>
+        <select class="form-select form-select-sm"
+                style="border-color:rgba(111,66,193,0.3)"
+                [(ngModel)]="analyzerPatientId">
+          <option [ngValue]="null">-- Sélectionner un patient --</option>
+          <option *ngFor="let p of patients" [ngValue]="p.id">
+            {{ p.nom }} {{ p.prenom }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Upload photo -->
+      <div class="mb-3">
+        <label class="form-label small fw-bold" style="color:#6f42c1">
+          <i class="fa-solid fa-camera me-1"></i>Photo à analyser
+        </label>
+        <div class="d-flex gap-2">
+          <label class="flex-fill d-flex align-items-center justify-content-center gap-2 p-3 rounded-3"
+                 style="border:2px dashed #b5d4f4; background:#f0f8ff; cursor:pointer; font-size:13px; color:#0d6efd; font-weight:700">
+            <i class="fa-solid fa-camera"></i>
+            Prendre une photo
+            <input type="file" accept="image/*" capture="environment" class="d-none"
+                   (change)="onAnalyzerImageSelected($event)">
+          </label>
+          <label class="flex-fill d-flex align-items-center justify-content-center gap-2 p-3 rounded-3"
+                 style="border:2px dashed #d5b8ff; background:#fdf8ff; cursor:pointer; font-size:13px; color:#6f42c1; font-weight:700">
+            <i class="fa-solid fa-image"></i>
+            Galerie
+            <input type="file" accept="image/*" class="d-none"
+                   (change)="onAnalyzerImageSelected($event)">
+          </label>
+        </div>
+      </div>
+
+      <!-- Prévisualisation image -->
+      <div *ngIf="analyzerImagePreview" class="mb-3 position-relative">
+        <img [src]="analyzerImagePreview"
+             class="w-100 rounded-3"
+             style="max-height:200px; object-fit:cover; border:2px solid #d5b8ff">
+        <div *ngIf="analyzerLoading"
+             class="position-absolute inset-0 top-0 start-0 w-100 h-100 d-flex flex-column
+                    align-items-center justify-content-center rounded-3"
+             style="background:rgba(38,33,92,0.6)">
+          <div class="spinner-border text-white mb-2"></div>
+          <span class="text-white fw-bold" style="font-size:13px">Analyse CLIP en cours…</span>
+        </div>
+      </div>
+
+      <!-- Résultat CLIP -->
+      <div *ngIf="analyzerResult && !analyzerLoading"
+           class="mb-3 p-3 rounded-3"
+           [style.background]="analyzerResult.danger ? '#fff0f3' : '#f0fbf4'"
+           [style.border]="'2px solid ' + (analyzerResult.danger ? '#f4a0b0' : '#8fd4a8')">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div class="rounded-circle d-flex align-items-center justify-content-center"
+               style="width:40px;height:40px;"
+               [style.background]="analyzerResult.danger ? 'rgba(192,32,62,0.12)' : 'rgba(26,110,58,0.12)'">
+            <i class="fa-solid fa-lg"
+               [class.fa-triangle-exclamation]="analyzerResult.danger"
+               [class.fa-circle-check]="!analyzerResult.danger"
+               [style.color]="analyzerResult.danger ? '#c0203e' : '#1a6e3a'"></i>
+          </div>
+          <p class="mb-0 fw-bold"
+             [style.color]="analyzerResult.danger ? '#c0203e' : '#1a6e3a'">
+            {{ analyzerResult.message }}
+          </p>
+        </div>
+
+        <!-- Barres de confiance top 3 -->
+        <div *ngIf="analyzerResult.predictions?.length">
+          <div *ngFor="let p of analyzerResult.predictions.slice(0,3)" class="mb-1">
+            <div class="d-flex justify-content-between" style="font-size:11px">
+              <span class="text-muted">{{ p.label }}</span>
+              <span class="fw-bold" style="color:#6f42c1">{{ (p.score * 100).toFixed(0) }}%</span>
+            </div>
+            <div class="rounded-pill overflow-hidden" style="height:5px; background:#e8d5ff">
+              <div class="h-100 rounded-pill"
+                   [style.width]="(p.score * 100) + '%'"
+                   [style.background]="analyzerResult.danger ? 'linear-gradient(90deg,#f4748a,#c0203e)' : 'linear-gradient(90deg,#5ac87a,#1a6e3a)'">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton créer incident depuis résultat IA -->
+      <div *ngIf="analyzerResult && analyzerResult.danger && !analyzerLoading"
+           class="mb-3">
+        <button class="btn w-100 fw-bold py-2"
+                style="background:linear-gradient(135deg,#6f42c1,#3c3489); color:white;
+                       border:none; border-radius:12px; font-size:14px"
+                (click)="createIncidentFromAnalysis()">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i>
+          Créer un incident depuis cette analyse
+        </button>
+      </div>
+
+      <!-- Bouton si pas danger mais créer quand même -->
+      <div *ngIf="analyzerResult && !analyzerResult.danger && !analyzerLoading"
+           class="mb-3">
+        <button class="btn w-100 fw-bold py-2 btn-outline-secondary"
+                style="border-radius:12px; font-size:13px"
+                (click)="createIncidentFromAnalysis()">
+          <i class="fa-solid fa-plus me-2"></i>
+          Créer un incident quand même
+        </button>
+      </div>
+
+      <!-- Erreur -->
+      <div *ngIf="analyzerError"
+           class="p-2 rounded-3 mb-3 small"
+           style="background:#fff0f3; border:1px solid #f4a0b0; color:#c0203e">
+        <i class="fa-solid fa-circle-xmark me-1"></i>{{ analyzerError }}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANNEAU CRÉATION INCIDENT (slide depuis la droite)
+     ═══════════════════════════════════════════════════════════ -->
+<div *ngIf="showIncidentPanel"
+     class="position-fixed top-0 end-0 h-100 bg-white border-start overflow-auto"
+     style="width:360px; z-index:2000;
+            box-shadow:-8px 0 32px rgba(111,66,193,0.18);
+            animation:slideInRight 0.28s cubic-bezier(.4,0,.2,1)">
+
+  <!-- Header -->
+  <div class="p-3 text-white d-flex align-items-center justify-content-between"
+       style="background:linear-gradient(135deg,#6f42c1,#3c3489)">
+    <div class="d-flex align-items-center gap-2">
+      <div class="rounded-circle d-flex align-items-center justify-content-center"
+           style="width:36px;height:36px;background:rgba(255,255,255,0.2)">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <div class="fw-bold">Nouvel incident</div>
+        <div class="opacity-75" style="font-size:11px">
+          {{ newIncident.latitude
+             ? (newIncident.latitude | number:'1.4-4') + ', ' + (newIncident.longitude | number:'1.4-4')
+             : 'Position non définie' }}
+        </div>
+      </div>
+    </div>
+    <button class="btn p-1"
+            style="color:white; background:rgba(255,255,255,0.15); border-radius:8px"
+            (click)="cancelAddIncident()">
+      <i class="fa-solid fa-xmark fa-lg"></i>
+    </button>
+  </div>
+
+  <!-- Badge position -->
+  <div *ngIf="newIncident.latitude"
+       class="mx-3 mt-3 p-2 rounded-3 d-flex align-items-center gap-2"
+       style="background:#f5f0ff; border:1px solid #d5b8ff">
+    <i class="fa-solid fa-location-dot" style="color:#6f42c1"></i>
+    <div style="font-size:12px">
+      <div class="fw-semibold" style="color:#3c3489">Position placée sur la carte</div>
+      <div class="text-muted">
+        {{ newIncident.latitude | number:'1.4-4' }}, {{ newIncident.longitude | number:'1.4-4' }}
+      </div>
+    </div>
+    <button class="btn btn-sm ms-auto py-0 px-2 rounded-pill"
+            style="font-size:10px; background:#e8d5ff; color:#4a2a8a; border:none"
+            (click)="repositionIncidentMarker()">
+      <i class="fa-solid fa-pen me-1"></i>Replacer
+    </button>
+  </div>
+
+  <div *ngIf="!newIncident.latitude"
+       class="mx-3 mt-3 p-2 rounded-3 d-flex align-items-center gap-2"
+       style="background:#fff8e1; border:1px solid #ffe082">
+    <i class="fa-solid fa-hand-pointer" style="color:#f59e0b"></i>
+    <span style="font-size:12px; color:#92400e; font-weight:600">
+      Cliquez sur la carte pour placer l'incident
+    </span>
+  </div>
+
+  <!-- Badge source IA si pré-rempli -->
+  <div *ngIf="newIncident.aiAnalysis"
+       class="mx-3 mt-2 p-2 rounded-3 d-flex align-items-center gap-2"
+       style="background:#e8f4ff; border:1px solid #b5d4f4">
+    <i class="fa-solid fa-brain" style="color:#0d6efd; font-size:13px"></i>
+    <div style="font-size:11px">
+      <span class="fw-bold" style="color:#0a58ca">Pré-rempli depuis CLIP</span>
+      <span class="text-muted ms-1">— {{ newIncident.aiAnalysis }}
+        <span *ngIf="newIncident.aiConfidence">
+          ({{ (newIncident.aiConfidence * 100).toFixed(0) }}%)
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="p-3 d-flex flex-column gap-3">
+
+    <!-- ── ÉTAPE 1 : Upload photo → CLIP analyse automatiquement ── -->
+    <div>
+      <label class="form-label small fw-bold mb-1" style="color:#6f42c1">
+        <i class="fa-solid fa-camera me-1"></i>
+        Photo de l'incident
+        <span class="text-muted fw-normal" style="font-size:10px"> — l'IA détecte le type automatiquement</span>
+      </label>
+
+      <!-- Zone upload -->
+      <label class="d-flex align-items-center justify-content-center gap-2 p-3 rounded-3 mb-2"
+             style="border:2px dashed #d5b8ff; background:#fdf8ff; cursor:pointer; font-size:13px; color:#6f42c1; font-weight:700"
+             [style.opacity]="panelAnalyzing ? '0.6' : '1'">
+        <i class="fa-solid" [class.fa-cloud-arrow-up]="!panelAnalyzing" [class.fa-spinner]="panelAnalyzing"
+           [class.fa-spin]="panelAnalyzing"></i>
+        <span *ngIf="!panelAnalyzing && !newIncident.media">Importer une photo pour analyse IA</span>
+        <span *ngIf="panelAnalyzing">Analyse CLIP en cours…</span>
+        <span *ngIf="!panelAnalyzing && newIncident.media" class="text-success fw-bold">
+          <i class="fa-solid fa-check me-1"></i>Photo analysée ✓
+        </span>
+        <input type="file" accept="image/*" class="d-none"
+               [disabled]="panelAnalyzing"
+               (change)="onIncidentPhotoSelected($event)">
+      </label>
+
+      <!-- Aperçu photo + résultat CLIP -->
+      <div *ngIf="newIncident.mediaPreview" class="position-relative">
+        <img [src]="newIncident.mediaPreview"
+             class="w-100 rounded-3"
+             style="max-height:150px; object-fit:cover; border:1.5px solid #d5b8ff">
+        <!-- Overlay loading -->
+        <div *ngIf="panelAnalyzing"
+             class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column
+                    align-items-center justify-content-center rounded-3"
+             style="background:rgba(38,33,92,0.55)">
+          <div class="spinner-border text-white mb-1" style="width:28px;height:28px"></div>
+          <span class="text-white fw-bold" style="font-size:12px">Analyse CLIP…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RÉSULTAT IA : type + titre + description (lecture seule, généré par CLIP) ── -->
+    <div *ngIf="newIncident.type && !panelAnalyzing"
+         class="p-3 rounded-3 d-flex flex-column gap-2"
+         style="background:#f5f0ff; border:1.5px solid #d5b8ff">
+      <div class="d-flex align-items-center gap-2">
+        <i class="fa-solid fa-brain" style="color:#6f42c1; font-size:14px"></i>
+        <span class="fw-bold small" style="color:#3c3489">Détecté par CLIP</span>
+        <span *ngIf="newIncident.aiConfidence"
+              class="badge rounded-pill ms-auto"
+              style="font-size:10px; background:#6f42c1; color:white">
+          {{ (newIncident.aiConfidence * 100).toFixed(0) }}% confiance
+        </span>
+      </div>
+
+      <!-- Type détecté (badge coloré) -->
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-bold" style="font-size:11px; color:#5a5475; min-width:70px">Type :</span>
+        <span class="badge rounded-pill px-3 py-2"
+              style="font-size:12px"
+              [style.background]="getTypeColor(newIncident.type)"
+              style2="color:white">
+          {{ getTypeEmoji(newIncident.type) }} {{ newIncident.type }}
+        </span>
+      </div>
+
+      <!-- Titre -->
+      <div>
+        <div class="fw-bold mb-1" style="font-size:11px; color:#5a5475">Titre :</div>
+        <div class="p-2 rounded-2 fw-semibold"
+             style="background:white; border:1px solid #e8d5ff; font-size:13px; color:#1e1b3a">
+          {{ newIncident.title }}
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <div class="fw-bold mb-1" style="font-size:11px; color:#5a5475">Description :</div>
+        <div class="p-2 rounded-2"
+             style="background:white; border:1px solid #e8d5ff; font-size:12px; color:#5a5475; line-height:1.5">
+          {{ newIncident.description }}
+        </div>
+      </div>
+
+      <!-- label CLIP brut -->
+      <div class="d-flex align-items-center gap-1" style="font-size:10px; color:#9490b0">
+        <i class="fa-solid fa-robot" style="font-size:9px"></i>
+        Label CLIP : <em>{{ newIncident.aiAnalysis }}</em>
+      </div>
+    </div>
+
+    <!-- Message si pas encore de photo -->
+    <div *ngIf="!newIncident.type && !panelAnalyzing && !newIncident.mediaPreview"
+         class="p-3 rounded-3 text-center"
+         style="background:#fdf8ff; border:1.5px dashed #d5b8ff">
+      <i class="fa-solid fa-camera-slash d-block mb-2" style="font-size:24px; color:#d5b8ff"></i>
+      <div style="font-size:12px; color:#9490b0; font-weight:600">
+        Importez une photo — l'IA détectera automatiquement<br>le type, titre et description de l'incident
+      </div>
+    </div>
+
+    <!-- Erreur analyse CLIP -->
+    <div *ngIf="panelClipError"
+         class="p-2 rounded-3 small"
+         style="background:#fff8e1; border:1px solid #ffe082; color:#92400e">
+      <i class="fa-solid fa-triangle-exclamation me-1"></i>{{ panelClipError }}
+      <div class="mt-2">
+        <div class="fw-bold mb-1" style="font-size:10px">Choisir manuellement :</div>
+        <div class="d-flex flex-wrap gap-1">
+          <button *ngFor="let t of incidentTypes"
+                  class="btn btn-sm rounded-pill px-2 py-0"
+                  style="font-size:10px; border:1px solid #d5b8ff; background:#f5f0ff; color:#4a2a8a"
+                  [style.background]="newIncident.type === t.value ? t.color : '#f5f0ff'"
+                  [style.color]="newIncident.type === t.value ? 'white' : '#4a2a8a'"
+                  (click)="onTypeSelected(t)">
+            {{ t.emoji }} {{ t.label }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Erreur sauvegarde -->
+    <div *ngIf="incidentCreateError"
+         class="p-2 rounded-3 small"
+         style="background:#fff0f3; border:1px solid #f4a0b0; color:#c0203e">
+      <i class="fa-solid fa-circle-xmark me-1"></i>{{ incidentCreateError }}
+    </div>
+
+    <!-- Boutons -->
+    <div class="d-flex gap-2">
+      <button class="btn flex-grow-1 fw-bold"
+              style="background:linear-gradient(135deg,#6f42c1,#3c3489);
+                     color:white; border:none; border-radius:12px; padding:10px"
+              [disabled]="savingIncident || !newIncident.latitude || !newIncident.type || panelAnalyzing"
+              (click)="saveNewIncident()">
+        <span *ngIf="!savingIncident">
+          <i class="fa-solid fa-floppy-disk me-2"></i>Enregistrer
+        </span>
+        <span *ngIf="savingIncident">
+          <span class="spinner-border spinner-border-sm me-2"></span>Enregistrement…
+        </span>
+      </button>
+      <button class="btn btn-outline-secondary"
+              style="border-radius:12px; padding:10px 14px"
+              (click)="cancelAddIncident()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Overlay panneau incident -->
+<div *ngIf="showIncidentPanel && !addingIncident"
+     class="position-fixed top-0 start-0 w-100 h-100"
+     style="background:rgba(38,33,92,0.2); z-index:1999"
+     (click)="cancelAddIncident()">
+</div>

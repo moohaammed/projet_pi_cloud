@@ -33,6 +33,17 @@ export class PatientService {
         );
     }
 
+    getPatientByUserId(userId: number): Observable<any> {
+        console.log(`[PatientService] GET ${this.apiUrl}/by-user/${userId}`);
+        return this.http.get<any>(`${this.apiUrl}/by-user/${userId}`).pipe(
+            tap(res => console.log(`[PatientService] Response getPatientByUserId:`, res)),
+            catchError(err => {
+                console.error(`[PatientService] Error getPatientByUserId:`, err);
+                return throwError(() => err);
+            })
+        );
+    }
+
     addPatient(patient: any): Observable<any> {
         const springPayload: any = {
             nom: patient.nom,

@@ -10,11 +10,13 @@ from dotenv import load_dotenv
 from groq import Groq
 import json
 import pdfplumber
+import resend
 
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
 
+resend.api_key = os.getenv("RESEND_API_KEY")
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 GROQ_MODEL = "llama-3.1-8b-instant"
 
@@ -73,8 +75,14 @@ def predict():
             return jsonify({'error': 'No image provided.'}), 400
         image_data = data['image']
         if "base64," in image_data:
-            image_data = image_data.split("base64,")[1]
-        img_bytes = base64.b64decode(image_data)
+            b64_str = image_data.split("base64,")[1]
+            image_url = image_data
+        else:
+            b64_str = image_data
+            image_url = f"data:image/jpeg;base64,{image_data}"
+
+
+        img_bytes = base64.b64decode(b64_str)
         img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
         img = img.resize((224, 224))
         img_array = np.array(img) / 255.0
@@ -196,6 +204,47 @@ Return only the answer as plain text, no markdown."""
 
     except Exception as e:
         print("Chat error:", e)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/send-reminder-email', methods=['POST'])
+def send_reminder_email():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No JSON payload provided.'}), 400
+
+        patient_name = data.get('patient_name', 'Patient')
+        patient_email = data.get('patient_email')
+        message = data.get('message', '')
+        date = data.get('date', '')
+
+        if not patient_email:
+            return jsonify({'error': 'Patient email is required.'}), 400
+
+        email_html = f"""
+        <p>Hello {patient_name},</p>
+        <p>You have a new medical reminder from your doctor.</p>
+        <p><strong>Reminder:</strong> {message}</p>
+        <p><strong>Date:</strong> {date}</p>
+        """
+
+        try:
+            r = resend.Emails.send({
+                "from": "AlzCare <onboarding@resend.dev>",
+                "to": [patient_email],
+                "subject": "Medical Reminder Notification",
+                "html": email_html
+            })
+            print("Resend Response:", r)
+            return jsonify({'status': 'ok', 'message': 'Email sent successfully'}), 200
+        except Exception as email_err:
+            print("Failed to send email via Resend:", email_err)
+            return jsonify({'error': str(email_err)}), 500
+
+    except Exception as e:
+        print("Error processing email request:", e)
+        # Log the error but Return 200 or 500? The user asked to not break the app. 
+        # Returning 500 but handled properly in Java backend
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

@@ -7,5 +7,7 @@ import java.time.Instant;
 import java.util.List;
 
 public interface MedicationComplianceLogRepository extends MongoRepository<MedicationComplianceLog, String> {
+
+    
     List<MedicationComplianceLog> findByCreatedAtAfterOrderByCreatedAtAsc(Instant since);
 }

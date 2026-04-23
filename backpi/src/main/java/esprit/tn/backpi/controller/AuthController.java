@@ -3,6 +3,7 @@ package esprit.tn.backpi.controller;
 import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.entity.Role;
 import esprit.tn.backpi.repository.UserRepository;
+
 import esprit.tn.backpi.services.collaboration.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
 
     @Autowired
     private FileStorageService fileStorageService;
@@ -38,6 +40,46 @@ public class AuthController {
         }
 
         User saved = userRepository.save(user);
+        // chatGroupService.assignUserToDefaultGroup(saved);
+
+// ── If PATIENT role: auto-create a Patient record linked to this user ──
+        if (Role.PATIENT.equals(saved.getRole())) {
+            Long newPatientId = -1L;
+            try {
+                org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+                java.util.Map<String, Object> req = new java.util.HashMap<>();
+                req.put("nom", saved.getNom());
+                req.put("prenom", saved.getPrenom());
+                java.util.Map<String, Object> userInfo = new java.util.HashMap<>();
+                userInfo.put("id", saved.getId());
+                userInfo.put("email", saved.getEmail());
+                userInfo.put("telephone", saved.getTelephone());
+                req.put("user", userInfo);
+
+                // Call patient-medecin-service via gateway or direct 8089
+                java.util.Map<String, Object> savedPatient = restTemplate.postForObject("http://localhost:8089/api/patients", req, java.util.Map.class);
+                
+                if (savedPatient != null && savedPatient.containsKey("id")) {
+                    newPatientId = Long.valueOf(savedPatient.get("id").toString());
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
+            // Include patientId in the response so the frontend can pre-load the profile
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                Map.of(
+                    "id",        saved.getId(),
+                    "nom",       saved.getNom(),
+                    "prenom",    saved.getPrenom(),
+                    "email",     saved.getEmail(),
+                    "role",      saved.getRole(),
+                    "actif",     saved.isActif(),
+                    "patientId", newPatientId
+                )
+            );
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 
+
 @Component({
   selector: 'app-contact-doctor',
   standalone: true,
@@ -48,17 +49,20 @@ export class ContactDoctorComponent implements OnInit {
       return;
     }
     this.filteredDoctors = this.doctors.filter(doc =>
-      (doc.firstName || '').toLowerCase().includes(q) ||
-      (doc.lastName || '').toLowerCase().includes(q) ||
+      (doc.nom || '').toLowerCase().includes(q) ||
+      (doc.prenom || '').toLowerCase().includes(q) ||
       (doc.specialite || '').toLowerCase().includes(q) ||
       (doc.email || '').toLowerCase().includes(q)
     );
   }
 
+
+
   getAvatarUrl(doc: any): string {
     if (doc.profileImageUrl) return doc.profileImageUrl;
-    const fn = encodeURIComponent((doc.firstName || 'D').charAt(0));
-    const ln = encodeURIComponent((doc.lastName || 'r').charAt(0));
+    if (doc.image) return doc.image;
+    const fn = encodeURIComponent((doc.prenom || doc.firstName || 'D').charAt(0));
+    const ln = encodeURIComponent((doc.nom || doc.lastName || 'r').charAt(0));
     return `https://ui-avatars.com/api/?name=${fn}+${ln}&background=8b5cf6&color=fff&size=128&bold=true`;
   }
 

@@ -8,8 +8,15 @@ public class PublicationResponseDto {
 
     private String id;
     private String content;
+    
+    // Multi-media support
+    private List<String> mediaUrls;
+    private List<String> mimeTypes;
+    
+    // Legacy single media (backward compatibility)
     private String mediaUrl;
     private String mimeType;
+    
     private PublicationType type;
     private Instant createdAt;
     private Long authorId;
@@ -17,11 +24,12 @@ public class PublicationResponseDto {
     private boolean isDistressed;
     private Double sentimentScore;
     private boolean anonymous;
+    private List<String> tags;
     private String pollQuestion;
     private List<PollOptionResponseDto> pollOptions;
     private String groupId;
     private String groupName;
-    private Long linkedEventId;
+    private String linkedEventId;
     private SharedEventPreviewDto linkedEvent;
     private List<CommentResponseDto> comments;
     private int commentCount;
@@ -35,6 +43,12 @@ public class PublicationResponseDto {
     public void setId(String id) { this.id = id; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
+    
+    public List<String> getMediaUrls() { return mediaUrls; }
+    public void setMediaUrls(List<String> mediaUrls) { this.mediaUrls = mediaUrls; }
+    public List<String> getMimeTypes() { return mimeTypes; }
+    public void setMimeTypes(List<String> mimeTypes) { this.mimeTypes = mimeTypes; }
+    
     public String getMediaUrl() { return mediaUrl; }
     public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
     public String getMimeType() { return mimeType; }
@@ -53,6 +67,8 @@ public class PublicationResponseDto {
     public void setSentimentScore(Double sentimentScore) { this.sentimentScore = sentimentScore; }
     public boolean isAnonymous() { return anonymous; }
     public void setAnonymous(boolean anonymous) { this.anonymous = anonymous; }
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
     public String getPollQuestion() { return pollQuestion; }
     public void setPollQuestion(String pollQuestion) { this.pollQuestion = pollQuestion; }
     public List<PollOptionResponseDto> getPollOptions() { return pollOptions; }
@@ -71,8 +87,8 @@ public class PublicationResponseDto {
     public void setGroupId(String groupId) { this.groupId = groupId; }
     public String getGroupName() { return groupName; }
     public void setGroupName(String groupName) { this.groupName = groupName; }
-    public Long getLinkedEventId() { return linkedEventId; }
-    public void setLinkedEventId(Long linkedEventId) { this.linkedEventId = linkedEventId; }
+    public String getLinkedEventId() { return linkedEventId; }
+    public void setLinkedEventId(String linkedEventId) { this.linkedEventId = linkedEventId; }
     public SharedEventPreviewDto getLinkedEvent() { return linkedEvent; }
     public void setLinkedEvent(SharedEventPreviewDto linkedEvent) { this.linkedEvent = linkedEvent; }
 }

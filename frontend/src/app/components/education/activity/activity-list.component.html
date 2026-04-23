@@ -1,13 +1,152 @@
 <div class="container-fluid py-4 px-4">
 
+  <!-- Header Section (Collaboration Style) -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-black border-opacity-10 position-relative" style="z-index: 10;">
+    <div class="d-flex align-items-center gap-4">
+      <div class="section-header text-start mb-0">
+        <h2 class="fw-black mb-1 section-header__title text-capitalize fs-28 ls-n1">
+          Gestion des <span class="underline text-primary position-relative">Activités</span>
+        </h2>
+        <div class="sub-title fs-14 text-muted opacity-75">Créez et gérez le socle thérapeutique (Quiz, Jeux, Contenus).</div>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button class="btn btn-primary fw-black rounded-pill shadow-sm d-flex justify-content-center align-items-center py-2 hov-grow" 
+              style="width: 180px;" (click)="showForm = true">
+        <i class="fa-solid fa-plus me-2"></i> Nouvelle Activité
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Section Premium (Purple Palette) -->
+  <section class="stats-section mb-5 mt-4" *ngIf="!showForm">
+    <div class="stats-header">
+      <span class="stats-label">📊 Vue d'ensemble</span>
+    </div>
+    <div class="row g-3">
+
+      <!-- Total -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-purple">
+          <div class="stat-icon-wrap">🎯</div>
+          <div class="stat-value">{{ totalActivities }}</div>
+          <div class="stat-title">Total</div>
+          <div class="stat-sub">activités créées</div>
+        </div>
+      </div>
+
+      <!-- Actives -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-green">
+          <div class="stat-icon-wrap">✅</div>
+          <div class="stat-value">{{ activeCount }}</div>
+          <div class="stat-title">Actives</div>
+          <div class="stat-sub">publiées aux patients</div>
+        </div>
+      </div>
+
+      <!-- Quiz -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-blue">
+          <div class="stat-icon-wrap">🧠</div>
+          <div class="stat-value">{{ quizCount }}</div>
+          <div class="stat-title">Quiz</div>
+          <div class="stat-sub">évaluation cognitive</div>
+        </div>
+      </div>
+
+      <!-- Jeux -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-indigo">
+          <div class="stat-icon-wrap">🎮</div>
+          <div class="stat-value">{{ gameCount }}</div>
+          <div class="stat-title">Jeux</div>
+          <div class="stat-sub">memory & puzzles</div>
+        </div>
+      </div>
+
+      <!-- Contenus -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-amber">
+          <div class="stat-icon-wrap">📹</div>
+          <div class="stat-value">{{ contentCount }}</div>
+          <div class="stat-title">Contenus</div>
+          <div class="stat-sub">vidéos & articles</div>
+        </div>
+      </div>
+
+      <!-- Exercices -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card stat-rose">
+          <div class="stat-icon-wrap">🧘</div>
+          <div class="stat-value">{{ exerciceCount }}</div>
+          <div class="stat-title">Exercices</div>
+          <div class="stat-sub">séances relaxation</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Stades Progress Bar -->
+    <div class="stades-bar-wrap mt-4">
+      <div class="stade-bar-label">Répartition par stade cognitif</div>
+      <div class="stades-bar">
+        <div class="stade-segment seg-leger"
+             [style.width.%]="totalActivities > 0 ? (legerCount / totalActivities) * 100 : 33"
+             title="Léger: {{ legerCount }}">
+          <span *ngIf="totalActivities > 0">Léger {{ legerCount }}</span>
+        </div>
+        <div class="stade-segment seg-modere"
+             [style.width.%]="totalActivities > 0 ? (modereCount / totalActivities) * 100 : 33"
+             title="Modéré: {{ modereCount }}">
+          <span *ngIf="totalActivities > 0">Modéré {{ modereCount }}</span>
+        </div>
+        <div class="stade-segment seg-severe"
+             [style.width.%]="totalActivities > 0 ? (severeCount / totalActivities) * 100 : 34"
+             title="Sévère: {{ severeCount }}">
+          <span *ngIf="totalActivities > 0">Sévère {{ severeCount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="row g-4 mt-2">
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-shapes me-2 text-primary" style="color: #6c2bd9 !important"></i>Type d'Activité</h6>
+          <div style="height: 230px; position: relative;">
+            <canvas #chartCanvas></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-brain me-2 text-primary" style="color: #9333ea !important"></i>Stades Cognitifs</h6>
+          <div style="height: 230px; position: relative;">
+            <canvas #chartCanvas></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-power-off me-2 text-primary" style="color: #10b981 !important"></i>Statut de Publication</h6>
+          <div style="height: 230px; position: relative;">
+            <canvas #chartCanvas></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
   <!-- Formulaire -->
-  <div class="card border-0 shadow rounded-4 overflow-hidden bg-white mb-5 animate-fade-in" *ngIf="showForm">
+  <div class="card border-0 shadow-doc rounded-4 overflow-hidden bg-white mb-5 animate-fade-in" *ngIf="showForm">
     <div class="card-header bg-soft-primary border-0 p-4 d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
         <button class="btn btn-sm btn-white rounded-circle shadow-sm me-3 text-primary bg-white px-2 py-1" (click)="reset()" title="Retour à la liste">
           <i class="fa-solid fa-arrow-left"></i>
         </button>
-        <span class="fw-bold fs-5 text-primary"><i class="fa-solid fa-gamepad me-2"></i> {{ isEditing ? 'Modifier l\'activité' : 'Nouvelle activité' }}</span>
+        <span class="fw-black fs-20 text-primary ls-n1"><i class="fa-solid fa-gamepad me-2"></i> {{ isEditing ? 'Modifier l\'activité' : 'Nouvelle activité' }}</span>
       </div>
     </div>
     <div class="card-body p-4 pt-4">
@@ -15,8 +154,8 @@
 
         <!-- Titre -->
         <div class="col-md-6">
-          <label class="form-label fw-bold text-muted small text-uppercase">Titre *</label>
-          <input class="form-control form-control-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" [class.is-invalid]="errors['title']" [(ngModel)]="newActivity.title"
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Titre de l'activité *</label>
+          <input class="form-control-doc w-100 ps-3" [class.is-invalid]="errors['title']" [(ngModel)]="newActivity.title"
             placeholder="ex : Quiz Saisons, Jeu des animaux">
           <div class="invalid-feedback" *ngIf="errors['title']">
             {{ errors['title'] }}
@@ -25,8 +164,8 @@
 
         <!-- Type -->
         <div class="col-md-3">
-          <label class="form-label fw-bold text-muted small text-uppercase">Type *</label>
-          <select class="form-select form-select-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" [(ngModel)]="newActivity.type">
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Type *</label>
+          <select class="form-select-doc w-100 ps-3" [(ngModel)]="newActivity.type">
             <option value="QUIZ">QUIZ</option>
             <option value="GAME">GAME</option>
             <option value="CONTENT">CONTENT</option>
@@ -36,8 +175,8 @@
 
         <!-- Stade -->
         <div class="col-md-3">
-          <label class="form-label fw-bold text-muted small text-uppercase">Stade *</label>
-          <select class="form-select form-select-lg bg-light border-0 rounded-4 px-3 py-2 shadow-sm fs-15" [(ngModel)]="newActivity.stade">
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Stade cognitif *</label>
+          <select class="form-select-doc w-100 ps-3" [(ngModel)]="newActivity.stade">
             <option value="LEGER">Léger</option>
             <option value="MODERE">Modéré</option>
             <option value="SEVERE">Sévère</option>
@@ -46,23 +185,19 @@
 
         <!-- Description -->
         <div class="col-md-12">
-          <label class="form-label fw-bold text-muted small text-uppercase">Description *</label>
-          <textarea class="form-control form-control-lg bg-light border-0 rounded-4 p-3 shadow-sm fs-15" [class.is-invalid]="errors['description']"
-            [(ngModel)]="newActivity.description" placeholder="Décrivez l'activité…" rows="3" style="resize:none;">
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Description pédagogique *</label>
+          <textarea class="form-control-doc w-100 p-3" [class.is-invalid]="errors['description']"
+            [(ngModel)]="newActivity.description" placeholder="Décrivez l'activité pour les soignants…" rows="3" style="resize:none; height: auto;">
           </textarea>
           <div class="invalid-feedback" *ngIf="errors['description']">
             {{ errors['description'] }}
-          </div>
-          <div class="form-text text-muted" *ngIf="newActivity.description">
-            {{ newActivity.description.length }} / 500 caractères
           </div>
         </div>
 
         <!-- Contenu dynamique -->
         <div class="col-12 mt-4" *ngIf="newActivity.type">
-          <label class="form-label fw-bold text-primary small text-uppercase mb-3">
-            <i class="fa-solid fa-code me-2"></i> Contenu de l'activité
-            <span class="text-muted fw-normal text-capitalize ms-2" style="text-transform: none !important;">(généré automatiquement selon le type)</span>
+          <label class="form-label fw-black text-primary small text-uppercase mb-3 letter-spacing-1">
+            <i class="fa-solid fa-code me-2"></i> Configuration du contenu
           </label>
 
           <div class="border-0 shadow-sm rounded-4 p-4 bg-light">
@@ -73,15 +208,11 @@
           </div>
         </div>
 
-        <div class="col-12 text-muted small" *ngIf="!newActivity.type">
-          ⬆ Sélectionnez d'abord un type d'activité pour configurer son contenu.
-        </div>
-
       </div>
 
       <div class="mt-4 d-flex gap-2">
-        <button class="btn btn-primary fw-bold rounded-pill px-4" (click)="save()">
-          <i class="fa-solid fa-check me-2"></i> {{ isEditing ? 'Sauvegarder' : 'Créer l\'activité' }}
+        <button class="btn btn-primary fw-black rounded-pill px-5 shadow transition-all hov-grow" (click)="save()">
+          <i class="fa-solid fa-check me-2"></i> {{ isEditing ? 'Sauvegarder' : 'Publier l\'activité' }}
         </button>
         <button class="btn btn-soft-secondary fw-bold rounded-pill px-4" (click)="reset()" *ngIf="isEditing">
           Annuler
@@ -90,89 +221,88 @@
     </div>
   </div>
 
-  <!-- Catégories Premium -->
-  <div class="d-flex flex-wrap gap-3 mb-4 animate-fade-in" *ngIf="!showForm">
-    <button class="filter-pill" [class.active]="filterType === ''" (click)="loadByType('')">
-      <i class="fa-solid fa-layer-group me-2"></i> Tous
-    </button>
-    <button class="filter-pill quiz" [class.active]="filterType === 'QUIZ'" (click)="loadByType('QUIZ')">
-      <i class="fa-solid fa-clipboard-question me-2"></i> QUIZ
-    </button>
-    <button class="filter-pill game" [class.active]="filterType === 'GAME'" (click)="loadByType('GAME')">
-      <i class="fa-solid fa-puzzle-piece me-2"></i> GAME
-    </button>
-    <button class="filter-pill content" [class.active]="filterType === 'CONTENT'" (click)="loadByType('CONTENT')">
-      <i class="fa-solid fa-book-open me-2"></i> CONTENT
-    </button>
-    <button class="filter-pill exercice" [class.active]="filterType === 'EXERCICE'" (click)="loadByType('EXERCICE')">
-      <i class="fa-solid fa-person-running me-2"></i> EXERCICE
-    </button>
+  <!-- Catégories & Filtres -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 animate-fade-in" *ngIf="!showForm">
+    <div class="d-flex flex-wrap gap-2">
+      <button class="filter-pill" [class.active]="filterType === ''" (click)="loadByType('')">
+        <i class="fa-solid fa-layer-group me-2"></i> Tous
+      </button>
+      <button class="filter-pill quiz" [class.active]="filterType === 'QUIZ'" (click)="loadByType('QUIZ')">
+        <i class="fa-solid fa-clipboard-question me-2"></i> QUIZ
+      </button>
+      <button class="filter-pill game" [class.active]="filterType === 'GAME'" (click)="loadByType('GAME')">
+        <i class="fa-solid fa-puzzle-piece me-2"></i> GAME
+      </button>
+      <button class="filter-pill content" [class.active]="filterType === 'CONTENT'" (click)="loadByType('CONTENT')">
+        <i class="fa-solid fa-book-open me-2"></i> CONTENT
+      </button>
+      <button class="filter-pill exercice" [class.active]="filterType === 'EXERCICE'" (click)="loadByType('EXERCICE')">
+        <i class="fa-solid fa-person-running me-2"></i> EXERCICE
+      </button>
+    </div>
+
+    <!-- Search in header -->
+    <div class="input-group search-form rounded-pill bg-white px-3 py-1 shadow-sm border border-black border-opacity-10" style="max-width: 350px;">
+      <span class="input-group-text bg-transparent border-0 text-muted">
+        <i class="fa-solid fa-magnifying-glass fs-14"></i>
+      </span>
+      <input type="text" class="form-control bg-transparent border-0 fs-14 fw-medium" 
+             placeholder="Rechercher une activité..." 
+             [(ngModel)]="searchTerm">
+    </div>
   </div>
 
   <!-- Table -->
-  <div class="card border-0 shadow rounded-4 overflow-hidden bg-white animate-fade-in" *ngIf="!showForm">
-    <div class="card-header bg-white border-0 p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
-      <div class="d-flex align-items-center flex-grow-1" style="max-width: 400px;">
-        <div class="input-group bg-light rounded-pill px-3 py-1 shadow-sm border">
-          <span class="input-group-text bg-transparent border-0 text-muted">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </span>
-          <input type="text" class="form-control bg-transparent border-0 fs-14" 
-                 placeholder="Rechercher une activité..." 
-                 [(ngModel)]="searchTerm">
-        </div>
-      </div>
-      <div class="d-flex align-items-center gap-3">
-        <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold" *ngIf="allActivities.length > 0">
-           {{ filteredActivities.length }} / {{ allActivities.length }}
-        </span>
-        <button class="btn btn-primary btn-sm fw-bold rounded-pill px-4" (click)="showForm = true">
-          <i class="fa-solid fa-plus me-2"></i> Créer Activité
-        </button>
-      </div>
-    </div>
+  <div class="card border-0 shadow-doc rounded-4 overflow-hidden bg-white animate-fade-in" *ngIf="!showForm">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
-        <thead class="bg-grey border-bottom border-black border-opacity-10">
+        <thead>
           <tr>
-            <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">ID / Titre</th>
-            <th class="py-3 text-uppercase small fw-bold text-muted text-center">Type / Stade</th>
-            <th class="text-end pe-4 py-3 text-uppercase small fw-bold text-muted">Actions</th>
+            <th class="ps-4 py-3 text-uppercase small fw-black text-muted letter-spacing-1">Activité / Identifiant</th>
+            <th class="py-3 text-uppercase small fw-black text-muted letter-spacing-1 text-center">Classification</th>
+            <th class="text-end pe-4 py-3 text-uppercase small fw-black text-muted letter-spacing-1">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let a of filteredActivities">
-            <td class="ps-4 py-3">
+            <td class="ps-4 py-4">
               <div class="d-flex align-items-center">
-                <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 42px; height: 42px;">
-                  <i class="fa-solid fa-puzzle-piece" *ngIf="a.type === 'GAME'"></i>
-                  <i class="fa-solid fa-question" *ngIf="a.type === 'QUIZ'"></i>
-                  <i class="fa-solid fa-heart-pulse" *ngIf="a.type === 'EXERCICE'"></i>
-                  <i class="fa-solid fa-book" *ngIf="a.type === 'CONTENT'"></i>
+                <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3 shadow-sm" style="width: 48px; height: 48px;">
+                  <i class="fa-solid fa-puzzle-piece fs-5" *ngIf="a.type === 'GAME'"></i>
+                  <i class="fa-solid fa-clipboard-question fs-5" *ngIf="a.type === 'QUIZ'"></i>
+                  <i class="fa-solid fa-heart-pulse fs-5" *ngIf="a.type === 'EXERCICE'"></i>
+                  <i class="fa-solid fa-book-open fs-5" *ngIf="a.type === 'CONTENT'"></i>
                 </div>
                 <div>
-                  <div class="fw-bold text-dark">{{ a.title }}</div>
-                  <div class="text-muted small">ID: #{{ a.id }}</div>
+                  <div class="fw-black text-dark fs-15 mb-0 ls-n1">{{ a.title }}</div>
+                  <div class="text-muted extra-small fw-bold opacity-50">SYSTEM_ID: #{{ a.id }}</div>
                 </div>
               </div>
             </td>
             <td class="text-center">
-              <span class="badge rounded-pill px-3 py-1 mb-1 fw-bold small text-uppercase" [class]="getBadgeClass(a.type)">{{ a.type }}</span>
-              <div class="text-muted small fw-bold">{{ a.stade }}</div>
+              <span class="badge rounded-pill px-3 py-2 mb-1 fw-black fs-11 text-uppercase ls-1 shadow-sm" 
+                    [class.bg-soft-success]="a.type === 'QUIZ'" [class.text-success]="a.type === 'QUIZ'"
+                    [class.bg-soft-primary]="a.type === 'GAME'" [class.text-primary]="a.type === 'GAME'"
+                    [class.bg-soft-warning]="a.type === 'CONTENT'" [class.text-warning]="a.type === 'CONTENT'"
+                    [class.bg-soft-danger]="a.type === 'EXERCICE'" [class.text-danger]="a.type === 'EXERCICE'">
+                {{ a.type }}
+              </span>
+              <div class="text-muted extra-small fw-black text-uppercase opacity-75 letter-spacing-1 mt-1">{{ a.stade }} — cognitive stage</div>
             </td>
             <td class="text-end pe-4">
-              <button class="btn btn-sm btn-light rounded-circle me-1" (click)="edit(a)" title="Modifier">
+              <button class="btn btn-sm btn-white border shadow-sm rounded-circle me-2 hov-primary" (click)="edit(a)" title="Modifier">
                 <i class="fa-solid fa-pen-to-square text-primary"></i>
               </button>
-              <button class="btn btn-sm btn-light rounded-circle text-danger" (click)="delete(a.id!)" title="Supprimer">
+              <button class="btn btn-sm btn-white border shadow-sm rounded-circle text-danger hov-danger" (click)="delete(a.id!)" title="Supprimer">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </td>
           </tr>
           <tr *ngIf="filteredActivities.length === 0">
-            <td colspan="3" class="text-center py-5 text-muted">
-              <i class="fa-solid fa-folder-open fs-2 opacity-25 mb-2 d-block"></i>
-              Aucune activité ne correspond à votre recherche.
+            <td colspan="3" class="text-center py-5 text-muted bg-light">
+              <i class="fa-solid fa-folder-open fs-1 opacity-25 mb-3 d-block"></i>
+              <div class="fw-black text-uppercase letter-spacing-1 small">Aucun enregistrement</div>
+              <p class="mb-0 small">Assurez-vous que les filtres de recherche sont corrects.</p>
             </td>
           </tr>
         </tbody>
@@ -182,41 +312,149 @@
 
 </div>
 
-<style>
+
+  <!-- ═══ STATS PREMIUM STYLES ═══ -->
+  <style>
+  .fw-black { font-weight: 800 !important; }
+  .ls-n1 { letter-spacing: -0.02em !important; }
+  .letter-spacing-1 { letter-spacing: 0.05em !important; }
+  .fs-28 { font-size: 1.75rem !important; }
+  .fs-20 { font-size: 1.25rem !important; }
+  .fs-15 { font-size: 0.95rem !important; }
+  .fs-14 { font-size: 0.875rem !important; }
+  .fs-11 { font-size: 0.7rem !important; }
+  .extra-small { font-size: 0.65rem !important; }
+
+  .section-header__title { color: var(--doc-heading); }
+
+  .underline::after {
+    content: ''; position: absolute; bottom: 2px; left: 0;
+    width: 100%; height: 8px;
+    background: rgba(128,0,128,0.1); z-index: -1; border-radius: 4px;
+  }
+  .transition-hover { transition: var(--doc-transition); }
+  .transition-hover:hover { transform: translateY(-5px); box-shadow: var(--doc-shadow) !important; }
+  .hov-grow { transition: all 0.2s cubic-bezier(0.4,0,0.2,1); }
+  .hov-grow:hover { transform: scale(1.02); }
+  .hov-primary:hover { background-color: #f3e8ff !important; border-color: #800080 !important; }
+  .hov-danger:hover { background-color: #fef2f2 !important; border-color: #ef4444 !important; }
+
+  /* ── Stats Section ── */
+  .stats-section {}
+  .stats-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px;
+  }
+  .stats-label {
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #800080;
+    background: rgba(128,0,128,0.07);
+    padding: 5px 14px; border-radius: 50px;
+  }
+
+  /* Stat Cards */
+  .stat-card {
+    border-radius: 20px; padding: 22px 18px;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 4px; position: relative; overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: default;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(128,0,128,0.15); }
+  .stat-card::before {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    transition: transform 0.4s ease;
+  }
+  .stat-card:hover::before { transform: scale(2.2); }
+
+  .stat-icon-wrap { font-size: 1.8rem; margin-bottom: 4px; }
+  .stat-value {
+    font-size: 2.4rem; font-weight: 900; line-height: 1;
+    color: white; letter-spacing: -0.03em;
+  }
+  .stat-title {
+    font-size: 0.82rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.05em; color: rgba(255,255,255,0.9);
+  }
+  .stat-sub { font-size: 0.68rem; color: rgba(255,255,255,0.65); font-weight: 600; }
+
+  /* Color Variants */
+  .stat-purple { background: linear-gradient(135deg, #800080, #5c0057); }
+  .stat-green  { background: linear-gradient(135deg, #059669, #047857); }
+  .stat-blue   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+  .stat-indigo { background: linear-gradient(135deg, #6c2bd9, #5b21b6); }
+  .stat-amber  { background: linear-gradient(135deg, #d97706, #b45309); }
+  .stat-rose   { background: linear-gradient(135deg, #e11d48, #be123c); }
+
+  /* Stades Progress Bar */
+  .stades-bar-wrap {
+    background: white; border-radius: 16px;
+    padding: 18px 24px;
+    box-shadow: 0 4px 20px rgba(128,0,128,0.06);
+    border: 1px solid rgba(128,0,128,0.08);
+  }
+  .stade-bar-label {
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.07em; color: #5c0057; margin-bottom: 12px;
+  }
+  .stades-bar {
+    display: flex; border-radius: 50px; overflow: hidden; height: 32px;
+    background: #f3e8ff;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+  }
+  .stade-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem; font-weight: 800; color: white;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    min-width: 15%;
+  }
+  .seg-leger  { background: linear-gradient(90deg, #800080, #9333ea); }
+  .seg-modere { background: linear-gradient(90deg, #5c0057, #7c3aed); }
+  .seg-severe { background: linear-gradient(90deg, #3d0040, #6d28d9); }
+
+  /* Filter Pills */
   .filter-pill {
-    background: white;
-    border: 1.5px solid #eee;
-    padding: 8px 20px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 13px;
-    color: #666;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    background: white; border: 1px solid rgba(128,0,128,0.1);
+    padding: 8px 22px; border-radius: 50px;
+    font-weight: 800; font-size: 12px; color: #64748b;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    display: flex; align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-transform: uppercase; letter-spacing: 0.05em;
   }
+  .filter-pill:hover { background: #faf5ff; border-color: rgba(128,0,128,0.3); transform: translateY(-2px); }
+  .filter-pill.active { background: linear-gradient(135deg,#800080,#5c0057); color: white; border-color: #800080;
+    box-shadow: 0 4px 12px rgba(128,0,128,0.3); }
+  .filter-pill.quiz.active    { background: linear-gradient(135deg,#059669,#047857); border-color:#059669; }
+  .filter-pill.game.active    { background: linear-gradient(135deg,#6c2bd9,#5b21b6); border-color:#6c2bd9; }
+  .filter-pill.content.active { background: linear-gradient(135deg,#d97706,#b45309); border-color:#d97706; }
+  .filter-pill.exercice.active{ background: linear-gradient(135deg,#e11d48,#be123c); border-color:#e11d48; }
 
-  .filter-pill:hover {
-    background: #f8f9fa;
-    border-color: #ddd;
-    transform: translateY(-2px);
+  .bg-soft-success { background-color: #ecfdf5 !important; }
+  .bg-soft-info    { background-color: #eff6ff !important; }
+  .bg-soft-warning { background-color: #fffbeb !important; }
+  .bg-soft-danger  { background-color: #fef2f2 !important; }
+  .text-success { color: #10b981 !important; }
+  .text-info    { color: #3b82f6 !important; }
+  .text-warning { color: #f59e0b !important; }
+  .text-danger  { color: #ef4444 !important; }
+
+  .form-control-doc, .form-select-doc {
+    height: 52px; background-color: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 12px; font-size: 0.9rem; font-weight: 600;
+    color: var(--doc-heading); transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    &:focus { background-color: #fff; border-color: #800080;
+      box-shadow: 0 0 0 4px rgba(128,0,128,0.1); outline: none; }
   }
-
-  .filter-pill.active {
-    background: #212529;
-    color: white;
-    border-color: #212529;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  .search-form {
+    transition: all 0.2s ease;
+    &:focus-within { background: white !important; border-color: #800080 !important;
+      box-shadow: 0 4px 12px rgba(128,0,128,0.15) !important; }
   }
-
-  /* Specific colors for types when active */
-  .filter-pill.quiz.active { background: #198754; border-color: #198754; }
-  .filter-pill.game.active { background: #800080; border-color: #800080; }
-  .filter-pill.content.active { background: #ffc107; border-color: #ffc107; color: #000; }
-  .filter-pill.exercice.active { background: #dc3545; border-color: #dc3545; }
-
-  .fs-14 { font-size: 14px; }
-  .bg-grey { background-color: #fcfcfc; }
-  .transition-all { transition: all 0.2s ease; }
-</style>
+  .shadow-doc { box-shadow: var(--doc-shadow) !important; }
+  table thead { background-color: #faf5ff; border-bottom: 1px solid #e9d5ff; }
+</style>

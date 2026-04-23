@@ -16,13 +16,20 @@ import { AuthService } from '../../../services/auth.service';
 import { CareBotService } from '../../../services/collaboration/care-bot.service';
 import { VideoCallComponent } from '../../videocall/videocall.component';
 import { VideoCallService } from '../../../services/videocall.service';
+import { GuidanceService } from '../../../services/collaboration/guidance.service';
+import { SpeechToTextService } from '../../../services/collaboration/speech-to-text.service';
+import { SpeakOnHoverDirective } from '../../../directives/speak-on-hover.directive';
+import { VoiceWelcomeComponent } from '../voice-welcome/voice-welcome.component';
+import { VoiceConversationComponent } from '../voice-conversation/voice-conversation.component';
+import { VoiceConversationService } from '../../../services/collaboration/voice-conversation.service';
+import { FloatingAssistantComponent } from '../floating-assistant/floating-assistant.component';
 import { Subscription } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-messenger',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MiniChatWidgetComponent, VideoCallComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MiniChatWidgetComponent, VideoCallComponent, VoiceWelcomeComponent, SpeakOnHoverDirective, VoiceConversationComponent, FloatingAssistantComponent],
   templateUrl: './messenger.component.html',
   styleUrls: ['./messenger.component.scss']
 })
@@ -40,6 +47,9 @@ export class MessengerComponent implements OnInit, OnDestroy {
   route = inject(ActivatedRoute);
   router = inject(Router);
   careBotApi = inject(CareBotService);
+  guidanceService = inject(GuidanceService);
+  sttService = inject(SpeechToTextService);
+  convService = inject(VoiceConversationService);
   private destroyRef = inject(DestroyRef);
 
   currentUserId = signal<number>(this.authService.getCurrentUser()?.id || 1);
@@ -47,8 +57,10 @@ export class MessengerComponent implements OnInit, OnDestroy {
   /** Hide Yes/No after the user answered (session only; reload may show again). */
   medicationReminderAnsweredIds = signal<Set<string>>(new Set());
   medReminderAckLoading = signal<boolean>(false);
+  
+  chattedUserIds = signal<number[]>([]);
+  isAddingContact = signal<boolean>(false);
 
-  // AI Handover State
   currentSummary = signal<string | null>(null);
   isGeneratingSummary = signal<boolean>(false);
 
@@ -57,7 +69,16 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   navigateToPost(pubId: string) {
-    this.router.navigate(['/collaboration/feed'], { fragment: 'pub-' + pubId });
+    this.router.navigate(['/collaboration/feed']).then(() => {
+      setTimeout(() => {
+        const element = document.getElementById('pub-' + pubId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('highlight-post');
+          setTimeout(() => element.classList.remove('highlight-post'), 2000);
+        }
+      }, 300);
+    });
   }
 
   getVotePercentage(msg: MessageDto, option: any): number {
@@ -72,21 +93,18 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   getUserName(userId: number): string {
-    // 1. Try to find in the fetched users list
     const user = this.userService.users().find(u => u.id === userId);
     if (user) {
       const fullName = [user.prenom, user.nom].filter(Boolean).join(' ');
       return fullName || 'User ' + userId;
     }
 
-    // 2. Fallback: If it's the current user, use AuthService data
     const current = this.authService.getCurrentUser();
     if (current && current.id === userId) {
       const fullName = [current.prenom, current.nom].filter(Boolean).join(' ');
       return fullName || 'User ' + userId;
     }
 
-    // 3. Last resort fallback
     return 'User ' + userId;
   }
 
@@ -144,15 +162,17 @@ export class MessengerComponent implements OnInit, OnDestroy {
   newGroupMessage = '';
   dmContent = '';
   dmUserSearch = signal<string>('');
-  selectedMessageFile: File | null = null;
+  selectedMessageFiles: File[] = [];
   searchQuery = signal<string>('');
   replyingTo: MessageDto | null = null;
+
+  editingMessageId: string | null = null;
+  editingMessageContent = '';
 
   isPollMode = signal<boolean>(false);
   pollQuestion = '';
   pollOptions = signal<string[]>(['', '']);
 
-  // @mention state
   mentionQuery = signal<string>('');
   showMentionDropdown = signal<boolean>(false);
   mentionSuggestions = computed(() => {
@@ -166,12 +186,29 @@ export class MessengerComponent implements OnInit, OnDestroy {
   });
 
   filteredDmUsers = computed(() => {
-    const users = this.userService.users();
+    const allUsers = this.userService.users();
     const uid = this.currentUserId();
     const q = this.dmUserSearch().toLowerCase();
-    return users.filter((u: any) => {
-      if (u.id === uid) return false;
-      if (!q) return true;
+    const historyIds = this.chattedUserIds();
+    const addingNew = this.isAddingContact();
+
+    let targetUsers = [];
+
+    if (!addingNew) {
+      targetUsers = allUsers.filter(u => historyIds.includes(Number(u.id)));
+    } else {
+      const myGroupMemberIds = new Set<number>();
+      this.groups().forEach(g => g.members.forEach(m => myGroupMemberIds.add(Number(m.id))));
+      
+      targetUsers = allUsers.filter(u => 
+        u.id !== uid && 
+        myGroupMemberIds.has(Number(u.id)) && 
+        !historyIds.includes(Number(u.id))
+      );
+    }
+
+    if (!q) return targetUsers;
+    return targetUsers.filter((u: any) => {
       const fullName = `${u.prenom || ''} ${u.nom || ''}`.toLowerCase();
       return fullName.includes(q) || (u.id?.toString() || '').includes(q);
     });
@@ -220,7 +257,6 @@ export class MessengerComponent implements OnInit, OnDestroy {
             return;
           }
 
-          // Handle pinning update (message updated in place)
           const indexGroup = this.messageService.messages().findIndex(m => m.id === newMsg.id);
           if (indexGroup !== -1) {
             this.messageService.messages.update(msgs => {
@@ -257,7 +293,6 @@ export class MessengerComponent implements OnInit, OnDestroy {
             newMsg.type === 'MEDICATION_REMINDER' ||
             newMsg.fromBot === true;
 
-          // CareBot replies: receiver set, sender null — must not use "otherUserId" DM logic
           if (
             isBotPipe &&
             (newMsg.receiverId === uid || newMsg.senderId === uid)
@@ -270,12 +305,54 @@ export class MessengerComponent implements OnInit, OnDestroy {
           }
 
           if (newMsg.chatGroupId && this.activeGroup()?.id === newMsg.chatGroupId) {
-            this.messageService.messages.update(msgs => [newMsg, ...msgs]);
+            this.messageService.messages.update(msgs => {
+              if (msgs.some(m => m.id === newMsg.id)) return msgs;
+              return [newMsg, ...msgs];
+            });
           } else if (newMsg.receiverId === uid || newMsg.senderId === uid) {
             const otherUserId =
               newMsg.senderId === uid ? newMsg.receiverId : newMsg.senderId;
-            if (otherUserId != null && this.activeDmUserId() === otherUserId) {
-              this.dmMessages.update(msgs => [newMsg, ...msgs]);
+            
+            if (otherUserId != null) {
+              if (!this.chattedUserIds().includes(otherUserId)) {
+                this.chattedUserIds.update(ids => [...ids, otherUserId]);
+              }
+
+              if (this.activeDmUserId() === otherUserId) {
+                this.dmMessages.update(msgs => {
+                  if (msgs.some(m => m.id === newMsg.id)) return msgs;
+                  return [newMsg, ...msgs];
+                });
+              }
+            }
+          }
+
+          if (newMsg.senderId !== uid && !isBotPipe) {
+            const senderName = this.getUserName(newMsg.senderId) || 'Someone';
+            const content = newMsg.content || 'sent a message';
+            this.guidanceService.speakIncomingMessage(senderName, content);
+          }
+          if (isBotPipe && newMsg.receiverId === uid) {
+            this.guidanceService.speak(newMsg.content || 'CareBot sent you a message.');
+            if (newMsg.type === 'MEDICATION_REMINDER') {
+              setTimeout(() => {
+                this.convService.ask({
+                  question: newMsg.content || 'Did you take your medication today?',
+                  actions: [
+                    {
+                      label: 'Yes, I took it',
+                      keyword: ['yes', 'took', 'done', 'taken', 'did'],
+                      callback: () => this.answerMedicationReminder(newMsg.id!, true)
+                    },
+                    {
+                      label: 'Not yet',
+                      keyword: ['no', 'not', 'yet', 'later', 'forgot'],
+                      callback: () => this.answerMedicationReminder(newMsg.id!, false)
+                    }
+                  ],
+                  timeoutMs: 30000
+                });
+              }, 2500);
             }
           }
         });
@@ -288,6 +365,61 @@ export class MessengerComponent implements OnInit, OnDestroy {
         untracked(() => {
           this.webSocketService.setUserId(uid);
           this.refreshData();
+        });
+      }
+    }, { allowSignalWrites: true });
+
+    effect(() => {
+      const evt = this.webSocketService.typingEvent();
+      if (evt && evt.senderId !== this.currentUserId()) {
+        untracked(() => {
+          if (evt.groupId && evt.groupId !== this.activeGroup()?.id) return;
+
+          const map = new Map(this.typingUsers());
+          if (evt.typing) {
+            const existing = map.get(evt.senderId);
+            if (existing) clearTimeout(existing as any);
+            const t = setTimeout(() => {
+              this.typingUsers.update(m => { const n = new Map(m); n.delete(evt.senderId); return n; });
+            }, 3000);
+            map.set(evt.senderId, t as any);
+          } else {
+            const existing = map.get(evt.senderId);
+            if (existing) clearTimeout(existing as any);
+            map.delete(evt.senderId);
+          }
+          this.typingUsers.set(map);
+        });
+      }
+    }, { allowSignalWrites: true });
+
+    effect(() => {
+      const notif = this.webSocketService.notificationMessage();
+      if (notif) {
+        untracked(() => {
+          this.notificationService.addNotification(notif);
+          this.guidanceService.speakNotification(notif.content, notif.type);
+
+          if (notif.type === 'CAREBOT' || notif.type === 'VOICE_PROMPT' || notif.type === 'MEDICATION_REMINDER') {
+            setTimeout(() => {
+              this.convService.ask({
+                question: notif.content,
+                actions: [
+                  {
+                    label: 'Okay',
+                    keyword: ['okay', 'ok', 'yes', 'understood', 'thanks'],
+                    callback: () => this.guidanceService.speakImmediate('Good. I am here if you need me.')
+                  },
+                  {
+                    label: 'Read again',
+                    keyword: ['again', 'repeat', 'what', 'pardon'],
+                    callback: () => this.guidanceService.speakImmediate(notif.content)
+                  }
+                ],
+                timeoutMs: 20000
+              });
+            }, 2000);
+          }
         });
       }
     }, { allowSignalWrites: true });
@@ -312,7 +444,6 @@ export class MessengerComponent implements OnInit, OnDestroy {
           this.videoCallService.unsubscribeFromRoom(prev);
         }
         this.videoListenRoomId = roomId;
-        // Always connect video STOMP so /user/queue/videocall (DM ring) works even if no chat is selected.
         this.videoCallService.connect(String(uid));
         if (roomId) {
           this.videoCallService.ensureSubscribedToRoom(roomId);
@@ -324,6 +455,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.refreshData();
+      this.guidanceService.loadAndSpeak('messenger');
       this.route.queryParams.subscribe(params => {
         if (params['dm']) {
           this.openDmChat(Number(params['dm']));
@@ -334,6 +466,34 @@ export class MessengerComponent implements OnInit, OnDestroy {
             this.enterGroup(grp);
           } else {
             this.chatGroupService.getGroupById(gid).subscribe(g => this.enterGroup(g));
+          }
+        } else if (params['sendTo']) {
+          const contactName: string = (params['sendTo'] as string).toLowerCase().trim();
+          const prefilledText: string = params['text'] ?? '';
+
+          const findAndOpen = () => {
+            const users = this.userService.users();
+            const match = users.find(u => {
+              const fullName = `${u.prenom ?? ''} ${u.nom ?? ''}`.toLowerCase().trim();
+              const firstName = (u.prenom ?? '').toLowerCase().trim();
+              return fullName.includes(contactName) || firstName === contactName;
+            });
+            if (match?.id) {
+              this.openDmChat(match.id);
+              if (prefilledText) {
+                setTimeout(() => { this.dmContent = prefilledText; }, 300);
+              }
+            } else {
+              this.guidanceService.speakImmediate(
+                `I could not find ${params['sendTo']} in your contacts. Please check your messages.`
+              );
+            }
+          };
+
+          if (this.userService.users().length > 0) {
+            findAndOpen();
+          } else {
+            setTimeout(findAndOpen, 800);
           }
         }
       });
@@ -347,13 +507,111 @@ export class MessengerComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * After a conversation is opened, asks the user what they want to say
+   * and sends it automatically if they speak.
+   * Only triggers if voice is unlocked and STT is supported.
+   */
   refreshData() {
     this.chatGroupService.fetchGroups();
     this.userService.fetchUsers();
-    this.notificationService.fetchNotifications(this.currentUserId());
+    
+    const uid = this.currentUserId();
+    if (uid) {
+      this.notificationService.fetchNotifications(uid);
+      this.fetchChattedPeers();
+    }
   }
 
-  // --- EMOJI PICKER LOGIC ---
+  fetchChattedPeers() {
+    this.messageService.fetchDirectMessagePeers(this.currentUserId()).subscribe(ids => {
+      this.chattedUserIds.set(ids);
+    });
+  }
+
+  /**
+   * Standalone voice-send: listens once and sends whatever the user says
+   * into the currently active conversation.
+   */
+  startVoiceSend() {
+    if (!this.sttService.isSupported) return;
+    const chatType = this.activeChatType();
+    const groupId = this.activeGroup()?.id;
+
+    this.sttService.askAndListen('Say your message now.').then(transcript => {
+      if (!transcript.trim() || transcript.toLowerCase() === 'cancel') {
+        this.guidanceService.speakImmediate('Cancelled.');
+        return;
+      }
+      if (chatType === 'GROUP' && groupId) {
+        this.newGroupMessage = transcript;
+        this.sendGroupMessage(groupId);
+        this.guidanceService.speakImmediate('Message sent.');
+      } else if (chatType === 'DM') {
+        this.dmContent = transcript;
+        this.sendDmMessage();
+        this.guidanceService.speakImmediate('Message sent.');
+      }
+    }).catch(() => {
+      this.guidanceService.speakImmediate('Could not hear you. Please try again.');
+    });
+  }
+
+  /**
+   * Voice command flow for the messenger.
+   * Asks "Who do you want to message?" then opens the matching group or DM.
+   */
+  startVoiceNavigation() {
+    const groupNames = this.groups().map(g => g.name);
+    const peopleNames = this.userService.users()
+      .filter(u => u.id !== this.currentUserId())
+      .map(u => `${u.prenom || ''} ${u.nom || ''}`.trim());
+
+    this.sttService.askAndListen(
+      'This is your messenger. Say the name of a group or a person you want to message.'
+    ).then(transcript => {
+      const cmd = this.sttService.parseCommand(transcript, groupNames, peopleNames);
+      switch (cmd.type) {
+        case 'OPEN_GROUP': {
+          const grp = this.groups().find(g =>
+            g.name.toLowerCase() === cmd.groupName.toLowerCase()
+          );
+          if (grp) {
+            this.enterGroup(grp);
+            this.guidanceService.speakImmediate(`Opening group ${grp.name}.`);
+          } else {
+            this.guidanceService.speakImmediate(`Sorry, I could not find a group called ${cmd.groupName}.`);
+          }
+          break;
+        }
+        case 'OPEN_DM': {
+          const user = this.userService.users().find(u =>
+            (`${u.prenom} ${u.nom}`).toLowerCase().includes(cmd.personName.toLowerCase())
+          );
+          if (user) {
+            this.openDmChat(user.id!);
+            this.guidanceService.speakImmediate(`Opening conversation with ${user.prenom}.`);
+          } else {
+            this.guidanceService.speakImmediate(`Sorry, I could not find ${cmd.personName} in your contacts.`);
+          }
+          break;
+        }
+        case 'STOP_VOICE':
+          this.guidanceService.stopSpeaking();
+          break;
+        case 'REPEAT':
+          this.guidanceService.speakCurrentPage();
+          break;
+        default:
+          this.guidanceService.speakImmediate(
+            `I heard: ${transcript}. I did not understand. Please say a group name or a person's name.`
+          );
+      }
+    }).catch(() => {
+      this.guidanceService.speakImmediate('Sorry, I could not hear you. Please try again.');
+    });
+  }
+
   showEmojiPicker = signal<boolean>(false);
   
   readonly EMOJI_LIST = [
@@ -382,16 +640,41 @@ export class MessengerComponent implements OnInit, OnDestroy {
       this.dmContent += emoji;
     }
   }
-  // --- END EMOJI LOGIC ---
 
   enterGroup(grp: ChatGroupDto) {
     this.searchQuery.set('');
     this.activeChatType.set('GROUP');
     this.activeDmUserId.set(null);
     this.chatGroupService.activeGroup.set(grp);
-    this.messageService.fetchMessagesByGroup(grp.id!);
+    this.messagePage = 0;
+    this.hasMoreMessages.set(true);
+    this.typingUsers.set(new Map());
+    this.messageService.fetchMessagesByGroupPaged(grp.id!, 0).subscribe(msgs => {
+      this.messageService.messages.set(msgs);
+    });
     this.webSocketService.subscribeToGroup(grp.id!);
+    this.webSocketService.subscribeToGroupTyping(grp.id!);
     this.currentSummary.set(null);
+
+    if (this.guidanceService.voiceUnlocked()) {
+      setTimeout(() => {
+        this.convService.ask({
+          question: `You opened the group ${grp.name}. Would you like to send a message?`,
+          actions: [
+            {
+              label: 'Yes, speak my message',
+              keyword: ['yes', 'sure', 'okay', 'speak', 'message', 'send'],
+              callback: () => this.startVoiceSend()
+            },
+            {
+              label: 'No, just browse',
+              keyword: ['no', 'browse', 'look', 'read', 'skip'],
+              callback: () => this.guidanceService.speakImmediate('Okay, take your time.')
+            }
+          ]
+        });
+      }, 800);
+    }
   }
 
   openDmChat(userId: number) {
@@ -401,8 +684,32 @@ export class MessengerComponent implements OnInit, OnDestroy {
     this.chatGroupService.activeGroup.set(null);
     this.messageService.fetchDirectMessages(this.currentUserId(), userId).subscribe(msgs => {
       this.dmMessages.set(msgs);
+      const me = this.currentUserId();
+      msgs.filter(m => m.senderId !== me && !(m.viewedByUserIds?.includes(me)))
+          .forEach(m => this.messageService.markAsRead(m.id, me).subscribe());
     });
     this.currentSummary.set(null);
+
+    if (this.guidanceService.voiceUnlocked()) {
+      const name = this.getUserName(userId);
+      setTimeout(() => {
+        this.convService.ask({
+          question: `You opened a conversation with ${name}. Would you like to say something?`,
+          actions: [
+            {
+              label: 'Yes, speak my message',
+              keyword: ['yes', 'sure', 'okay', 'speak', 'message', 'send'],
+              callback: () => this.startVoiceSend()
+            },
+            {
+              label: 'No thanks',
+              keyword: ['no', 'skip', 'cancel', 'browse'],
+              callback: () => this.guidanceService.speakImmediate('Okay, no problem.')
+            }
+          ]
+        });
+      }, 800);
+    }
   }
 
   fetchHandoverSummary() {
@@ -495,18 +802,21 @@ export class MessengerComponent implements OnInit, OnDestroy {
       this.submitPoll(groupId);
       return;
     }
-    if (!this.newGroupMessage.trim() && !this.selectedMessageFile) return;
+    if (!this.newGroupMessage.trim() && this.selectedMessageFiles.length === 0) return;
     this.messageService.createMessage({
       content: this.newGroupMessage,
       chatGroupId: groupId,
       senderId: this.currentUserId(),
       parentMessageId: this.replyingTo?.id,
       type: 'TEXT'
-    }, this.selectedMessageFile || undefined).subscribe(() => {
+    }, this.selectedMessageFiles.length > 0 ? this.selectedMessageFiles : undefined).subscribe((saved) => {
       this.newGroupMessage = '';
-      this.selectedMessageFile = null;
+      this.selectedMessageFiles = [];
       this.replyingTo = null;
-      this.messageService.fetchMessagesByGroup(groupId);
+      this.messageService.messages.update(msgs => {
+        if (msgs.some(m => m.id === saved.id)) return msgs;
+        return [saved, ...msgs];
+      });
     });
   }
 
@@ -530,13 +840,56 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   vote(messageId: string, optionId: string) {
-    this.messageService.voteOnPoll(messageId, this.currentUserId(), optionId).subscribe();
+    this.messageService.voteOnPoll(messageId, this.currentUserId(), optionId).subscribe(updated => {
+      const updateList = (msgs: MessageDto[]) =>
+        msgs.map(m => m.id === updated.id ? updated : m);
+      this.messageService.messages.update(updateList);
+      this.dmMessages.update(updateList);
+      this.botMessages.update(updateList);
+    });
   }
 
   togglePin(msg: MessageDto) {
-    this.messageService.togglePin(msg.id).subscribe(() => {
-      // Update will come via WebSocket
+    this.messageService.togglePin(msg.id).subscribe(updated => {
+      const updateList = (msgs: MessageDto[]) => msgs.map(m => m.id === updated.id ? updated : m);
+      this.messageService.messages.update(updateList);
+      this.dmMessages.update(updateList);
     });
+  }
+
+  deleteMsg(msg: MessageDto) {
+    if (!confirm('Delete this message?')) return;
+    this.messageService.deleteMessage(msg.id).subscribe();
+    const removeMsg = (msgs: MessageDto[]) => msgs.filter(m => m.id !== msg.id);
+    this.messageService.messages.update(removeMsg);
+    this.dmMessages.update(removeMsg);
+    this.botMessages.update(removeMsg);
+  }
+
+  startEditMessage(msg: MessageDto) {
+    this.editingMessageId = msg.id;
+    this.editingMessageContent = msg.content;
+  }
+
+  saveEditMessage(msg: MessageDto) {
+    if (!this.editingMessageContent.trim()) return;
+    const req = {
+      content: this.editingMessageContent,
+      senderId: this.currentUserId(),
+      chatGroupId: msg.chatGroupId,
+      receiverId: msg.receiverId
+    };
+    this.messageService.updateMessage(msg.id, req).subscribe(updated => {
+      const updateList = (msgs: MessageDto[]) => msgs.map(m => m.id === updated.id ? updated : m);
+      this.messageService.messages.update(updateList);
+      this.dmMessages.update(updateList);
+      this.cancelEditMessage();
+    });
+  }
+
+  cancelEditMessage() {
+    this.editingMessageId = null;
+    this.editingMessageContent = '';
   }
 
   togglePollMode() {
@@ -578,43 +931,32 @@ export class MessengerComponent implements OnInit, OnDestroy {
 
   sendDmMessage() {
     const trimmed = this.dmContent.trim();
-    if (!trimmed || !this.activeDmUserId()) return;
-    
+    if (!trimmed && this.selectedMessageFiles.length === 0) return;
+    if (!this.activeDmUserId()) return;
     this.messageService.createMessage({
-      content: trimmed,
+      content: trimmed || '',
       senderId: this.currentUserId(),
       receiverId: this.activeDmUserId()!,
+      parentMessageId: this.replyingTo?.id,
       type: 'TEXT'
-    }).subscribe(() => {
+    }, this.selectedMessageFiles.length > 0 ? this.selectedMessageFiles : undefined).subscribe((saved) => {
       this.dmContent = '';
-      this.refreshData();
+      this.selectedMessageFiles = [];
+      this.replyingTo = null;
+      
+      this.dmMessages.update(msgs => {
+        if (msgs.some(m => m.id === saved.id)) return msgs;
+        return [saved, ...msgs];
+      });
+
+      const otherId = saved.receiverId!;
+      if (!this.chattedUserIds().includes(otherId)) {
+        this.chattedUserIds.update(ids => [...ids, otherId]);
+      }
     });
   }
 
   sendBotMessage() {
-    if (!this.dmContent.trim()) return;
-    const content = this.dmContent;
-    this.dmContent = '';
-    
-    // 1. Create a local temporary message for UI
-    const tempMsg: MessageDto = {
-      id: Date.now().toString(),
-      content: content,
-      senderId: this.currentUserId(),
-      senderName: 'You',
-      sentAt: new Date().toISOString(),
-      type: 'TEXT'
-    };
-    this.botMessages.update(prev => [tempMsg, ...prev]);
-
-    // 2. Send to backend (CareBot will intercept if disoriented)
-    this.messageService.createMessage({
-      content: content,
-      senderId: this.currentUserId(),
-      type: 'BOT_MESSAGE' // Tag it so backend knows it's a bot-destined message
-    }).subscribe(() => {
-      setTimeout(() => this.openBotChat(), 500);
-    });
   }
 
   /** Same payload as the daily 8:00 AM job; sends only to the logged-in user if they are a PATIENT. */
@@ -675,10 +1017,13 @@ export class MessengerComponent implements OnInit, OnDestroy {
 
   onMessageFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      this.selectedMessageFile = file;
+    if (input.files) {
+      this.selectedMessageFiles = Array.from(input.files);
     }
+  }
+  
+  removeSelectedMessageFile(index: number) {
+    this.selectedMessageFiles.splice(index, 1);
   }
 
   setReply(msg: MessageDto) {
@@ -687,6 +1032,18 @@ export class MessengerComponent implements OnInit, OnDestroy {
 
   cancelReply() {
     this.replyingTo = null;
+  }
+
+  scrollToMessage(messageId: string) {
+    const element = document.getElementById('msg-' + messageId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      element.classList.add('highlight-message');
+      setTimeout(() => {
+        element.classList.remove('highlight-message');
+      }, 2000);
+    }
   }
 
   closeChat() {
@@ -739,7 +1096,6 @@ export class MessengerComponent implements OnInit, OnDestroy {
   /** Called on every keystroke in the group message input */
   onGroupMessageInput(value: string) {
     this.newGroupMessage = value;
-    // Detect if the last typed word starts with @
     const lastWord = value.split(/\s/).pop() || '';
     if (lastWord.startsWith('@') && lastWord.length > 1) {
       this.mentionQuery.set(lastWord.slice(1));
@@ -759,34 +1115,86 @@ export class MessengerComponent implements OnInit, OnDestroy {
     this.mentionQuery.set('');
   }
 
+  messagePage = 0;
+  hasMoreMessages = signal<boolean>(true);
+  isLoadingMoreMessages = signal<boolean>(false);
+
+  loadMoreMessages() {
+    const grp = this.activeGroup();
+    if (!grp || this.isLoadingMoreMessages() || !this.hasMoreMessages()) return;
+    this.isLoadingMoreMessages.set(true);
+    this.messagePage++;
+    this.messageService.fetchMessagesByGroupPaged(grp.id!, this.messagePage).subscribe({
+      next: (older) => {
+        if (older.length === 0) {
+          this.hasMoreMessages.set(false);
+        } else {
+          this.messageService.messages.update(msgs => [...msgs, ...older]);
+        }
+        this.isLoadingMoreMessages.set(false);
+      },
+      error: () => this.isLoadingMoreMessages.set(false)
+    });
+  }
+  typingUsers = signal<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+  isOtherTyping = computed(() => this.typingUsers().size > 0);
+  typingLabel = computed(() => {
+    const ids = Array.from(this.typingUsers().keys());
+    if (ids.length === 0) return '';
+    if (ids.length === 1) return this.getUserName(ids[0]) + ' is typing...';
+    return ids.length + ' people are typing...';
+  });
+
+  private typingTimeout: any;
+
+  onInputChange(value: string, isGroup: boolean) {
+    if (isGroup) {
+      this.newGroupMessage = value;
+      const lastWord = value.split(/\s/).pop() || '';
+      if (lastWord.startsWith('@') && lastWord.length > 1) {
+        this.mentionQuery.set(lastWord.slice(1));
+        this.showMentionDropdown.set(true);
+      } else {
+        this.showMentionDropdown.set(false);
+        this.mentionQuery.set('');
+      }
+      const gid = this.activeGroup()?.id;
+      if (gid) this.webSocketService.sendTyping(this.currentUserId(), undefined, gid, true);
+    } else {
+      this.dmContent = value;
+      const otherId = this.activeDmUserId();
+      if (otherId) this.webSocketService.sendTyping(this.currentUserId(), otherId, undefined, true);
+    }
+    clearTimeout(this.typingTimeout);
+    this.typingTimeout = setTimeout(() => {
+      const gid = this.activeGroup()?.id;
+      const otherId = this.activeDmUserId();
+      if (gid) this.webSocketService.sendTyping(this.currentUserId(), undefined, gid, false);
+      if (otherId) this.webSocketService.sendTyping(this.currentUserId(), otherId, undefined, false);
+    }, 2000);
+  }
+
   formatMessage(content: string | undefined): SafeHtml {
     if (!content) return '';
     
-    // Escape HTML first to prevent XSS
     let escaped = content.replace(/&/g, '&amp;')
                          .replace(/</g, '&lt;')
                          .replace(/>/g, '&gt;')
                          .replace(/"/g, '&quot;')
                          .replace(/'/g, '&#039;');
 
-    // Regex to match anything starting with @ and continuing with valid name characters/spaces
     const mentionRegex = /@([a-zA-Z0-9À-ÿ._-]+(?:\s[a-zA-Z0-9À-ÿ._-]+)*)/g;
     
     const formatted = escaped.replace(mentionRegex, (match, fullName) => {
       const grp = this.activeGroup();
       if (!grp) return match;
 
-      // Backtracking match: try the full matched name, then peel off words from the end
-      // e.g., if we matched "@Rania Ghrissi hello", try:
-      // 1. "Rania Ghrissi hello"
-      // 2. "Rania Ghrissi" -> Match!
       let words = fullName.split(/\s+/);
       while (words.length > 0) {
         let candidate = words.join(' ');
         let member = grp.members.find(m => m.name?.toLowerCase() === candidate.toLowerCase());
         
         if (member) {
-          // We found a match! Return the highlight span + any remaining words we peeled off
           const remainingWords = fullName.slice(candidate.length);
           return `<span class="mention-tag">@${member.name}</span>${remainingWords}`;
         }

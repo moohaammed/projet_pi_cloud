@@ -14,20 +14,21 @@ import { User, Role } from '../../../models/user.model';
 })
 export class PatientDetailComponent implements OnInit {
 
-  patient: any = null;
-  loading = true;
-  isAdmin = false;
-  isDoctor = false;
+  patient:  any = null;
+  relation: any = null;   // ← compte RELATION lié au patient
+  loading      = true;
+  isAdmin      = false;
+  isDoctor     = false;
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
+    private route:          ActivatedRoute,
+    private router:         Router,
     private alzUserService: AlzUserService,
-    private authService: AuthService
+    private authService:    AuthService
   ) {}
 
   ngOnInit(): void {
-    const role = this.authService.getRole();
+    const role    = this.authService.getRole();
     this.isAdmin  = role === 'ADMIN';
     this.isDoctor = role === 'DOCTOR';
 
@@ -37,10 +38,35 @@ export class PatientDetailComponent implements OnInit {
         next: (data) => {
           this.patient = data;
           this.loading = false;
+          // ── Charger la relation liée si relationId existe ──
+          const anyData = data as any;
+          const relationId = anyData?.relationId ?? anyData?.relation_id;
+          if (relationId) {
+            this.alzUserService.getById(relationId).subscribe({
+              next: (rel) => this.relation = rel,
+              error: () => this.relation = null
+            });
+          } else {
+            // Fallback : chercher via role RELATION + patientId
+            this.loadRelationByPatientId(+id);
+          }
         },
         error: () => this.loading = false
       });
     }
+  }
+
+  /** Cherche l'utilisateur RELATION dont le patientId = id du patient */
+  private loadRelationByPatientId(patientId: number): void {
+    this.alzUserService.getAll().subscribe({
+      next: (users: User[]) => {
+        this.relation = users.find(
+          u => u.role === Role.RELATION &&
+               ((u as any).patientId === patientId ||
+                (u as any).patient_id === patientId)
+        ) ?? null;
+      }
+    });
   }
 
   toggleActif(): void {
@@ -66,7 +92,7 @@ export class PatientDetailComponent implements OnInit {
       case 'LEGER':  return 'Léger';
       case 'MODERE': return 'Modéré';
       case 'SEVERE': return 'Sévère';
-      default: return 'Non défini';
+      default:       return 'Non défini';
     }
   }
 
@@ -75,24 +101,33 @@ export class PatientDetailComponent implements OnInit {
       case 'LEGER':  return 'success';
       case 'MODERE': return 'warning';
       case 'SEVERE': return 'danger';
-      default: return 'secondary';
+      default:       return 'secondary';
     }
   }
 
-  // ← Getters pour éviter (patient as any) dans le template
-  get contactUrgenceNom(): string {
-    return this.patient?.contactUrgenceNom || 'Non renseigné';
+  get contactUrgenceNom():      string {
+    return this.patient?.contactUrgenceNom
+        || (this.relation ? `${this.relation.prenom} ${this.relation.nom}` : 'Non renseigné');
   }
-  get contactUrgenceTelephone(): string {
-    return this.patient?.contactUrgenceTelephone || 'Non renseigné';
+  get contactUrgenceTelephone():string {
+    return this.patient?.contactUrgenceTelephone
+        || this.relation?.telephone
+        || 'Non renseigné';
   }
   get contactUrgenceRelation(): string {
-    return this.patient?.contactUrgenceRelation || 'Non renseigné';
+    return this.patient?.contactUrgenceRelation
+        || (this.relation as any)?.lienAvecPatient
+        || 'Non renseigné';
   }
-  get notes(): string {
-    return this.patient?.notes || '';
+  get notes():   string { return this.patient?.notes   || ''; }
+  get adresse(): string { return this.patient?.adresse || 'Non renseignée'; }
+
+  // ── Infos relation ────────────────────────────────────────
+  get relationNomComplet(): string {
+    if (!this.relation) return 'Aucun compte relation créé';
+    return `${this.relation.prenom ?? ''} ${this.relation.nom ?? ''}`.trim();
   }
-  get adresse(): string {
-    return this.patient?.adresse || 'Non renseignée';
-  }
+  get relationEmail():    string { return this.relation?.email     || '—'; }
+  get relationTelephone():string { return this.relation?.telephone || '—'; }
+  get relationLien():     string { return (this.relation as any)?.lienAvecPatient || '—'; }
 }

@@ -1,8 +1,9 @@
-import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { FirebaseMessagingService } from '../../../services/firebase-messaging.service';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +14,7 @@ import { AuthService } from '../../../services/auth.service';
 export class LoginComponent implements AfterViewInit {
 
   @ViewChild('recaptchaContainer') recaptchaContainer!: ElementRef;
+  private messagingService = inject(FirebaseMessagingService);
 
   credentials = { email: '', password: '' };
   loading = false;
@@ -88,7 +90,7 @@ export class LoginComponent implements AfterViewInit {
     this.authService.login(this.credentials).subscribe({
       next: () => {
         this.loading = false;
-        this.authService.redirectByRole();
+        this.requestPushPermissionThenRedirect();
       },
       error: (err: any) => {
         this.loading = false;
@@ -97,6 +99,15 @@ export class LoginComponent implements AfterViewInit {
           : (err.error?.message || err.error || 'Email ou mot de passe incorrect');
       }
     });
+  }
+
+  private async requestPushPermissionThenRedirect() {
+    try {
+      await this.messagingService.requestNotificationPermission();
+    } catch (e) {
+      console.error('Permission request failed', e);
+    }
+    this.authService.redirectByRole();
   }
 
   handleGoogleCredential(response: any): void {

@@ -81,7 +81,7 @@
           </div>
           <div>
             <h6 class="fw-bold mb-0 text-dark">Rappel Imminent</h6>
-            <span class="mt-1 small">Votre rendez-vous #{{ imminentRv.id }} {{ imminentRv.motif ? '(' + imminentRv.motif
+            <span class="mt-1 small">Votre rendez-vous {{ imminentRv.motif ? '(' + imminentRv.motif
               + ')' : '' }} est prévu dans moins de 30 minutes. Veuillez vous préparer.</span>
           </div>
         </div>
@@ -146,7 +146,7 @@
 
       <ng-container *ngIf="viewMode === 'list'">
         <div class="row g-4" *ngIf="filteredList.length > 0; else noData">
-          <div class="col-lg-6" *ngFor="let rv of filteredList">
+          <div class="col-lg-6" *ngFor="let rv of filteredList; let i = index">
             <div class="card border-0 rounded-4 shadow-sm card-hover overflow-hidden h-100">
               <div class="card-body p-0">
                 <div class="d-sm-flex align-items-stretch">
@@ -161,7 +161,7 @@
 
                   <div class="p-4 flex-grow-1">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                      <h5 class="fw-bold mb-0 text-dark">Rendez-vous #{{ rv.id }}</h5>
+                      <h5 class="fw-bold mb-0 text-dark">Rendez-vous #{{ i + 1 }}</h5>
                       <button class="btn btn-sm btn-light text-primary rounded-pill fw-bold shadow-sm"
                         (click)="openPatientProfile(rv.patientId)" title="Dossier Patient">
                         <i class="fa-solid fa-user me-1"></i> #P-{{ rv.patientId }}
@@ -245,7 +245,7 @@
           <i class="fa-solid fa-triangle-exclamation fs-1"></i>
         </div>
         <h4 class="fw-bold">Confirmer la suppression</h4>
-        <p class="text-muted">Voulez-vous vraiment supprimer le rendez-vous <strong>#{{ deleteConfirmId }}</strong> ?
+        <p class="text-muted">Voulez-vous vraiment supprimer ce rendez-vous ?
           Cette action est irréversible.</p>
         <div class="d-flex gap-2 mt-4">
           <button class="btn btn-light w-100 py-2 rounded-3" (click)="cancelDelete()">Annuler</button>

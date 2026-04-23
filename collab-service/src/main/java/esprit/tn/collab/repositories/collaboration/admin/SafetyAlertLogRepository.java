@@ -12,5 +12,4 @@ public interface SafetyAlertLogRepository extends MongoRepository<SafetyAlertLog
     long countByStatusNotIn(Collection<SafetyAlertStatus> statuses);
     List<SafetyAlertLog> findTop200ByOrderByCreatedAtDesc();
     List<SafetyAlertLog> findByCreatedAtAfterOrderByCreatedAtAsc(Instant since);
-    boolean existsByRelatedMessageId(Long messageId);
 }

@@ -1,6 +1,5 @@
-// environment.ts
 export const environment = {
   production: false,
-  apiUrl:    'http://localhost:8082',
-  geoApiUrl: 'http://localhost:8085'
+  apiUrl:    'http://192.168.1.169:8082',
+  geoApiUrl: 'http://192.168.1.169:8085'
 };

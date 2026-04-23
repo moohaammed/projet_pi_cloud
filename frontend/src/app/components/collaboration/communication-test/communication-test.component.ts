@@ -8,11 +8,12 @@ import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/collaboration/notification.service';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs/operators';
+import { VoiceWelcomeComponent } from '../voice-welcome/voice-welcome.component';
 
 @Component({
   selector: 'app-communication-test',
   standalone: true,
-  imports: [CommonModule, RouterModule, MiniChatWidgetComponent, FormsModule],
+  imports: [CommonModule, RouterModule, MiniChatWidgetComponent, FormsModule, VoiceWelcomeComponent],
   templateUrl: './communication-test.component.html',
   styleUrls: ['./communication-test.component.scss']
 })

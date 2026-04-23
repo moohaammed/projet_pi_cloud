@@ -11,6 +11,8 @@ public class ChatGroupAdminDto {
     private int memberCount;
     private Instant createdAt;
     private String ownerName;
+    private boolean isDefault;
+    private String defaultForRole;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -26,4 +28,8 @@ public class ChatGroupAdminDto {
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public String getOwnerName() { return ownerName; }
     public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+    public boolean isDefault() { return isDefault; }
+    public void setDefault(boolean aDefault) { isDefault = aDefault; }
+    public String getDefaultForRole() { return defaultForRole; }
+    public void setDefaultForRole(String defaultForRole) { this.defaultForRole = defaultForRole; }
 }
