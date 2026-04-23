@@ -27,6 +27,8 @@ export class AppComponent implements OnDestroy {
   videoCallService = inject(VideoCallService);
   platformId = inject(PLATFORM_ID);
   alzAccessibility = inject(AlzheimerAccessibilityService);
+  accService = this.alzAccessibility;
+  isDarkMode = false;
 
   // Video Call State
   showVideoCall = inject(VideoCallService).showCallOverlay;
@@ -211,5 +213,54 @@ export class AppComponent implements OnDestroy {
 
   isLoggedIn(): boolean {
     return this.auth.isLoggedIn();
+  }
+
+  // --- Voice & Accessibility ---
+  isVoiceEnabled(): boolean {
+    // Logic to check if voice is active in accessibility service
+    return !!(this.alzAccessibility as any).isListening;
+  }
+
+  toggleUnifiedVoice(): void {
+    const isPatient = this.auth.getRole() === 'PATIENT';
+    if (this.isVoiceEnabled()) {
+      (this.alzAccessibility as any).stopListening?.();
+    } else {
+      (this.alzAccessibility as any).startListening?.();
+    }
+  }
+
+  notificationPermissionDenied(): boolean {
+    return isPlatformBrowser(this.platformId) && Notification.permission === 'denied';
+  }
+
+  toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('darkMode', String(this.isDarkMode));
+      this.applyDarkMode();
+    }
+  }
+
+  private applyDarkMode(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      if (this.isDarkMode) {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+    }
+  }
+
+  getBreadcrumbs(): string {
+    const url = this.router.url;
+    if (url.includes('home')) return 'Accueil';
+    if (url.includes('rendezvous')) return 'Rendez-vous';
+    if (url.includes('donations')) return 'Dons';
+    return 'Application';
+  }
+
+  getInstructionPhrase(): string {
+    return "Utilisez votre voix ou les boutons simplifiés pour naviguer.";
   }
 }

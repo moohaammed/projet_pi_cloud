@@ -20,7 +20,7 @@ public class DonationAIController {
     @Autowired
     private DonationCampaignService campaignService;
 
-    @GetMapping("/analyze-campaign/{id}")
+    @PostMapping("/analyze-campaign/{id}")
     public ResponseEntity<Map<String, Object>> analyzeCampaign(@PathVariable String id) {
         try {
             DonationCampaign campaign = campaignService.getCampaignById(id);
