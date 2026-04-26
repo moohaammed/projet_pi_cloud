@@ -316,6 +316,84 @@ import { AuthService } from '../../../services/auth.service';
       .form-row { grid-template-columns: 1fr; }
       .payment-options { flex-direction: column; }
     }
+
+    /* MODAL AI */
+    .ai-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(46,21,46,0.6); backdrop-filter: blur(4px);
+      z-index: 9999; display: flex; align-items: center; justify-content: center;
+      padding: 20px; animation: fadeIn .3s ease;
+    }
+    .ai-modal {
+      background: var(--white); width: 100%; max-width: 550px;
+      border-radius: 24px; padding: 32px; box-shadow: 0 20px 50px rgba(128,0,128,0.2);
+      position: relative; animation: slideUp .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    .ai-modal-close {
+      position: absolute; top: 20px; right: 20px; background: var(--primary-light);
+      border: none; width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--primary); transition: all .2s;
+    }
+    .ai-modal-close:hover { background: var(--primary-mid); transform: rotate(90deg); }
+
+    .ai-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .ai-logo {
+      width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary), #a855a8);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      color: white; box-shadow: 0 4px 12px rgba(128,0,128,0.3);
+    }
+    .ai-logo svg { width: 24px; height: 24px; }
+    .ai-title-group h2 { 
+      font-family: 'Fraunces', serif; font-size: 1.4rem; margin: 0; color: var(--text-dark);
+    }
+    .ai-subtitle { font-size: .8rem; color: var(--text-mid); margin: 0; }
+
+    .ai-content { display: flex; flex-direction: column; gap: 20px; }
+    .ai-pitch-card {
+      background: linear-gradient(135deg, var(--primary-light) 0%, #fff 100%);
+      padding: 20px; border-radius: 16px; border: 1px solid var(--primary-mid);
+      font-style: italic; color: var(--text-dark); line-height: 1.6;
+      font-size: .95rem; position: relative;
+    }
+    .ai-pitch-card::before {
+      content: '"'; position: absolute; top: -10px; left: 10px; 
+      font-size: 4rem; color: var(--primary-mid); opacity: 0.5; font-family: 'Fraunces', serif;
+    }
+
+    .ai-tags-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ai-tag-item {
+      display: flex; flex-direction: column; gap: 4px; padding: 12px;
+      background: #fcfaff; border: 1px solid var(--border); border-radius: 12px;
+    }
+    .tag-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-light); font-weight: 700; }
+    .tag-value { font-size: .85rem; font-weight: 600; color: var(--text-dark); }
+    .tag-value.urgency { display: flex; align-items: center; gap: 6px; }
+    .urgency-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .urgency-dot.haute { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    .urgency-dot.moyenne { background: #f59e0b; }
+    .urgency-dot.basse { background: #10b981; }
+
+    .ai-loading { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 40px 0; }
+    .spinner {
+      width: 40px; height: 40px; border: 4px solid var(--primary-light);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .ai-explain-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; background: var(--white);
+      color: var(--primary); border: 1.5px solid var(--primary-mid);
+      border-radius: 50px; font-size: .7rem; font-weight: 700;
+      cursor: pointer; transition: all .2s; margin-bottom: 12px;
+    }
+    .ai-explain-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+    .ai-explain-btn svg { width: 12px; height: 12px; }
   `]
 })
 export class DonationFormComponent implements OnInit {
@@ -341,6 +419,11 @@ export class DonationFormComponent implements OnInit {
 
   lookupEmail = '';
   lookupResults: Donation[] = [];
+
+  // AI Analysis
+  analyzing = false;
+  showAiModal = false;
+  aiResult: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -473,5 +556,30 @@ export class DonationFormComponent implements OnInit {
     this.donationService.getDonationsByEmail(this.lookupEmail).subscribe(data => {
       this.lookupResults = data;
     });
+  }
+
+  explainWithAi() {
+    if (!this.campaign?.id) return;
+    this.analyzing = true;
+    this.showAiModal = true;
+    this.aiResult = null;
+
+    this.donationService.analyzeCampaign(this.campaign.id).subscribe({
+      next: (res) => {
+        this.aiResult = res;
+        this.analyzing = false;
+      },
+      error: (err) => {
+        console.error('AI Analysis Error:', err);
+        this.analyzing = false;
+        this.showAiModal = false;
+        alert('Désolé, l\'IA n\'a pas pu analyser cette campagne pour le moment.');
+      }
+    });
+  }
+
+  closeAiModal() {
+    this.showAiModal = false;
+    this.aiResult = null;
   }
 }

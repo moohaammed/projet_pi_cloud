@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class MapService {
 
-  private baseUrl = `${environment.apiUrl}/api`;
+  private baseUrl = `${environment.geoApiUrl}/api`;
   constructor(private http: HttpClient) {}
 
   sendLocation(patientId: number, lat: number,
