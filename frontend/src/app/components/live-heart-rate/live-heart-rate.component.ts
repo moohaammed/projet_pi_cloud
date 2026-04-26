@@ -336,7 +336,7 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   getBpmZone(): string {
     if (!this.currentBpm) return 'Disconnected';
     if (this.currentBpm < 60) return 'Bradycardia';
-    if (this.currentBpm <= 100) return 'Normal Zone';
+    if (this.currentBpm <= 100) return 'Normal State';
     return 'Tachycardia';
   }
 
