@@ -5,7 +5,9 @@ import {
   ViewChild,
   ElementRef,
   PLATFORM_ID,
-  Inject
+  Inject,
+  NgZone,
+  ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HeartRateService, HeartRateRecord } from '../../services/heart-rate.service';
@@ -47,6 +49,11 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
   private userId: number = 1; // TODO: Replace with authenticated user ID
 
+  // Inactivity detection: if no heart-rate event arrives within this many ms, mark as disconnected
+  private readonly INACTIVITY_TIMEOUT_MS = 5000;
+  private lastEventTimestamp: number = 0;
+  private inactivityIntervalId: any = null;
+
   @ViewChild('ecgCanvas', { static: false }) ecgCanvas!: ElementRef<HTMLCanvasElement>;
   private canvasCtx: CanvasRenderingContext2D | null = null;
   private animationFrameId: number = 0;
@@ -55,6 +62,8 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     private heartRateService: HeartRateService,
     private heartRateAiService: HeartRateAiService,
     private authService: AuthService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: any
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -83,6 +92,9 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
     // Start ECG canvas animation
     setTimeout(() => this.initCanvas(), 100);
+
+    // Start inactivity checker — runs every second
+    this.startInactivityChecker();
   }
 
   ngOnDestroy(): void {
@@ -101,6 +113,32 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
+    if (this.inactivityIntervalId) {
+      clearInterval(this.inactivityIntervalId);
+    }
+  }
+
+  /**
+   * Periodically checks whether we have received a heart-rate event recently.
+   * If more than INACTIVITY_TIMEOUT_MS has passed since the last event,
+   * the device is marked as disconnected. As soon as a new event arrives
+   * (handled in connectToLiveStream), the status flips back to 'connected'.
+   */
+  private startInactivityChecker(): void {
+    this.inactivityIntervalId = setInterval(() => {
+      if (
+        this.lastEventTimestamp > 0 &&
+        Date.now() - this.lastEventTimestamp >= this.INACTIVITY_TIMEOUT_MS &&
+        this.status !== 'disconnected'
+      ) {
+        console.log('[LIVE] No heart-rate event for 5 s — marking device as disconnected');
+
+        this.status = 'disconnected';
+        this.currentBpm = null;          // clear stale BPM from center display
+        this.deviceName = 'Disconnected';
+        this.cdr.detectChanges();
+      }
+    }, 1000);
   }
 
   /**
@@ -113,41 +151,53 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
     this.sseSubscription = this.heartRateService.connectLiveStream(this.userId).subscribe({
       next: (event: any) => {
-        console.log('[LIVE] Received heart-rate event:', event);
+        this.ngZone.run(() => {
+          console.log('[LIVE] Received heart-rate event:', event);
 
-        this.currentBpm = event.bpm;
-        this.deviceName = event.deviceName || '—';
-        this.lastRecordedAt = event.receivedAt || event.capturedAt || '';
-        this.status = 'connected';
+          this.currentBpm = event.bpm;
+          this.deviceName = event.deviceName || '—';
+          this.lastRecordedAt = event.receivedAt || event.capturedAt || '';
+          this.status = 'connected';
+          this.lastEventTimestamp = Date.now();
 
-        // Push to ECG waveform
-        this.pushEcgData(event.bpm);
+          // Push to ECG waveform
+          this.pushEcgData(event.bpm);
 
-        // Update BPM sparkline history
-        this.bpmHistory.push(event.bpm);
-        if (this.bpmHistory.length > 30) {
-          this.bpmHistory.shift();
-        }
+          // Update BPM sparkline history
+          this.bpmHistory.push(event.bpm);
+          if (this.bpmHistory.length > 30) {
+            this.bpmHistory.shift();
+          }
 
-        // Prepend to history display (newest first)
-        const record: HeartRateRecord = {
-          eventId: event.eventId,
-          userId: event.userId,
-          deviceName: event.deviceName,
-          bpm: event.bpm,
-          source: event.source,
-          capturedAt: event.capturedAt,
-          receivedAt: event.receivedAt,
-          recordedAt: event.receivedAt || ''
-        };
-        this.history.unshift(record);
-        if (this.history.length > 50) {
-          this.history.pop();
-        }
+          // Prepend to history display (newest first)
+          const record: HeartRateRecord = {
+            eventId: event.eventId,
+            userId: event.userId,
+            deviceName: event.deviceName,
+            bpm: event.bpm,
+            source: event.source,
+            capturedAt: event.capturedAt,
+            receivedAt: event.receivedAt,
+            recordedAt: event.receivedAt || ''
+          };
+
+          this.history.unshift(record);
+          if (this.history.length > 50) {
+            this.history.pop();
+          }
+
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
-        console.warn('[LIVE] SSE stream error:', err);
-        this.status = 'disconnected';
+        this.ngZone.run(() => {
+          console.warn('[LIVE] SSE stream error:', err);
+
+          this.status = 'disconnected';
+          this.currentBpm = null;        // clear stale BPM on stream error too
+          this.deviceName = 'Disconnected';
+          this.cdr.detectChanges();
+        });
 
         // When watch disconnects, set AI to disconnected too
         this.aiStatus = 'disconnected';
@@ -224,6 +274,7 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     // Generate a synthetic ECG-like waveform segment based on BPM
     const amplitude = Math.min(bpm / 200, 1);
     const segment = this.generateEcgSegment(amplitude);
+
     for (const val of segment) {
       this.ecgData.push(val);
       if (this.ecgData.length > this.ECG_MAX_POINTS) {
@@ -236,9 +287,11 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     // Simplified PQRST waveform
     const seg: number[] = [];
     const steps = 20;
+
     for (let i = 0; i < steps; i++) {
       const t = i / steps;
       let v = 0;
+
       // P wave
       if (t >= 0.0 && t < 0.1) v = amplitude * 0.15 * Math.sin(Math.PI * t / 0.1);
       // PR segment
@@ -256,6 +309,7 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
       seg.push(v);
     }
+
     return seg;
   }
 
@@ -347,9 +401,9 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   }
 
   getBpmZone(): string {
-    if (!this.currentBpm) return 'No Data';
+    if (!this.currentBpm) return 'Disconnected';
     if (this.currentBpm < 60) return 'Bradycardia';
-    if (this.currentBpm <= 100) return 'Normal Zone';
+    if (this.currentBpm <= 100) return 'Normal State';
     return 'Tachycardia';
   }
 
@@ -372,7 +426,11 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     if (!ts) return '—';
     try {
       const d = new Date(ts);
-      return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      return d.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     } catch {
       return ts;
     }
