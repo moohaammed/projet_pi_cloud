@@ -38,6 +38,8 @@ export class WebSocketService {
   public typingEvent = signal<any>(null);
 
   /** Observable that emits true when connected, false when disconnected */
+  public helpNotificationMessage = signal<any>(null);
+
   public connected$ = new BehaviorSubject<boolean>(false);
 
   constructor() { }
@@ -172,5 +174,11 @@ this.stompClient = new Client({
     this.stompClient.subscribe(`/user/queue/typing`, (msg: any) => {
       this.typingEvent.set(JSON.parse(msg.body));
     });
+
+    // Help Notification channel (separate from SOS/GPS)
+    this.stompClient.subscribe(`/user/queue/help-notifications`, (msg: any) => {
+      this.helpNotificationMessage.set(JSON.parse(msg.body));
+    });
   }
+
 }

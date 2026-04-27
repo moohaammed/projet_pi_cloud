@@ -1,0 +1,46 @@
+<main class="location-dashboard">
+  <header class="toolbar">
+    <div>
+      <h1>Localisation patient</h1>
+      <p>Suivi actualise toutes les 30 secondes.</p>
+    </div>
+
+    <form class="patient-form" (ngSubmit)="startPolling()">
+      <label for="patientId">Patient</label>
+      <input id="patientId" name="patientId" type="number" min="1" [(ngModel)]="patientId" placeholder="ID patient">
+      <button type="submit">Suivre</button>
+    </form>
+  </header>
+
+  <section class="alert-banner" *ngIf="isUnknown">
+    Lieu inconnu detecte. Une alerte a ete creee automatiquement.
+  </section>
+
+  <section class="current-card" *ngIf="current" [class.unknown]="isUnknown">
+    <span class="label">Position actuelle</span>
+    <strong>{{ current.lieu }}</strong>
+    <div class="metrics">
+      <span>Confiance {{ current.confiance }}</span>
+      <span>{{ current.date | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+    </div>
+  </section>
+
+  <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <p class="loading" *ngIf="loading">Mise a jour en cours...</p>
+
+  <section class="history">
+    <h2>Historique recent</h2>
+    <article class="history-row" *ngFor="let item of history" [class.unknown]="item.statut === 'ZONE_INCONNUE'">
+      <div>
+        <strong>{{ item.lieu }}</strong>
+        <span>{{ item.date | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+      </div>
+      <div class="history-meta">
+        <span>{{ item.confiance }}</span>
+        <span>{{ item.statut }}</span>
+      </div>
+    </article>
+
+    <p class="empty" *ngIf="!history.length && !loading">Aucun historique disponible.</p>
+  </section>
+</main>

@@ -4,13 +4,13 @@
   <div class="mb-4">
     <h3 class="fw-bold" style="color:#3c3489">
       <i class="fa-solid fa-user-plus me-2" style="color:#6f42c1"></i>
-      Creer un nouveau patient
+      {{ existingPatientMode ? 'Ajouter un contact relation' : 'Creer un nouveau patient' }}
     </h3>
     <p class="text-muted">Wizard guide — patient + position maison + zones de securite + compte relation.</p>
   </div>
 
   <!-- STEPPER -->
-  <div *ngIf="currentStep < 5" class="d-flex align-items-center mb-4">
+  <div *ngIf="currentStep < 5 && !existingPatientMode" class="d-flex align-items-center mb-4">
     <ng-container *ngFor="let s of [
       {n:1, label:'Patient'},
       {n:2, label:'Position'},
@@ -34,6 +34,16 @@
            [style.background]="currentStep > s.n ? '#6f42c1' : '#e8d5ff'">
       </div>
     </ng-container>
+  </div>
+
+  <div *ngIf="currentStep < 5 && existingPatientMode" class="d-flex align-items-center mb-4">
+    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
+         style="width:36px;height:36px;font-size:14px;background:#6f42c1;color:white;border:2px solid #6f42c1">
+      <i class="fa-solid fa-people-arrows" style="font-size:12px"></i>
+    </div>
+    <span class="fw-semibold small ms-2" style="color:#3c3489">
+      Contact relation pour {{ patient.prenom || 'ce patient' }} {{ patient.nom }}
+    </span>
   </div>
 
   <!-- ETAPE 1 : INFOS PATIENT -->
@@ -222,10 +232,13 @@
       <h5 class="fw-bold mb-1" style="color:#6f42c1">
         <i class="fa-solid fa-people-arrows me-2"></i>Contact urgence / Relation
       </h5>
-      <p class="text-muted small mb-4">
+      <p class="text-muted small mb-4" *ngIf="!existingPatientMode">
         Ce contact recevra un compte RELATION pour suivre {{ patient.prenom || "le patient" }}.
       </p>
-      <div class="form-check form-switch mb-4">
+      <p class="text-muted small mb-4" *ngIf="existingPatientMode">
+        Le patient existe deja. Renseignez seulement les informations du contact relation.
+      </p>
+      <div class="form-check form-switch mb-4" *ngIf="!existingPatientMode">
         <input class="form-check-input" type="checkbox" [(ngModel)]="creerRelation"
                style="width:44px;height:24px;cursor:pointer">
         <label class="form-check-label fw-semibold ms-2" style="color:#3c3489">
@@ -290,7 +303,9 @@
         <div class="d-flex align-items-center gap-2 mb-2">
           <div class="rounded-circle d-flex align-items-center justify-content-center"
                style="width:32px;height:32px;background:#6f42c1;color:white;font-size:12px;font-weight:700">P</div>
-          <span class="fw-bold" style="color:#3c3489">Compte PATIENT</span>
+          <span class="fw-bold" style="color:#3c3489">
+            {{ existingPatientMode ? 'Patient existant' : 'Compte PATIENT' }}
+          </span>
         </div>
         <div class="row g-1" style="font-size:13px">
           <div class="col-5 text-muted">Nom</div>
@@ -302,7 +317,7 @@
         </div>
       </div>
       <!-- Position -->
-      <div class="p-3 rounded-3 mb-3" style="background:#f0fbf4;border:1.5px solid #8fd4a8">
+      <div *ngIf="!existingPatientMode" class="p-3 rounded-3 mb-3" style="background:#f0fbf4;border:1.5px solid #8fd4a8">
         <div class="d-flex align-items-center gap-2 mb-2">
           <div class="rounded-circle d-flex align-items-center justify-content-center"
                style="width:32px;height:32px;background:#198754;color:white;font-size:12px">
@@ -352,7 +367,10 @@
         <button class="btn rounded-pill px-4 fw-bold"
                 style="background:linear-gradient(135deg,#198754,#0f5132);color:white;border:none"
                 [disabled]="loading" (click)="submit()">
-          <span *ngIf="!loading"><i class="fa-solid fa-check me-2"></i>Creer les comptes</span>
+          <span *ngIf="!loading">
+            <i class="fa-solid fa-check me-2"></i>
+            {{ existingPatientMode ? 'Creer le contact relation' : 'Creer les comptes' }}
+          </span>
           <span *ngIf="loading"><span class="spinner-border spinner-border-sm me-2"></span>Creation...</span>
         </button>
       </div>
@@ -366,7 +384,9 @@
            style="width:80px;height:80px;background:linear-gradient(135deg,#198754,#0f5132)">
         <i class="fa-solid fa-check text-white" style="font-size:36px"></i>
       </div>
-      <h4 class="fw-bold" style="color:#0f5132">Comptes crees avec succes !</h4>
+      <h4 class="fw-bold" style="color:#0f5132">
+        {{ existingPatientMode ? 'Contact relation cree avec succes !' : 'Comptes crees avec succes !' }}
+      </h4>
       <p class="text-muted">Les identifiants ont ete envoyes par email.</p>
     </div>
     <!-- Patient -->
@@ -375,7 +395,7 @@
            style="background:linear-gradient(135deg,#f5f0ff,#ede5ff);border:none">
         <span class="fw-bold" style="color:#3c3489">
           <i class="fa-solid fa-user me-2" style="color:#6f42c1"></i>
-          Compte PATIENT
+          {{ result.patientMotDePasse ? 'Compte PATIENT' : 'Patient lie' }}
         </span>
       </div>
       <div class="card-body p-4">
@@ -383,17 +403,17 @@
           <span class="text-muted small">Email</span>
           <code style="background:#f5f0ff;color:#3c3489;padding:2px 8px;border-radius:4px">{{ result.patientEmail }}</code>
         </div>
-        <div class="d-flex justify-content-between py-2">
+        <div *ngIf="result.patientMotDePasse" class="d-flex justify-content-between py-2">
           <span class="text-muted small">Mot de passe temporaire</span>
           <code style="background:#f5f0ff;color:#3c3489;padding:2px 8px;border-radius:4px;font-size:15px;letter-spacing:1px;font-weight:700">{{ result.patientMotDePasse }}</code>
         </div>
-        <div *ngIf="patient.latitude && patient.longitude"
+        <div *ngIf="result.patientMotDePasse && patient.latitude && patient.longitude"
              class="mt-2 p-2 rounded-2 d-flex align-items-center gap-2"
              style="background:#f0fbf4;border:1px solid #8fd4a8;font-size:12px;color:#0f5132">
           <i class="fa-solid fa-location-dot"></i>
           Zone verte {{ patient.rayonVert }}m — Zone rouge {{ patient.rayonRouge }}m creees
         </div>
-        <div class="mt-2 p-2 rounded-2 small"
+        <div *ngIf="result.patientMotDePasse" class="mt-2 p-2 rounded-2 small"
              style="background:#fff8e1;color:#92400e;border:1px solid #ffe082">
           <i class="fa-solid fa-triangle-exclamation me-1"></i>
           Notez ce mot de passe — il ne sera plus affiche.
@@ -427,7 +447,7 @@
     </div>
     <div class="d-flex gap-3 justify-content-center mt-4">
       <button class="btn btn-outline-secondary rounded-pill px-4" (click)="resetForm()">
-        <i class="fa-solid fa-plus me-2"></i>Nouveau patient
+        <i class="fa-solid fa-plus me-2"></i>{{ existingPatientMode ? 'Ajouter un autre contact' : 'Nouveau patient' }}
       </button>
       <button class="btn rounded-pill px-4 fw-bold"
               style="background:linear-gradient(135deg,#6f42c1,#3c3489);color:white;border:none"

@@ -1,0 +1,55 @@
+<main class="hospital-alert-page">
+  <header class="page-header">
+    <div class="header-icon"><i class="fa-solid fa-truck-medical"></i></div>
+    <div>
+      <h1>Alertes hospitalieres</h1>
+      <p>Recommandations automatiques quand un patient sort de sa zone verte.</p>
+    </div>
+  </header>
+
+  <section class="state-card" *ngIf="loading">
+    <span class="spinner-border spinner-border-sm"></span>
+    Chargement des recommandations...
+  </section>
+
+  <section class="state-card error" *ngIf="!loading && error">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ error }}
+  </section>
+
+  <section class="state-card empty" *ngIf="!loading && !error && predictions.length === 0">
+    <i class="fa-solid fa-shield-heart"></i>
+    Aucune alerte hospitaliere recente.
+  </section>
+
+  <section class="alert-card" *ngFor="let prediction of predictions">
+    <div class="alert-banner">
+      <div>
+        <strong>{{ patientLabel(prediction) }}</strong>
+        <span>Adresse actuelle : {{ positionLabel(prediction) }}</span>
+      </div>
+      <a class="map-link" [routerLink]="['/hospital-map']">Carte</a>
+    </div>
+
+    <div class="hospital-list">
+      <article class="hospital-row" *ngFor="let hospital of prediction.hopitaux; let i = index">
+        <div class="rank" [class.recommended]="i === 0">{{ i + 1 }}</div>
+        <div class="hospital-info">
+          <div class="hospital-title">
+            <strong>{{ hospital.nom }}</strong>
+            <span class="badge" *ngIf="hospital.recommande">RECOMMANDE</span>
+          </div>
+          <p>{{ hospital.adresse }} - {{ hospital.gouvernorat }}</p>
+          <div class="meta">
+            <span><i class="fa-solid fa-route"></i> {{ distance(hospital) }} km</span>
+            <span><i class="fa-solid fa-stethoscope"></i> {{ hospital.specialite }}</span>
+            <span><i class="fa-solid fa-phone"></i> {{ hospital.telephone }}</span>
+          </div>
+        </div>
+        <a class="directions" [href]="mapsUrl(prediction, hospital)" target="_blank" rel="noopener">
+          Voir itineraire
+        </a>
+      </article>
+    </div>
+  </section>
+</main>

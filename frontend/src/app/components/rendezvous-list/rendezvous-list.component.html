@@ -161,7 +161,7 @@
 
                   <div class="p-4 flex-grow-1">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                      <h5 class="fw-bold mb-0 text-dark">Rendez-vous #{{ i + 1 }}</h5>
+                      <h5 class="fw-bold mb-0 text-dark">Rendez-vous #{{ i + 1 }} <small class="text-primary fs-6 ms-2" *ngIf="rv.nomPatient">({{ rv.nomPatient }})</small></h5>
                       <button class="btn btn-sm btn-light text-primary rounded-pill fw-bold shadow-sm"
                         (click)="openPatientProfile(rv.patientId)" title="Dossier Patient">
                         <i class="fa-solid fa-user me-1"></i> #P-{{ rv.patientId }}

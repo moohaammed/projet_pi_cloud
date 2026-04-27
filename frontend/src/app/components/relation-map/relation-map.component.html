@@ -91,7 +91,7 @@
           Incident IA
         </div>
         <div class="d-flex align-items-center">
-          <div style="width:12px;height:12px;background:#dc3545;border-radius:3px;margin-right:6px"></div>
+          <div style="width:12px;height:12px;background:#198754;border-radius:3px;margin-right:6px"></div>
           Hôpital
         </div>
       </div>
@@ -203,9 +203,8 @@
             <div *ngIf="lastLocation" class="mt-2 pt-2 border-top" style="font-size:12px">
               <div class="d-flex justify-content-between">
                 <span class="text-muted">Position</span>
-                <span class="fw-semibold">
-                  {{ lastLocation.latitude | number:'1.4-4' }},
-                  {{ lastLocation.longitude | number:'1.4-4' }}
+                <span class="fw-semibold text-end" style="max-width:210px">
+                  {{ lastLocationAddress }}
                 </span>
               </div>
               <div *ngIf="lastLocation.batterie" class="d-flex justify-content-between mt-1">
@@ -249,18 +248,21 @@
                  style="letter-spacing:.5px; font-size:10px">
               <i class="fa-solid fa-hospital text-danger me-1"></i>Hôpital le plus proche
             </div>
-            <div class="card border-danger border-opacity-25">
+            <div class="card border-success border-opacity-25">
               <div class="card-body p-2">
-                <div class="fw-semibold small text-danger">{{ nearestHospital.nom }}</div>
+                <div class="fw-semibold small text-success">{{ nearestHospital.nom }}</div>
                 <div class="text-muted" style="font-size:11px">
-                  {{ nearestHospital.adresse }}, {{ nearestHospital.ville }}
+                  {{ nearestHospital.adresse }}<span *ngIf="nearestHospital.gouvernorat">, {{ nearestHospital.gouvernorat }}</span>
+                </div>
+                <div class="text-muted" style="font-size:11px">
+                  {{ nearestHospital.specialite }}<span *ngIf="hospitalDistance(nearestHospital)"> - {{ hospitalDistance(nearestHospital) }} km</span>
                 </div>
                 <div *ngIf="nearestHospital.telephone" style="font-size:11px" class="mt-1">
                   <i class="fa-solid fa-phone text-success me-1"></i>{{ nearestHospital.telephone }}
                 </div>
-                <a [href]="'https://maps.google.com/?q=' + nearestHospital.latitude + ',' + nearestHospital.longitude"
+                <a [href]="hospitalMapsUrl(nearestHospital)"
                    target="_blank"
-                   class="btn btn-outline-danger btn-sm w-100 mt-2 py-0"
+                   class="btn btn-outline-success btn-sm w-100 mt-2 py-0"
                    style="font-size:11px">
                   <i class="fa-solid fa-compass me-1"></i>Itinéraire
                 </a>
@@ -314,6 +316,13 @@
 
         <!-- ══ INCIDENTS ══ -->
         <div *ngIf="activeTab === 'incidents'">
+          <button class="btn w-100 mb-3 fw-bold d-flex align-items-center justify-content-center gap-2"
+                  style="background:linear-gradient(135deg,#6f42c1,#3c3489); color:white; border:none; border-radius:12px"
+                  (click)="startAddIncident()">
+            <i class="fa-solid fa-plus"></i>
+            Ajouter un incident
+          </button>
+
           <div *ngFor="let inc of incidents"
                class="mb-2 rounded-3 border overflow-hidden"
                style="border-color:rgba(111,66,193,0.25) !important">
@@ -442,6 +451,120 @@
         </div>
 
       </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showIncidentPanel"
+     class="position-fixed top-0 end-0 h-100 bg-white border-start overflow-auto"
+     style="width:360px; z-index:2000; box-shadow:-8px 0 32px rgba(111,66,193,0.18)">
+  <div class="p-3 text-white d-flex align-items-center justify-content-between"
+       style="background:linear-gradient(135deg,#6f42c1,#3c3489)">
+    <div>
+      <div class="fw-bold">Nouvel incident</div>
+      <div class="opacity-75" style="font-size:11px">
+        {{ newIncident.latitude ? (newIncident.latitude | number:'1.4-4') + ', ' + (newIncident.longitude | number:'1.4-4') : 'Position non definie' }}
+      </div>
+    </div>
+    <button class="btn p-1 text-white" style="background:rgba(255,255,255,0.15); border-radius:8px"
+            (click)="cancelAddIncident()">
+      <i class="fa-solid fa-xmark fa-lg"></i>
+    </button>
+  </div>
+
+  <div *ngIf="newIncident.latitude"
+       class="mx-3 mt-3 p-2 rounded-3 d-flex align-items-center gap-2"
+       style="background:#f5f0ff; border:1px solid #d5b8ff">
+    <i class="fa-solid fa-location-dot" style="color:#6f42c1"></i>
+    <div style="font-size:12px">
+      <div class="fw-semibold" style="color:#3c3489">Position placee sur la carte</div>
+      <div class="text-muted">
+        {{ newIncident.latitude | number:'1.4-4' }}, {{ newIncident.longitude | number:'1.4-4' }}
+      </div>
+    </div>
+    <button class="btn btn-sm ms-auto py-0 px-2 rounded-pill"
+            style="font-size:10px; background:#e8d5ff; color:#4a2a8a; border:none"
+            (click)="repositionIncidentMarker()">
+      <i class="fa-solid fa-pen me-1"></i>Replacer
+    </button>
+  </div>
+
+  <div *ngIf="!newIncident.latitude"
+       class="mx-3 mt-3 p-2 rounded-3 d-flex align-items-center gap-2"
+       style="background:#fff8e1; border:1px solid #ffe082">
+    <i class="fa-solid fa-hand-pointer" style="color:#f59e0b"></i>
+    <span style="font-size:12px; color:#92400e; font-weight:600">
+      Cliquez sur la carte pour placer l incident
+    </span>
+  </div>
+
+  <div class="p-3 d-flex flex-column gap-3">
+    <div>
+      <label class="form-label small fw-bold mb-1" style="color:#6f42c1">
+        <i class="fa-solid fa-camera me-1"></i>Photo de l incident
+      </label>
+      <label class="d-flex align-items-center justify-content-center gap-2 p-3 rounded-3 mb-2"
+             style="border:2px dashed #d5b8ff; background:#fdf8ff; cursor:pointer; font-size:13px; color:#6f42c1; font-weight:700">
+        <i class="fa-solid" [class.fa-cloud-arrow-up]="!panelAnalyzing" [class.fa-spinner]="panelAnalyzing"
+           [class.fa-spin]="panelAnalyzing"></i>
+        <span *ngIf="!panelAnalyzing && !newIncident.media">Importer une photo</span>
+        <span *ngIf="panelAnalyzing">Analyse IA en cours...</span>
+        <span *ngIf="!panelAnalyzing && newIncident.media" class="text-success fw-bold">Photo ajoutee</span>
+        <input type="file" accept="image/*" class="d-none"
+               [disabled]="panelAnalyzing"
+               (change)="onIncidentPhotoSelected($event)">
+      </label>
+      <img *ngIf="newIncident.mediaPreview"
+           [src]="newIncident.mediaPreview"
+           class="w-100 rounded-3"
+           style="max-height:150px; object-fit:cover; border:1.5px solid #d5b8ff">
+    </div>
+
+    <div>
+      <div class="small fw-bold mb-2" style="color:#6f42c1">Type d incident</div>
+      <div class="d-flex flex-wrap gap-1">
+        <button *ngFor="let t of incidentTypes"
+                class="btn btn-sm rounded-pill px-2"
+                style="font-size:11px; border:1px solid #d5b8ff"
+                [style.background]="newIncident.type === t.value ? t.color : '#f5f0ff'"
+                [style.color]="newIncident.type === t.value ? 'white' : '#4a2a8a'"
+                (click)="onTypeSelected(t)">
+          {{ t.emoji }} {{ t.label }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="newIncident.type" class="p-3 rounded-3" style="background:#f5f0ff; border:1px solid #d5b8ff">
+      <div class="fw-bold small mb-1" style="color:#3c3489">{{ getTypeEmoji(newIncident.type) }} {{ newIncident.title }}</div>
+      <div class="text-muted" style="font-size:12px">{{ newIncident.description }}</div>
+      <div *ngIf="newIncident.aiAnalysis" class="text-muted mt-2" style="font-size:10px">
+        IA: {{ newIncident.aiAnalysis }}
+        <span *ngIf="newIncident.aiConfidence">({{ (newIncident.aiConfidence * 100).toFixed(0) }}%)</span>
+      </div>
+    </div>
+
+    <div *ngIf="panelClipError" class="p-2 rounded-3 small"
+         style="background:#fff8e1; border:1px solid #ffe082; color:#92400e">
+      <i class="fa-solid fa-triangle-exclamation me-1"></i>{{ panelClipError }}
+    </div>
+
+    <div *ngIf="incidentCreateError" class="p-2 rounded-3 small"
+         style="background:#fff0f3; border:1px solid #f4a0b0; color:#c0203e">
+      <i class="fa-solid fa-circle-xmark me-1"></i>{{ incidentCreateError }}
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn flex-grow-1 fw-bold"
+              style="background:linear-gradient(135deg,#6f42c1,#3c3489); color:white; border:none; border-radius:12px; padding:10px"
+              [disabled]="savingIncident || !newIncident.latitude || !newIncident.type || panelAnalyzing"
+              (click)="saveNewIncident()">
+        <span *ngIf="!savingIncident"><i class="fa-solid fa-floppy-disk me-2"></i>Enregistrer</span>
+        <span *ngIf="savingIncident"><span class="spinner-border spinner-border-sm me-2"></span>Enregistrement...</span>
+      </button>
+      <button class="btn btn-outline-secondary" style="border-radius:12px; padding:10px 14px"
+              (click)="cancelAddIncident()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
   </div>
 </div>

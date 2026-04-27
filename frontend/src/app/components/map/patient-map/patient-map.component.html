@@ -110,6 +110,40 @@
       </span>
     </p>
 
+    <div class="location-actions mt-2">
+      <button type="button" class="location-action-btn primary" (click)="openLocationCamera()">
+        <i class="fa-solid fa-video"></i>
+        <span>Ouvrir la camera</span>
+      </button>
+
+      <label class="location-action-btn secondary">
+        <i class="fa-solid fa-image"></i>
+        <span>Analyser une photo</span>
+        <input type="file" accept="image/*" capture="environment" (change)="onLocationPhotoSelected($event)">
+      </label>
+    </div>
+
+    <div class="location-result mt-3"
+         *ngIf="locationResult || locationAnalysisLoading || locationAnalysisError"
+         [class.unknown]="locationIsUnknown">
+      <div *ngIf="locationAnalysisLoading" class="d-flex align-items-center justify-content-center gap-2">
+        <span class="spinner-border spinner-border-sm"></span>
+        <span>Analyse du lieu...</span>
+      </div>
+
+      <div *ngIf="locationResult && !locationAnalysisLoading">
+        <div class="fw-bold">
+          <span *ngIf="!locationIsUnknown">Vous etes a : {{ locationResult.lieu }} ({{ locationResult.confiance }})</span>
+          <span *ngIf="locationIsUnknown && locationResult.incidentId">Lieu inconnu - alerte envoyee a votre famille</span>
+          <span *ngIf="locationIsUnknown && !locationResult.incidentId">Lieu inconnu - aucune alerte rouge detectee</span>
+        </div>
+      </div>
+
+      <div *ngIf="locationAnalysisError && !locationAnalysisLoading" class="text-danger fw-semibold">
+        {{ locationAnalysisError }}
+      </div>
+    </div>
+
   </div>
 
   <!-- ===== FOOTER ===== -->
