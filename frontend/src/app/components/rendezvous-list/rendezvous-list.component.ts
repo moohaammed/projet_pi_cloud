@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RendezVous, StatutRendezVous } from '../../models/rendezvous.model';
 import { RendezVousService } from '../../services/rendezvous.service';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
@@ -61,7 +62,8 @@ export class RendezVousListComponent implements OnInit {
   constructor(
     private service: RendezVousService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private userService: UserService
   ) {
     this.currentUser = this.authService.getCurrentUser();
   }
@@ -76,8 +78,26 @@ export class RendezVousListComponent implements OnInit {
     this.service.getAll().subscribe({
       next: (data) => {
         this.rendezvousList = data;
-        this.applyFilters();
-        this.loading = false;
+        
+        // --- Fetch user names ---
+        this.userService.getAll().subscribe({
+          next: (users: any[]) => {
+            const usersMap = new Map<number, any>();
+            users.forEach(u => usersMap.set(u.id, u));
+            this.rendezvousList.forEach(rv => {
+              const p = usersMap.get(Number(rv.patientId));
+              if (p) rv.nomPatient = `${p.prenom || ''} ${p.nom || ''}`.trim();
+              const m = usersMap.get(Number(rv.medecinId));
+              if (m) rv.medecinNom = `${m.prenom || ''} ${m.nom || ''}`.trim();
+            });
+            this.applyFilters();
+            this.loading = false;
+          },
+          error: () => {
+            this.applyFilters();
+            this.loading = false;
+          }
+        });
       },
       error: () => {
         this.error = 'Impossible de charger les rendez-vous. Vérifiez que le serveur est démarré.';
@@ -91,9 +111,9 @@ export class RendezVousListComponent implements OnInit {
 
     if (this.currentUser) {
       if (this.currentUser.role === 'DOCTOR') {
-        baseList = baseList.filter(rv => rv.medecinId === this.currentUser.id);
+        baseList = baseList.filter(rv => Number(rv.medecinId) === Number(this.currentUser.id));
       } else if (this.currentUser.role === 'PATIENT') {
-        baseList = baseList.filter(rv => rv.patientId === this.currentUser.id);
+        baseList = baseList.filter(rv => Number(rv.patientId) === Number(this.currentUser.id));
       }
     }
 
@@ -254,7 +274,7 @@ export class RendezVousListComponent implements OnInit {
     this.selectedPatientId = patientId;
     
     // Historique
-    this.patientHistory = this.rendezvousList.filter(rv => rv.patientId === patientId).sort((a, b) => {
+    this.patientHistory = this.rendezvousList.filter(rv => Number(rv.patientId) === Number(patientId)).sort((a, b) => {
       return new Date(b.dateHeure || '').getTime() - new Date(a.dateHeure || '').getTime();
     });
 

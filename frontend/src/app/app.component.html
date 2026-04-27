@@ -14,13 +14,15 @@
         style="flex-shrink: 0; z-index: 10; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
 
         <div class="p-3 d-flex align-items-center justify-content-between border-bottom" style="height: 80px;">
-          <img src="template/assets/img/logo.png" alt="MediSync" height="35"
-            *ngIf="!isSidebarCollapsed" class="ms-2">
-          <div class="bg-soft-primary text-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold mx-auto"
+          <img src="template/assets/img/logo.png" alt="MediSync" height="35" *ngIf="!isSidebarCollapsed" class="ms-2">
+          <div
+            class="bg-soft-primary text-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold mx-auto"
             style="width: 42px; height: 42px; cursor: pointer; border: 2px solid rgba(128,0,128,0.1);"
-            *ngIf="isSidebarCollapsed" (click)="toggleSidebar()">M</div>
-          <button class="btn btn-sm btn-soft-primary border-0 rounded-circle"
-            (click)="toggleSidebar()" *ngIf="!isSidebarCollapsed"
+            *ngIf="isSidebarCollapsed" (click)="toggleSidebar()">
+            M
+          </div>
+          <button class="btn btn-sm btn-soft-primary border-0 rounded-circle" (click)="toggleSidebar()"
+            *ngIf="!isSidebarCollapsed"
             style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
             <i class="fa-solid fa-indent text-primary"></i>
           </button>
@@ -52,12 +54,11 @@
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/admin/collaboration" routerLinkActive="active-purple fw-semibold shadow-sm"
                 style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Collaboration' : ''">
-                <i class="fa-solid fa-comments fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <i class="fa-solid fa-comments fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Collaboration</span>
               </a>
             </li>
-
-            <!-- Mon patient — RELATION -->
             <li class="nav-item w-100" *ngIf="auth.getRole() === 'RELATION'">
               <a routerLink="/mon-patient" routerLinkActive="active-purple fw-semibold shadow-sm"
                 class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1">
@@ -66,13 +67,12 @@
                 <span *ngIf="!isSidebarCollapsed" class="fs-15 fw-semibold">Mon patient</span>
               </a>
             </li>
-
-            <!-- Rendez-vous -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/admin/rendezvous" routerLinkActive="active-purple fw-semibold shadow-sm"
                 style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Rendez-vous' : ''">
-                <i class="fa-solid fa-calendar-check fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <i class="fa-solid fa-calendar-check fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Rendez-Vous</span>
               </a>
             </li>
@@ -82,7 +82,8 @@
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/admin/patients" routerLinkActive="active-purple fw-semibold shadow-sm"
                 style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Gestion Patients' : ''">
-                <i class="fa-solid fa-users fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <i class="fa-solid fa-users fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Gestion Patients</span>
               </a>
             </li>
@@ -107,9 +108,10 @@
               </a>
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/admin/events" routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Evenements' : ''">
-                <i class="fa-regular fa-calendar-days fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Evenements</span>
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Événements' : ''">
+                <i class="fa-regular fa-calendar-days fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Événements</span>
               </a>
             </li>
 
@@ -118,21 +120,23 @@
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/admin/donations" routerLinkActive="active-purple fw-semibold shadow-sm"
                 style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Donations' : ''">
-                <i class="fa-solid fa-hand-holding-heart fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <i class="fa-solid fa-hand-holding-heart fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Donations</span>
               </a>
             </li>
 
             <!-- Data Management -->
             <li class="nav-item w-100 mt-2">
-              <span class="text-uppercase text-muted extra-small fw-bold px-2 mb-2 d-block"
-                *ngIf="!isSidebarCollapsed" style="font-size: 10px; opacity: 0.5; letter-spacing: 1px;">
+              <span class="text-uppercase text-muted extra-small fw-bold px-2 mb-2 d-block" *ngIf="!isSidebarCollapsed"
+                style="font-size: 10px; opacity: 0.5; letter-spacing: 1px;">
                 Data Management
               </span>
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/users" routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'User Management' : ''">
-                <i class="fa-solid fa-user-shield fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/users" routerLinkActive="active-purple fw-semibold shadow-sm" style="cursor: pointer;"
+                [title]="isSidebarCollapsed ? 'User Management' : ''">
+                <i class="fa-solid fa-user-shield fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">User Access</span>
               </a>
             </li>
@@ -140,9 +144,10 @@
             <!-- Heart Rate -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/heart-rate" routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Heart Rate' : ''">
-                <i class="fa-solid fa-heart-pulse fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/heart-rate" routerLinkActive="active-purple fw-semibold shadow-sm" style="cursor: pointer;"
+                [title]="isSidebarCollapsed ? 'Heart Rate' : ''">
+                <i class="fa-solid fa-heart-pulse fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Heart Rate</span>
               </a>
             </li>
@@ -152,7 +157,8 @@
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/patient-profiles" routerLinkActive="active-purple fw-semibold shadow-sm"
                 style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Patients' : ''">
-                <i class="fa-solid fa-bed-pulse fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <i class="fa-solid fa-bed-pulse fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Patients</span>
               </a>
             </li>
@@ -236,7 +242,8 @@ style="cursor:pointer"
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
                 routerLink="/patient/incidents" routerLinkActive="active-purple fw-semibold shadow-sm"
                 style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Mes Incidents' : ''">
-                <i class="fa-solid fa-bell-exclamation fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <i class="fa-solid fa-bell-exclamation fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Mes Incidents</span>
               </a>
             </li>
@@ -259,7 +266,8 @@ style="cursor:pointer"
         </div>
 
         <div class="p-4 mt-auto border-top bg-grey text-center">
-          <button class="btn btn-white border shadow-sm w-100 rounded-pill fw-bold text-danger d-flex align-items-center justify-content-center py-2"
+          <button
+            class="btn btn-white border shadow-sm w-100 rounded-pill fw-bold text-danger d-flex align-items-center justify-content-center py-2"
             [title]="isSidebarCollapsed ? 'Logout' : ''" (click)="auth.logout()">
             <i class="fa-solid fa-power-off" [class.me-2]="!isSidebarCollapsed"></i>
             <span *ngIf="!isSidebarCollapsed">Logout Portal</span>
@@ -279,26 +287,30 @@ style="cursor:pointer"
                 <i class="fa-solid fa-magnifying-glass text-muted fs-14"></i>
               </span>
               <input type="text" class="form-control bg-transparent border-0 fs-14"
-                placeholder="Search metrics, users, or system groups..."
-                [(ngModel)]="globalSearchQuery" (keyup.enter)="doGlobalSearch()">
+                placeholder="Search metrics, users, or system groups..." [(ngModel)]="globalSearchQuery"
+                (keyup.enter)="doGlobalSearch()">
             </div>
           </div>
           <div class="d-flex align-items-center gap-4 ms-3 h-100">
-            <div class="cursor-pointer transition-all"
-              [ngClass]="isVoiceEnabled() ? 'text-success' : 'text-muted'"
+            <!-- Voice Toggle -->
+            <div class="cursor-pointer transition-all" [ngClass]="isVoiceEnabled() ? 'text-success' : 'text-muted'"
               (click)="toggleUnifiedVoice()" title="Toggle Voice Assistance">
               <i class="fa-solid fs-5" [ngClass]="isVoiceEnabled() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
             </div>
             <button class="btn rounded-circle d-flex align-items-center justify-content-center border-0 transition-all"
-              style="width: 36px; height: 36px;"
-              [ngClass]="isDarkMode ? 'bg-soft-primary' : 'bg-grey'"
+              style="width: 36px; height: 36px;" [ngClass]="isDarkMode ? 'bg-soft-primary' : 'bg-grey'"
               (click)="toggleDarkMode()" [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
               <i class="fa-solid fs-14" [ngClass]="isDarkMode ? 'fa-sun text-warning' : 'fa-moon text-muted'"></i>
             </button>
+
+            <!-- Profile -->
+            <!-- ── BOUTON GUIDE VOCAL (Admin) ── -->
             <div class="voice-nav-btn-admin cursor-pointer" *ngIf="auth.getRole() === 'PATIENT'"
               [class.active]="isVoiceEnabled()" (click)="toggleUnifiedVoice()"
-              [title]="isVoiceEnabled() ? 'Desactiver' : 'Activer'" style="cursor:pointer">
-              <i class="fa-solid fs-5" [class.fa-volume-high]="isVoiceEnabled()" [class.fa-volume-xmark]="!isVoiceEnabled()"></i>
+              [title]="isVoiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'"
+              style="cursor:pointer">
+              <i class="fa-solid fs-5" [class.fa-volume-high]="isVoiceEnabled()"
+                [class.fa-volume-xmark]="!isVoiceEnabled()"></i>
             </div>
             <div class="position-relative cursor-pointer text-muted hover-primary">
               <i class="fa-regular fa-bell fs-5"></i>
@@ -317,9 +329,11 @@ style="cursor:pointer"
                   System Administrator
                 </div>
               </div>
-              <div class="bg-soft-primary text-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold fs-5 border border-2 border-white"
-                style="width: 48px; height: 48px; cursor: pointer;">
-                {{ (auth.getCurrentUser()?.prenom || 'A')[0] }}{{ (auth.getCurrentUser()?.nom || 'U')[0] }}
+              <div class="bg-soft-primary text-primary rounded-circle shadow-sm d-flex
+                          align-items-center justify-content-center fw-bold fs-5
+                          border border-2 border-white" style="width: 48px; height: 48px; cursor: pointer;">
+                {{ (auth.getCurrentUser()?.prenom || 'A')[0] }}
+                {{ (auth.getCurrentUser()?.nom || 'U')[0] }}
               </div>
             </div>
           </div>
@@ -352,8 +366,12 @@ style="cursor:pointer"
               </li>
             </ul>
           </div>
+          <!-- Right side: Actions (SOS, Compte, Voice, Logout) -->
           <div class="col-lg-8 col-md-8 col-12 d-flex justify-content-end align-items-center gap-3">
-            <span class="small text-muted" *ngIf="auth.isLoggedIn()">Logged as: <strong>{{ auth.getRole() }}</strong></span>
+            <span class="small text-muted" *ngIf="auth.isLoggedIn()">Logged as: <strong>{{ auth.getRole()
+                }}</strong></span>
+
+            <!-- Compte Button -->
             <a *ngIf="auth.isLoggedIn()" [routerLink]="getAccountLink()"
               class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm fw-bold">
               <i class="fa-solid fa-user-circle me-1"></i>Compte
@@ -389,21 +407,58 @@ style="cursor:pointer"
               </button>
               <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center gap-3">
-                  <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
-                  <li class="nav-item"><a class="nav-link" routerLink="/rendezvous" routerLinkActive="active">Rendez-vous</a></li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/home" routerLinkActive="active"
+                      [routerLinkActiveOptions]="{exact: true}">Home</a>
+                  </li>
+
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/rendezvous" routerLinkActive="active">Rendez-vous</a>
+                  </li>
+
+                  <!-- Dropdown: Activités & Événements -->
                   <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Activites</a>
-                    <ul class="dropdown-menu border-0 shadow rounded-4 p-2">
-                      <li><a class="dropdown-item rounded-3 py-2" routerLink="/education"><i class="fa-solid fa-graduation-cap me-2 text-primary"></i>Education</a></li>
-                      <li><a class="dropdown-item rounded-3 py-2" routerLink="/eventfront"><i class="fa-solid fa-calendar-day me-2 text-primary"></i>Events</a></li>
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navDropdownAct"
+                      role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Activités
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 p-2 animate-fade-in"
+                      aria-labelledby="navDropdownAct">
+                      <li>
+                        <a class="dropdown-item rounded-3 py-2" routerLink="/education"
+                          routerLinkActive="active-purple">
+                          <i class="fa-solid fa-graduation-cap me-2 text-primary"></i>Education
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item rounded-3 py-2" routerLink="/eventfront"
+                          routerLinkActive="active-purple">
+                          <i class="fa-solid fa-calendar-day me-2 text-primary"></i>Events
+                        </a>
+                      </li>
                     </ul>
                   </li>
                   <li class="nav-item"><a class="nav-link" routerLink="/collaboration/feed" routerLinkActive="active">Community</a></li>
                   <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Dons</a>
-                    <ul class="dropdown-menu border-0 shadow rounded-4 p-2">
-                      <li><a class="dropdown-item rounded-3 py-2" routerLink="/donations"><i class="fa-solid fa-hand-holding-heart me-2 text-primary"></i>Donations</a></li>
-                      <li *ngIf="auth.isLoggedIn()"><a class="dropdown-item rounded-3 py-2" routerLink="/my-donations"><i class="fa-solid fa-history me-2 text-primary"></i>Mes Dons</a></li>
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navDropdownDons"
+                      role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Dons
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 p-2 animate-fade-in"
+                      aria-labelledby="navDropdownDons">
+                      <li>
+                        <a class="dropdown-item rounded-3 py-2" routerLink="/donations"
+                          routerLinkActive="active-purple">
+                          <i class="fa-solid fa-hand-holding-heart me-2 text-primary"></i>Donations
+                        </a>
+                      </li>
+                      <li *ngIf="auth.isLoggedIn()">
+                        <a class="dropdown-item rounded-3 py-2" routerLink="/my-donations"
+                          routerLinkActive="active-purple">
+                          <i class="fa-solid fa-history me-2 text-primary"></i>Mes Dons
+                        </a>
+                      </li>
                     </ul>
                   </li>
                   <li class="nav-item"><a class="nav-link" routerLink="/heart-rate" routerLinkActive="active"><i class="fa-solid fa-heart-pulse me-1"></i>Heart Rate</a></li>
@@ -412,7 +467,10 @@ style="cursor:pointer"
                     <a class="nav-link" routerLink="/patient-profiles" routerLinkActive="active"><i class="fa-solid fa-bed-pulse me-1"></i>Patients</a>
                   </li>
                   <li class="nav-item" *ngIf="auth.getRole() === 'RELATION'">
-                    <a class="nav-link fw-bold" style="color:#9b59b6" routerLink="/mon-patient" routerLinkActive="active"><i class="fa-solid fa-user-injured me-1"></i>Mon patient</a>
+                    <a class="nav-link fw-bold" style="color:#9b59b6" routerLink="/mon-patient"
+                      routerLinkActive="active">
+                      <i class="fa-solid fa-user-injured me-1"></i>Mon patient
+                    </a>
                   </li>
                   <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
                     <a class="nav-link fw-bold text-primary" routerLink="/map" routerLinkActive="active"><i class="fa-solid fa-map-location-dot me-1"></i>Geolocalisation</a>
@@ -488,9 +546,9 @@ style="cursor:pointer"
   </ng-template>
 </ng-template>
 
-<!-- VIDEO CALL RINGING -->
-<div *ngIf="incomingVideoCall() as inv"
-  class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-4 py-3 bg-dark text-white rounded-4 shadow-lg d-flex flex-wrap align-items-center gap-3"
+<!-- GLOBAL VIDEO CALL RINGING UI -->
+<div *ngIf="incomingVideoCall() as inv" class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-4 py-3
+         bg-dark text-white rounded-4 shadow-lg d-flex flex-wrap align-items-center gap-3"
   style="z-index: 9999; max-width: min(520px, 94vw);">
   <i class="fa-solid fa-video text-success fs-5"></i>
   <span class="fw-medium flex-grow-1">{{ inv.callerName }} is calling...</span>
@@ -498,7 +556,7 @@ style="cursor:pointer"
   <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3" (click)="declineIncomingVideoCall()">Decline</button>
 </div>
 
-<!-- VIDEO CALL OVERLAY -->
-<app-videocall *ngIf="showVideoCall() && videoCallRoomId()"
-  [roomId]="videoCallRoomId()" (closeCall)="closeGlobalVideoCall()">
+<!-- GLOBAL VIDEO CALL OVERLAY -->
+<app-videocall *ngIf="showVideoCall() && videoCallRoomId()" [roomId]="videoCallRoomId()"
+  (closeCall)="closeGlobalVideoCall()">
 </app-videocall>
