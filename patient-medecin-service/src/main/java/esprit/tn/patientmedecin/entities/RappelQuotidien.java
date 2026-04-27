@@ -47,6 +47,9 @@ public class RappelQuotidien {
     @Field("created_at")
     private LocalDateTime createdAt;
 
+    @Field("voice_message_path")
+    private String voiceMessagePath;
+
     public enum TypeRappel {
         MEDICAMENT, REPAS, HYGIENE, EXERCICE, SOCIAL, AUTRE
     }

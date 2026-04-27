@@ -21,57 +21,97 @@ public class RappelEmailService {
         this.patientRepo = patientRepo;
     }
 
+    /**
+     * Resolves the full Patient from DB, then sends a scheduled reminder email.
+     */
     public void sendScheduledReminderEmail(RappelQuotidien rappel) {
-        String email = extractEmail(rappel);
+        Patient fullPatient = resolveFullPatient(rappel);
+        if (fullPatient == null) return;
+
+        String email = resolveEmail(fullPatient);
         if (email == null) return;
 
         String description = rappel.getDescription() != null ? rappel.getDescription() : rappel.getTitre();
         String heure = rappel.getHeureRappel() != null ? rappel.getHeureRappel().toString() : "Aucune";
-        String patientName = rappel.getPatient().getPrenom() + " " + rappel.getPatient().getNom();
+        String patientName = buildPatientName(fullPatient);
 
         sendHtmlEmail(email, "Medical Reminder Notification", rappel.getTitre(), description, heure, patientName);
     }
 
+    /**
+     * Resolves the full Patient from DB, then sends a "new reminder created" email.
+     */
     public void sendNewReminderCreatedEmail(RappelQuotidien rappel) {
-        String email = extractEmail(rappel);
+        Patient fullPatient = resolveFullPatient(rappel);
+        if (fullPatient == null) return;
+
+        String email = resolveEmail(fullPatient);
         if (email == null) return;
 
         String description = rappel.getDescription() != null ? rappel.getDescription() : rappel.getTitre();
         String heure = rappel.getHeureRappel() != null ? rappel.getHeureRappel().toString() : "Aucune";
-        String patientName = rappel.getPatient().getPrenom() + " " + rappel.getPatient().getNom();
+        String patientName = buildPatientName(fullPatient);
 
         sendHtmlEmail(email, "Medical Reminder Notification", rappel.getTitre(), description, heure, patientName);
     }
 
-    private String extractEmail(RappelQuotidien rappel) {
+    /**
+     * Loads the complete Patient document from MongoDB using the ID embedded in the rappel.
+     * Returns null if the patient is missing or cannot be resolved.
+     */
+    private Patient resolveFullPatient(RappelQuotidien rappel) {
         try {
-            if (rappel.getPatient() == null || rappel.getPatient().getId() == null) return null;
-            
+            if (rappel.getPatient() == null || rappel.getPatient().getId() == null) {
+                log.warn("[RappelEmail] Rappel has no patient reference — skipping email.");
+                return null;
+            }
             Patient fullPatient = patientRepo.findById(rappel.getPatient().getId()).orElse(null);
-                    
-            if (fullPatient == null) return null;
-            if (fullPatient.getUser() == null) return null;
-            
-            String email = fullPatient.getUser().getEmail();
-            if (email == null || email.isBlank()) return null;
-            
-            return email;
+            if (fullPatient == null) {
+                log.warn("[RappelEmail] Patient {} not found in DB — skipping email.", rappel.getPatient().getId());
+            }
+            return fullPatient;
         } catch (Exception e) {
-            log.warn("[RappelEmail] Could not resolve patient email: {}", e.getMessage());
+            log.warn("[RappelEmail] Could not resolve patient from DB: {}", e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Extracts the email from a fully-loaded Patient object.
+     */
+    private String resolveEmail(Patient fullPatient) {
+        if (fullPatient.getUser() == null) {
+            log.warn("[RappelEmail] Patient {} has no UserInfo embedded — cannot determine email.", fullPatient.getId());
+            return null;
+        }
+        String email = fullPatient.getUser().getEmail();
+        if (email == null || email.isBlank()) {
+            log.warn("[RappelEmail] Patient {} has a blank email — skipping.", fullPatient.getId());
+            return null;
+        }
+        return email;
+    }
+
+    /**
+     * Builds "Prénom Nom" from the full Patient, falling back to "Patient" if both are null.
+     */
+    private String buildPatientName(Patient fullPatient) {
+        String prenom = fullPatient.getPrenom() != null ? fullPatient.getPrenom() : "";
+        String nom    = fullPatient.getNom()    != null ? fullPatient.getNom()    : "";
+        String name = (prenom + " " + nom).trim();
+        return name.isEmpty() ? "Patient" : name;
     }
 
     private void sendHtmlEmail(String to, String subject, String titre, String description, String heure, String patientName) {
         try {
             log.info("[RappelEmail] Sending Gmail SMTP notification to: {}", to);
-            
+
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(to);
             helper.setSubject(subject);
-            
+
             String htmlContent = String.format(
                 "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>" +
                 "  <h2 style='color: #8b5cf6;'>Nouveau Rappel Médical</h2>" +
@@ -84,7 +124,7 @@ public class RappelEmailService {
                 "  </div>" +
                 "  <p style='color: #6b7280; font-size: 12px;'>Ceci est une notification automatique. Merci de ne pas y répondre.</p>" +
                 "</div>",
-                patientName != null ? patientName : "Patient",
+                patientName,
                 titre,
                 description,
                 heure
@@ -92,7 +132,7 @@ public class RappelEmailService {
 
             helper.setText(htmlContent, true);
             mailSender.send(message);
-            
+
             log.info("[RappelEmail] Email successfully sent via Gmail SMTP to {}", to);
         } catch (Exception e) {
             log.error("[RappelEmail] Failed to send email to {}: {}", to, e.getMessage());

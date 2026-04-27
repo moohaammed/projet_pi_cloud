@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AnalyseService {
-    private apiUrl = 'http://localhost:8080/api/analyses';
-    private apiHistoriqueUrl = 'http://localhost:8080/api/historique/patient';
+    private apiUrl = `${environment.apiUrl}/api/analyses`;
+    private apiHistoriqueUrl = `${environment.apiUrl}/api/historique/patient`;
 
     constructor(private http: HttpClient) { }
 

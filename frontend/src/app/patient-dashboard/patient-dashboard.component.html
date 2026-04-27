@@ -160,6 +160,97 @@
        </div>
     </div>
 
+    <!-- NEW: Mes Rappels Quotidiens -->
+    <div class="row mb-4" *ngIf="patientId && reminders.length > 0">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+            <h5 class="fw-bold mb-0">
+              <i class="fa-solid fa-clock me-2 text-primary"></i>
+              Mes Rappels Quotidiens
+            </h5>
+            <p class="text-muted small mt-1 mb-0">Cliquez sur un rappel pour voir les détails et écouter le message vocal.</p>
+          </div>
+          <div class="card-body p-4">
+            <div class="row g-3">
+              <div class="col-md-4" *ngFor="let r of reminders">
+
+                <!-- Clickable Card Header -->
+                <div class="p-3 rounded-4 border bg-light h-100 shadow-sm hover-elevate"
+                     style="cursor: pointer;"
+                     (click)="openRappel(r)">
+                  <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="fs-4 bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
+                         style="width: 45px; height: 45px;">
+                      {{ r.type === 'MEDICAMENT' ? '💊' : r.type === 'REPAS' ? '🍽️' : r.type === 'HYGIENE' ? '🪥' : r.type === 'EXERCICE' ? '🏃' : r.type === 'SOCIAL' ? '👥' : '🔔' }}
+                    </div>
+                    <div class="flex-grow-1 min-width-0">
+                      <h6 class="fw-bold mb-0 text-dark text-truncate">{{ r.titre }}</h6>
+                      <span class="text-primary fw-bold small">{{ r.heureRappel }}</span>
+                    </div>
+                    <i class="fa-solid text-muted small"
+                       [ngClass]="selectedRappel?.id === r.id ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                  </div>
+
+                  <!-- Expanded Detail Panel -->
+                  <div *ngIf="selectedRappel?.id === r.id" class="rappel-detail-panel" (click)="$event.stopPropagation()">
+
+                    <!-- Full Details -->
+                    <div class="detail-section">
+                      <p *ngIf="r.description"><strong>📋 Description :</strong> {{ r.description }}</p>
+                      <p *ngIf="r.heureRappel"><strong>⏰ Heure :</strong> {{ r.heureRappel }}</p>
+                      <p *ngIf="r.jours"><strong>📅 Jours :</strong> {{ r.jours }}</p>
+                      <p *ngIf="r.type"><strong>🏷️ Type :</strong> {{ r.type }}</p>
+                    </div>
+
+                    <!-- Voice message section -->
+                    <div class="voice-section" *ngIf="r.voiceMessagePath">
+                      <p class="mb-2">🎤 <strong>Votre médecin a laissé un message vocal</strong></p>
+
+                      <!-- Audio player -->
+                      <audio controls [src]="getVoiceUrl(r.id)" class="audio-player">
+                        Votre navigateur ne supporte pas la lecture audio.
+                      </audio>
+
+                      <!-- Summarize button -->
+                      <button
+                        class="btn-summarize"
+                        (click)="summarizeVoice(r); $event.stopPropagation()"
+                        [disabled]="isSummarizing[r.id]">
+                        <span *ngIf="!isSummarizing[r.id]">
+                          <i class="fa-solid fa-wand-magic-sparkles me-1"></i>
+                          {{ summaries[r.id] ? 'Réactualiser le résumé' : '📝 Résumer avec IA' }}
+                        </span>
+                        <span *ngIf="isSummarizing[r.id]">
+                          <i class="fa-solid fa-spinner fa-spin me-1"></i>
+                          ⏳ L'IA analyse le message...
+                        </span>
+                      </button>
+
+                      <!-- Summary result -->
+                      <div *ngIf="summaries[r.id]" class="summary-box animate__fadeIn">
+                        <p><strong>🤖 Résumé IA</strong></p>
+                        <p>{{ summaries[r.id] }}</p>
+                      </div>
+                    </div>
+
+                    <!-- No voice message -->
+                    <div *ngIf="!r.voiceMessagePath" class="no-voice">
+                      <p style="color: #aaa; font-size: 13px;">
+                        🔇 Aucun message vocal pour ce rappel.
+                      </p>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ══ Main Row ═══════════════════════════════════ -->
     <div class="row g-4">
 

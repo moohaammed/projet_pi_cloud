@@ -8,6 +8,7 @@ import { PatientProgressionService } from '../services/patient-progression.servi
 import { AuthService } from '../services/auth.service';
 import { AssignmentService } from '../services/assignment.service';
 import { NotificationService } from '../services/notification.service';
+import { RappelService } from '../services/rappel.service';
 
 @Component({
   selector: 'app-patient-dashboard',
@@ -49,6 +50,13 @@ export class PatientDashboardComponent implements OnInit {
   showNotificationPanel = false;
   isLoadingNotifications = false;
 
+  // Reminders
+  reminders: any[] = [];
+  isLoadingReminders = false;
+  isSummarizing: {[key: number]: boolean} = {};
+  summaries: {[key: number]: string} = {};
+  selectedRappel: any = null;
+
   constructor(
     private patientService: PatientService,
     private analyseService: AnalyseService,
@@ -56,6 +64,7 @@ export class PatientDashboardComponent implements OnInit {
     private authService: AuthService,
     private assignmentService: AssignmentService,
     private notificationService: NotificationService,
+    private rappelService: RappelService,
     private router: Router
   ) { }
 
@@ -85,6 +94,7 @@ export class PatientDashboardComponent implements OnInit {
              if (this.patientId) {
                this.loadNotifications(this.patientId);
                this.loadUnreadCount(this.patientId);
+               this.loadReminders(this.patientId);
              }
            } else {
              // If patient doesn't exist yet, we keep patientId = null
@@ -447,5 +457,47 @@ export class PatientDashboardComponent implements OnInit {
         }
       });
     }
+  }
+
+  // --- Reminders Logic ---
+  loadReminders(patientId: number) {
+    this.isLoadingReminders = true;
+    this.rappelService.getByPatient(patientId).subscribe({
+      next: (data) => {
+        this.reminders = data.filter((r: any) => r.actif) || [];
+        this.isLoadingReminders = false;
+      },
+      error: () => this.isLoadingReminders = false
+    });
+  }
+
+  openRappel(rappel: any) {
+    if (this.selectedRappel?.id === rappel.id) {
+      this.selectedRappel = null; // toggle close
+    } else {
+      this.selectedRappel = rappel;
+    }
+  }
+
+  getVoiceUrl(id: number) {
+    return this.rappelService.getVoiceUrl(id);
+  }
+
+  summarizeVoice(rappel: any) {
+    // Use cached summary if already fetched
+    if (this.summaries[rappel.id] && !this.isSummarizing[rappel.id]) {
+      // allow re-fetch if user clicked again — just re-call
+    }
+    this.isSummarizing[rappel.id] = true;
+    this.rappelService.summarizeVoice(rappel.id).subscribe({
+      next: (data) => {
+        this.summaries[rappel.id] = data.summary;
+        this.isSummarizing[rappel.id] = false;
+      },
+      error: (err) => {
+        this.summaries[rappel.id] = 'Résumé indisponible pour le moment.';
+        this.isSummarizing[rappel.id] = false;
+      }
+    });
   }
 }
