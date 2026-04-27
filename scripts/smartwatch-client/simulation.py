@@ -16,7 +16,7 @@ SOURCE = "SIMULATOR"
 # "PIC_SOUDAIN"
 SCENARIO = "TACHYCARDIE"
 
-NORMAL_DURATION_SECONDS = 30
+NORMAL_DURATION_SECONDS = 80
 SEND_INTERVAL_SECONDS = 1.0
 
 
@@ -157,7 +157,7 @@ async def main():
     print(f"Backend  = {BACKEND_URL}")
 
     await run_normal_phase()
-    await run_selected_scenario()
+    #await run_selected_scenario()
 
     print("\nSimulation finished.")
 

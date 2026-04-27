@@ -1,8 +1,10 @@
 package esprit.tn.backpi.controllers.gestion_patient;
 
+import esprit.tn.backpi.dto.PatientMetadataDto;
 import esprit.tn.backpi.entities.gestion_patient.Patient;
 import esprit.tn.backpi.services.gestion_patient.IPatientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +28,27 @@ public class PatientController {
     @GetMapping("/{id}")
     public Patient getPatientById(@PathVariable("id") Long id) {
         return patientService.retrievePatient(id);
+    }
+
+    /**
+     * GET /api/patients/by-user/{userId}
+     *
+     * Returns only the patient metadata (age, sexe, poids) for the given userId.
+     * Used by the smartwatch-service AI prediction pipeline.
+     * Returns 204 No Content if no patient is linked to this user.
+     */
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<PatientMetadataDto> getPatientMetadataByUserId(@PathVariable("userId") Long userId) {
+        Patient patient = patientService.retrievePatientByUserId(userId);
+        if (patient == null) {
+            return ResponseEntity.noContent().build();
+        }
+        PatientMetadataDto dto = PatientMetadataDto.builder()
+                .age(patient.getAge())
+                .sexe(patient.getSexe())
+                .poids(patient.getPoids())
+                .build();
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping

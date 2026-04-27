@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HeartRateService, HeartRateRecord } from '../../services/heart-rate.service';
+import { HeartRateAiService, HeartRateAiResult } from '../../services/heart-rate-ai.service';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 
@@ -33,8 +34,15 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   private ecgData: number[] = [];
   private readonly ECG_MAX_POINTS = 200;
 
+  // ─── AI Prediction State ──────────────────────────────────────
+  aiResult: HeartRateAiResult | null = null;
+  /** 'waiting' | 'ready' | 'disconnected' | 'error' | 'idle' */
+  aiStatus: string = 'idle';
+
   private sseSubscription: Subscription | null = null;
+  private aiSseSubscription: Subscription | null = null;
   private reconnectTimeout: any = null;
+  private aiReconnectTimeout: any = null;
   private isBrowser: boolean;
 
   private userId: number = 1; // TODO: Replace with authenticated user ID
@@ -45,6 +53,7 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
   constructor(
     private heartRateService: HeartRateService,
+    private heartRateAiService: HeartRateAiService,
     private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: any
   ) {
@@ -66,6 +75,9 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     // Connect to the live SSE stream
     this.connectToLiveStream();
 
+    // Connect to the AI SSE stream
+    this.connectToAiStream();
+
     // Load history from MongoDB (one-time)
     this.loadHistory();
 
@@ -77,8 +89,14 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     if (this.sseSubscription) {
       this.sseSubscription.unsubscribe();
     }
+    if (this.aiSseSubscription) {
+      this.aiSseSubscription.unsubscribe();
+    }
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
+    }
+    if (this.aiReconnectTimeout) {
+      clearTimeout(this.aiReconnectTimeout);
     }
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
@@ -131,11 +149,60 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
         console.warn('[LIVE] SSE stream error:', err);
         this.status = 'disconnected';
 
+        // When watch disconnects, set AI to disconnected too
+        this.aiStatus = 'disconnected';
+        this.aiResult = null;
+
         // Auto-reconnect after 3 seconds
         this.reconnectTimeout = setTimeout(() => {
           console.log('[LIVE] Attempting SSE reconnect...');
           this.connectToLiveStream();
         }, 3000);
+      }
+    });
+  }
+
+  /**
+   * Connect to the AI prediction SSE stream.
+   */
+  private connectToAiStream(): void {
+    console.log(`[AI] Connecting to AI SSE stream for userId=${this.userId}...`);
+
+    this.aiSseSubscription = this.heartRateAiService.connectAiStream(this.userId).subscribe({
+      next: (result: HeartRateAiResult) => {
+        console.log('[AI] Received AI prediction:', result);
+
+        // Only update AI state if the watch is still connected
+        if (this.status === 'disconnected') {
+          this.aiStatus = 'disconnected';
+          this.aiResult = null;
+          return;
+        }
+
+        this.aiResult = result;
+
+        switch (result.status) {
+          case 'WAITING':
+            this.aiStatus = 'waiting';
+            break;
+          case 'READY':
+            this.aiStatus = 'ready';
+            break;
+          case 'ERROR':
+            this.aiStatus = 'error';
+            break;
+          default:
+            this.aiStatus = 'idle';
+        }
+      },
+      error: (err) => {
+        console.warn('[AI] AI SSE stream error:', err);
+
+        // Auto-reconnect after 5 seconds
+        this.aiReconnectTimeout = setTimeout(() => {
+          console.log('[AI] Attempting AI SSE reconnect...');
+          this.connectToAiStream();
+        }, 5000);
       }
     });
   }
@@ -309,5 +376,39 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     } catch {
       return ts;
     }
+  }
+
+  // ─── AI display helpers ────────────────────────────────────────
+
+  getAiProgressPercent(): number {
+    if (!this.aiResult) return 0;
+    return Math.round((this.aiResult.readingsCollected / this.aiResult.readingsRequired) * 100);
+  }
+
+  getAiRiskColor(): string {
+    if (!this.aiResult || this.aiResult.status !== 'READY') return '#6b7280';
+    switch (this.aiResult.riskLevel) {
+      case 'NORMAL': return '#00ff88';
+      case 'ATTENTION': return '#fbbf24';
+      case 'SURVEILLANCE': return '#f97316';
+      case 'ALERTE': return '#ef4444';
+      default: return '#6b7280';
+    }
+  }
+
+  getAiRiskIcon(): string {
+    if (!this.aiResult || this.aiResult.status !== 'READY') return 'fa-circle-question';
+    switch (this.aiResult.riskLevel) {
+      case 'NORMAL': return 'fa-circle-check';
+      case 'ATTENTION': return 'fa-triangle-exclamation';
+      case 'SURVEILLANCE': return 'fa-eye';
+      case 'ALERTE': return 'fa-bell';
+      default: return 'fa-circle-question';
+    }
+  }
+
+  getAiProbabilityPercent(): number {
+    if (!this.aiResult || this.aiResult.probability == null) return 0;
+    return Math.round(this.aiResult.probability * 100);
   }
 }

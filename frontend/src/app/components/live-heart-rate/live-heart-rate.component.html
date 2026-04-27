@@ -89,6 +89,117 @@
       </div>
     </div>
 
+    <!-- ═══ AI PREDICTION PANEL ═══ -->
+    <div class="card ai-card">
+      <div class="card-header-mini">
+        <span><i class="fa-solid fa-brain me-1"></i>AI Crisis Prediction</span>
+        <span class="ai-status-badge"
+          [class.ai-waiting]="aiStatus === 'waiting'"
+          [class.ai-ready]="aiStatus === 'ready'"
+          [class.ai-disconnected]="aiStatus === 'disconnected'"
+          [class.ai-error]="aiStatus === 'error'"
+          [class.ai-idle]="aiStatus === 'idle'">
+          <span class="ai-status-dot"></span>
+          {{ aiStatus === 'waiting' ? 'Collecting Data' :
+             aiStatus === 'ready' ? 'Live Prediction' :
+             aiStatus === 'disconnected' ? 'Disconnected' :
+             aiStatus === 'error' ? 'Error' : 'Initializing' }}
+        </span>
+      </div>
+
+      <!-- ── Disconnected State ── -->
+      <div class="ai-disconnected-state" *ngIf="aiStatus === 'disconnected'">
+        <div class="ai-disconnected-icon">
+          <i class="fa-solid fa-link-slash"></i>
+        </div>
+        <p class="ai-disconnected-text">Device Disconnected</p>
+        <small class="ai-disconnected-hint">AI prediction paused — connect your smartwatch to resume monitoring.</small>
+      </div>
+
+      <!-- ── Idle State ── -->
+      <div class="ai-idle-state" *ngIf="aiStatus === 'idle'">
+        <div class="ai-idle-icon">
+          <i class="fa-solid fa-hourglass-start"></i>
+        </div>
+        <p class="ai-idle-text">Initializing AI Pipeline</p>
+        <small class="ai-idle-hint">Waiting for heart-rate data to begin analysis...</small>
+      </div>
+
+      <!-- ── Waiting State ── -->
+      <div class="ai-waiting-state" *ngIf="aiStatus === 'waiting' && aiResult">
+        <div class="ai-waiting-header">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span>Collecting BPM readings...</span>
+        </div>
+        <div class="ai-progress-container">
+          <div class="ai-progress-bar">
+            <div class="ai-progress-fill" [style.width.%]="getAiProgressPercent()"></div>
+          </div>
+          <div class="ai-progress-text">
+            {{ aiResult.readingsCollected }} / {{ aiResult.readingsRequired }} readings
+          </div>
+        </div>
+        <small class="ai-waiting-hint">AI prediction will begin after {{ aiResult.readingsRequired }} BPM readings are collected.</small>
+      </div>
+
+      <!-- ── Error State ── -->
+      <div class="ai-error-state" *ngIf="aiStatus === 'error' && aiResult">
+        <div class="ai-error-icon">
+          <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+        <p class="ai-error-text">AI Prediction Error</p>
+        <small class="ai-error-hint">{{ aiResult.errorMessage || 'An error occurred during prediction. The system will retry automatically.' }}</small>
+      </div>
+
+      <!-- ── Ready State — Live Prediction ── -->
+      <div class="ai-ready-state" *ngIf="aiStatus === 'ready' && aiResult">
+        <div class="ai-prediction-grid">
+
+          <!-- Risk Level Badge -->
+          <div class="ai-risk-badge" [style.borderColor]="getAiRiskColor()">
+            <div class="ai-risk-icon" [style.color]="getAiRiskColor()">
+              <i class="fa-solid" [ngClass]="getAiRiskIcon()"></i>
+            </div>
+            <div class="ai-risk-level" [style.color]="getAiRiskColor()">{{ aiResult.riskLevel }}</div>
+            <div class="ai-risk-label">Risk Level</div>
+          </div>
+
+          <!-- Probability Bar -->
+          <div class="ai-probability-section">
+            <div class="ai-probability-header">
+              <span class="ai-prob-label">Crisis Probability</span>
+              <span class="ai-prob-value" [style.color]="getAiRiskColor()">{{ getAiProbabilityPercent() }}%</span>
+            </div>
+            <div class="ai-prob-bar">
+              <div class="ai-prob-fill" [style.width.%]="getAiProbabilityPercent()" [style.backgroundColor]="getAiRiskColor()"></div>
+            </div>
+          </div>
+
+          <!-- Prediction Details -->
+          <div class="ai-details">
+            <div class="ai-detail-item">
+              <span class="ai-detail-label">Prediction</span>
+              <span class="ai-detail-value" [class.prediction-normal]="aiResult.prediction === 'NORMAL'" [class.prediction-crisis]="aiResult.prediction === 'PRE_CRISE'">
+                {{ aiResult.prediction === 'NORMAL' ? '✅ Normal' : '⚠️ Pre-Crisis' }}
+              </span>
+            </div>
+            <div class="ai-detail-item">
+              <span class="ai-detail-label">Action</span>
+              <span class="ai-detail-value">{{ aiResult.action }}</span>
+            </div>
+            <div class="ai-detail-item">
+              <span class="ai-detail-label">Current BPM</span>
+              <span class="ai-detail-value">{{ aiResult.bpmCurrent }}</span>
+            </div>
+            <div class="ai-detail-item">
+              <span class="ai-detail-label">Avg BPM (60s)</span>
+              <span class="ai-detail-value">{{ aiResult.bpmMean }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── History Table ── -->
     <div class="card history-card">
       <div class="card-header-mini">
