@@ -124,22 +124,28 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
    * the device is marked as disconnected. As soon as a new event arrives
    * (handled in connectToLiveStream), the status flips back to 'connected'.
    */
-  private startInactivityChecker(): void {
-    this.inactivityIntervalId = setInterval(() => {
-      if (
-        this.lastEventTimestamp > 0 &&
-        Date.now() - this.lastEventTimestamp >= this.INACTIVITY_TIMEOUT_MS &&
-        this.status !== 'disconnected'
-      ) {
-        console.log('[LIVE] No heart-rate event for 5 s — marking device as disconnected');
+private startInactivityChecker(): void {
+  this.inactivityIntervalId = setInterval(() => {
+    if (
+      this.lastEventTimestamp > 0 &&
+      Date.now() - this.lastEventTimestamp >= this.INACTIVITY_TIMEOUT_MS &&
+      this.status !== 'disconnected'
+    ) {
+      console.log('[LIVE] No heart-rate event for 5 s — marking device as disconnected');
 
-        this.status = 'disconnected';
-        this.currentBpm = null;          // clear stale BPM from center display
-        this.deviceName = 'Disconnected';
-        this.cdr.detectChanges();
-      }
-    }, 1000);
-  }
+      // Heart-rate UI
+      this.status = 'disconnected';
+      this.currentBpm = null;
+      this.deviceName = 'Disconnected';
+
+      // AI UI must also go disconnected live
+      this.aiStatus = 'disconnected';
+      this.aiResult = null;
+
+      this.cdr.detectChanges();
+    }
+  }, 1000);
+}
 
   /**
    * Connect to the SSE live stream from the Heart Beat service.
@@ -147,85 +153,96 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
    * Replaces the old 2-second polling mechanism with real-time push.
    */
   private connectToLiveStream(): void {
-    console.log(`[LIVE] Connecting to SSE stream for userId=${this.userId}...`);
+  console.log(`[LIVE] Connecting to SSE stream for userId=${this.userId}...`);
 
-    this.sseSubscription = this.heartRateService.connectLiveStream(this.userId).subscribe({
-      next: (event: any) => {
-        this.ngZone.run(() => {
-          console.log('[LIVE] Received heart-rate event:', event);
+  this.sseSubscription = this.heartRateService.connectLiveStream(this.userId).subscribe({
+    next: (event: any) => {
+      this.ngZone.run(() => {
+        console.log('[LIVE] Received heart-rate event:', event);
 
-          this.currentBpm = event.bpm;
-          this.deviceName = event.deviceName || '—';
-          this.lastRecordedAt = event.receivedAt || event.capturedAt || '';
-          this.status = 'connected';
-          this.lastEventTimestamp = Date.now();
+        this.currentBpm = event.bpm;
+        this.deviceName = event.deviceName || '—';
+        this.lastRecordedAt = event.receivedAt || event.capturedAt || '';
+        this.status = 'connected';
+        this.lastEventTimestamp = Date.now();
 
-          // Push to ECG waveform
-          this.pushEcgData(event.bpm);
+        // If the watch was previously disconnected, AI should leave disconnected state
+        // and wait for the next fresh AI prediction.
+        if (this.aiStatus === 'disconnected') {
+          this.aiStatus = 'waiting';
+          this.aiResult = null;
+        }
 
-          // Update BPM sparkline history
-          this.bpmHistory.push(event.bpm);
-          if (this.bpmHistory.length > 30) {
-            this.bpmHistory.shift();
-          }
+        // Push to ECG waveform
+        this.pushEcgData(event.bpm);
 
-          // Prepend to history display (newest first)
-          const record: HeartRateRecord = {
-            eventId: event.eventId,
-            userId: event.userId,
-            deviceName: event.deviceName,
-            bpm: event.bpm,
-            source: event.source,
-            capturedAt: event.capturedAt,
-            receivedAt: event.receivedAt,
-            recordedAt: event.receivedAt || ''
-          };
+        // Update BPM sparkline history
+        this.bpmHistory.push(event.bpm);
+        if (this.bpmHistory.length > 30) {
+          this.bpmHistory.shift();
+        }
 
-          this.history.unshift(record);
-          if (this.history.length > 50) {
-            this.history.pop();
-          }
+        // Prepend to history display (newest first)
+        const record: HeartRateRecord = {
+          eventId: event.eventId,
+          userId: event.userId,
+          deviceName: event.deviceName,
+          bpm: event.bpm,
+          source: event.source,
+          capturedAt: event.capturedAt,
+          receivedAt: event.receivedAt,
+          recordedAt: event.receivedAt || ''
+        };
 
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
-          console.warn('[LIVE] SSE stream error:', err);
+        this.history.unshift(record);
+        if (this.history.length > 50) {
+          this.history.pop();
+        }
 
-          this.status = 'disconnected';
-          this.currentBpm = null;        // clear stale BPM on stream error too
-          this.deviceName = 'Disconnected';
-          this.cdr.detectChanges();
-        });
+        this.cdr.detectChanges();
+      });
+    },
+    error: (err) => {
+      this.ngZone.run(() => {
+        console.warn('[LIVE] SSE stream error:', err);
 
-        // When watch disconnects, set AI to disconnected too
+        // Heart-rate UI
+        this.status = 'disconnected';
+        this.currentBpm = null;
+        this.deviceName = 'Disconnected';
+
+        // AI UI must also go disconnected
         this.aiStatus = 'disconnected';
         this.aiResult = null;
 
-        // Auto-reconnect after 3 seconds
-        this.reconnectTimeout = setTimeout(() => {
-          console.log('[LIVE] Attempting SSE reconnect...');
-          this.connectToLiveStream();
-        }, 3000);
-      }
-    });
-  }
+        this.cdr.detectChanges();
+      });
+
+      // Auto-reconnect after 3 seconds
+      this.reconnectTimeout = setTimeout(() => {
+        console.log('[LIVE] Attempting SSE reconnect...');
+        this.connectToLiveStream();
+      }, 3000);
+    }
+  });
+}
 
   /**
    * Connect to the AI prediction SSE stream.
    */
-  private connectToAiStream(): void {
-    console.log(`[AI] Connecting to AI SSE stream for userId=${this.userId}...`);
+private connectToAiStream(): void {
+  console.log(`[AI] Connecting to AI SSE stream for userId=${this.userId}...`);
 
-    this.aiSseSubscription = this.heartRateAiService.connectAiStream(this.userId).subscribe({
-      next: (result: HeartRateAiResult) => {
+  this.aiSseSubscription = this.heartRateAiService.connectAiStream(this.userId).subscribe({
+    next: (result: HeartRateAiResult) => {
+      this.ngZone.run(() => {
         console.log('[AI] Received AI prediction:', result);
 
-        // Only update AI state if the watch is still connected
+        // If watch is disconnected, AI section must stay disconnected
         if (this.status === 'disconnected') {
           this.aiStatus = 'disconnected';
           this.aiResult = null;
+          this.cdr.detectChanges();
           return;
         }
 
@@ -244,18 +261,34 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
           default:
             this.aiStatus = 'idle';
         }
-      },
-      error: (err) => {
+
+        this.cdr.detectChanges();
+      });
+    },
+    error: (err) => {
+      this.ngZone.run(() => {
         console.warn('[AI] AI SSE stream error:', err);
 
-        // Auto-reconnect after 5 seconds
-        this.aiReconnectTimeout = setTimeout(() => {
-          console.log('[AI] Attempting AI SSE reconnect...');
-          this.connectToAiStream();
-        }, 5000);
-      }
-    });
-  }
+        // If the watch is disconnected, keep AI as disconnected.
+        // Otherwise show AI error state.
+        if (this.status === 'disconnected') {
+          this.aiStatus = 'disconnected';
+          this.aiResult = null;
+        } else {
+          this.aiStatus = 'error';
+        }
+
+        this.cdr.detectChanges();
+      });
+
+      // Auto-reconnect after 5 seconds
+      this.aiReconnectTimeout = setTimeout(() => {
+        console.log('[AI] Attempting AI SSE reconnect...');
+        this.connectToAiStream();
+      }, 5000);
+    }
+  });
+}
 
   private loadHistory(): void {
     this.heartRateService.getHistory(this.userId).subscribe({
