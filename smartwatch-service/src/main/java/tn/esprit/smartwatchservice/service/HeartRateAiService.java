@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import tn.esprit.smartwatchservice.dto.HeartRateAiResultDto;
 import tn.esprit.smartwatchservice.dto.HeartRateEvent;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,13 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * When 60 readings are available, fetches patient metadata from backpi
  * and calls the Python inference API to get a prediction.
  *
- * <b>Fault-tolerance:</b>
- * <ul>
- *   <li>If backpi is unavailable → ERROR state, continue consuming</li>
- *   <li>If Python inference API is unavailable → ERROR state, continue consuming</li>
- *   <li>If patient metadata is incomplete → ERROR state, continue consuming</li>
- *   <li>Any unexpected exception → ERROR state, continue consuming</li>
- * </ul>
+ * Fault-tolerance:
+ * - If backpi is unavailable -> ERROR state, continue consuming
+ * - If Python inference API is unavailable -> ERROR state, continue consuming
+ * - If patient metadata is incomplete -> ERROR state, continue consuming
+ * - Any unexpected exception -> ERROR state, continue consuming
  *
  * This service NEVER throws exceptions to the caller (HeartRateAiConsumer).
  */
@@ -38,6 +37,9 @@ public class HeartRateAiService {
 
     /** Per-user sliding window of BPM values */
     private final ConcurrentHashMap<Long, LinkedList<Integer>> userWindows = new ConcurrentHashMap<>();
+
+    /** Per-user timestamp of the last AI-consumed heart-rate event */
+    private final ConcurrentHashMap<Long, Instant> lastEventTimestamps = new ConcurrentHashMap<>();
 
     /** Per-user cached patient metadata */
     private final ConcurrentHashMap<Long, PatientMetadata> metadataCache = new ConcurrentHashMap<>();
@@ -54,6 +56,9 @@ public class HeartRateAiService {
 
     @Value("${heartrate.ai.inference-url}")
     private String inferenceUrl;
+
+    @Value("${heartrate.ai.reset-gap-seconds:60}")
+    private long resetGapSeconds;
 
     public HeartRateAiService(HeartRateAiStreamingService aiStreamingService) {
         this.aiStreamingService = aiStreamingService;
@@ -106,6 +111,39 @@ public class HeartRateAiService {
 
         Long userId = event.getUserId();
         int bpm = event.getBpm();
+        Instant now = Instant.now();
+
+        // Reset AI buffer if there was a long inactivity gap
+        Instant lastEventTime = lastEventTimestamps.get(userId);
+        if (lastEventTime != null) {
+            long gapSeconds = Duration.between(lastEventTime, now).getSeconds();
+
+            if (gapSeconds > resetGapSeconds) {
+                log.info("🤖 [AI] Resetting AI window for userId={} because gap={}s > {}s",
+                        userId, gapSeconds, resetGapSeconds);
+
+                LinkedList<Integer> existingWindow = userWindows.get(userId);
+                if (existingWindow != null) {
+                    synchronized (existingWindow) {
+                        existingWindow.clear();
+                    }
+                }
+
+                HeartRateAiResultDto waitingAfterReset = HeartRateAiResultDto.builder()
+                        .userId(userId)
+                        .status("WAITING")
+                        .readingsCollected(0)
+                        .readingsRequired(REQUIRED_READINGS)
+                        .timestamp(now)
+                        .build();
+
+                latestResults.put(userId, waitingAfterReset);
+                aiStreamingService.broadcast(waitingAfterReset);
+            }
+        }
+
+        // Update last seen timestamp for this user
+        lastEventTimestamps.put(userId, now);
 
         // Update sliding window
         LinkedList<Integer> window = userWindows.computeIfAbsent(userId, id -> new LinkedList<>());
@@ -130,7 +168,7 @@ public class HeartRateAiService {
                     .status("WAITING")
                     .readingsCollected(collected)
                     .readingsRequired(REQUIRED_READINGS)
-                    .timestamp(Instant.now())
+                    .timestamp(now)
                     .build();
 
             latestResults.put(userId, waitingResult);
@@ -141,7 +179,7 @@ public class HeartRateAiService {
             return;
         }
 
-        // ≥60 readings available — fetch metadata and predict
+        // >=60 readings available — fetch metadata and predict
         PatientMetadata metadata = fetchPatientMetadata(userId);
 
         if (metadata == null) {
@@ -202,8 +240,8 @@ public class HeartRateAiService {
 
     /**
      * Call the Python inference API with the 60-read window and patient metadata.
-     * On success → broadcast READY result.
-     * On failure → broadcast ERROR result.
+     * On success -> broadcast READY result.
+     * On failure -> broadcast ERROR result.
      */
     @SuppressWarnings("unchecked")
     private void callInferenceApi(Long userId, List<Integer> bpmValues, PatientMetadata metadata) {

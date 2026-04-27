@@ -24,11 +24,21 @@
     <div class="card bpm-card" [class]="getBpmClass()">
       <div class="card-glow"></div>
       <div class="bpm-display">
-        <div class="bpm-value-container">
-          <span class="bpm-value" *ngIf="currentBpm; else noBpm">{{ currentBpm }}</span>
-          <ng-template #noBpm><span class="bpm-value bpm-na">--</span></ng-template>
-          <span class="bpm-unit">BPM</span>
-        </div>
+
+       <div class="bpm-value-container">
+  <ng-container *ngIf="status === 'disconnected'; else connectedBpmBlock">
+    <span class="bpm-value bpm-na disconnected-text">Disconnected</span>
+  </ng-container>
+
+  <ng-template #connectedBpmBlock>
+    <span class="bpm-value" *ngIf="currentBpm !== null; else noBpm">{{ currentBpm }}</span>
+    <ng-template #noBpm>
+      <span class="bpm-value bpm-na">--</span>
+    </ng-template>
+    <span class="bpm-unit">BPM</span>
+  </ng-template>
+</div>
+
         <div class="bpm-heartbeat" *ngIf="status === 'connected'">
           <i class="fa-solid fa-heart"></i>
         </div>
@@ -121,7 +131,7 @@
         <div class="ai-idle-icon">
           <i class="fa-solid fa-hourglass-start"></i>
         </div>
-        <p class="ai-idle-text">Initializing AI Pipeline</p>
+        <p class="ai-idle-text">Initializing Analysis</p>
         <small class="ai-idle-hint">Waiting for heart-rate data to begin analysis...</small>
       </div>
 
