@@ -135,8 +135,25 @@ export const routes: Routes = [
   { path: 'my-donations',            component: MyDonationsComponent, canActivate: [authGuard] },
   { path: 'donations/:campaignId',   component: DonationFormComponent },
 
-  // HEART RATE
-  { path: 'heart-rate', loadComponent: () => import('./components/live-heart-rate/live-heart-rate.component').then(m => m.LiveHeartRateComponent), canActivate: [authGuard] },
+
+
+  // HELP NOTIFICATION — Patient Emergency Contacts
+  {
+    path: 'help-notification-contacts',
+    loadComponent: () =>
+      import('./components/help-notification-contacts/help-notification-contacts.component')
+        .then(m => m.HelpNotificationContactsComponent),
+    canActivate: [authGuard]
+  },
+
+  // SMARTWATCH — Heart Rate Monitor
+  {
+    path: 'heart-rate',
+    loadComponent: () =>
+      import('./components/live-heart-rate/live-heart-rate.component')
+        .then(m => m.LiveHeartRateComponent),
+    canActivate: [authGuard]
+  },
 
   { path: '**', redirectTo: 'auth/login' }
 ];
