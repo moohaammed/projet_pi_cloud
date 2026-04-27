@@ -13,7 +13,7 @@ spring:
             allowedOrigins: 
               - "http://localhost:4200"
               - "http://127.0.0.1:4200"
-              - "http://192.168.1.169:4200"
+              - "http://192.168.1.126:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
@@ -77,7 +77,7 @@ spring:
         # ── Main service (backpi) ──────────────────────────────────────────
         # ── Main service (backpi) ────────────────────────────────────────
         - id: main-service
-          uri: lb://backpi
+          uri: lb://BACKPI
           predicates:
             - Path=/api/**,/ws/**,/uploads/**
 
@@ -89,4 +89,5 @@ eureka:
     fetch-registry: true
     registry-fetch-interval-seconds: 5
   instance:
-    prefer-ip-address: true
+    hostname: localhost
+    prefer-ip-address: false

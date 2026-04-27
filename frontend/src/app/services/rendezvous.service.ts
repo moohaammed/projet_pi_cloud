@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RendezVous, StatutRendezVous } from '../models/rendezvous.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RendezVousService {
-  private readonly apiUrl = '/api/rendezvous';
+  private readonly apiUrl = `${environment.apiUrl}/api/rendezvous`;
   constructor(private http: HttpClient) { }
 
   getAll(): Observable<RendezVous[]> {
