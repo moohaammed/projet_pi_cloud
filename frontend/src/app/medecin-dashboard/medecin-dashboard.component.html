@@ -17,6 +17,14 @@
           {{ alertesCount }}
         </span>
       </a>
+      <a *ngIf="false" routerLink="/hospital-alerts" class="btn btn-outline-danger d-flex align-items-center gap-2">
+        <i class="fa-solid fa-truck-medical"></i>
+        Hôpitaux IA
+      </a>
+      <a *ngIf="false" routerLink="/hospital-map" class="btn btn-outline-glass d-flex align-items-center gap-2">
+        <i class="fa-solid fa-map-location-dot"></i>
+        Carte hôpitaux
+      </a>
       <a routerLink="/patients" class="btn btn-outline-glass d-flex align-items-center gap-2">
         <i class="fa-solid fa-arrow-left"></i>
         Retour Administration

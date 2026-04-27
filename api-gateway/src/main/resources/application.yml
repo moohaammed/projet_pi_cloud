@@ -10,10 +10,13 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "http://localhost:4200"
+            allowedOrigins: 
+              - "http://localhost:4200"
+              - "http://127.0.0.1:4200"
+              - "http://192.168.1.169:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
-            allowCredentials: false
+            allowCredentials: true
             maxAge: 3600
 
       # Remove duplicate CORS headers coming from upstream services
@@ -37,7 +40,7 @@ spring:
         - id: rendezvous-rest
           uri: lb://rendezvous-service
           predicates:
-            - Path=/api/rendezvous/**
+            - Path=/api/rendezvous/**,/api/rendezvous
 
         # ── Geo service ──────────────────────────────────────────────────────
         # Must be declared BEFORE the backpi catch-all (/api/**) so these
@@ -45,14 +48,8 @@ spring:
         - id: geo-service
           uri: lb://geo-service
           predicates:
-            - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/patient-locations/**
+            - Path=/api/incidents/**,/api/location/**,/api/alerts/**,/api/hospital/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/safezones/**,/api/patient-locations/**
 
-        - id: geo-service
-          uri: lb://geo-service
-          predicates:
-            - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/safezones/**,/api/patient-locations/**
-
-        # ── Main service (backpi) ──────────────────────────────────────────
         # ── Education service ──────────────────────────────────────────
         - id: education-rest
           uri: lb://education-service
@@ -63,7 +60,7 @@ spring:
         - id: donation-rest
           uri: lb://donation-service
           predicates:
-            - Path=/api/donations/**,/api/campaigns/**
+            - Path=/api/donations/**,/api/campaigns/**,/api/ai/**
 
         # ── Smartwatch service ──────────────────────────────────────────
         - id: smartwatch-service
@@ -75,7 +72,7 @@ spring:
         - id: patient-medecin-service
           uri: lb://patient-medecin-service
           predicates:
-            - Path=/api/patients/**,/api/analyses/**,/api/rappel-quotidien/**,/api/patient-notification/**,/api/jeux/**
+            - Path=/api/patients/**,/api/patients,/api/analyses/**,/api/analyses,/api/rappel-quotidien/**,/api/rappel-quotidien,/api/patient-notification/**,/api/patient-notification,/api/jeux/**,/api/jeux
 
         # ── Main service (backpi) ──────────────────────────────────────────
         # ── Main service (backpi) ────────────────────────────────────────

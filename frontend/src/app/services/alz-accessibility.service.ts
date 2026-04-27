@@ -138,19 +138,19 @@ export class AlzheimerAccessibilityService {
     let description = '';
 
     if (url.includes('/home')) {
-      description = "Bienvenue sur la page d'accueil.";
+      description = "Welcome to the home page.";
     } else if (url.includes('/rendezvous')) {
-      description = "Vous êtes sur la page des rendez-vous.";
+      description = "You are on the appointments page.";
     } else if (url.includes('/patient-dashboard')) {
-      description = "Voici votre espace personnel.";
+      description = "This is your personal space.";
     } else if (url.includes('/messenger')) {
-      description = "Vous êtes dans la messagerie.";
+      description = "You are in the messaging section.";
     } else if (url.includes('/education')) {
-      description = "Voici l'espace éducation.";
+      description = "This is the education section.";
     } else if (url.includes('/eventfront')) {
-      description = "Vous consultez les événements.";
+      description = "You are viewing upcoming events.";
     } else if (url.includes('/donations')) {
-      description = "Vous êtes sur la page des dons.";
+      description = "You are on the donations page.";
     }
 
     if (description) this.speak(description);
@@ -162,7 +162,7 @@ export class AlzheimerAccessibilityService {
 
     this.recognition = new SpeechRecognition();
     this.recognition.continuous = true;
-    this.recognition.lang = 'fr-FR';
+    this.recognition.lang = 'en-US';
 
     this.recognition.onresult = (event: any) => {
       if (this.isAgentPaused || this.ignoreVoiceCommands || window.speechSynthesis.speaking) return;
@@ -239,7 +239,30 @@ export class AlzheimerAccessibilityService {
 
   private processAppointments(apps: RendezVous[]) {
     if (!apps?.length) return;
-    this.speak("Vous avez des rendez-vous à venir.");
+
+    const now = new Date();
+
+    const upcoming = apps
+      .map(app => ({ ...app, date: new Date(app.dateHeure) }))
+      .filter(app => app.date > now)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    if (upcoming.length === 0) return;
+
+    const next = upcoming[0];
+
+    const dateStr = next.date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
+    });
+
+    const timeStr = next.date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    this.speak(`Reminder: You have an appointment on ${dateStr} at ${timeStr}.`);
   }
 
   private speak(text: string) {
@@ -247,7 +270,7 @@ export class AlzheimerAccessibilityService {
     if (!this.voiceEnabled()) return;
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'fr-FR';
+    utterance.lang = 'en-US';
 
     window.speechSynthesis.speak(utterance);
   }

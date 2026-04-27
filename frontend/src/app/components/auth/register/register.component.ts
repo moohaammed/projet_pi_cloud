@@ -26,8 +26,7 @@ export class RegisterComponent {
 
   roles = [
     { value: Role.DOCTOR,   label: 'Médecin',       icon: 'fa-user-doctor' },
-    { value: Role.PATIENT,  label: 'Patient',        icon: 'fa-bed-pulse' },
-    { value: Role.RELATION, label: 'Famille/Proche', icon: 'fa-people-group' }
+    { value: Role.PATIENT,  label: 'Patient',        icon: 'fa-bed-pulse' }
   ];
 
   constructor(private authService: AuthService, private router: Router) {}

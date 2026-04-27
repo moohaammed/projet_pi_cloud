@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { MapService } from '../../../services/map.service';
+import { LocationPrediction, LocationRecognitionService } from '../../../services/location-recognition.service';
 
 type AppStatus = 'starting' | 'tracking' | 'sos' | 'error' | 'offline';
 
@@ -23,6 +25,10 @@ export class PatientMapComponent implements OnInit, OnDestroy {
   currentUser: any  = {};
   positionsEnvoyees = 0;
   sosCountdown      = 0;
+  locationResult: LocationPrediction | null = null;
+  locationPhotoPreview: string | null = null;
+  locationAnalysisLoading = false;
+  locationAnalysisError = '';
 
   private gpsInterval:     any = null;
   private wakeLock:        any = null;
@@ -33,6 +39,8 @@ export class PatientMapComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private mapService: MapService,
+    private locationRecognitionService: LocationRecognitionService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -191,6 +199,56 @@ export class PatientMapComponent implements OnInit, OnDestroy {
       clearInterval(this.sosTimer);
       this.sosTimer = null;
     }
+  }
+
+  openLocationCamera(): void {
+    this.router.navigate(['/location-capture']);
+  }
+
+  onLocationPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = reader.result as string;
+      this.locationPhotoPreview = image;
+      this.analyzeLocationPhoto(image);
+      input.value = '';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  private analyzeLocationPhoto(image: string): void {
+    const patientId = Number(this.currentUser.userId || this.currentUser.id);
+    if (!patientId) {
+      this.locationAnalysisError = 'Identifiant patient introuvable.';
+      return;
+    }
+
+    this.locationAnalysisLoading = true;
+    this.locationAnalysisError = '';
+    this.locationResult = null;
+
+    this.locationRecognitionService.predict({
+      image,
+      patientId,
+      reporterId: patientId
+    }).subscribe({
+      next: (result) => {
+        this.locationResult = result;
+        this.locationAnalysisLoading = false;
+      },
+      error: (err) => {
+        this.locationAnalysisError = err?.error?.detail || err?.error?.message || 'Analyse de lieu impossible.';
+        this.locationAnalysisLoading = false;
+      }
+    });
+  }
+
+  get locationIsUnknown(): boolean {
+    return this.locationResult?.statut === 'ZONE_INCONNUE';
   }
 
   // ===== BATTERIE =====

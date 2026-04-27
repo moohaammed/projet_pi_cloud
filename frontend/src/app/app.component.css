@@ -216,6 +216,7 @@
   box-shadow: 0 4px 14px rgba(128, 0, 128, 0.4);
   animation: voice-btn-pulse 2.5s ease-in-out infinite;
 }
+
 @keyframes voice-btn-pulse {
   0%, 100% { box-shadow: 0 4px 14px rgba(128, 0, 128, 0.35); }
   50%       { box-shadow: 0 4px 22px rgba(128, 0, 128, 0.6); }
@@ -243,4 +244,10 @@
   color: white;
   box-shadow: 0 4px 14px rgba(128, 0, 128, 0.4);
   animation: voice-btn-pulse 2.5s ease-in-out infinite;
-}
+}
+
+/* Help Notification Popup Animation */
+@keyframes helpNotifSlideIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}

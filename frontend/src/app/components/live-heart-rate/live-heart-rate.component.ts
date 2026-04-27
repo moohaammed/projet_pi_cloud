@@ -5,10 +5,13 @@ import {
   ViewChild,
   ElementRef,
   PLATFORM_ID,
-  Inject
+  Inject,
+  NgZone,
+  ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HeartRateService, HeartRateRecord } from '../../services/heart-rate.service';
+import { HeartRateAiService, HeartRateAiResult } from '../../services/heart-rate-ai.service';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 
@@ -33,11 +36,23 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   private ecgData: number[] = [];
   private readonly ECG_MAX_POINTS = 200;
 
+  // ─── AI Prediction State ──────────────────────────────────────
+  aiResult: HeartRateAiResult | null = null;
+  /** 'waiting' | 'ready' | 'disconnected' | 'error' | 'idle' */
+  aiStatus: string = 'idle';
+
   private sseSubscription: Subscription | null = null;
+  private aiSseSubscription: Subscription | null = null;
   private reconnectTimeout: any = null;
+  private aiReconnectTimeout: any = null;
   private isBrowser: boolean;
 
   private userId: number = 1; // TODO: Replace with authenticated user ID
+
+  // Inactivity detection: if no heart-rate event arrives within this many ms, mark as disconnected
+  private readonly INACTIVITY_TIMEOUT_MS = 5000;
+  private lastEventTimestamp: number = 0;
+  private inactivityIntervalId: any = null;
 
   @ViewChild('ecgCanvas', { static: false }) ecgCanvas!: ElementRef<HTMLCanvasElement>;
   private canvasCtx: CanvasRenderingContext2D | null = null;
@@ -45,7 +60,10 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
   constructor(
     private heartRateService: HeartRateService,
+    private heartRateAiService: HeartRateAiService,
     private authService: AuthService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: any
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -66,24 +84,68 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     // Connect to the live SSE stream
     this.connectToLiveStream();
 
+    // Connect to the AI SSE stream
+    this.connectToAiStream();
+
     // Load history from MongoDB (one-time)
     this.loadHistory();
 
     // Start ECG canvas animation
     setTimeout(() => this.initCanvas(), 100);
+
+    // Start inactivity checker — runs every second
+    this.startInactivityChecker();
   }
 
   ngOnDestroy(): void {
     if (this.sseSubscription) {
       this.sseSubscription.unsubscribe();
     }
+    if (this.aiSseSubscription) {
+      this.aiSseSubscription.unsubscribe();
+    }
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
+    }
+    if (this.aiReconnectTimeout) {
+      clearTimeout(this.aiReconnectTimeout);
     }
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
+    if (this.inactivityIntervalId) {
+      clearInterval(this.inactivityIntervalId);
+    }
   }
+
+  /**
+   * Periodically checks whether we have received a heart-rate event recently.
+   * If more than INACTIVITY_TIMEOUT_MS has passed since the last event,
+   * the device is marked as disconnected. As soon as a new event arrives
+   * (handled in connectToLiveStream), the status flips back to 'connected'.
+   */
+private startInactivityChecker(): void {
+  this.inactivityIntervalId = setInterval(() => {
+    if (
+      this.lastEventTimestamp > 0 &&
+      Date.now() - this.lastEventTimestamp >= this.INACTIVITY_TIMEOUT_MS &&
+      this.status !== 'disconnected'
+    ) {
+      console.log('[LIVE] No heart-rate event for 5 s — marking device as disconnected');
+
+      // Heart-rate UI
+      this.status = 'disconnected';
+      this.currentBpm = null;
+      this.deviceName = 'Disconnected';
+
+      // AI UI must also go disconnected live
+      this.aiStatus = 'disconnected';
+      this.aiResult = null;
+
+      this.cdr.detectChanges();
+    }
+  }, 1000);
+}
 
   /**
    * Connect to the SSE live stream from the Heart Beat service.
@@ -91,16 +153,25 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
    * Replaces the old 2-second polling mechanism with real-time push.
    */
   private connectToLiveStream(): void {
-    console.log(`[LIVE] Connecting to SSE stream for userId=${this.userId}...`);
+  console.log(`[LIVE] Connecting to SSE stream for userId=${this.userId}...`);
 
-    this.sseSubscription = this.heartRateService.connectLiveStream(this.userId).subscribe({
-      next: (event: any) => {
+  this.sseSubscription = this.heartRateService.connectLiveStream(this.userId).subscribe({
+    next: (event: any) => {
+      this.ngZone.run(() => {
         console.log('[LIVE] Received heart-rate event:', event);
 
         this.currentBpm = event.bpm;
         this.deviceName = event.deviceName || '—';
         this.lastRecordedAt = event.receivedAt || event.capturedAt || '';
         this.status = 'connected';
+        this.lastEventTimestamp = Date.now();
+
+        // If the watch was previously disconnected, AI should leave disconnected state
+        // and wait for the next fresh AI prediction.
+        if (this.aiStatus === 'disconnected') {
+          this.aiStatus = 'waiting';
+          this.aiResult = null;
+        }
 
         // Push to ECG waveform
         this.pushEcgData(event.bpm);
@@ -122,23 +193,102 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
           receivedAt: event.receivedAt,
           recordedAt: event.receivedAt || ''
         };
+
         this.history.unshift(record);
         if (this.history.length > 50) {
           this.history.pop();
         }
-      },
-      error: (err) => {
-        console.warn('[LIVE] SSE stream error:', err);
-        this.status = 'disconnected';
 
-        // Auto-reconnect after 3 seconds
-        this.reconnectTimeout = setTimeout(() => {
-          console.log('[LIVE] Attempting SSE reconnect...');
-          this.connectToLiveStream();
-        }, 3000);
-      }
-    });
-  }
+        this.cdr.detectChanges();
+      });
+    },
+    error: (err) => {
+      this.ngZone.run(() => {
+        console.warn('[LIVE] SSE stream error:', err);
+
+        // Heart-rate UI
+        this.status = 'disconnected';
+        this.currentBpm = null;
+        this.deviceName = 'Disconnected';
+
+        // AI UI must also go disconnected
+        this.aiStatus = 'disconnected';
+        this.aiResult = null;
+
+        this.cdr.detectChanges();
+      });
+
+      // Auto-reconnect after 3 seconds
+      this.reconnectTimeout = setTimeout(() => {
+        console.log('[LIVE] Attempting SSE reconnect...');
+        this.connectToLiveStream();
+      }, 3000);
+    }
+  });
+}
+
+  /**
+   * Connect to the AI prediction SSE stream.
+   */
+private connectToAiStream(): void {
+  console.log(`[AI] Connecting to AI SSE stream for userId=${this.userId}...`);
+
+  this.aiSseSubscription = this.heartRateAiService.connectAiStream(this.userId).subscribe({
+    next: (result: HeartRateAiResult) => {
+      this.ngZone.run(() => {
+        console.log('[AI] Received AI prediction:', result);
+
+        // If watch is disconnected, AI section must stay disconnected
+        if (this.status === 'disconnected') {
+          this.aiStatus = 'disconnected';
+          this.aiResult = null;
+          this.cdr.detectChanges();
+          return;
+        }
+
+        this.aiResult = result;
+
+        switch (result.status) {
+          case 'WAITING':
+            this.aiStatus = 'waiting';
+            break;
+          case 'READY':
+            this.aiStatus = 'ready';
+            break;
+          case 'ERROR':
+            this.aiStatus = 'error';
+            break;
+          default:
+            this.aiStatus = 'idle';
+        }
+
+        this.cdr.detectChanges();
+      });
+    },
+    error: (err) => {
+      this.ngZone.run(() => {
+        console.warn('[AI] AI SSE stream error:', err);
+
+        // If the watch is disconnected, keep AI as disconnected.
+        // Otherwise show AI error state.
+        if (this.status === 'disconnected') {
+          this.aiStatus = 'disconnected';
+          this.aiResult = null;
+        } else {
+          this.aiStatus = 'error';
+        }
+
+        this.cdr.detectChanges();
+      });
+
+      // Auto-reconnect after 5 seconds
+      this.aiReconnectTimeout = setTimeout(() => {
+        console.log('[AI] Attempting AI SSE reconnect...');
+        this.connectToAiStream();
+      }, 5000);
+    }
+  });
+}
 
   private loadHistory(): void {
     this.heartRateService.getHistory(this.userId).subscribe({
@@ -157,6 +307,7 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     // Generate a synthetic ECG-like waveform segment based on BPM
     const amplitude = Math.min(bpm / 200, 1);
     const segment = this.generateEcgSegment(amplitude);
+
     for (const val of segment) {
       this.ecgData.push(val);
       if (this.ecgData.length > this.ECG_MAX_POINTS) {
@@ -169,9 +320,11 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     // Simplified PQRST waveform
     const seg: number[] = [];
     const steps = 20;
+
     for (let i = 0; i < steps; i++) {
       const t = i / steps;
       let v = 0;
+
       // P wave
       if (t >= 0.0 && t < 0.1) v = amplitude * 0.15 * Math.sin(Math.PI * t / 0.1);
       // PR segment
@@ -189,6 +342,7 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
       seg.push(v);
     }
+
     return seg;
   }
 
@@ -280,9 +434,9 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   }
 
   getBpmZone(): string {
-    if (!this.currentBpm) return 'No Data';
+    if (!this.currentBpm) return 'Disconnected';
     if (this.currentBpm < 60) return 'Bradycardia';
-    if (this.currentBpm <= 100) return 'Normal Zone';
+    if (this.currentBpm <= 100) return 'Normal State';
     return 'Tachycardia';
   }
 
@@ -305,9 +459,47 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     if (!ts) return '—';
     try {
       const d = new Date(ts);
-      return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      return d.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     } catch {
       return ts;
     }
+  }
+
+  // ─── AI display helpers ────────────────────────────────────────
+
+  getAiProgressPercent(): number {
+    if (!this.aiResult) return 0;
+    return Math.round((this.aiResult.readingsCollected / this.aiResult.readingsRequired) * 100);
+  }
+
+  getAiRiskColor(): string {
+    if (!this.aiResult || this.aiResult.status !== 'READY') return '#6b7280';
+    switch (this.aiResult.riskLevel) {
+      case 'NORMAL': return '#00ff88';
+      case 'ATTENTION': return '#fbbf24';
+      case 'SURVEILLANCE': return '#f97316';
+      case 'ALERTE': return '#ef4444';
+      default: return '#6b7280';
+    }
+  }
+
+  getAiRiskIcon(): string {
+    if (!this.aiResult || this.aiResult.status !== 'READY') return 'fa-circle-question';
+    switch (this.aiResult.riskLevel) {
+      case 'NORMAL': return 'fa-circle-check';
+      case 'ATTENTION': return 'fa-triangle-exclamation';
+      case 'SURVEILLANCE': return 'fa-eye';
+      case 'ALERTE': return 'fa-bell';
+      default: return 'fa-circle-question';
+    }
+  }
+
+  getAiProbabilityPercent(): number {
+    if (!this.aiResult || this.aiResult.probability == null) return 0;
+    return Math.round(this.aiResult.probability * 100);
   }
 }

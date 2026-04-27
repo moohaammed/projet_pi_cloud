@@ -126,6 +126,28 @@
       </span>
     </div>
 
+    <div class="card border-0 shadow-sm mb-4" *ngIf="patientId">
+      <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h5 class="fw-bold mb-1">
+            <i class="fa-solid fa-location-crosshairs me-2 text-primary"></i>
+            Reconnaissance de lieu
+          </h5>
+          <p class="text-muted small mb-0">
+            Ouvrez la camera pour detecter automatiquement si vous etes dans un lieu connu.
+          </p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <a routerLink="/location-capture" class="btn btn-primary">
+            <i class="fa-solid fa-video me-2"></i>Ouvrir la camera
+          </a>
+          <a routerLink="/patient-map" class="btn btn-outline-danger">
+            <i class="fa-solid fa-bell me-2"></i>Interface SOS
+          </a>
+        </div>
+      </div>
+    </div>
+
     <div class="row mb-4" *ngIf="!isLoadingProgression">
        <div class="col-12">
            <div class="card border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #800080, #5c005c); border-radius: 16px;">
