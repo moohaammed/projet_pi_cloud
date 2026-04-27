@@ -10,7 +10,10 @@
     </div>
   </div>
 </div>
-
+<a routerLink="/admin/geo"
+   class="btn btn-outline-success w-100 text-start p-3 rounded-4 d-flex align-items-center">
+  <i class="fa-solid fa-earth-africa me-2"></i>Dashboard Géolocalisation
+</a>
 <!-- Alertes Intelligentes -->
 <div class="row mb-4" *ngIf="unconfirmedTodayAlerts > 0 || upcomingIn30MinsAlerts > 0 || absentPatientsAlerts.length > 0">
   <div class="col-12">

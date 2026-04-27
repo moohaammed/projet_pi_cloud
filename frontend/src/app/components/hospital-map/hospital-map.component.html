@@ -1,0 +1,21 @@
+<main class="hospital-map-page">
+  <header class="page-header">
+    <div>
+      <h1>Carte hospitaliere</h1>
+      <p>Position du patient et hôpitaux recommandes.</p>
+    </div>
+  </header>
+
+  <section class="state-card" *ngIf="loading">Chargement de la carte...</section>
+  <section class="state-card error" *ngIf="!loading && error">{{ error }}</section>
+  <section class="state-card empty" *ngIf="!loading && !error && !prediction">Aucune recommandation disponible.</section>
+
+  <section class="map-shell" *ngIf="prediction">
+    <div id="hospitalPredictionMap"></div>
+    <div class="legend">
+      <span><i class="dot patient"></i> Patient</span>
+      <span><i class="dot recommended"></i> Hôpital recommande</span>
+      <span><i class="dot other"></i> Autre hôpital</span>
+    </div>
+  </section>
+</main>

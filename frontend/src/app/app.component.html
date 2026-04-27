@@ -1,5 +1,3 @@
-
-
 <ng-container *ngIf="isAuthPage(); else mainLayout">
   <router-outlet></router-outlet>
 </ng-container>
@@ -18,12 +16,9 @@
         <div class="p-3 d-flex align-items-center justify-content-between border-bottom" style="height: 80px;">
           <img src="template/assets/img/logo.png" alt="MediSync" height="35"
             *ngIf="!isSidebarCollapsed" class="ms-2">
-          <div
-            class="bg-soft-primary text-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold mx-auto"
+          <div class="bg-soft-primary text-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold mx-auto"
             style="width: 42px; height: 42px; cursor: pointer; border: 2px solid rgba(128,0,128,0.1);"
-            *ngIf="isSidebarCollapsed" (click)="toggleSidebar()">
-            M
-          </div>
+            *ngIf="isSidebarCollapsed" (click)="toggleSidebar()">M</div>
           <button class="btn btn-sm btn-soft-primary border-0 rounded-circle"
             (click)="toggleSidebar()" *ngIf="!isSidebarCollapsed"
             style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
@@ -33,251 +28,227 @@
 
         <div class="p-3 mt-2 flex-grow-1 overflow-auto custom-scrollbar">
           <p class="text-uppercase text-muted small fw-bold mb-3 px-2 text-truncate"
-            style="letter-spacing: 1.5px; opacity: 0.7;"
-            *ngIf="!isSidebarCollapsed">Admin Portal</p>
+            style="letter-spacing: 1.5px; opacity: 0.7;" *ngIf="!isSidebarCollapsed">Admin Portal</p>
           <ul class="nav flex-column gap-2 w-100 pb-3">
 
-            <li class="nav-item w-100">
+            <!-- Dashboard -->
+            <li class="nav-item w-100" *ngIf="auth.getRole() !== 'DOCTOR'">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/admin/dashboard"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
+                routerLink="/admin/dashboard" routerLinkActive="active-purple fw-semibold shadow-sm"
                 [routerLinkActiveOptions]="{exact:true}" style="cursor: pointer;"
                 [title]="isSidebarCollapsed ? 'Overview' : ''">
-                <!-- Unified Dashboard item with accessibility support -->
                 <div class="d-flex align-items-center w-100" [class.flex-column]="accService.simplifiedMode()">
                   <i class="fa-solid fa-gauge-high fs-5"
                     [class.me-3]="!isSidebarCollapsed && !accService.simplifiedMode()"
                     [class.mx-auto]="isSidebarCollapsed || accService.simplifiedMode()"></i>
-                  <span *ngIf="!isSidebarCollapsed || accService.simplifiedMode()"
-                    class="fs-15"
+                  <span *ngIf="!isSidebarCollapsed || accService.simplifiedMode()" class="fs-15"
                     [class.mt-1]="accService.simplifiedMode()">Dashboard</span>
                 </div>
               </a>
             </li>
 
+            <!-- Collaboration -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/admin/collaboration"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Collaboration' : ''">
-                <i class="fa-solid fa-comments fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/admin/collaboration" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Collaboration' : ''">
+                <i class="fa-solid fa-comments fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Collaboration</span>
               </a>
             </li>
-<li class="nav-item w-100" *ngIf="auth.getRole() === 'RELATION'">
-  <a routerLink="/mon-patient" routerLinkActive="active-purple fw-semibold shadow-sm"
-     class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1">
-    <i class="fa-solid fa-user-injured fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed" style="color:#9b59b6"></i>
-    <span *ngIf="!isSidebarCollapsed" class="fs-15 fw-semibold">Mon patient</span>
-  </a>
-</li>
+
+            <!-- Mon patient — RELATION -->
+            <li class="nav-item w-100" *ngIf="auth.getRole() === 'RELATION'">
+              <a routerLink="/mon-patient" routerLinkActive="active-purple fw-semibold shadow-sm"
+                class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1">
+                <i class="fa-solid fa-user-injured fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed" style="color:#9b59b6"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15 fw-semibold">Mon patient</span>
+              </a>
+            </li>
+
+            <!-- Rendez-vous -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/admin/rendezvous"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Rendez-vous' : ''">
-                <i class="fa-solid fa-calendar-check fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/admin/rendezvous" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Rendez-vous' : ''">
+                <i class="fa-solid fa-calendar-check fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Rendez-Vous</span>
               </a>
             </li>
 
-            <!-- ADDED: GESTION PATIENTS & MÉDECINS -->
+            <!-- Gestion Patients -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/admin/patients"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Gestion Patients' : ''">
-                <i class="fa-solid fa-users fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/admin/patients" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Gestion Patients' : ''">
+                <i class="fa-solid fa-users fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Gestion Patients</span>
               </a>
             </li>
 
+            <!-- Gestion Medecins -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/admin/medecins"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Gestion Médecins' : ''">
-                <i class="fa-solid fa-user-doctor fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Gestion Médecins (Assignation)</span>
+                routerLink="/admin/medecins" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Gestion Medecins' : ''">
+                <i class="fa-solid fa-user-doctor fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Gestion Medecins</span>
               </a>
             </li>
 
+            <!-- Activites + Events -->
             <li class="nav-item w-100">
-              <!-- Activities -->
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                 routerLink="/admin/activities"
-                 routerLinkActive="active-purple fw-semibold shadow-sm"
-                 style="cursor: pointer;"
-                 [title]="isSidebarCollapsed ? 'Activités' : ''">
-                <i class="fa-solid fa-gamepad fs-5"
-                   [class.me-3]="!isSidebarCollapsed"
-                   [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Activités</span>
+                routerLink="/admin/activities" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Activites' : ''">
+                <i class="fa-solid fa-gamepad fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Activites</span>
               </a>
-
-              <!-- Events -->
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                 routerLink="/admin/events"
-                 routerLinkActive="active-purple fw-semibold shadow-sm"
-                 style="cursor: pointer;"
-                 [title]="isSidebarCollapsed ? 'Événements' : ''">
-                <i class="fa-regular fa-calendar-days fs-5"
-                   [class.me-3]="!isSidebarCollapsed"
-                   [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Événements</span>
+                routerLink="/admin/events" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Evenements' : ''">
+                <i class="fa-regular fa-calendar-days fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Evenements</span>
               </a>
             </li>
 
+            <!-- Donations -->
             <li class="nav-item w-100">
-              <!-- Donations -->
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                 routerLink="/admin/donations"
-                 routerLinkActive="active-purple fw-semibold shadow-sm"
-                 style="cursor: pointer;"
-                 [title]="isSidebarCollapsed ? 'Donations' : ''">
-                <i class="fa-solid fa-hand-holding-heart fs-5"
-                   [class.me-3]="!isSidebarCollapsed"
-                   [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/admin/donations" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Donations' : ''">
+                <i class="fa-solid fa-hand-holding-heart fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Donations</span>
               </a>
             </li>
+
+            <!-- Data Management -->
             <li class="nav-item w-100 mt-2">
               <span class="text-uppercase text-muted extra-small fw-bold px-2 mb-2 d-block"
-                *ngIf="!isSidebarCollapsed"
-                style="font-size: 10px; opacity: 0.5; letter-spacing: 1px;">
+                *ngIf="!isSidebarCollapsed" style="font-size: 10px; opacity: 0.5; letter-spacing: 1px;">
                 Data Management
               </span>
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/users"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'User Management' : ''">
-                <i class="fa-solid fa-user-shield fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/users" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'User Management' : ''">
+                <i class="fa-solid fa-user-shield fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">User Access</span>
               </a>
             </li>
 
+            <!-- Heart Rate -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/heart-rate"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Heart Rate' : ''">
-                <i class="fa-solid fa-heart-pulse fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/heart-rate" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Heart Rate' : ''">
+                <i class="fa-solid fa-heart-pulse fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Heart Rate</span>
               </a>
             </li>
 
+            <!-- Patients -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/patient-profiles"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Patients' : ''">
-                <i class="fa-solid fa-bed-pulse fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/patient-profiles" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Patients' : ''">
+                <i class="fa-solid fa-bed-pulse fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Patients</span>
               </a>
             </li>
 
-            <li class="nav-item w-100">
+            <!-- Hopitaux -->
+            <li class="nav-item w-100" *ngIf="auth.getRole() !== 'DOCTOR'">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/hospitals"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Hôpitaux' : ''">
-                <i class="fa-solid fa-hospital fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Hôpitaux</span>
+                routerLink="/hospitals" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Hopitaux' : ''">
+                <i class="fa-solid fa-hospital fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Hopitaux</span>
               </a>
             </li>
 
+            <!-- Geolocalisation -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/map"
-                routerLinkActive="active-purple fw-semibold shadow-sm"
-                style="cursor: pointer;"
-                [title]="isSidebarCollapsed ? 'Géolocalisation' : ''">
-                <i class="fa-solid fa-map-location-dot fs-5"
-                  [class.me-3]="!isSidebarCollapsed"
-                  [class.mx-auto]="isSidebarCollapsed"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15">Géolocalisation</span>
+                routerLink="/map" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Geolocalisation' : ''">
+                <i class="fa-solid fa-map-location-dot fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Geolocalisation</span>
               </a>
             </li>
 
-            <!-- ANALYSE CHEMIN — DOCTOR + RELATION -->
-            <li class="nav-item w-100"
-                *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'RELATION'">
-              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                 routerLink="/analyzer"
+            <!-- ★ DASHBOARD GEO — juste apres Geolocalisation ★ -->
+            <li class="nav-item w-100">
+              <a class="nav-link w-100 py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                 routerLink="/admin/geo"
                  routerLinkActive="active-purple fw-semibold shadow-sm"
-                 style="cursor: pointer;"
-                 [title]="isSidebarCollapsed ? 'Analyse IA' : ''">
-                <i class="fa-solid fa-brain fs-5"
+style="cursor:pointer"
+                 [title]="isSidebarCollapsed ? 'Dashboard Geo' : ''">
+                <i class="fa-solid fa-earth-africa fs-5"
                    [class.me-3]="!isSidebarCollapsed"
-                   [class.mx-auto]="isSidebarCollapsed"></i>
+                   [class.mx-auto]="isSidebarCollapsed"
+                   style="color:#198754"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15 fw-semibold">Dashboard Geo</span>
+              </a>
+            </li>
+
+            <!-- Analyse chemin — DOCTOR + RELATION -->
+            <li class="nav-item w-100" *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'RELATION'">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/analyzer" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Analyse IA' : ''">
+                <i class="fa-solid fa-brain fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Analyse chemin</span>
               </a>
             </li>
 
-            <!-- ★ SUIVI DE MON PATIENT — RELATION uniquement ★ -->
+            <!-- Suivi de mon patient — RELATION -->
             <li class="nav-item w-100" *ngIf="auth.getRole() === 'RELATION'">
-              <a class="nav-link w-100 py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                 routerLink="/relation-map"
-                 routerLinkActive="active-purple fw-semibold shadow-sm"
-                 style="cursor:pointer; background:linear-gradient(135deg,#f5f0ff,#ede5ff);
-                        color:#4a2a8a; border:1px solid #d5b8ff !important"
-                 [title]="isSidebarCollapsed ? 'Suivi patient' : ''">
-                <i class="fa-solid fa-map-location-dot fs-5"
-                   [class.me-3]="!isSidebarCollapsed"
-                   [class.mx-auto]="isSidebarCollapsed"
-                   style="color:#6f42c1"></i>
-                <span *ngIf="!isSidebarCollapsed" class="fs-15 fw-semibold">
-                  Suivi de mon patient
-                </span>
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/hospital-alerts" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Hopitaux IA' : ''">
+                <i class="fa-solid fa-truck-medical fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Hopitaux IA</span>
               </a>
             </li>
 
-            <!-- MES INCIDENTS — PATIENT -->
+            <li class="nav-item w-100" *ngIf="auth.getRole() === 'RELATION'">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/hospital-map" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Carte hopitaux' : ''">
+                <i class="fa-solid fa-map-location-dot fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Carte hopitaux</span>
+              </a>
+            </li>
+
+            <li class="nav-item w-100" *ngIf="auth.getRole() === 'RELATION'">
+              <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
+                routerLink="/relation-map" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Suivi patient' : ''">
+                <i class="fa-solid fa-map-location-dot fs-5" [class.me-3]="!isSidebarCollapsed"
+                  [class.mx-auto]="isSidebarCollapsed"></i>
+                <span *ngIf="!isSidebarCollapsed" class="fs-15">Suivi de mon patient</span>
+              </a>
+            </li>
+
+            <!-- Mes Incidents — PATIENT -->
             <li class="nav-item w-100" *ngIf="auth.getRole() === 'PATIENT'">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                 routerLink="/patient/incidents"
-                 routerLinkActive="active-purple fw-semibold shadow-sm"
-                 style="cursor: pointer;"
-                 [title]="isSidebarCollapsed ? 'Mes Incidents' : ''">
-                <i class="fa-solid fa-bell-exclamation fs-5"
-                   [class.me-3]="!isSidebarCollapsed"
-                   [class.mx-auto]="isSidebarCollapsed"></i>
+                routerLink="/patient/incidents" routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;" [title]="isSidebarCollapsed ? 'Mes Incidents' : ''">
+                <i class="fa-solid fa-bell-exclamation fs-5" [class.me-3]="!isSidebarCollapsed" [class.mx-auto]="isSidebarCollapsed"></i>
                 <span *ngIf="!isSidebarCollapsed" class="fs-15">Mes Incidents</span>
               </a>
             </li>
 
-            <!-- DASHBOARD MÉDECIN -->
+            <!-- Dashboard Medecin -->
             <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR'">
               <a class="nav-link" routerLink="/medecin-dashboard" routerLinkActive="active">
                 <i class="fa-solid fa-user-doctor me-1"></i>Dashboard
               </a>
             </li>
 
-            <!-- ALERTES MÉDECIN -->
+            <!-- Alertes Medecin -->
             <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR'">
               <a class="nav-link text-danger fw-bold" routerLink="/medecin/alertes" routerLinkActive="active">
                 <i class="fa-solid fa-bell me-1"></i>Alertes
@@ -288,10 +259,8 @@
         </div>
 
         <div class="p-4 mt-auto border-top bg-grey text-center">
-          <button
-            class="btn btn-white border shadow-sm w-100 rounded-pill fw-bold text-danger d-flex align-items-center justify-content-center py-2"
-            [title]="isSidebarCollapsed ? 'Logout' : ''"
-            (click)="auth.logout()">
+          <button class="btn btn-white border shadow-sm w-100 rounded-pill fw-bold text-danger d-flex align-items-center justify-content-center py-2"
+            [title]="isSidebarCollapsed ? 'Logout' : ''" (click)="auth.logout()">
             <i class="fa-solid fa-power-off" [class.me-2]="!isSidebarCollapsed"></i>
             <span *ngIf="!isSidebarCollapsed">Logout Portal</span>
           </button>
@@ -299,52 +268,36 @@
       </aside>
 
       <div class="flex-grow-1 d-flex flex-column overflow-hidden bg-grey h-100 position-relative">
-
         <header class="bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center shadow-sm"
           style="z-index: 10; height: 90px; flex-shrink: 0;">
           <div class="d-flex align-items-center flex-grow-1">
-            <button class="btn btn-soft-primary rounded-circle d-lg-none me-3"
-              (click)="toggleSidebar()">
+            <button class="btn btn-soft-primary rounded-circle d-lg-none me-3" (click)="toggleSidebar()">
               <i class="fa-solid fa-bars"></i>
             </button>
-            <div class="input-group search-form border-0 rounded-pill bg-grey px-3 py-0 mt-2"
-              style="max-width: 450px;">
+            <div class="input-group search-form border-0 rounded-pill bg-grey px-3 py-0 mt-2" style="max-width: 450px;">
               <span class="input-group-text bg-transparent border-0">
                 <i class="fa-solid fa-magnifying-glass text-muted fs-14"></i>
               </span>
               <input type="text" class="form-control bg-transparent border-0 fs-14"
                 placeholder="Search metrics, users, or system groups..."
-                [(ngModel)]="globalSearchQuery"
-                (keyup.enter)="doGlobalSearch()">
+                [(ngModel)]="globalSearchQuery" (keyup.enter)="doGlobalSearch()">
             </div>
           </div>
-
           <div class="d-flex align-items-center gap-4 ms-3 h-100">
-            <!-- Voice Toggle -->
             <div class="cursor-pointer transition-all"
-                 [ngClass]="isVoiceEnabled() ? 'text-success' : 'text-muted'"
-                 (click)="toggleUnifiedVoice()"
-                 title="Toggle Voice Assistance">
+              [ngClass]="isVoiceEnabled() ? 'text-success' : 'text-muted'"
+              (click)="toggleUnifiedVoice()" title="Toggle Voice Assistance">
               <i class="fa-solid fs-5" [ngClass]="isVoiceEnabled() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
             </div>
-
-            <!-- Dark Mode Toggle -->
             <button class="btn rounded-circle d-flex align-items-center justify-content-center border-0 transition-all"
-                    style="width: 36px; height: 36px;"
-                    [ngClass]="isDarkMode ? 'bg-soft-primary' : 'bg-grey'"
-                    (click)="toggleDarkMode()"
-                    [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
+              style="width: 36px; height: 36px;"
+              [ngClass]="isDarkMode ? 'bg-soft-primary' : 'bg-grey'"
+              (click)="toggleDarkMode()" [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
               <i class="fa-solid fs-14" [ngClass]="isDarkMode ? 'fa-sun text-warning' : 'fa-moon text-muted'"></i>
             </button>
-
-            <!-- Profile -->
-            <!-- ── BOUTON GUIDE VOCAL (Admin) ── -->
-            <div class="voice-nav-btn-admin cursor-pointer"
-                 *ngIf="auth.getRole() === 'PATIENT'"
-                 [class.active]="isVoiceEnabled()"
-                 (click)="toggleUnifiedVoice()"
-                 [title]="isVoiceEnabled() ? 'Désactiver le guide vocal' : 'Activer le guide vocal'"
-                 style="cursor:pointer">
+            <div class="voice-nav-btn-admin cursor-pointer" *ngIf="auth.getRole() === 'PATIENT'"
+              [class.active]="isVoiceEnabled()" (click)="toggleUnifiedVoice()"
+              [title]="isVoiceEnabled() ? 'Desactiver' : 'Activer'" style="cursor:pointer">
               <i class="fa-solid fs-5" [class.fa-volume-high]="isVoiceEnabled()" [class.fa-volume-xmark]="!isVoiceEnabled()"></i>
             </div>
             <div class="position-relative cursor-pointer text-muted hover-primary">
@@ -354,26 +307,19 @@
                 style="font-size: 8px; padding: 3px 5px;">1</span>
               <span *ngIf="!notificationPermissionDenied()"
                 class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-              <span class="position-absolute top-0 start-100 translate-middle p-1
-                           bg-danger border border-light rounded-circle"></span>
             </div>
             <div class="d-flex align-items-center gap-3">
               <div class="text-end d-none d-md-block">
                 <div class="fw-bold text-dark mb-0 lh-1 fs-14">
-                  {{ auth.getCurrentUser()?.prenom || 'Admin' }}
-                  {{ auth.getCurrentUser()?.nom || 'User' }}
+                  {{ auth.getCurrentUser()?.prenom || 'Admin' }} {{ auth.getCurrentUser()?.nom || 'User' }}
                 </div>
-                <div class="text-primary fw-bold"
-                  style="font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase;">
+                <div class="text-primary fw-bold" style="font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase;">
                   System Administrator
                 </div>
               </div>
-              <div class="bg-soft-primary text-primary rounded-circle shadow-sm d-flex
-                          align-items-center justify-content-center fw-bold fs-5
-                          border border-2 border-white"
+              <div class="bg-soft-primary text-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold fs-5 border border-2 border-white"
                 style="width: 48px; height: 48px; cursor: pointer;">
-                {{ (auth.getCurrentUser()?.prenom || 'A')[0] }}
-                {{ (auth.getCurrentUser()?.nom || 'U')[0] }}
+                {{ (auth.getCurrentUser()?.prenom || 'A')[0] }}{{ (auth.getCurrentUser()?.nom || 'U')[0] }}
               </div>
             </div>
           </div>
@@ -381,11 +327,8 @@
 
         <main class="flex-grow-1 p-4 p-lg-5 overflow-auto bg-grey">
           <div class="container-fluid p-0">
-            <!-- Simplified Mode Instructions -->
             <div *ngIf="accService.simplifiedMode()" class="mb-4">
-              <div class="simplified-breadcrumb mb-2">
-                Vous êtes ici : {{ getBreadcrumbs() }}
-              </div>
+              <div class="simplified-breadcrumb mb-2">Vous etes ici : {{ getBreadcrumbs() }}</div>
               <div class="alert alert-info border-0 shadow-sm rounded-4">
                 <strong>Instruction :</strong> {{ getInstructionPhrase() }}
               </div>
@@ -393,7 +336,6 @@
             <router-outlet></router-outlet>
           </div>
         </main>
-
       </div>
     </div>
   </ng-container>
@@ -402,52 +344,33 @@
     <div class="topbar d-none d-lg-block py-3">
       <div class="container">
         <div class="row align-items-center">
-          <!-- Left side: Contact Info -->
           <div class="col-lg-4 col-md-4 col-12">
             <ul class="top-contact list-unstyled d-flex gap-4 mb-0 small">
               <li><i class="fa fa-phone"></i> +216 71 000 000</li>
-              <li>
-                <i class="fa fa-envelope"></i>
+              <li><i class="fa fa-envelope"></i>
                 <a href="mailto:contact&#64;alzcare.tn" class="text-decoration-none">contact&#64;alzcare.tn</a>
               </li>
             </ul>
           </div>
-
-          <!-- Right side: Actions (SOS, Compte, Voice, Logout) -->
           <div class="col-lg-8 col-md-8 col-12 d-flex justify-content-end align-items-center gap-3">
             <span class="small text-muted" *ngIf="auth.isLoggedIn()">Logged as: <strong>{{ auth.getRole() }}</strong></span>
-
-            <!-- Compte Button -->
             <a *ngIf="auth.isLoggedIn()" [routerLink]="getAccountLink()"
-               class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm fw-bold">
+              class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm fw-bold">
               <i class="fa-solid fa-user-circle me-1"></i>Compte
             </a>
-
-            <!-- SOS Button (for Patients) -->
             <a *ngIf="auth.getRole() === 'PATIENT'" routerLink="/patient-map"
-               class="btn btn-sm btn-danger rounded-pill px-3 fw-bold d-flex align-items-center gap-2 shadow-sm"
-               style="animation: pulse-sos 2s infinite">
-              <i class="fa-solid fa-bell"></i>
-              <span>SOS</span>
+              class="btn btn-sm btn-danger rounded-pill px-3 fw-bold d-flex align-items-center gap-2 shadow-sm"
+              style="animation: pulse-sos 2s infinite">
+              <i class="fa-solid fa-bell"></i><span>SOS</span>
             </a>
-
-            <!-- Global Voice Toggle -->
             <button class="btn btn-sm rounded-pill px-3 border-0 transition-all d-flex align-items-center gap-2 shadow-sm"
               [ngClass]="isVoiceEnabled() ? 'btn-soft-success' : 'btn-soft-secondary'"
-              (click)="toggleUnifiedVoice()"
-              title="Toggle Voice Assistance">
+              (click)="toggleUnifiedVoice()" title="Toggle Voice Assistance">
               <i class="fa-solid" [ngClass]="isVoiceEnabled() ? 'fa-volume-high' : 'fa-volume-xmark'"></i>
               <span class="fw-bold fs-11">VOICE</span>
             </button>
-
-
-            <button class="btn btn-sm btn-outline-danger"
-            <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold"
-              *ngIf="auth.isLoggedIn()"
-              (click)="auth.logout()">Logout</button>
-
-            <a routerLink="/auth/login" class="btn btn-sm btn-primary shadow-sm fw-bold"
-              *ngIf="!auth.isLoggedIn()">Login</a>
+            <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold" *ngIf="auth.isLoggedIn()" (click)="auth.logout()">Logout</button>
+            <a routerLink="/auth/login" class="btn btn-sm btn-primary shadow-sm fw-bold" *ngIf="!auth.isLoggedIn()">Login</a>
           </div>
         </div>
       </div>
@@ -457,120 +380,55 @@
       <div class="container">
         <div class="row align-items-center">
           <div class="col-lg-2 col-md-3 col-12">
-            <div class="logo">
-              <a routerLink="/">
-                <img src="template/assets/img/logo.png" alt="logo" height="45">
-              </a>
-            </div>
+            <div class="logo"><a routerLink="/"><img src="template/assets/img/logo.png" alt="logo" height="45"></a></div>
           </div>
           <div class="col-lg-10 col-md-9 col-12">
             <nav class="navbar navbar-expand-lg py-0">
-              <button class="navbar-toggler" type="button"
-                data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
               </button>
               <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center gap-3">
-
-                  <li class="nav-item">
-                    <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-                  </li>
-
-                  <li class="nav-item">
-                    <a class="nav-link" routerLink="/rendezvous" routerLinkActive="active">Rendez-vous</a>
-                  </li>
-
-                  <!-- Dropdown: Activités & Événements -->
+                  <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+                  <li class="nav-item"><a class="nav-link" routerLink="/rendezvous" routerLinkActive="active">Rendez-vous</a></li>
                   <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navDropdownAct" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Activités
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 p-2 animate-fade-in" aria-labelledby="navDropdownAct">
-                      <li>
-                        <a class="dropdown-item rounded-3 py-2" routerLink="/education" routerLinkActive="active-purple">
-                          <i class="fa-solid fa-graduation-cap me-2 text-primary"></i>Education
-                        </a>
-                      </li>
-                      <li>
-                        <a class="dropdown-item rounded-3 py-2" routerLink="/eventfront" routerLinkActive="active-purple">
-                          <i class="fa-solid fa-calendar-day me-2 text-primary"></i>Events
-                        </a>
-                      </li>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Activites</a>
+                    <ul class="dropdown-menu border-0 shadow rounded-4 p-2">
+                      <li><a class="dropdown-item rounded-3 py-2" routerLink="/education"><i class="fa-solid fa-graduation-cap me-2 text-primary"></i>Education</a></li>
+                      <li><a class="dropdown-item rounded-3 py-2" routerLink="/eventfront"><i class="fa-solid fa-calendar-day me-2 text-primary"></i>Events</a></li>
                     </ul>
                   </li>
-
-                  <li class="nav-item">
-                    <a class="nav-link" routerLink="/collaboration/feed" routerLinkActive="active">Community</a>
-                  </li>
-
-                  <!-- Dropdown: Dons -->
+                  <li class="nav-item"><a class="nav-link" routerLink="/collaboration/feed" routerLinkActive="active">Community</a></li>
                   <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navDropdownDons" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Dons
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 p-2 animate-fade-in" aria-labelledby="navDropdownDons">
-                      <li>
-                        <a class="dropdown-item rounded-3 py-2" routerLink="/donations" routerLinkActive="active-purple">
-                          <i class="fa-solid fa-hand-holding-heart me-2 text-primary"></i>Donations
-                        </a>
-                      </li>
-                      <li *ngIf="auth.isLoggedIn()">
-                        <a class="dropdown-item rounded-3 py-2" routerLink="/my-donations" routerLinkActive="active-purple">
-                          <i class="fa-solid fa-history me-2 text-primary"></i>Mes Dons
-                        </a>
-                      </li>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Dons</a>
+                    <ul class="dropdown-menu border-0 shadow rounded-4 p-2">
+                      <li><a class="dropdown-item rounded-3 py-2" routerLink="/donations"><i class="fa-solid fa-hand-holding-heart me-2 text-primary"></i>Donations</a></li>
+                      <li *ngIf="auth.isLoggedIn()"><a class="dropdown-item rounded-3 py-2" routerLink="/my-donations"><i class="fa-solid fa-history me-2 text-primary"></i>Mes Dons</a></li>
                     </ul>
                   </li>
-
-                  <li class="nav-item">
-                    <a class="nav-link" routerLink="/heart-rate" routerLinkActive="active">
-                      <i class="fa-solid fa-heart-pulse me-1"></i>Heart Rate
-                    </a>
-                  </li>
-
-                  <li class="nav-item">
-                    <a class="nav-link" routerLink="/hospitals" routerLinkActive="active">Hôpitaux</a>
-                  </li>
-
-                  <!-- Role-based items -->
+                  <li class="nav-item"><a class="nav-link" routerLink="/heart-rate" routerLinkActive="active"><i class="fa-solid fa-heart-pulse me-1"></i>Heart Rate</a></li>
+                  <li class="nav-item" *ngIf="auth.getRole() !== 'DOCTOR'"><a class="nav-link" routerLink="/hospitals" routerLinkActive="active">Hopitaux</a></li>
                   <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
-                    <a class="nav-link" routerLink="/patient-profiles" routerLinkActive="active">
-                      <i class="fa-solid fa-bed-pulse me-1"></i>Patients
-                    </a>
+                    <a class="nav-link" routerLink="/patient-profiles" routerLinkActive="active"><i class="fa-solid fa-bed-pulse me-1"></i>Patients</a>
                   </li>
-
                   <li class="nav-item" *ngIf="auth.getRole() === 'RELATION'">
-                    <a class="nav-link fw-bold" style="color:#9b59b6" routerLink="/mon-patient" routerLinkActive="active">
-                      <i class="fa-solid fa-user-injured me-1"></i>Mon patient
-                    </a>
+                    <a class="nav-link fw-bold" style="color:#9b59b6" routerLink="/mon-patient" routerLinkActive="active"><i class="fa-solid fa-user-injured me-1"></i>Mon patient</a>
                   </li>
-
                   <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
-                    <a class="nav-link fw-bold text-primary" routerLink="/map" routerLinkActive="active">
-                      <i class="fa-solid fa-map-location-dot me-1"></i>Géolocalisation
-                    </a>
+                    <a class="nav-link fw-bold text-primary" routerLink="/map" routerLinkActive="active"><i class="fa-solid fa-map-location-dot me-1"></i>Geolocalisation</a>
                   </li>
-
                   <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'RELATION'">
-                    <a class="nav-link fw-bold" style="color: #7c3aed;" routerLink="/analyzer" routerLinkActive="active">
-                      <i class="fa-solid fa-brain me-1"></i>Analyse IA
-                    </a>
+                    <a class="nav-link fw-bold" style="color: #7c3aed;" routerLink="/analyzer" routerLinkActive="active"><i class="fa-solid fa-brain me-1"></i>Analyse IA</a>
                   </li>
-
                   <li class="nav-item" *ngIf="auth.getRole() === 'RELATION'">
-                    <a class="nav-link fw-bold d-flex align-items-center gap-1 px-3 py-1 rounded-pill"
-                       style="background:linear-gradient(135deg,#6f42c1,#3c3489); color:white; font-size:14px"
-                       routerLink="/relation-map" routerLinkActive="active">
-                      <i class="fa-solid fa-map-location-dot"></i> Suivi patient
+                    <a class="nav-link d-flex align-items-center gap-1"
+                      routerLink="/relation-map" routerLinkActive="active">
+                      <i class="fa-solid fa-map-location-dot"></i>Suivi patient
                     </a>
                   </li>
-
                   <li class="nav-item" *ngIf="auth.getRole() === 'PATIENT'">
-                    <a class="nav-link fw-semibold text-danger" routerLink="/patient/incidents" routerLinkActive="active">
-                      <i class="fa-solid fa-bell-exclamation me-1"></i>Mes Incidents
-                    </a>
+                    <a class="nav-link fw-semibold text-danger" routerLink="/patient/incidents" routerLinkActive="active"><i class="fa-solid fa-bell-exclamation me-1"></i>Mes Incidents</a>
                   </li>
-
                 </ul>
               </div>
             </nav>
@@ -581,64 +439,40 @@
 
     <main style="min-height: 70vh;">
       <div class="container py-4" *ngIf="accService.simplifiedMode()">
-        <div class="simplified-breadcrumb mb-2">
-          Vous êtes ici : {{ getBreadcrumbs() }}
-        </div>
-        <div class="alert alert-info border-0 shadow-sm rounded-4">
-          <strong>Instruction :</strong> {{ getInstructionPhrase() }}
-        </div>
+        <div class="simplified-breadcrumb mb-2">Vous etes ici : {{ getBreadcrumbs() }}</div>
+        <div class="alert alert-info border-0 shadow-sm rounded-4"><strong>Instruction :</strong> {{ getInstructionPhrase() }}</div>
       </div>
       <router-outlet></router-outlet>
     </main>
-
 
     <footer class="footer bg-dark text-white pt-5 mt-5">
       <div class="container">
         <div class="row">
           <div class="col-lg-4">
             <img src="template/assets/img/logo2.png" alt="logo" height="40" class="mb-3">
-            <p class="text-muted">360° Alzheimer Support Platform & MediSync —
-              La solution complète pour le suivi médical et le soutien aux familles.</p>
+            <p class="text-muted">360 Alzheimer Support Platform &amp; MediSync</p>
             <p class="text-muted small">Email: contact&#64;alzcare.tn</p>
           </div>
           <div class="col-lg-4 ms-auto text-end">
             <h5>Quick Links</h5>
             <ul class="list-unstyled">
-              <li>
-                <a routerLink="/rendezvous"
-                   class="text-muted text-decoration-none">Gestion Rendez-vous</a>
-              </li>
-              <li>
-                <a routerLink="/education"
-                   class="text-muted text-decoration-none">Espace Education</a>
-              </li>
-              <li>
-                <a routerLink="/collaboration/feed"
-                   class="text-muted text-decoration-none">Hub Collaboration</a>
-              </li>
-              <li>
-                <a routerLink="/hospitals"
-                   class="text-muted text-decoration-none">Hôpitaux</a>
+              <li><a routerLink="/rendezvous" class="text-muted text-decoration-none">Gestion Rendez-vous</a></li>
+              <li><a routerLink="/education" class="text-muted text-decoration-none">Espace Education</a></li>
+              <li><a routerLink="/collaboration/feed" class="text-muted text-decoration-none">Hub Collaboration</a></li>
+              <li><a routerLink="/hospitals" class="text-muted text-decoration-none">Hopitaux</a></li>
+              <li *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
+                <a routerLink="/patient-profiles" class="text-muted text-decoration-none">Patients</a>
               </li>
               <li *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
-                <a routerLink="/patient-profiles"
-                   class="text-muted text-decoration-none">Patients</a>
+                <a routerLink="/map" class="text-muted text-decoration-none">Geolocalisation</a>
               </li>
-              <li *ngIf="auth.getRole() === 'DOCTOR' || auth.getRole() === 'ADMIN'">
-                <a routerLink="/map"
-                   class="text-muted text-decoration-none">Géolocalisation</a>
-              </li>
-              <!-- ★ FOOTER — RELATION ★ -->
               <li *ngIf="auth.getRole() === 'RELATION'">
-                <a routerLink="/relation-map"
-                   class="text-decoration-none fw-bold"
-                   style="color:#9b59b6">
+                <a routerLink="/relation-map" class="text-muted text-decoration-none">
                   <i class="fa-solid fa-map-location-dot me-1"></i>Suivi de mon patient
                 </a>
               </li>
               <li *ngIf="auth.getRole() === 'PATIENT'">
-                <a routerLink="/patient-map"
-                   class="text-danger text-decoration-none fw-bold">
+                <a routerLink="/patient-map" class="text-danger text-decoration-none fw-bold">
                   <i class="fa-solid fa-bell me-1"></i>Interface SOS
                 </a>
               </li>
@@ -647,30 +481,24 @@
         </div>
         <hr class="mt-4 border-secondary">
         <div class="text-center pb-3">
-          <p class="mb-0 text-muted small">
-            © 2026 Alzheimer Support Platform. Tous droits réservés.
-          </p>
+          <p class="mb-0 text-muted small">2026 Alzheimer Support Platform. Tous droits reserves.</p>
         </div>
       </div>
     </footer>
   </ng-template>
 </ng-template>
 
-<!-- GLOBAL VIDEO CALL RINGING UI -->
+<!-- VIDEO CALL RINGING -->
 <div *ngIf="incomingVideoCall() as inv"
-  class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-4 py-3
-         bg-dark text-white rounded-4 shadow-lg d-flex flex-wrap align-items-center gap-3"
+  class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-4 py-3 bg-dark text-white rounded-4 shadow-lg d-flex flex-wrap align-items-center gap-3"
   style="z-index: 9999; max-width: min(520px, 94vw);">
   <i class="fa-solid fa-video text-success fs-5"></i>
-  <span class="fw-medium flex-grow-1">{{ inv.callerName }} is calling…</span>
-  <button type="button" class="btn btn-success btn-sm rounded-pill px-3"
-    (click)="acceptIncomingVideoCall()">Accept</button>
-  <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3"
-    (click)="declineIncomingVideoCall()">Decline</button>
+  <span class="fw-medium flex-grow-1">{{ inv.callerName }} is calling...</span>
+  <button type="button" class="btn btn-success btn-sm rounded-pill px-3" (click)="acceptIncomingVideoCall()">Accept</button>
+  <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3" (click)="declineIncomingVideoCall()">Decline</button>
 </div>
 
-<!-- GLOBAL VIDEO CALL OVERLAY -->
+<!-- VIDEO CALL OVERLAY -->
 <app-videocall *ngIf="showVideoCall() && videoCallRoomId()"
-  [roomId]="videoCallRoomId()"
-  (closeCall)="closeGlobalVideoCall()">
+  [roomId]="videoCallRoomId()" (closeCall)="closeGlobalVideoCall()">
 </app-videocall>

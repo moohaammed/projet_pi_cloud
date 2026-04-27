@@ -48,7 +48,7 @@ spring:
         - id: geo-service
           uri: lb://geo-service
           predicates:
-            - Path=/api/incidents/**,/api/alerts/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/safezones/**,/api/patient-locations/**
+            - Path=/api/incidents/**,/api/location/**,/api/alerts/**,/api/hospital/**,/api/hospitals/**,/api/locations/**,/api/safe-zones/**,/api/safezones/**,/api/patient-locations/**
 
         # ── Education service ──────────────────────────────────────────
         - id: education-rest

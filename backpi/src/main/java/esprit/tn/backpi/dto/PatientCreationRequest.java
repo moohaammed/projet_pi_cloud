@@ -26,5 +26,6 @@ public class PatientCreationRequest {
     private String relationPrenom;
     private String relationEmail;
     private String relationTelephone;
-    private String lienAvecPatient;        // fils, fille, femme, mari, frère...
+    private String lienAvecPatient;
+    private Long existingPatientId;// fils, fille, femme, mari, frère...
 }

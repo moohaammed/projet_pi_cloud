@@ -4,6 +4,7 @@ import esprit.tn.geo.entities.geo.GeoAlert;
 import esprit.tn.geo.entities.geo.PatientLocation;
 import esprit.tn.geo.entities.geo.SafeZone;
 import esprit.tn.geo.entities.geo.TypeAlerte;
+import esprit.tn.geo.dto.HospitalPredictionRequest;
 import esprit.tn.geo.repositories.geo.GeoAlertRepository;
 import esprit.tn.geo.repositories.geo.PatientLocationRepository;
 import esprit.tn.geo.repositories.geo.SafeZoneRepository;
@@ -21,6 +22,8 @@ public class PatientLocationService {
     @Autowired private SafeZoneRepository safeZoneRepository;
 
     @Autowired private GeoAlertRepository alertRepository;
+
+    @Autowired private HospitalPredictionService hospitalPredictionService;
 
     /**
      * Enregistrer la position GPS d'un patient.
@@ -70,11 +73,13 @@ public class PatientLocationService {
             );
 
             if (distance > zone.getRayonRouge()) {
-                createAlert(patientId, TypeAlerte.HORS_ZONE_ROUGE, lat, lng,
+                GeoAlert alert = createAlert(patientId, TypeAlerte.HORS_ZONE_ROUGE, lat, lng,
                         "URGENT ! Patient hors zone rouge à " + (int) distance + "m du centre");
+                predictHospitalForAlert(alert, "fugue");
             } else if (distance > zone.getRayonVert()) {
-                createAlert(patientId, TypeAlerte.HORS_ZONE_VERTE, lat, lng,
+                GeoAlert alert = createAlert(patientId, TypeAlerte.HORS_ZONE_VERTE, lat, lng,
                         "Patient hors zone verte à " + (int) distance + "m du centre");
+                predictHospitalForAlert(alert, "fugue");
             }
         }
     }
@@ -92,7 +97,7 @@ public class PatientLocationService {
         return R * c;
     }
 
-    private void createAlert(Long patientId, TypeAlerte type,
+    private GeoAlert createAlert(Long patientId, TypeAlerte type,
                               Double lat, Double lng, String message) {
         GeoAlert alert = new GeoAlert();
         alert.setPatientId(patientId);
@@ -100,6 +105,21 @@ public class PatientLocationService {
         alert.setLatitude(lat);
         alert.setLongitude(lng);
         alert.setMessage(message);
-        alertRepository.save(alert);
+        return alertRepository.save(alert);
+    }
+
+    private void predictHospitalForAlert(GeoAlert alert, String typeIncident) {
+        if (alert.getLatitude() == null || alert.getLongitude() == null) return;
+        try {
+            HospitalPredictionRequest request = new HospitalPredictionRequest();
+            request.setPatientId(alert.getPatientId());
+            request.setAlertId(alert.getId());
+            request.setPatientLatitude(alert.getLatitude());
+            request.setPatientLongitude(alert.getLongitude());
+            request.setTypeIncident(typeIncident);
+            hospitalPredictionService.predictAndSave(request);
+        } catch (Exception e) {
+            System.err.println("[HospitalPrediction] Erreur prediction alerte " + alert.getId() + ": " + e.getMessage());
+        }
     }
 }

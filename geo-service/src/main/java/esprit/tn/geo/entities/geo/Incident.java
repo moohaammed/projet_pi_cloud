@@ -3,6 +3,8 @@ package esprit.tn.geo.entities.geo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Document MongoDB représentant un incident de sécurité détecté par CLIP
@@ -36,6 +38,9 @@ public class Incident {
 
     // Image (data-URL base64 ou URL)
     private String media;
+
+    private String recommendedHospitalName;
+    private List<RecommendedHospital> recommendedHospitals = new ArrayList<>();
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
@@ -77,6 +82,12 @@ public class Incident {
 
     public String getMedia() { return media; }
     public void setMedia(String media) { this.media = media; }
+
+    public String getRecommendedHospitalName() { return recommendedHospitalName; }
+    public void setRecommendedHospitalName(String recommendedHospitalName) { this.recommendedHospitalName = recommendedHospitalName; }
+
+    public List<RecommendedHospital> getRecommendedHospitals() { return recommendedHospitals; }
+    public void setRecommendedHospitals(List<RecommendedHospital> recommendedHospitals) { this.recommendedHospitals = recommendedHospitals; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

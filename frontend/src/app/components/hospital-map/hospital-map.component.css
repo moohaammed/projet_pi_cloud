@@ -1,0 +1,119 @@
+.hospital-map-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24px 18px 48px;
+}
+
+.page-header,
+.map-shell,
+.state-card {
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-header {
+  background: #ffffff;
+  border: 1px solid #ece8f2;
+  border-radius: 8px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+h1 {
+  color: #800080;
+  font-weight: 800;
+}
+
+p {
+  color: #6c757d;
+}
+
+.state-card {
+  background: #ffffff;
+  border: 1px solid #ece8f2;
+  border-radius: 8px;
+  padding: 22px;
+  text-align: center;
+  color: #6c757d;
+}
+
+.state-card.error {
+  color: #dc3545;
+}
+
+.map-shell {
+  background: #ffffff;
+  border: 1px solid #ece8f2;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(22, 28, 45, 0.06);
+}
+
+#hospitalPredictionMap {
+  height: 620px;
+  width: 100%;
+}
+
+.legend {
+  padding: 12px 16px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: #495057;
+  font-weight: 700;
+}
+
+.dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.dot.patient {
+  background: #dc3545;
+}
+
+.dot.recommended {
+  background: #198754;
+}
+
+.dot.other {
+  background: #6c757d;
+}
+
+:host ::ng-deep .map-pin {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+}
+
+:host ::ng-deep .patient-pin {
+  background: #dc3545;
+}
+
+:host ::ng-deep .recommended-pin {
+  background: #198754;
+}
+
+:host ::ng-deep .hospital-pin {
+  background: #6c757d;
+}
+
+@media (max-width: 760px) {
+  #hospitalPredictionMap {
+    height: 520px;
+  }
+}
