@@ -1,6 +1,7 @@
 package esprit.tn.geo.services.geo;
 
 import esprit.tn.geo.dto.IncidentRequest;
+import esprit.tn.geo.dto.HospitalPredictionRequest;
 import esprit.tn.geo.entities.geo.Incident;
 import esprit.tn.geo.entities.geo.IncidentStatus;
 import esprit.tn.geo.entities.geo.IncidentType;
@@ -17,6 +18,9 @@ public class IncidentService {
 
     @Autowired
     private IncidentRepository incidentRepository;
+
+    @Autowired
+    private HospitalPredictionService hospitalPredictionService;
 
     // Mapping label CLIP → [titre, description, IncidentType]
     private static final Map<String, String[]> LABEL_INFO = Map.ofEntries(
@@ -35,7 +39,8 @@ public class IncidentService {
             Map.entry("road blocked by accident", new String[]{"Route bloquée par accident",   "La route est bloquée suite à un accident. Ne pas avancer.",                   "ACCIDENT"}),
             Map.entry("emergency situation",      new String[]{"Situation d'urgence",          "Une situation d'urgence a été détectée sur le chemin du patient.",            "ZONE_DANGEREUSE"}),
             Map.entry("fire or smoke",            new String[]{"Incendie ou fumée détecté",    "Un feu ou de la fumée a été détecté. Éloignement immédiat nécessaire.",       "INCENDIE"}),
-            Map.entry("flooding water on path",   new String[]{"Inondation sur le chemin",     "De l'eau ou une inondation a été détectée sur le chemin du patient.",         "INONDATION"})
+            Map.entry("flooding water on path",   new String[]{"Inondation sur le chemin",     "De l'eau ou une inondation a été détectée sur le chemin du patient.",         "INONDATION"}),
+            Map.entry("unknown location",         new String[]{"Lieu inconnu detecte",         "Le patient se trouve dans une zone non reconnue. Une verification familiale est requise.", "ZONE_DANGEREUSE"})
     );
 
     /**
@@ -61,7 +66,9 @@ public class IncidentService {
         incident.setCreatedAt(LocalDateTime.now());
         incident.setUpdatedAt(LocalDateTime.now());
 
-        return incidentRepository.save(incident);
+        Incident saved = incidentRepository.save(incident);
+        predictHospitalIfPossible(saved);
+        return incidentRepository.findById(saved.getId()).orElse(saved);
     }
 
     /** Tous les incidents (pour ADMIN). */
@@ -90,5 +97,22 @@ public class IncidentService {
         incident.setStatus(IncidentStatus.FERME);
         incident.setUpdatedAt(LocalDateTime.now());
         return incidentRepository.save(incident);
+    }
+
+    private void predictHospitalIfPossible(Incident incident) {
+        if (incident.getLatitude() == null || incident.getLongitude() == null) {
+            return;
+        }
+        try {
+            HospitalPredictionRequest request = new HospitalPredictionRequest();
+            request.setPatientId(incident.getPatientId());
+            request.setIncidentId(incident.getId());
+            request.setPatientLatitude(incident.getLatitude());
+            request.setPatientLongitude(incident.getLongitude());
+            request.setTypeIncident(incident.getType() != null ? incident.getType().name() : incident.getAiAnalysis());
+            hospitalPredictionService.predictAndSave(request);
+        } catch (Exception e) {
+            System.err.println("[HospitalPrediction] Erreur prediction incident " + incident.getId() + ": " + e.getMessage());
+        }
     }
 }

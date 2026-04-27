@@ -87,3 +87,105 @@
   background: #e5e7eb;
   border-radius: 4px;
 }
+
+.hover-elevate {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-elevate:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.bg-soft-primary {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.btn-xs {
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.ai-summary-text {
+  line-height: 1.5;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate__fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* ── Rappel Detail Panel ────────────────────────────────── */
+.rappel-detail-panel {
+  margin-top: 12px;
+  padding: 16px;
+  background: #f8f9ff;
+  border-radius: 8px;
+  border-left: 4px solid #6B46C1;
+  animation: fadeIn 0.2s ease;
+}
+
+.detail-section p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #2D3748;
+}
+
+.voice-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.audio-player {
+  width: 100%;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+.btn-summarize {
+  background: linear-gradient(135deg, #0BC5AC, #6B46C1);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 8px;
+  width: 100%;
+  transition: opacity 0.2s ease;
+}
+
+.btn-summarize:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-summarize:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.summary-box {
+  margin-top: 12px;
+  padding: 14px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #0BC5AC;
+}
+
+.summary-box p {
+  margin: 4px 0;
+  color: #2D3748;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.no-voice {
+  margin-top: 12px;
+  text-align: center;
+}

@@ -17,6 +17,14 @@
           {{ alertesCount }}
         </span>
       </a>
+      <a *ngIf="false" routerLink="/hospital-alerts" class="btn btn-outline-danger d-flex align-items-center gap-2">
+        <i class="fa-solid fa-truck-medical"></i>
+        Hôpitaux IA
+      </a>
+      <a *ngIf="false" routerLink="/hospital-map" class="btn btn-outline-glass d-flex align-items-center gap-2">
+        <i class="fa-solid fa-map-location-dot"></i>
+        Carte hôpitaux
+      </a>
       <a routerLink="/patients" class="btn btn-outline-glass d-flex align-items-center gap-2">
         <i class="fa-solid fa-arrow-left"></i>
         Retour Administration
@@ -607,6 +615,50 @@
             <div class="d-flex flex-wrap gap-2">
               <button type="button" class="btn btn-xs rounded-pill px-3" [class]="selectedDays.length === 7 ? 'btn-primary' : 'btn-outline-glass'" (click)="toggleDay('TOUS')">Tous les jours</button>
               <button *ngFor="let d of ['LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI','DIMANCHE']" type="button" class="btn btn-xs rounded-pill" [class]="selectedDays.includes(d) ? 'btn-primary' : 'btn-outline-glass'" (click)="toggleDay(d)">{{ d.substring(0,3) }}</button>
+            </div>
+          </div>
+
+          <!-- NEW: Message Vocal Section -->
+          <div class="mt-4 pt-3 border-top">
+            <label class="fw-semibold text-subtle mb-2 small">MESSAGE VOCAL (OPTIONNEL)</label>
+            
+            <div class="voice-recorder-box p-3 rounded-3 border bg-light">
+              <!-- Case 1: Recording in progress -->
+              <div *ngIf="isRecording" class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="recording-dot"></div>
+                  <span class="fw-bold">{{ formatTimer(recordingTimer) }}</span>
+                </div>
+                <button class="btn btn-danger btn-sm rounded-pill px-3" (click)="stopRecording()">
+                  <i class="fa-solid fa-stop me-1"></i> Arrêter
+                </button>
+              </div>
+
+              <!-- Case 2: Not recording, no record yet -->
+              <div *ngIf="!isRecording && !recordedBlob" class="text-center">
+                <button class="btn btn-outline-primary btn-sm rounded-pill px-4" (click)="startRecording()">
+                  <i class="fa-solid fa-microphone me-2"></i> Enregistrer un message
+                </button>
+              </div>
+
+              <!-- Case 3: Recorded, waiting for upload/preview -->
+              <div *ngIf="!isRecording && recordedBlob" class="d-flex flex-column gap-2">
+                <audio [src]="recordedAudioUrl" controls class="w-100" style="height: 35px;"></audio>
+                <div class="d-flex justify-content-end gap-2">
+                  <button class="btn btn-outline-danger btn-xs px-2" (click)="deleteRecording()">
+                    <i class="fa-solid fa-trash me-1"></i> Supprimer
+                  </button>
+                  <button class="btn btn-outline-primary btn-xs px-2" (click)="startRecording()">
+                    <i class="fa-solid fa-rotate me-1"></i> Recommencer
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Case 4: Existing recording on server -->
+            <div *ngIf="isEditingReminder && reminderForm.voiceMessagePath && !recordedBlob" class="mt-2 small text-muted">
+              <i class="fa-solid fa-circle-check text-success me-1"></i> Un message vocal est déjà enregistré.
+              <button class="btn btn-link btn-xs p-0 ms-1 text-primary" (click)="startRecording()">Remplacer</button>
             </div>
           </div>
         </div>

@@ -4,8 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from transformers import pipeline
 from PIL import Image
 import io, base64
+from hospital_prediction import router as hospital_prediction_router, search_hospitals
 
 app = FastAPI()
+app.include_router(hospital_prediction_router)
+app.get("/search-hospitals")(search_hospitals)
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,0 +1,27 @@
+<main class="location-capture">
+  <section class="camera-panel">
+    <div class="camera-frame">
+      <video #video autoplay muted playsinline></video>
+      <canvas #canvas aria-hidden="true"></canvas>
+      <div class="scan-line" *ngIf="cameraReady"></div>
+    </div>
+
+    <div class="status-card" *ngIf="result" [class.unknown]="isUnknown" [class.known]="!isUnknown">
+      <ng-container *ngIf="!isUnknown; else unknownLocation">
+        <strong>Vous etes a : {{ result.lieu }} ({{ result.confiance }})</strong>
+      </ng-container>
+      <ng-template #unknownLocation>
+        <strong *ngIf="result.incidentId">Lieu inconnu - alerte envoyee a votre famille</strong>
+        <strong *ngIf="!result.incidentId">Lieu inconnu - aucune alerte rouge detectee</strong>
+      </ng-template>
+      <span *ngIf="lastCaptureAt">Derniere analyse : {{ lastCaptureAt | date:'HH:mm:ss' }}</span>
+    </div>
+
+    <div class="waiting-card" *ngIf="!result && !errorMessage">
+      <strong>Activation de la surveillance AlzCare</strong>
+      <span>La camera analyse l'environnement toutes les 30 secondes.</span>
+    </div>
+
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </section>
+</main>

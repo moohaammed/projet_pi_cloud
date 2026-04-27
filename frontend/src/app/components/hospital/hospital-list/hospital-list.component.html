@@ -1,47 +1,178 @@
 <div class="container py-4">
 
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div *ngIf="!isAiHospitalView" class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
       <h3 class="fw-bold mb-1">
         <i class="fa-solid fa-hospital text-primary me-2"></i>
-        Hôpitaux
+        {{ isAiHospitalView ? 'Hopitaux proches' : 'Hopitaux' }}
       </h3>
-      <p class="text-muted mb-0">{{ filtered.length }} établissement(s) trouvé(s)</p>
+      <p *ngIf="!isAiHospitalView" class="text-muted mb-0">
+        {{ filtered.length }} etablissement(s) trouve(s)
+      </p>
+      <p *ngIf="isAiHospitalView" class="text-muted mb-0">
+        {{ filteredRecommendedHospitals.length }}
+        {{ searchAttempted ? 'resultat(s) dans le dataset tunisien' : 'hopital(aux) du dataset trie(s) par proximite' }}
+      </p>
     </div>
 
-    <!-- Bouton visible pour ADMIN et DOCTOR -->
     <a *ngIf="isAdmin || isDoctor"
        routerLink="/hospitals/new"
        class="btn btn-primary">
-      <i class="fa-solid fa-plus me-1"></i>Ajouter un hôpital
+      <i class="fa-solid fa-plus me-1"></i>Ajouter un hopital
     </a>
   </div>
 
-  <!-- Recherche -->
+  <div *ngIf="isAiHospitalView" class="p-3 p-md-4 rounded-4 shadow-sm mb-4"
+       style="background:linear-gradient(135deg,#f5f0ff,#eef7ff);border:1px solid #e3d7ff">
+    <div class="d-flex align-items-start gap-3">
+      <div class="rounded-circle d-flex align-items-center justify-content-center text-white"
+           style="width:46px;height:46px;background:linear-gradient(135deg,#6f42c1,#3c3489);flex-shrink:0">
+        <i class="fa-solid fa-location-dot"></i>
+      </div>
+      <div class="flex-grow-1">
+        <div class="fw-bold mb-1" style="color:#3c3489">
+          {{ isAdmin ? 'Hopitaux du dataset tunisien' : 'Trouver un hopital rapidement' }}
+        </div>
+        <div class="small text-muted">
+          {{ isAdmin
+            ? 'AlzCare affiche tous les hopitaux disponibles dans le dataset tunisien.'
+            : 'AlzCare charge les hopitaux directement depuis le dataset tunisien et les trie selon la position du patient.' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="mb-4">
     <div class="input-group">
       <span class="input-group-text bg-white border-end-0">
         <i class="fa-solid fa-magnifying-glass text-muted"></i>
       </span>
       <input type="text" class="form-control border-start-0"
-             placeholder="Rechercher par nom ou ville..."
-             [(ngModel)]="search" (input)="onSearch()">
+             [placeholder]="isAiHospitalView ? 'Rechercher par nom, specialite ou adresse...' : 'Rechercher par nom ou ville...'"
+             [(ngModel)]="search"
+             (input)="!isAiHospitalView && onSearch()"
+             (keyup.enter)="isAiHospitalView ? searchDataset() : onSearch()">
+      <button *ngIf="isAiHospitalView"
+              class="btn btn-primary"
+              type="button"
+              [disabled]="searchLoading"
+              (click)="searchDataset()">
+        <span *ngIf="searchLoading" class="spinner-border spinner-border-sm me-1"></span>
+        Rechercher
+      </button>
+      <button *ngIf="isAiHospitalView && search"
+              class="btn btn-outline-secondary"
+              type="button"
+              (click)="clearSearch()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div *ngIf="isAiHospitalView" class="form-text">
+      Exemples : Razi, Aziza, Tunis, urgences, neurologie.
     </div>
   </div>
 
-  <!-- Loading -->
+  <div *ngIf="isAiHospitalView && searchLoading" class="small text-muted mb-3">
+    <span class="spinner-border spinner-border-sm me-2"></span>
+    Recherche dans le dataset des hopitaux...
+  </div>
+  <div *ngIf="isAiHospitalView && searchError && hasPatientSearch" class="alert alert-warning py-2">
+    {{ searchError }}
+  </div>
+
   <div *ngIf="loading" class="text-center py-5">
     <div class="spinner-border text-primary"></div>
     <p class="mt-2 text-muted">Chargement...</p>
   </div>
 
-  <!-- Grille hôpitaux -->
-  <div class="row g-4" *ngIf="!loading">
+  <div *ngIf="!loading && isAiHospitalView && patientLocationError && !hasPatientSearch"
+       class="alert alert-warning border-0 shadow-sm rounded-4">
+    <div class="d-flex align-items-start gap-3">
+      <i class="fa-solid fa-location-crosshairs fs-4 text-warning"></i>
+      <div>
+        <div class="fw-semibold">Position indisponible</div>
+        <div class="small">{{ patientLocationError }}</div>
+        <button class="btn btn-sm btn-outline-primary mt-3"
+                type="button"
+                (click)="isAdmin ? loadDatasetHospitalsForAdmin() : (isPatient ? loadNearestHospitalsForPatient() : loadNearestHospitalsForRelation())">
+          Reessayer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4" *ngIf="!loading && isAiHospitalView && (!patientLocationError || hasPatientSearch)">
+    <div class="col-md-6 col-lg-4" *ngFor="let h of filteredRecommendedHospitals; let i = index">
+      <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+
+        <div class="card-header text-white p-3"
+             [style.background]="(i === 0 || h.recommande) && !searchAttempted ? 'linear-gradient(135deg,#198754,#0f5132)' : 'linear-gradient(135deg,#6f42c1,#3c3489)'">
+          <div class="d-flex align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-white bg-opacity-20 rounded-circle p-2">
+                <i class="fa-solid fa-hospital text-white"></i>
+              </div>
+              <div>
+                <div class="fw-bold">{{ h.nom }}</div>
+                <div class="small opacity-75">{{ h.gouvernorat }}</div>
+              </div>
+            </div>
+            <span *ngIf="(i === 0 || h.recommande) && !searchAttempted" class="badge bg-light text-success">
+              RECOMMANDE
+            </span>
+            <span *ngIf="searchAttempted" class="badge bg-light text-primary">
+              DATASET
+            </span>
+          </div>
+        </div>
+
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span *ngIf="distance(h)" class="badge bg-primary-subtle text-primary">
+              {{ distance(h) }} km
+            </span>
+            <span class="badge bg-success-subtle text-success">
+              {{ h.specialite }}
+            </span>
+          </div>
+
+          <div class="small text-muted mb-2">
+            <i class="fa-solid fa-location-dot me-2 text-danger"></i>
+            {{ h.adresse }}
+          </div>
+          <div class="small text-muted mb-2">
+            <i class="fa-solid fa-phone me-2 text-success"></i>
+            {{ h.telephone }}
+          </div>
+          <div class="small text-muted">
+            <i class="fa-solid fa-route me-2 text-primary"></i>
+            {{ distance(h) ? 'Itineraire depuis votre position actuelle' : 'Hopital du dataset tunisien' }}
+          </div>
+        </div>
+
+        <div class="card-footer bg-white border-0 p-3">
+          <a [href]="mapsUrl(h)"
+             target="_blank"
+             rel="noopener"
+             class="btn btn-success btn-sm w-100">
+            <i class="fa-solid fa-route me-1"></i>Voir l'itineraire
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div *ngIf="filteredRecommendedHospitals.length === 0" class="col-12 text-center py-5 text-muted">
+      <i class="fa-solid fa-hospital-slash fs-1 mb-3 d-block"></i>
+      <div class="fw-semibold">{{ hasPatientSearch ? 'Aucun hopital trouve dans le dataset' : 'Aucun hopital proche trouve' }}</div>
+      <div class="small mt-1">Essayez de modifier votre recherche</div>
+    </div>
+  </div>
+
+  <div class="row g-4" *ngIf="!loading && !isAiHospitalView">
     <div class="col-md-6 col-lg-4" *ngFor="let h of filtered">
       <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
 
-        <!-- Header carte -->
         <div class="card-header bg-primary text-white p-3">
           <div class="d-flex align-items-center gap-2">
             <div class="bg-white bg-opacity-20 rounded-circle p-2">
@@ -56,7 +187,6 @@
 
         <div class="card-body p-3">
 
-          <!-- Rating -->
           <div *ngIf="h.rating" class="mb-2 d-flex align-items-center gap-1">
             <i *ngFor="let s of [1,2,3,4,5]"
                class="fa-solid fa-star small"
@@ -69,7 +199,6 @@
             </span>
           </div>
 
-          <!-- Infos -->
           <div class="small text-muted mb-1" *ngIf="h.adresse">
             <i class="fa-solid fa-location-dot me-2 text-danger"></i>
             {{ h.adresse }}, {{ h.ville }}
@@ -81,7 +210,6 @@
             <i class="fa-solid fa-envelope me-2 text-primary"></i>{{ h.email }}
           </div>
 
-          <!-- Description -->
           <p *ngIf="h.description"
              class="small text-muted mt-2 mb-0"
              style="display:-webkit-box; -webkit-line-clamp:2;
@@ -90,21 +218,18 @@
           </p>
         </div>
 
-        <!-- Actions -->
         <div class="card-footer bg-white border-0 p-3 d-flex gap-2">
           <a [routerLink]="['/hospitals', h.id]"
              class="btn btn-outline-primary btn-sm flex-grow-1">
-            <i class="fa-solid fa-circle-info me-1"></i>Détails
+            <i class="fa-solid fa-circle-info me-1"></i>Details
           </a>
 
-          <!-- Modifier : ADMIN et DOCTOR -->
           <a *ngIf="isAdmin || isDoctor"
              [routerLink]="['/hospitals/edit', h.id]"
              class="btn btn-warning btn-sm">
             <i class="fa-solid fa-pen"></i>
           </a>
 
-          <!-- Supprimer : ADMIN seulement -->
           <button *ngIf="isAdmin"
                   class="btn btn-danger btn-sm"
                   (click)="delete(h.id!)">
@@ -115,15 +240,14 @@
       </div>
     </div>
 
-    <!-- Aucun résultat -->
     <div *ngIf="filtered.length === 0" class="col-12 text-center py-5 text-muted">
       <i class="fa-solid fa-hospital-slash fs-1 mb-3 d-block"></i>
-      <div class="fw-semibold">Aucun hôpital trouvé</div>
+      <div class="fw-semibold">Aucun hopital trouve</div>
       <div class="small mt-1">Essayez de modifier votre recherche</div>
       <a *ngIf="isAdmin || isDoctor"
          routerLink="/hospitals/new"
          class="btn btn-primary btn-sm mt-3">
-        <i class="fa-solid fa-plus me-1"></i>Ajouter le premier hôpital
+        <i class="fa-solid fa-plus me-1"></i>Ajouter le premier hopital
       </a>
     </div>
   </div>

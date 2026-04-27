@@ -1,6 +1,9 @@
 package esprit.tn.geo.controllers.geo;
 
+import esprit.tn.geo.dto.HospitalPredictionRequest;
 import esprit.tn.geo.entities.geo.Hospital;
+import esprit.tn.geo.entities.geo.HospitalPrediction;
+import esprit.tn.geo.services.geo.HospitalPredictionService;
 import esprit.tn.geo.services.geo.HospitalService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +15,11 @@ import java.util.List;
 public class HospitalController {
 
     private final HospitalService hospitalService;
+    private final HospitalPredictionService hospitalPredictionService;
 
-    public HospitalController(HospitalService hospitalService) {
+    public HospitalController(HospitalService hospitalService, HospitalPredictionService hospitalPredictionService) {
         this.hospitalService = hospitalService;
+        this.hospitalPredictionService = hospitalPredictionService;
     }
 
     @GetMapping
@@ -45,5 +50,20 @@ public class HospitalController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         hospitalService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/predict")
+    public ResponseEntity<HospitalPrediction> predict(@RequestBody HospitalPredictionRequest request) {
+        return ResponseEntity.ok(hospitalPredictionService.predictAndSave(request));
+    }
+
+    @GetMapping("/prediction/latest/{patientId}")
+    public ResponseEntity<HospitalPrediction> latestForPatient(@PathVariable Long patientId) {
+        return ResponseEntity.ok(hospitalPredictionService.getLatestForPatient(patientId));
+    }
+
+    @GetMapping("/prediction/latest")
+    public ResponseEntity<List<HospitalPrediction>> latestAlerts() {
+        return ResponseEntity.ok(hospitalPredictionService.getLatestAlerts());
     }
 }

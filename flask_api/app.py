@@ -58,12 +58,71 @@ def extract_text_from_report(report_text):
 def test_groq():
     try:
         response = groq_client.chat.completions.create(
-            model=GROQ_MODEL,
-            messages=[{"role": "user", "content": "Say hello"}]
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": "Dis bonjour en une phrase simple en français."}],
+            max_tokens=50
         )
-        return jsonify({"status": "ok", "response": response.choices[0].message.content}), 200
+        content = response.choices[0].message.content
+        print('Groq API working:', content)
+        return jsonify({"status": "ok", "response": content}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/summarize-voice', methods=['POST'])
+def summarize_voice():
+    try:
+        data = request.json
+        voice_path = data.get('voice_path')
+        if not voice_path:
+            return jsonify({"error": "Aucun message vocal disponible"}), 404
+        
+        # Absolute path calculation
+        # voice_path is something like "uploads/voice-rappels/rappel_1.webm"
+        # Since we are in flask_api, we need to go up one level
+        abs_voice_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', voice_path))
+        
+        if not os.path.exists(abs_voice_path):
+            return jsonify({"error": "Fichier audio introuvable"}), 404
+
+        # Step A - Transcribe with Groq Whisper
+        with open(abs_voice_path, "rb") as file:
+            transcription = groq_client.audio.transcriptions.create(
+                file=(os.path.basename(abs_voice_path), file.read()),
+                model="whisper-large-v3",
+                language="fr",
+                response_format="text"
+            )
+
+        # Step B - Summarize with Groq LLaMA
+        summary_response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": """Tu es un assistant médical pour patients atteints d'Alzheimer.
+                                Résume ce message vocal de manière très simple, claire et courte.
+                                Utilise des phrases courtes. Maximum 3 phrases.
+                                Commence par "Votre médecin vous rappelle de :" """
+                },
+                {
+                    "role": "user",
+                    "content": transcription
+                }
+            ],
+            max_tokens=150,
+            temperature=0.3
+        )
+        
+        summary = summary_response.choices[0].message.content
+        
+        return jsonify({
+            "transcription": transcription,
+            "summary": summary
+        }), 200
+
+    except Exception as e:
+        print("Summarize voice error:", e)
+        return jsonify({"error": "Résumé indisponible pour le moment"}), 500
 
 @app.route('/predict', methods=['POST'])
 def predict():

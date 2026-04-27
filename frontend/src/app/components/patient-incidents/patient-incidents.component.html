@@ -53,21 +53,22 @@
       <div class="pi-card-body">
         <div class="pi-card-header">
           <span class="pi-card-title">{{ inc.title }}</span>
-          <span class="pi-badge" [ngClass]="statusClass(inc.status)">
-            {{ statusLabel(inc.status) }}
-          </span>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="pi-badge">
+              <i class="fa-solid" [ngClass]="typeIcon(inc.type)"></i>
+              {{ typeLabel(inc.type) }}
+            </span>
+            <span class="pi-badge" [ngClass]="statusClass(inc.status)">
+              {{ statusLabel(inc.status) }}
+            </span>
+          </div>
         </div>
-        <p class="pi-card-desc">{{ inc.description }}</p>
+        <p class="pi-card-desc">
+          <strong>Explication :</strong>
+          {{ patientFriendlyDescription(inc) }}
+        </p>
 
         <div class="pi-card-meta">
-          <span *ngIf="inc.aiAnalysis">
-            <i class="fa-solid fa-brain me-1"></i>
-            CLIP: <em>{{ inc.aiAnalysis }}</em>
-            <span *ngIf="inc.aiConfidence">
-              ({{ (inc.aiConfidence * 100).toFixed(0) }}%)
-            </span>
-          </span>
-
           <span *ngIf="inc.reporterId">
             <i class="fa-solid fa-user-doctor me-1"></i>
             Signalé par le personnel soignant
@@ -80,7 +81,7 @@
 
           <span *ngIf="inc.latitude">
             <i class="fa-solid fa-location-dot me-1"></i>
-            {{ inc.latitude | number:'1.3-3' }}, {{ inc.longitude | number:'1.3-3' }}
+            {{ addressFor(inc) }}
           </span>
         </div>
       </div>
