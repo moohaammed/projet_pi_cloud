@@ -1,31 +1,26 @@
-<div class="align-items-center d-flex justify-content-center min-vh-100 py-4">
+<div class="align-items-center d-flex justify-content-center min-vh-100 py-4 bg-light">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-6">
         <div class="card border-0 shadow-sm rounded-4">
           <div class="card-body p-5">
             <div class="text-center mb-4">
-              <h3 class="fw-semibold">Créez votre
-                <span class="text-primary">compte</span>
+              <h3 class="fw-semibold">Create your
+                <span class="text-primary">account</span>
               </h3>
-              <p class="text-muted">Rejoignez AlzCare</p>
+              <p class="text-muted">Join the AlzCare Community</p>
             </div>
 
             <div *ngIf="error" class="alert alert-danger py-2">
               <i class="fa-solid fa-circle-exclamation me-2"></i>{{ error }}
             </div>
 
-            <!-- Choix du rôle -->
+            <!-- Role Selection -->
             <div class="mb-4">
-              <label class="form-label fw-medium">Je suis :</label>
               <div class="d-flex gap-2">
-                <div *ngFor="let r of roles"
-                     class="border rounded-3 p-2 text-center flex-fill"
-                     style="cursor:pointer"
-                     [class.border-primary]="data.role === r.value"
-                     [class.bg-primary]="data.role === r.value"
-                     [class.text-white]="data.role === r.value"
-                     (click)="selectRole(r.value)">
+                <div *ngFor="let r of roles" class="border rounded-3 p-2 text-center flex-fill" style="cursor:pointer"
+                  [class.border-primary]="data.role === r.value" [class.bg-primary]="data.role === r.value"
+                  [class.text-white]="data.role === r.value" (click)="selectRole(r.value)">
                   <i class="fa-solid d-block mb-1" [class]="r.icon"></i>
                   <small>{{ r.label }}</small>
                 </div>
@@ -35,76 +30,72 @@
             <div class="row g-3">
               <div class="col-12 text-center mb-3">
                 <div class="avatar-upload position-relative d-inline-block">
-                  <div class="avatar-preview rounded-circle border overflow-hidden bg-light" 
-                       style="width: 100px; height: 100px; margin: 0 auto;">
+                  <div class="avatar-preview rounded-circle border overflow-hidden bg-light"
+                    style="width: 100px; height: 100px; margin: 0 auto;">
                     <img *ngIf="imagePreview" [src]="imagePreview" class="w-100 h-100 object-fit-cover">
-                    <div *ngIf="!imagePreview" class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                    <div *ngIf="!imagePreview"
+                      class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
                       <i class="fa-solid fa-camera fs-2"></i>
                     </div>
                   </div>
-                  <label for="avatar-input" class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0 shadow-sm" 
-                         style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                  <label for="avatar-input"
+                    class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0 shadow-sm"
+                    style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer;">
                     <i class="fa-solid fa-plus fs-12"></i>
                   </label>
-                  <input id="avatar-input" type="file" (change)="onFileSelected($event)" accept="image/*" class="d-none">
+                  <input id="avatar-input" type="file" (change)="onFileSelected($event)" accept="image/*"
+                    class="d-none">
                 </div>
-                <div class="small text-muted mt-2">Photo de profil (optionnelle)</div>
+                <div class="small text-muted mt-2">Profile Picture (optional)</div>
               </div>
 
               <div class="col-6">
-                <label class="form-label fw-medium">Nom</label>
-                <input [(ngModel)]="data.nom" name="nom"
-                       class="form-control" placeholder="Nom">
+                <label class="form-label fw-medium">Last Name</label>
+                <input [(ngModel)]="data.nom" name="nom" class="form-control bg-light border-0" placeholder="Last Name">
               </div>
               <div class="col-6">
-                <label class="form-label fw-medium">Prénom</label>
-                <input [(ngModel)]="data.prenom" name="prenom"
-                       class="form-control" placeholder="Prénom">
+                <label class="form-label fw-medium">First Name</label>
+                <input [(ngModel)]="data.prenom" name="prenom" class="form-control bg-light border-0"
+                  placeholder="First Name">
               </div>
               <div class="col-12">
-                <label class="form-label fw-medium">Email</label>
-                <input [(ngModel)]="data.email" name="email"
-                       type="email" class="form-control"
-                       placeholder="votre@email.com">
+                <label class="form-label fw-medium">Email Address</label>
+                <input [(ngModel)]="data.email" name="email" type="email" class="form-control bg-light border-0"
+                  placeholder="your@email.com">
               </div>
               <div class="col-12">
-                <label class="form-label fw-medium">Téléphone</label>
-                <input [(ngModel)]="data.telephone" name="telephone"
-                       class="form-control" placeholder="+216 XX XXX XXX">
+                <label class="form-label fw-medium">Phone Number</label>
+                <input [(ngModel)]="data.telephone" name="telephone" class="form-control bg-light border-0"
+                  placeholder="+216 XX XXX XXX">
               </div>
               <div class="col-12 position-relative">
-                <label class="form-label fw-medium">Mot de passe</label>
-                <input [type]="showPassword ? 'text' : 'password'"
-                       [(ngModel)]="data.password" name="password"
-                       class="form-control" placeholder="••••••••">
-                <i class="far position-absolute"
-                   [class.fa-eye]="showPassword"
-                   [class.fa-eye-slash]="!showPassword"
-                   (click)="togglePassword()"
-                   style="right:12px; top:38px; cursor:pointer; color:#888"></i>
+                <label class="form-label fw-medium">Password</label>
+                <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="data.password" name="password"
+                  class="form-control bg-light border-0" placeholder="••••••••">
+                <i class="far position-absolute" [class.fa-eye]="showPassword" [class.fa-eye-slash]="!showPassword"
+                  (click)="togglePassword()" style="right:12px; top:38px; cursor:pointer; color:#888"></i>
               </div>
               <div class="col-12">
-                <label class="form-label fw-medium">Confirmer le mot de passe</label>
-                <input type="password"
-                       [(ngModel)]="confirmPassword" name="confirm"
-                       class="form-control" placeholder="••••••••"
-                       [class.is-invalid]="confirmPassword && confirmPassword !== data.password">
+                <label class="form-label fw-medium">Confirm Password</label>
+                <input type="password" [(ngModel)]="confirmPassword" name="confirm"
+                  class="form-control bg-light border-0" placeholder="••••••••"
+                  [class.is-invalid]="confirmPassword && confirmPassword !== data.password">
                 <div class="invalid-feedback">
-                  Les mots de passe ne correspondent pas
+                  Passwords do not match
                 </div>
               </div>
             </div>
 
-            <button class="btn btn-primary btn-lg w-100 mt-4"
-                    (click)="register()" [disabled]="loading">
+            <button class="btn btn-primary btn-lg w-100 mt-4 rounded-pill shadow-sm" (click)="register()"
+              [disabled]="loading">
               <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-              {{ loading ? 'Inscription...' : "S'inscrire" }}
+              {{ loading ? 'Signing up...' : 'Sign Up' }}
             </button>
 
             <div class="text-center mt-3">
-              Déjà un compte ?
-              <a routerLink="/auth/login" class="text-primary fw-medium">
-                Se connecter
+              Already have an account?
+              <a routerLink="/auth/login" class="text-primary fw-medium text-decoration-none">
+                Login here
               </a>
             </div>
           </div>

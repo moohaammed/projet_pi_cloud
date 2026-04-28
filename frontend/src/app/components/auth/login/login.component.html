@@ -1,17 +1,17 @@
-<div class="align-items-center d-flex justify-content-center vh-100">
+<div class="align-items-center d-flex justify-content-center vh-100 bg-light">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-5">
         <div class="card border-0 shadow-sm rounded-4">
           <div class="card-body p-5">
             
-            <!-- ====== VUE: FORMULAIRE DE CONNEXION ====== -->
+            <!-- ====== VIEW: LOGIN FORM ====== -->
             <div [hidden]="view !== 'login'">
               <div class="text-center mb-4">
-                <h3 class="fw-semibold">Connexion à votre
-                  <span class="text-primary">compte</span>
+                <h3 class="fw-semibold">Login to your
+                  <span class="text-primary">account</span>
                 </h3>
-                <p class="text-muted">Bienvenue sur AlzCare</p>
+                <p class="text-muted">Welcome to AlzCare</p>
               </div>
 
               <!-- Real Google Auth Button Placeholder -->
@@ -21,7 +21,7 @@
 
               <div class="d-flex align-items-center mb-4">
                 <hr class="flex-grow-1 opacity-25">
-                <span class="mx-2 text-muted small px-2">ou avec votre email</span>
+                <span class="mx-2 text-muted small px-2">or with your email</span>
                 <hr class="flex-grow-1 opacity-25">
               </div>
 
@@ -30,16 +30,16 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label fw-medium">Email</label>
+                <label class="form-label fw-medium">Email Address</label>
                 <input type="email" class="form-control bg-light border-0"
-                       placeholder="votre@email.com"
+                       placeholder="your@email.com"
                        [(ngModel)]="credentials.email" name="email">
               </div>
 
               <div class="mb-3 position-relative">
                 <div class="d-flex justify-content-between">
-                  <label class="form-label fw-medium">Mot de passe</label>
-                  <a href="javascript:void(0)" class="text-primary small fw-semibold text-decoration-none" (click)="showForgotForm()">Mot de passe oublié ?</a>
+                  <label class="form-label fw-medium">Password</label>
+                  <a href="javascript:void(0)" class="text-primary small fw-semibold text-decoration-none" (click)="showForgotForm()">Forgot password?</a>
                 </div>
                 <input [type]="showPassword ? 'text' : 'password'"
                        class="form-control bg-light border-0" placeholder="••••••••"
@@ -60,25 +60,25 @@
                       (click)="login()" [disabled]="loading">
                 <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
                 <i *ngIf="!loading" class="fa-solid fa-right-to-bracket me-2"></i>
-                {{ loading ? 'Connexion...' : 'Se connecter' }}
+                {{ loading ? 'Connecting...' : 'Login' }}
               </button>
 
               <div class="text-center mt-4 text-muted">
-                Pas encore de compte ?
+                Don't have an account yet?
                 <a routerLink="/auth/register" class="text-primary fw-bold text-decoration-none">
-                  Inscrivez-vous ici
+                  Sign up here
                 </a>
               </div>
             </div>
 
-            <!-- ====== VUE: MOT DE PASSE OUBLIÉ ====== -->
+            <!-- ====== VIEW: FORGOT PASSWORD ====== -->
             <div [hidden]="view !== 'forgot'">
               <div class="text-center mb-4">
                 <div class="bg-soft-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
                   <i class="fa-solid fa-key fs-1 text-primary"></i>
                 </div>
-                <h3 class="fw-semibold">Mot de passe oublié ?</h3>
-                <p class="text-muted small px-3">Entrez l'adresse email associée à votre compte, et nous vous enverrons un lien de réinitialisation.</p>
+                <h3 class="fw-semibold">Forgot Password?</h3>
+                <p class="text-muted small px-3">Enter the email address associated with your account, and we'll send you a reset link.</p>
               </div>
 
               <div *ngIf="error" class="alert alert-danger py-2 border-0 shadow-sm rounded-3">
@@ -89,9 +89,9 @@
               </div>
 
               <div class="mb-4">
-                <label class="form-label fw-medium">Email</label>
+                <label class="form-label fw-medium">Email Address</label>
                 <input type="email" class="form-control bg-light border-0"
-                       placeholder="votre@email.com"
+                       placeholder="your@email.com"
                        [(ngModel)]="credentials.email" name="email">
               </div>
 
@@ -99,12 +99,12 @@
                       (click)="requestReset()" [disabled]="loading">
                 <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
                 <i *ngIf="!loading" class="fa-solid fa-paper-plane me-2"></i>
-                {{ loading ? 'Envoi...' : 'Envoyer le lien' }}
+                {{ loading ? 'Sending...' : 'Send Link' }}
               </button>
 
               <div class="text-center">
                 <a href="javascript:void(0)" class="text-muted fw-medium text-decoration-none" (click)="backToLogin()">
-                  <i class="fa-solid fa-arrow-left me-1"></i> Retour à la connexion
+                  <i class="fa-solid fa-arrow-left me-1"></i> Back to login
                 </a>
               </div>
             </div>
