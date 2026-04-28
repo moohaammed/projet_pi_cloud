@@ -107,7 +107,7 @@ def predict_location(payload: LocationPredictionRequest):
         "confiance": f"{round(score * 100)}%",
         "statut": statut,
     }
-//detecte danger/sécuité
+# Detect danger/security
 pipe = pipeline("zero-shot-image-classification", model="openai/clip-vit-base-patch32")
 
 LABELS_ALZHEIMER = [
