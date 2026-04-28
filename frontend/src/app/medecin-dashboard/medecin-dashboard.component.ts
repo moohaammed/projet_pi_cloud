@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
 import { MapService } from '../services/map.service';
@@ -13,6 +14,8 @@ import { UserService } from '../services/user.service';
 import { RappelService } from '../services/rappel.service';
 import { PredictionService } from '../services/prediction.service';
 import { HeartRateAccessService, MonitoredPatient } from '../services/heart-rate-access.service';
+import { HeartRateService, HeartRateRecord } from '../services/heart-rate.service';
+import { HeartRateAiService, HeartRateAiResult } from '../services/heart-rate-ai.service';
 
 
 @Component({
@@ -93,6 +96,23 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   startX = 0;
   startY = 0;
 
+  // --- Heart Rate Monitoring ---
+  heartRateStatus: 'connected' | 'disconnected' = 'disconnected';
+  currentBpm: number | null = null;
+  deviceName: string = '—';
+  lastRecordedAt: string = '';
+  bpmHistory: number[] = [];
+  history: HeartRateRecord[] = [];
+  aiStatus: string = 'idle';
+  aiResult: HeartRateAiResult | null = null;
+
+  private heartRateSseSubscription: Subscription | null = null;
+  private aiSseSubscription: Subscription | null = null;
+  private heartRateInactivityInterval: ReturnType<typeof setInterval> | null = null;
+  private heartRateReconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+  private lastHeartRateEventTimestamp: number = 0;
+  private readonly HEART_RATE_INACTIVITY_MS = 5000;
+
   // --- Voice Recording ---
   mediaRecorder: any;
   audioChunks: any[] = [];
@@ -112,8 +132,11 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     private rappelService: RappelService,
     private predictionService: PredictionService,
     private mapService: MapService,
-    private heartRateAccessService: HeartRateAccessService
-
+    private heartRateAccessService: HeartRateAccessService,
+    private heartRateService: HeartRateService,
+    private heartRateAiService: HeartRateAiService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -132,6 +155,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.evolutionChart) this.evolutionChart.destroy();
+    this.stopHeartRateMonitoring();
   }
 
   showSuccess(msg: string) {
@@ -208,8 +232,14 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  setTab(tab: string) {
+  setTab(tab: string): void {
+    if (this.activeTab === 'monitoring' && tab !== 'monitoring') {
+      this.stopHeartRateMonitoring();
+    }
     this.activeTab = tab;
+    if (tab === 'monitoring') {
+      this.initHeartRateMonitoring();
+    }
   }
 
   loadProgression(userId: number) {
@@ -554,5 +584,181 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     link.href = this.selectedAnalyse.imageIRM;
     link.download = `IRM_${this.selectedPatient.nom}_${this.selectedAnalyse.date}.jpg`;
     link.click();
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Heart Rate Monitoring Methods
+  // ═══════════════════════════════════════════════════════
+
+  initHeartRateMonitoring(): void {
+    if (!this.selectedPatient?.user?.id) return;
+    this.connectHeartRateStream(this.selectedPatient.user.id);
+    this.connectAiStream(this.selectedPatient.user.id);
+    this.loadHeartRateHistory(this.selectedPatient.user.id);
+    this.startHeartRateInactivityChecker();
+  }
+
+  stopHeartRateMonitoring(): void {
+    this.heartRateSseSubscription?.unsubscribe();
+    this.aiSseSubscription?.unsubscribe();
+    if (this.heartRateInactivityInterval) clearInterval(this.heartRateInactivityInterval);
+    if (this.heartRateReconnectTimeout) clearTimeout(this.heartRateReconnectTimeout);
+  }
+
+  refreshHeartRate(): void {
+    this.stopHeartRateMonitoring();
+    this.initHeartRateMonitoring();
+  }
+
+  private connectHeartRateStream(userId: number): void {
+    this.heartRateSseSubscription = this.heartRateService.connectLiveStream(userId).subscribe({
+      next: (event: any) => {
+        this.ngZone.run(() => {
+          this.currentBpm = event.bpm;
+          this.deviceName = event.deviceName || '—';
+          this.lastRecordedAt = event.receivedAt || event.capturedAt || '';
+          this.heartRateStatus = 'connected';
+          this.lastHeartRateEventTimestamp = Date.now();
+          if (this.aiStatus === 'disconnected') { this.aiStatus = 'waiting'; this.aiResult = null; }
+          this.bpmHistory.push(event.bpm);
+          if (this.bpmHistory.length > 30) this.bpmHistory.shift();
+          this.history.unshift({
+            eventId: event.eventId,
+            userId: event.userId,
+            deviceName: event.deviceName,
+            bpm: event.bpm,
+            source: event.source,
+            capturedAt: event.capturedAt,
+            receivedAt: event.receivedAt,
+            recordedAt: event.receivedAt || ''
+          });
+          if (this.history.length > 50) this.history.pop();
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.ngZone.run(() => {
+          this.heartRateStatus = 'disconnected';
+          this.currentBpm = null;
+          this.deviceName = '—';
+          this.aiStatus = 'disconnected';
+          this.aiResult = null;
+          this.cdr.detectChanges();
+        });
+        this.heartRateReconnectTimeout = setTimeout(() => {
+          if (this.selectedPatient?.user?.id) this.connectHeartRateStream(this.selectedPatient.user.id);
+        }, 3000);
+      }
+    });
+  }
+
+  private connectAiStream(userId: number): void {
+    this.aiSseSubscription = this.heartRateAiService.connectAiStream(userId).subscribe({
+      next: (result: HeartRateAiResult) => {
+        this.ngZone.run(() => {
+          if (this.heartRateStatus === 'disconnected') { this.aiStatus = 'disconnected'; this.aiResult = null; this.cdr.detectChanges(); return; }
+          this.aiResult = result;
+          switch (result.status) {
+            case 'WAITING': this.aiStatus = 'waiting'; break;
+            case 'READY': this.aiStatus = 'ready'; break;
+            case 'ERROR': this.aiStatus = 'error'; break;
+            default: this.aiStatus = 'idle';
+          }
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.ngZone.run(() => {
+          this.aiStatus = this.heartRateStatus === 'disconnected' ? 'disconnected' : 'error';
+          this.aiResult = null;
+          this.cdr.detectChanges();
+        });
+        setTimeout(() => {
+          if (this.selectedPatient?.user?.id) this.connectAiStream(this.selectedPatient.user.id);
+        }, 5000);
+      }
+    });
+  }
+
+  private loadHeartRateHistory(userId: number): void {
+    this.heartRateService.getHistory(userId).subscribe({
+      next: records => { this.history = (records || []).slice(0, 50); },
+      error: () => { this.history = []; }
+    });
+  }
+
+  private startHeartRateInactivityChecker(): void {
+    if (this.heartRateInactivityInterval) clearInterval(this.heartRateInactivityInterval);
+    this.heartRateInactivityInterval = setInterval(() => {
+      if (this.lastHeartRateEventTimestamp > 0 && Date.now() - this.lastHeartRateEventTimestamp >= this.HEART_RATE_INACTIVITY_MS && this.heartRateStatus !== 'disconnected') {
+        this.heartRateStatus = 'disconnected';
+        this.currentBpm = null;
+        this.deviceName = '—';
+        this.aiStatus = 'disconnected';
+        this.aiResult = null;
+        this.cdr.detectChanges();
+      }
+    }, 1000);
+  }
+
+  getBpmZone(): string {
+    if (!this.currentBpm) return 'Déconnecté';
+    if (this.currentBpm < 60) return 'Bradycardie';
+    if (this.currentBpm <= 100) return 'État Normal';
+    return 'Tachycardie';
+  }
+
+  getBpmClass(): string {
+    if (!this.currentBpm) return '';
+    if (this.currentBpm < 60) return 'bpm-low';
+    if (this.currentBpm > 100) return 'bpm-high';
+    return 'bpm-normal';
+  }
+
+  getAverageBpm(): number {
+    if (!this.bpmHistory.length) return 0;
+    return Math.round(this.bpmHistory.reduce((a, b) => a + b, 0) / this.bpmHistory.length);
+  }
+
+  getMinBpm(): number { return this.bpmHistory.length ? Math.min(...this.bpmHistory) : 0; }
+  getMaxBpm(): number { return this.bpmHistory.length ? Math.max(...this.bpmHistory) : 0; }
+
+  getAiProgressPercent(): number {
+    if (!this.aiResult) return 0;
+    return Math.round((this.aiResult.readingsCollected / this.aiResult.readingsRequired) * 100);
+  }
+
+  getAiRiskColor(): string {
+    if (!this.aiResult || this.aiResult.status !== 'READY') return '#6b7280';
+    switch (this.aiResult.riskLevel) {
+      case 'NORMAL': return '#10b981';
+      case 'ATTENTION': return '#f59e0b';
+      case 'SURVEILLANCE': return '#f97316';
+      case 'ALERTE': return '#ef4444';
+      default: return '#6b7280';
+    }
+  }
+
+  getAiRiskIcon(): string {
+    if (!this.aiResult || this.aiResult.status !== 'READY') return 'fa-circle-question';
+    switch (this.aiResult.riskLevel) {
+      case 'NORMAL': return 'fa-circle-check';
+      case 'ATTENTION': return 'fa-triangle-exclamation';
+      case 'SURVEILLANCE': return 'fa-eye';
+      case 'ALERTE': return 'fa-bell';
+      default: return 'fa-circle-question';
+    }
+  }
+
+  getAiProbabilityPercent(): number {
+    if (!this.aiResult || this.aiResult.probability == null) return 0;
+    return Math.round(this.aiResult.probability * 100);
+  }
+
+  formatTimestamp(ts: string): string {
+    if (!ts) return '—';
+    try {
+      return new Date(ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch { return ts; }
   }
 }

@@ -7,7 +7,8 @@
       <p class="text-subtle mb-0">Voici l'aperçu de votre activité clinique aujourd'hui.</p>
     </div>
     <div class="d-flex gap-2 align-items-center">
-      <button class="btn btn-outline-glass d-flex align-items-center gap-2" (click)="loadPatients()" [disabled]="isLoadingPatients">
+      <button class="btn btn-outline-glass d-flex align-items-center gap-2"
+              (click)="loadPatients()" [disabled]="isLoadingPatients">
         <i [class.fa-spin]="isLoadingPatients" class="fa-solid fa-rotate-right"></i>
         Actualiser
       </button>
@@ -16,14 +17,6 @@
         <span *ngIf="alertesCount > 0" class="badge bg-white text-danger ms-1">
           {{ alertesCount }}
         </span>
-      </a>
-      <a *ngIf="false" routerLink="/hospital-alerts" class="btn btn-outline-danger d-flex align-items-center gap-2">
-        <i class="fa-solid fa-truck-medical"></i>
-        Hôpitaux IA
-      </a>
-      <a *ngIf="false" routerLink="/hospital-map" class="btn btn-outline-glass d-flex align-items-center gap-2">
-        <i class="fa-solid fa-map-location-dot"></i>
-        Carte hôpitaux
       </a>
       <a routerLink="/patients" class="btn btn-outline-glass d-flex align-items-center gap-2">
         <i class="fa-solid fa-arrow-left"></i>
@@ -35,7 +28,9 @@
   <div class="container-fluid px-0">
 
     <!-- ══ Success Banner ══════════════════════════════ -->
-    <div *ngIf="successMessage" class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 mb-4" style="border-radius: var(--radius-md);">
+    <div *ngIf="successMessage"
+         class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 mb-4"
+         style="border-radius: var(--radius-md);">
       <i class="fa-solid fa-circle-check fa-lg"></i>
       <span class="fw-medium">{{ successMessage }}</span>
     </div>
@@ -96,7 +91,8 @@
         </div>
 
         <!-- Loading state -->
-        <div *ngIf="isLoadingPatients" class="empty-state bg-white rounded-4 shadow-sm border border-light">
+        <div *ngIf="isLoadingPatients"
+             class="empty-state bg-white rounded-4 shadow-sm border border-light">
           <div class="spinner-border text-primary" role="status"></div>
           <p class="text-muted mt-3 fw-medium">Chargement des dossiers...</p>
         </div>
@@ -108,7 +104,8 @@
                [class.active-card]="selectedPatient?.id === p.id"
                (click)="selectPatient(p)">
 
-            <div class="p-status-badge" [ngClass]="(p.user?.actif !== false) ? 'status-active' : 'status-inactive'">
+            <div class="p-status-badge"
+                 [ngClass]="(p.user?.actif !== false) ? 'status-active' : 'status-inactive'">
               <div class="status-dot-small"></div>
               <span>{{ (p.user?.actif !== false) ? 'Actif' : 'Inactif' }}</span>
             </div>
@@ -127,13 +124,17 @@
               </div>
             </div>
 
-            <div class="mt-1 d-flex align-items-center gap-2 text-subtle" style="font-size: 0.8rem;">
+            <div class="mt-1 d-flex align-items-center gap-2 text-subtle"
+                 style="font-size: 0.8rem;">
               <i class="fa-solid fa-clock-rotate-left"></i>
               Dernière MAJ récente
             </div>
           </div>
 
-          <div *ngIf="patients.length === 0" class="empty-state bg-white w-100" style="grid-column: 1 / -1; border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+          <div *ngIf="patients.length === 0"
+               class="empty-state bg-white w-100"
+               style="grid-column: 1 / -1; border-radius: var(--radius-lg);
+                      border: 1px dashed var(--border-color);">
             <div class="empty-state-icon"><i class="fa-solid fa-user-slash"></i></div>
             <h6 class="fw-bold text-dark">Aucun patient trouvé</h6>
             <p class="text-subtle mb-0">Vous n'avez actuellement aucun patient assigné.</p>
@@ -145,11 +146,18 @@
       <div class="patient-detail">
 
         <!-- Initial Empty State -->
-        <div *ngIf="!selectedPatient" class="empty-state bg-white border shadow-sm h-100 d-flex flex-column justify-content-center" style="border-radius: var(--radius-xl);">
-          <div class="empty-state-icon mx-auto" style="width: 80px; height: 80px; font-size: 2rem;"><i class="fa-solid fa-hand-pointer"></i></div>
+        <div *ngIf="!selectedPatient"
+             class="empty-state bg-white border shadow-sm h-100 d-flex flex-column
+                    justify-content-center"
+             style="border-radius: var(--radius-xl);">
+          <div class="empty-state-icon mx-auto"
+               style="width: 80px; height: 80px; font-size: 2rem;">
+            <i class="fa-solid fa-hand-pointer"></i>
+          </div>
           <h4 class="fw-bold text-dark mt-2">Dossier Médical</h4>
           <p class="text-subtle col-md-8 mx-auto mt-2">
-            Veuillez sélectionner un patient dans la liste de gauche pour visualiser son dossier complet, ses analyses IRM récentes et paramétrer ses rappels cliniques.
+            Veuillez sélectionner un patient dans la liste de gauche pour visualiser son dossier
+            complet, ses analyses IRM récentes et paramétrer ses rappels cliniques.
           </p>
         </div>
 
@@ -162,19 +170,38 @@
               {{ selectedPatient.nom?.charAt(0) }}{{ selectedPatient.prenom?.charAt(0) }}
             </div>
             <div class="flex-grow-1">
-              <h2 class="fw-bold text-dark mb-1">{{ selectedPatient.nom }} {{ selectedPatient.prenom }}</h2>
+              <h2 class="fw-bold text-dark mb-1">
+                {{ selectedPatient.nom }} {{ selectedPatient.prenom }}
+              </h2>
               <div class="profile-stats-grid flex-wrap">
-                <span class="pill-info"><i class="fa-solid fa-calendar text-primary"></i> {{ selectedPatient.age }} ans</span>
-                <span class="pill-info"><i class="fa-solid fa-weight-scale text-primary"></i> {{ selectedPatient.poids }} kg</span>
-                <span class="pill-info"><i [class]="selectedPatient.sexe === 'Homme' ? 'fa-solid fa-mars text-primary' : 'fa-solid fa-venus text-primary'"></i> {{ selectedPatient.sexe }}</span>
+                <span class="pill-info">
+                  <i class="fa-solid fa-calendar text-primary"></i> {{ selectedPatient.age }} ans
+                </span>
+                <span class="pill-info">
+                  <i class="fa-solid fa-weight-scale text-primary"></i>
+                  {{ selectedPatient.poids }} kg
+                </span>
+                <span class="pill-info">
+                  <i [class]="selectedPatient.sexe === 'Homme'
+                               ? 'fa-solid fa-mars text-primary'
+                               : 'fa-solid fa-venus text-primary'"></i>
+                  {{ selectedPatient.sexe }}
+                </span>
               </div>
             </div>
 
             <div class="text-end" *ngIf="analyses.length > 0">
-              <div class="text-subtle fw-semibold mb-1 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">Diagnostic IRM (Dernier)</div>
+              <div class="text-subtle fw-semibold mb-1 text-uppercase"
+                   style="font-size: 0.7rem; letter-spacing: 0.05em;">
+                Diagnostic IRM (Dernier)
+              </div>
               <div class="d-inline-flex align-items-center gap-2 px-3 py-2 fw-bold"
                    style="border-radius: 8px;"
-                   [ngClass]="{'bg-danger text-white': analyses[0].pourcentageRisque > 50, 'bg-success text-white': analyses[0].pourcentageRisque <= 50, 'bg-light text-muted': analyses[0].pourcentageRisque == null}">
+                   [ngClass]="{
+                     'bg-danger text-white': analyses[0].pourcentageRisque > 50,
+                     'bg-success text-white': analyses[0].pourcentageRisque <= 50,
+                     'bg-light text-muted': analyses[0].pourcentageRisque == null
+                   }">
                 <i class="fa-solid fa-brain"></i>
                 {{ analyses[0].interpretation || 'En attente' }}
               </div>
@@ -183,14 +210,25 @@
 
           <!-- Tab Navigation -->
           <div class="segmented-control mt-4">
-            <button class="segment-btn" [class.active]="activeTab === 'analyses'" (click)="setTab('analyses')">
+            <button class="segment-btn"
+                    [class.active]="activeTab === 'analyses'"
+                    (click)="setTab('analyses')">
               <i class="fa-solid fa-chart-line me-2"></i>Dossier Clinique
             </button>
-            <button class="segment-btn" [class.active]="activeTab === 'analyse_avancee'" (click)="setTab('analyse_avancee')">
+            <button class="segment-btn"
+                    [class.active]="activeTab === 'analyse_avancee'"
+                    (click)="setTab('analyse_avancee')">
               <i class="fa-solid fa-brain me-2"></i>Analyse Avancée
             </button>
-            <button class="segment-btn" [class.active]="activeTab === 'rappels'" (click)="setTab('rappels')">
+            <button class="segment-btn"
+                    [class.active]="activeTab === 'rappels'"
+                    (click)="setTab('rappels')">
               <i class="fa-solid fa-bell me-2"></i>Rappels & Prescriptions
+            </button>
+            <button class="segment-btn"
+                    [class.active]="activeTab === 'monitoring'"
+                    (click)="setTab('monitoring')">
+              <i class="fa-solid fa-heart-pulse me-2"></i>Monitoring Live
             </button>
           </div>
 
@@ -202,9 +240,12 @@
               <!-- Cognitive Evaluation -->
               <div class="p-4 border rounded-4 bg-light mb-4" *ngIf="!isLoadingProgression">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                  <h5 class="fw-bold mb-0"><i class="fa-solid fa-puzzle-piece text-primary me-2"></i>Évaluation Cognitive</h5>
+                  <h5 class="fw-bold mb-0">
+                    <i class="fa-solid fa-puzzle-piece text-primary me-2"></i>Évaluation Cognitive
+                  </h5>
                   <div class="badge bg-white border text-dark fs-6 px-3 py-2 shadow-sm rounded-pill">
-                    Score Global : <strong class="text-success ms-1">{{ progressionScoreFinal }} pts</strong>
+                    Score Global :
+                    <strong class="text-success ms-1">{{ progressionScoreFinal }} pts</strong>
                   </div>
                 </div>
 
@@ -213,15 +254,20 @@
                   <div class="col-md-6">
                     <div class="bg-white p-3 rounded-3 border h-100 shadow-sm">
                       <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-bold text-subtle text-uppercase mb-0" style="font-size:0.75rem;">Quiz & Mémoire</h6>
-                        <button class="btn btn-sm btn-outline-glass text-danger px-2 border-0" (click)="resetPatientProgression('QUIZ')" [disabled]="isResetting" title="Réinitialiser">
+                        <h6 class="fw-bold text-subtle text-uppercase mb-0"
+                            style="font-size:0.75rem;">Quiz & Mémoire</h6>
+                        <button class="btn btn-sm btn-outline-glass text-danger px-2 border-0"
+                                (click)="resetPatientProgression('QUIZ')"
+                                [disabled]="isResetting" title="Réinitialiser">
                           <i class="fa-solid fa-rotate-left"></i>
                         </button>
                       </div>
                       <div class="d-flex justify-content-between align-items-end">
                         <div>
                           <p class="text-subtle mb-1" style="font-size:0.75rem;">Stade Actuel</p>
-                          <span class="badge bg-primary px-2 py-1 rounded-pill">{{ progressionStadeQuiz }}</span>
+                          <span class="badge bg-primary px-2 py-1 rounded-pill">
+                            {{ progressionStadeQuiz }}
+                          </span>
                         </div>
                         <div class="text-end">
                           <p class="text-subtle mb-1" style="font-size:0.75rem;">Points</p>
@@ -235,15 +281,20 @@
                   <div class="col-md-6">
                     <div class="bg-white p-3 rounded-3 border h-100 shadow-sm">
                       <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-bold text-subtle text-uppercase mb-0" style="font-size:0.75rem;">Jeux Logiques</h6>
-                        <button class="btn btn-sm btn-outline-glass text-danger px-2 border-0" (click)="resetPatientProgression('GAME')" [disabled]="isResetting" title="Réinitialiser">
+                        <h6 class="fw-bold text-subtle text-uppercase mb-0"
+                            style="font-size:0.75rem;">Jeux Logiques</h6>
+                        <button class="btn btn-sm btn-outline-glass text-danger px-2 border-0"
+                                (click)="resetPatientProgression('GAME')"
+                                [disabled]="isResetting" title="Réinitialiser">
                           <i class="fa-solid fa-rotate-left"></i>
                         </button>
                       </div>
                       <div class="d-flex justify-content-between align-items-end">
                         <div>
                           <p class="text-subtle mb-1" style="font-size:0.75rem;">Stade Actuel</p>
-                          <span class="badge bg-primary px-2 py-1 rounded-pill">{{ progressionStadeGame }}</span>
+                          <span class="badge bg-primary px-2 py-1 rounded-pill">
+                            {{ progressionStadeGame }}
+                          </span>
                         </div>
                         <div class="text-end">
                           <p class="text-subtle mb-1" style="font-size:0.75rem;">Points</p>
@@ -256,7 +307,9 @@
               </div>
 
               <!-- Risk Chart -->
-              <div class="card border-0 shadow-sm mb-4 overflow-hidden" *ngIf="!isLoadingAnalyses && analyses.length > 0 && analyses[0].pourcentageRisque != null">
+              <div class="card border-0 shadow-sm mb-4 overflow-hidden"
+                   *ngIf="!isLoadingAnalyses && analyses.length > 0
+                          && analyses[0].pourcentageRisque != null">
                 <div class="bg-light px-4 py-3 border-bottom d-flex align-items-center gap-2">
                   <i class="fa-solid fa-chart-area text-primary"></i>
                   <h6 class="fw-bold mb-0">Trajectoire du Risque IA</h6>
@@ -268,22 +321,28 @@
 
               <!-- IRM History Table -->
               <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-bottom py-3 px-4
+                            d-flex justify-content-between align-items-center">
                   <h6 class="fw-bold mb-0">
                     <i class="fa-solid fa-microscope me-2 text-primary"></i>
                     Analyses IRM
-                    <span class="badge bg-soft-primary text-primary ms-1">{{ analyses.length }}</span>
+                    <span class="badge bg-soft-primary text-primary ms-1">
+                      {{ analyses.length }}
+                    </span>
                   </h6>
-                  <div *ngIf="isLoadingAnalyses" class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                  <div *ngIf="isLoadingAnalyses"
+                       class="spinner-border spinner-border-sm text-primary" role="status"></div>
                 </div>
 
                 <div class="card-body p-0">
-                  <div *ngIf="!isLoadingAnalyses && analyses.length === 0" class="empty-state py-5">
+                  <div *ngIf="!isLoadingAnalyses && analyses.length === 0"
+                       class="empty-state py-5">
                     <div class="empty-state-icon"><i class="fa-solid fa-folder-open"></i></div>
                     <h6 class="fw-bold text-dark">Aucune archive IRM</h6>
                   </div>
 
-                  <div class="table-responsive" *ngIf="!isLoadingAnalyses && analyses.length > 0">
+                  <div class="table-responsive"
+                       *ngIf="!isLoadingAnalyses && analyses.length > 0">
                     <table class="modern-table">
                       <thead>
                         <tr>
@@ -296,33 +355,53 @@
                       </thead>
                       <tbody>
                         <tr *ngFor="let a of analyses">
-                          <td><span class="pill-info bg-white border shadow-sm" style="font-size: 0.75rem;"><i class="fa-regular fa-calendar-days"></i> {{ a.date }}</span></td>
                           <td>
-                            <div class="d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1"
+                            <span class="pill-info bg-white border shadow-sm"
+                                  style="font-size: 0.75rem;">
+                              <i class="fa-regular fa-calendar-days"></i> {{ a.date }}
+                            </span>
+                          </td>
+                          <td>
+                            <div class="d-inline-flex align-items-center gap-1
+                                        rounded-pill px-3 py-1"
                                  style="font-size: 0.75rem; font-weight: 600;"
-                                 [ngClass]="{'bg-warning text-dark': a.statut === 'EN_COURS', 'bg-success text-white': a.statut === 'TERMINÉ', 'bg-light text-muted': a.statut !== 'EN_COURS' && a.statut !== 'TERMINÉ'}">
-                              <i class="fa-solid fa-circle" style="font-size: 0.4rem;"></i> {{ a.statut }}
+                                 [ngClass]="{
+                                   'bg-warning text-dark': a.statut === 'EN_COURS',
+                                   'bg-success text-white': a.statut === 'TERMINÉ',
+                                   'bg-light text-muted': a.statut !== 'EN_COURS'
+                                                          && a.statut !== 'TERMINÉ'
+                                 }">
+                              <i class="fa-solid fa-circle" style="font-size: 0.4rem;"></i>
+                              {{ a.statut }}
                             </div>
                           </td>
                           <td>
                             <div *ngIf="a.pourcentageRisque != null">
-                              <div class="d-flex justify-content-between align-items-end mb-1">
-                                <span class="fw-bold" style="font-size: 0.8rem;" [ngClass]="{'text-danger': a.pourcentageRisque > 50, 'text-success': a.pourcentageRisque <= 50}">
+                              <div class="d-flex justify-content-between
+                                          align-items-end mb-1">
+                                <span class="fw-bold" style="font-size: 0.8rem;"
+                                      [ngClass]="{
+                                        'text-danger': a.pourcentageRisque > 50,
+                                        'text-success': a.pourcentageRisque <= 50
+                                      }">
                                   {{ a.pourcentageRisque }}%
                                 </span>
                               </div>
                               <div class="prog-track">
                                 <div class="prog-fill"
                                      [style.width.%]="a.pourcentageRisque"
-                                     [ngClass]="a.pourcentageRisque > 50 ? 'bg-danger' : 'bg-success'">
+                                     [ngClass]="a.pourcentageRisque > 50
+                                                ? 'bg-danger' : 'bg-success'">
                                 </div>
                               </div>
                             </div>
-                            <span *ngIf="a.pourcentageRisque == null" class="text-subtle fst-italic">—</span>
+                            <span *ngIf="a.pourcentageRisque == null"
+                                  class="text-subtle fst-italic">—</span>
                           </td>
                           <td class="fw-bold">{{ a.interpretation || '—' }}</td>
                           <td class="text-center">
-                            <button class="btn btn-sm btn-outline-glass rounded-pill px-3" (click)="viewAnalyseDetails(a)">
+                            <button class="btn btn-sm btn-outline-glass rounded-pill px-3"
+                                    (click)="viewAnalyseDetails(a)">
                               Voir <i class="fa-solid fa-arrow-right ms-1"></i>
                             </button>
                           </td>
@@ -334,57 +413,124 @@
               </div>
 
               <!-- Detailed Observation View -->
-              <div *ngIf="selectedAnalyse" class="border rounded-4 bg-white shadow mt-4 overflow-hidden border-primary" style="border-width: 2px !important;">
-                <div class="bg-light px-4 py-3 d-flex justify-content-between align-items-center border-bottom">
-                  <h6 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-stethoscope me-2"></i>Consultation : {{ selectedAnalyse.date }}</h6>
-                  <button class="btn btn-sm btn-light border rounded-pill px-3" (click)="selectedAnalyse = null">Fermer</button>
+              <div *ngIf="selectedAnalyse"
+                   class="border rounded-4 bg-white shadow mt-4 overflow-hidden border-primary"
+                   style="border-width: 2px !important;">
+                <div class="bg-light px-4 py-3 d-flex justify-content-between
+                            align-items-center border-bottom">
+                  <h6 class="fw-bold mb-0 text-primary">
+                    <i class="fa-solid fa-stethoscope me-2"></i>
+                    Consultation : {{ selectedAnalyse.date }}
+                  </h6>
+                  <button class="btn btn-sm btn-light border rounded-pill px-3"
+                          (click)="selectedAnalyse = null">Fermer</button>
                 </div>
 
                 <div class="p-4 row g-4">
                   <div class="col-md-7 d-flex flex-column gap-3">
                     <div class="d-flex flex-wrap gap-2">
-                       <span class="pill-info shadow-sm bg-white"><i class="fa-solid fa-chart-pie text-primary"></i> Probabilité IA: <strong [ngClass]="selectedAnalyse.pourcentageRisque > 50 ? 'text-danger' : 'text-success'">{{ selectedAnalyse.pourcentageRisque ?? 'N/A' }}%</strong></span>
-                       <span class="pill-info shadow-sm bg-white"><i class="fa-solid fa-comment-medical text-primary"></i> Résultat: <strong>{{ selectedAnalyse.interpretation || 'Inconnu' }}</strong></span>
+                      <span class="pill-info shadow-sm bg-white">
+                        <i class="fa-solid fa-chart-pie text-primary"></i>
+                        Probabilité IA:
+                        <strong [ngClass]="selectedAnalyse.pourcentageRisque > 50
+                                           ? 'text-danger' : 'text-success'">
+                          {{ selectedAnalyse.pourcentageRisque ?? 'N/A' }}%
+                        </strong>
+                      </span>
+                      <span class="pill-info shadow-sm bg-white">
+                        <i class="fa-solid fa-comment-medical text-primary"></i>
+                        Résultat:
+                        <strong>{{ selectedAnalyse.interpretation || 'Inconnu' }}</strong>
+                      </span>
                     </div>
                     <div class="flex-grow-1">
-                      <label class="fw-bold mb-2 small text-uppercase">Observations Médicales</label>
-                      <textarea class="form-control input-modern w-100" rows="5" [(ngModel)]="observationToAdd" placeholder="Saisir vos conclusions ici..."></textarea>
+                      <label class="fw-bold mb-2 small text-uppercase">
+                        Observations Médicales
+                      </label>
+                      <textarea class="form-control input-modern w-100" rows="5"
+                                [(ngModel)]="observationToAdd"
+                                placeholder="Saisir vos conclusions ici..."></textarea>
                     </div>
-                    <button class="btn btn-primary fw-bold py-2 shadow-sm align-self-start px-4" (click)="saveObservation()" [disabled]="isSavingObservation || !observationToAdd">
-                      <span *ngIf="isSavingObservation" class="spinner-border spinner-border-sm me-2"></span>
+                    <button class="btn btn-primary fw-bold py-2 shadow-sm
+                                   align-self-start px-4"
+                            (click)="saveObservation()"
+                            [disabled]="isSavingObservation || !observationToAdd">
+                      <span *ngIf="isSavingObservation"
+                            class="spinner-border spinner-border-sm me-2"></span>
                       Enregistrer au dossier
                     </button>
                   </div>
                   <div class="col-md-5">
-                    <div class="bg-light p-3 rounded-4 h-100 border text-center d-flex flex-column min-vh-25">
-                      <div *ngIf="selectedAnalyse.imageIRM" class="mb-2 d-flex justify-content-between align-items-center">
+                    <div class="bg-light p-3 rounded-4 h-100 border text-center
+                                d-flex flex-column min-vh-25">
+                      <div *ngIf="selectedAnalyse.imageIRM"
+                           class="mb-2 d-flex justify-content-between align-items-center">
                         <span class="fw-bold text-subtle small">Visionneuse IRM</span>
                         <div class="d-flex gap-1">
-                          <button class="btn btn-sm btn-outline-glass border-0" [ngClass]="{'text-primary': imgInvert}" (click)="toggleInvert()" title="Inverser"><i class="fa-solid fa-circle-half-stroke"></i></button>
-                          <button class="btn btn-sm btn-outline-glass border-0 text-danger" (click)="resetFilters()" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
-                          <button class="btn btn-sm btn-outline-glass border-0 text-success" (click)="downloadFilteredImage()" title="Télécharger"><i class="fa-solid fa-download"></i></button>
+                          <button class="btn btn-sm btn-outline-glass border-0"
+                                  [ngClass]="{'text-primary': imgInvert}"
+                                  (click)="toggleInvert()" title="Inverser">
+                            <i class="fa-solid fa-circle-half-stroke"></i>
+                          </button>
+                          <button class="btn btn-sm btn-outline-glass border-0 text-danger"
+                                  (click)="resetFilters()" title="Reset">
+                            <i class="fa-solid fa-rotate-left"></i>
+                          </button>
+                          <button class="btn btn-sm btn-outline-glass border-0 text-success"
+                                  (click)="downloadFilteredImage()" title="Télécharger">
+                            <i class="fa-solid fa-download"></i>
+                          </button>
                         </div>
                       </div>
-                      <div *ngIf="selectedAnalyse.imageIRM" class="d-flex flex-column gap-2 mb-3 px-2 text-start small">
+                      <div *ngIf="selectedAnalyse.imageIRM"
+                           class="d-flex flex-column gap-2 mb-3 px-2 text-start small">
                         <div class="d-flex align-items-center gap-2">
-                          <label class="text-subtle fw-medium" style="width: 70px;">Luminosité</label>
-                          <input type="range" class="form-range flex-grow-1" min="0.5" max="2.0" step="0.1" [(ngModel)]="imgBrightness">
+                          <label class="text-subtle fw-medium" style="width: 70px;">
+                            Luminosité
+                          </label>
+                          <input type="range" class="form-range flex-grow-1"
+                                 min="0.5" max="2.0" step="0.1"
+                                 [(ngModel)]="imgBrightness">
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                          <label class="text-subtle fw-medium" style="width: 70px;">Contraste</label>
-                          <input type="range" class="form-range flex-grow-1" min="0.5" max="2.5" step="0.1" [(ngModel)]="imgContrast">
+                          <label class="text-subtle fw-medium" style="width: 70px;">
+                            Contraste
+                          </label>
+                          <input type="range" class="form-range flex-grow-1"
+                                 min="0.5" max="2.5" step="0.1"
+                                 [(ngModel)]="imgContrast">
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                          <label class="text-subtle fw-medium" style="width: 70px;">Exposition</label>
-                          <input type="range" class="form-range flex-grow-1" min="0.5" max="2" step="0.1" [(ngModel)]="imgExposure">
+                          <label class="text-subtle fw-medium" style="width: 70px;">
+                            Exposition
+                          </label>
+                          <input type="range" class="form-range flex-grow-1"
+                                 min="0.5" max="2" step="0.1"
+                                 [(ngModel)]="imgExposure">
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                          <label class="text-subtle fw-medium" style="width: 70px;">Zoom</label>
-                          <input type="range" class="form-range flex-grow-1" min="1" max="4" step="0.1" [(ngModel)]="imgZoom">
+                          <label class="text-subtle fw-medium" style="width: 70px;">
+                            Zoom
+                          </label>
+                          <input type="range" class="form-range flex-grow-1"
+                                 min="1" max="4" step="0.1"
+                                 [(ngModel)]="imgZoom">
                         </div>
                       </div>
-                      <div class="mri-wrapper shadow-sm mt-auto" (mousedown)="startDrag($event)" (mousemove)="doDrag($event)" (mouseup)="stopDrag()" (mouseleave)="stopDrag()">
-                        <img *ngIf="selectedAnalyse.imageIRM" [src]="selectedAnalyse.imageIRM" class="mri-image w-100 h-100 object-fit-cover" [style.filter]="mriFilterStyle" [style.transform]="mriTransformStyle" [style.cursor]="imgZoom > 1.0 ? (isDragging ? 'grabbing' : 'grab') : 'default'" draggable="false">
+                      <div class="mri-wrapper shadow-sm mt-auto"
+                           (mousedown)="startDrag($event)"
+                           (mousemove)="doDrag($event)"
+                           (mouseup)="stopDrag()"
+                           (mouseleave)="stopDrag()">
+                        <img *ngIf="selectedAnalyse.imageIRM"
+                             [src]="selectedAnalyse.imageIRM"
+                             class="mri-image w-100 h-100 object-fit-cover"
+                             [style.filter]="mriFilterStyle"
+                             [style.transform]="mriTransformStyle"
+                             [style.cursor]="imgZoom > 1.0
+                                             ? (isDragging ? 'grabbing' : 'grab')
+                                             : 'default'"
+                             draggable="false">
                         <div *ngIf="!selectedAnalyse.imageIRM" class="empty-state p-4">
                           <i class="fa-solid fa-image-slash fa-2x text-muted mb-2"></i>
                           <p class="mb-0 text-subtle">Image non disponible</p>
@@ -403,59 +549,89 @@
               <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="selectedPatient">
                 <div class="card-header bg-transparent border-0 py-3 px-4">
                   <h6 class="fw-bold mb-0 text-dark">
-                     <i class="fa-solid fa-robot me-2 text-primary"></i>
-                     Prédiction IA d'Alzheimer
+                    <i class="fa-solid fa-robot me-2 text-primary"></i>
+                    Prédiction IA d'Alzheimer
                   </h6>
                 </div>
                 <div class="card-body px-4 pb-4">
                   <div class="row g-3">
                     <div class="col-md-6 col-12">
                       <label class="form-label small fw-bold">Âge (Age)</label>
-                      <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.Age" placeholder="Ex: 70">
+                      <input type="number" class="form-control shadow-sm"
+                             [(ngModel)]="predictionData.Age" placeholder="Ex: 70">
                     </div>
                     <div class="col-md-6 col-12">
-                      <label class="form-label small fw-bold">Éducation (EDUC) <small class="text-muted">Années</small></label>
-                      <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.EDUC" placeholder="Ex: 15">
+                      <label class="form-label small fw-bold">
+                        Éducation (EDUC) <small class="text-muted">Années</small>
+                      </label>
+                      <input type="number" class="form-control shadow-sm"
+                             [(ngModel)]="predictionData.EDUC" placeholder="Ex: 15">
                     </div>
                     <div class="col-md-6 col-12">
-                      <label class="form-label small fw-bold">Niveau Social (SES) <small class="text-muted">1 à 5</small></label>
-                      <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.SES" placeholder="1=Haut, 5=Bas">
+                      <label class="form-label small fw-bold">
+                        Niveau Social (SES) <small class="text-muted">1 à 5</small>
+                      </label>
+                      <input type="number" class="form-control shadow-sm"
+                             [(ngModel)]="predictionData.SES" placeholder="1=Haut, 5=Bas">
                     </div>
                     <div class="col-md-6 col-12">
                       <label class="form-label small fw-bold">Score Mémoire (MMSE)</label>
-                      <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.MMSE" placeholder="0-30">
+                      <input type="number" class="form-control shadow-sm"
+                             [(ngModel)]="predictionData.MMSE" placeholder="0-30">
                     </div>
                     <div class="col-md-6 col-12">
                       <label class="form-label small fw-bold">Taille du Cerveau (eTIV)</label>
-                      <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.eTIV" placeholder="Volume Est.">
+                      <input type="number" class="form-control shadow-sm"
+                             [(ngModel)]="predictionData.eTIV" placeholder="Volume Est.">
                     </div>
                     <div class="col-md-6 col-12">
                       <label class="form-label small fw-bold">Santé du Cerveau (nWBV)</label>
-                      <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.nWBV" placeholder="Volume Normalisé">
+                      <input type="number" class="form-control shadow-sm"
+                             [(ngModel)]="predictionData.nWBV" placeholder="Volume Normalisé">
                     </div>
                     <div class="col-md-6 col-12">
                       <label class="form-label small fw-bold">Facteur du Cerveau (ASF)</label>
-                      <input type="number" class="form-control shadow-sm" [(ngModel)]="predictionData.ASF" placeholder="Facteur Atlas">
+                      <input type="number" class="form-control shadow-sm"
+                             [(ngModel)]="predictionData.ASF" placeholder="Facteur Atlas">
                     </div>
                     <div class="col-12 mt-4 text-end">
-                      <button class="btn btn-primary px-4 fw-bold shadow-sm" (click)="predictAlzheimer()" [disabled]="isPredicting">
-                        <span *ngIf="isPredicting" class="spinner-border spinner-border-sm me-2"></span>
-                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Lancer la Prédiction
+                      <button class="btn btn-primary px-4 fw-bold shadow-sm"
+                              (click)="predictAlzheimer()" [disabled]="isPredicting">
+                        <span *ngIf="isPredicting"
+                              class="spinner-border spinner-border-sm me-2"></span>
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
+                        Lancer la Prédiction
                       </button>
                     </div>
                   </div>
 
                   <!-- Prediction Results -->
-                  <div *ngIf="predictionResult" class="mt-4 p-4 rounded-4 shadow-sm border border-light bg-white">
+                  <div *ngIf="predictionResult"
+                       class="mt-4 p-4 rounded-4 shadow-sm border border-light bg-white">
                     <div class="d-flex align-items-center gap-4">
-                      <i class="fa-solid fa-brain fa-3x" [ngClass]="predictionResult?.prediction === 'Demented' ? 'text-danger' : 'text-success'"></i>
+                      <i class="fa-solid fa-brain fa-3x"
+                         [ngClass]="predictionResult?.prediction === 'Demented'
+                                    ? 'text-danger' : 'text-success'"></i>
                       <div>
                         <h5 class="fw-bold mb-1 text-primary">Résultat de l'analyse :</h5>
-                        <div class="fs-5 fw-bold" [ngClass]="predictionResult?.prediction === 'Demented' ? 'text-danger' : 'text-success'">
-                          <span>{{ predictionResult.prediction || predictionResult.result || predictionResult.state || predictionResult.Group }}</span>
+                        <div class="fs-5 fw-bold"
+                             [ngClass]="predictionResult?.prediction === 'Demented'
+                                        ? 'text-danger' : 'text-success'">
+                          <span>{{
+                            predictionResult.prediction ||
+                            predictionResult.result ||
+                            predictionResult.state ||
+                            predictionResult.Group
+                          }}</span>
                         </div>
-                        <div class="small text-muted mt-2" *ngIf="!predictionResult?.prediction && !predictionResult?.result && !predictionResult?.state && !predictionResult?.Group">
-                          <pre class="mb-0 p-2 bg-light rounded text-dark">{{ predictionResult | json }}</pre>
+                        <div class="small text-muted mt-2"
+                             *ngIf="!predictionResult?.prediction
+                                    && !predictionResult?.result
+                                    && !predictionResult?.state
+                                    && !predictionResult?.Group">
+                          <pre class="mb-0 p-2 bg-light rounded text-dark">{{
+                            predictionResult | json
+                          }}</pre>
                         </div>
                       </div>
                     </div>
@@ -467,45 +643,63 @@
               <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="selectedPatient">
                 <div class="card-header bg-transparent border-0 py-3 px-4">
                   <h6 class="fw-bold mb-0 text-dark">
-                     <i class="fa-solid fa-stethoscope me-2 text-warning"></i>
-                     Prédiction IA - Évaluation du Stade Clinique
+                    <i class="fa-solid fa-stethoscope me-2 text-warning"></i>
+                    Prédiction IA — Évaluation du Stade Clinique
                   </h6>
                 </div>
                 <div class="card-body px-4 pb-4">
                   <div class="row g-3">
                     <div class="col-md-6 col-12">
                       <label class="form-label small fw-bold">Score Mémoire (MMSE)</label>
-                      <input type="number" class="form-control shadow-sm" [(ngModel)]="riskPredictionData.MMSE" placeholder="0-30">
+                      <input type="number" class="form-control shadow-sm"
+                             [(ngModel)]="riskPredictionData.MMSE" placeholder="0-30">
                     </div>
                     <div class="col-md-6 col-12">
                       <label class="form-label small fw-bold">Score Démence (CDRSB)</label>
-                      <input type="number" step="0.5" class="form-control shadow-sm" [(ngModel)]="riskPredictionData.CDRSB" placeholder="Ex: 0.5">
+                      <input type="number" step="0.5" class="form-control shadow-sm"
+                             [(ngModel)]="riskPredictionData.CDRSB" placeholder="Ex: 0.5">
                     </div>
                     <div class="col-md-6 col-12">
-                      <label class="form-label small fw-bold">Alzheimer Score 11 (ADAS11)</label>
-                      <input type="number" step="1" class="form-control shadow-sm" [(ngModel)]="riskPredictionData.ADAS11" placeholder="Ex: 10">
+                      <label class="form-label small fw-bold">
+                        Alzheimer Score 11 (ADAS11)
+                      </label>
+                      <input type="number" step="1" class="form-control shadow-sm"
+                             [(ngModel)]="riskPredictionData.ADAS11" placeholder="Ex: 10">
                     </div>
                     <div class="col-md-6 col-12">
-                      <label class="form-label small fw-bold">Alzheimer Score 13 (ADAS13)</label>
-                      <input type="number" step="1" class="form-control shadow-sm" [(ngModel)]="riskPredictionData.ADAS13" placeholder="Ex: 15">
+                      <label class="form-label small fw-bold">
+                        Alzheimer Score 13 (ADAS13)
+                      </label>
+                      <input type="number" step="1" class="form-control shadow-sm"
+                             [(ngModel)]="riskPredictionData.ADAS13" placeholder="Ex: 15">
                     </div>
                     <div class="col-12 mt-4 text-end">
-                      <button class="btn btn-warning px-4 fw-bold shadow-sm" (click)="predictRiskAlzheimer()" [disabled]="isPredictingRisk">
-                        <span *ngIf="isPredictingRisk" class="spinner-border spinner-border-sm me-2"></span>
+                      <button class="btn btn-warning px-4 fw-bold shadow-sm"
+                              (click)="predictRiskAlzheimer()" [disabled]="isPredictingRisk">
+                        <span *ngIf="isPredictingRisk"
+                              class="spinner-border spinner-border-sm me-2"></span>
                         <i class="fa-solid fa-microscope me-2"></i>Évaluer le Risque
                       </button>
                     </div>
                   </div>
 
                   <!-- Risk Results -->
-                  <div *ngIf="riskPredictionResult" class="mt-4 p-4 rounded-4 shadow-sm border border-light bg-white">
+                  <div *ngIf="riskPredictionResult"
+                       class="mt-4 p-4 rounded-4 shadow-sm border border-light bg-white">
                     <div class="d-flex align-items-center gap-4">
-                      <i class="fa-solid fa-notes-medical fa-3x" [ngClass]="riskPredictionResult?.risk_class > 0 ? 'text-warning' : 'text-success'"></i>
+                      <i class="fa-solid fa-notes-medical fa-3x"
+                         [ngClass]="riskPredictionResult?.risk_class > 0
+                                    ? 'text-warning' : 'text-success'"></i>
                       <div>
                         <h5 class="fw-bold mb-1 text-primary">Résultat de l'Évaluation :</h5>
-                        <div class="fs-5 fw-bold" [ngClass]="riskPredictionResult?.risk_class > 0 ? 'text-warning' : 'text-success'">
-                          <span *ngIf="riskPredictionResult?.risk_label">{{ riskPredictionResult.risk_label }}
-                            <small class="text-muted fs-6 mb-0 d-block d-md-inline ms-md-2">(Classe: {{ riskPredictionResult.risk_class }})</small>
+                        <div class="fs-5 fw-bold"
+                             [ngClass]="riskPredictionResult?.risk_class > 0
+                                        ? 'text-warning' : 'text-success'">
+                          <span *ngIf="riskPredictionResult?.risk_label">
+                            {{ riskPredictionResult.risk_label }}
+                            <small class="text-muted fs-6 mb-0 d-block d-md-inline ms-md-2">
+                              (Classe: {{ riskPredictionResult.risk_class }})
+                            </small>
                           </span>
                         </div>
                       </div>
@@ -522,7 +716,9 @@
                   <h5 class="fw-bold mb-1">Rappels & Régime</h5>
                   <p class="text-subtle mb-0">Gestion des médicaments et exercices.</p>
                 </div>
-                <button class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2 shadow-sm" (click)="openAddReminder()">
+                <button class="btn btn-primary d-flex align-items-center gap-2
+                               px-3 py-2 shadow-sm"
+                        (click)="openAddReminder()">
                   <i class="fa-solid fa-plus"></i> Nouveau Rappel
                 </button>
               </div>
@@ -531,38 +727,64 @@
                 <div class="spinner-border text-primary" role="status"></div>
               </div>
 
-              <div *ngIf="!isLoadingReminders && reminders.length === 0" class="empty-state border rounded-4 bg-light">
-                <div class="empty-state-icon"><i class="fa-regular fa-bell-slash"></i></div>
+              <div *ngIf="!isLoadingReminders && reminders.length === 0"
+                   class="empty-state border rounded-4 bg-light">
+                <div class="empty-state-icon">
+                  <i class="fa-regular fa-bell-slash"></i>
+                </div>
                 <h6 class="fw-bold">Aucun rappel</h6>
-                <p class="text-subtle text-center">Programmez les soins journaliers ici.</p>
+                <p class="text-subtle text-center">
+                  Programmez les soins journaliers ici.
+                </p>
               </div>
 
               <div class="row g-3" *ngIf="!isLoadingReminders && reminders.length > 0">
                 <div class="col-md-6" *ngFor="let r of reminders">
-                  <div class="reminder-card h-100 shadow-sm" [class.inactive-reminder]="!r.actif">
+                  <div class="reminder-card h-100 shadow-sm"
+                       [class.inactive-reminder]="!r.actif">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                       <div class="d-flex align-items-center gap-3">
-                        <div class="fs-3 bg-light rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                          {{ r.type === 'MEDICAMENT' ? '💊' : r.type === 'REPAS' ? '🍽️' : r.type === 'HYGIENE' ? '🪥' : r.type === 'EXERCICE' ? '🏃' : r.type === 'SOCIAL' ? '👥' : '🔔' }}
+                        <div class="fs-3 bg-light rounded-3 d-flex align-items-center
+                                    justify-content-center"
+                             style="width: 48px; height: 48px;">
+                          {{ r.type === 'MEDICAMENT' ? '💊'
+                             : r.type === 'REPAS' ? '🍽️'
+                             : r.type === 'HYGIENE' ? '🪥'
+                             : r.type === 'EXERCICE' ? '🏃'
+                             : r.type === 'SOCIAL' ? '👥' : '🔔' }}
                         </div>
                         <div>
                           <h6 class="fw-bold mb-1">{{ r.titre }}</h6>
-                          <div class="badge bg-white border text-muted" style="font-size: 0.65rem;">{{ r.type }}</div>
+                          <div class="badge bg-white border text-muted"
+                               style="font-size: 0.65rem;">{{ r.type }}</div>
                         </div>
                       </div>
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" [checked]="r.actif" (change)="toggleReminderActif(r)">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               [checked]="r.actif" (change)="toggleReminderActif(r)">
                       </div>
                     </div>
                     <p class="text-subtle flex-grow-1 small">{{ r.description }}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center
+                                mt-3 pt-3 border-top">
                       <div>
-                        <div class="fw-bold text-main small"><i class="fa-regular fa-clock me-1 text-primary"></i> {{ r.heureRappel }}</div>
-                        <div class="text-subtle extra-small">{{ r.jours === 'TOUS' ? 'Quotidien' : r.jours }}</div>
+                        <div class="fw-bold text-main small">
+                          <i class="fa-regular fa-clock me-1 text-primary"></i>
+                          {{ r.heureRappel }}
+                        </div>
+                        <div class="text-subtle extra-small">
+                          {{ r.jours === 'TOUS' ? 'Quotidien' : r.jours }}
+                        </div>
                       </div>
                       <div class="d-flex gap-1">
-                        <button class="btn btn-sm btn-outline-glass border-0" (click)="openEditReminder(r)"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn btn-sm btn-outline-glass border-0 text-danger" (click)="deleteReminder(r.id)"><i class="fa-solid fa-trash"></i></button>
+                        <button class="btn btn-sm btn-outline-glass border-0"
+                                (click)="openEditReminder(r)">
+                          <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-glass border-0 text-danger"
+                                (click)="deleteReminder(r.id)">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -570,28 +792,419 @@
               </div>
             </div>
 
+            <!-- ══ Tab: Monitoring Live ══════════════════════════════════ -->
+            <div *ngIf="activeTab === 'monitoring'">
+
+              <!-- Sub-header -->
+              <div class="monitoring-header">
+                <div>
+                  <h5 class="fw-bold mb-1">
+                    <i class="fa-solid fa-heart-pulse text-danger me-2"></i>
+                    Monitoring Cardiaque en Direct
+                  </h5>
+                  <p class="text-subtle mb-0">
+                    Flux SSE live depuis la smartwatch de
+                    {{ selectedPatient.prenom }} {{ selectedPatient.nom }}
+                  </p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="status-pill"
+                       [ngClass]="heartRateStatus === 'connected'
+                                  ? 'status-pill--connected'
+                                  : 'status-pill--disconnected'">
+                    <span class="status-pill__dot"
+                          [class.live-pulse]="heartRateStatus === 'connected'"></span>
+                    {{ heartRateStatus === 'connected' ? 'Appareil connecté' : 'Déconnecté' }}
+                  </div>
+                  <button class="btn btn-outline-glass d-flex align-items-center gap-2"
+                          (click)="refreshHeartRate()">
+                    <i class="fa-solid fa-rotate-right"></i> Actualiser
+                  </button>
+                </div>
+              </div>
+
+              <!-- BPM Hero -->
+              <div class="bpm-hero">
+                <div class="bpm-circle"
+                     [class.bpm-circle--active]="heartRateStatus === 'connected'">
+                  <ng-container *ngIf="heartRateStatus === 'disconnected'; else bpmValue">
+                    <span class="bpm-circle__label" style="font-size:0.6rem;text-align:center;padding:0 4px;">Déconnecté</span>
+                  </ng-container>
+                  <ng-template #bpmValue>
+                    <span class="bpm-circle__value">{{ currentBpm ?? '--' }}</span>
+                    <span class="bpm-circle__label">BPM</span>
+                  </ng-template>
+                  <span *ngIf="heartRateStatus === 'connected'"
+                        class="bpm-circle__heart heart-beat-icon">♥</span>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="bpm-info__zone">{{ getBpmZone() }}</div>
+                  <div class="bpm-info__pills">
+                    <span class="bpm-pill">
+                      <i class="fa-solid fa-watch"></i>
+                      {{ deviceName || '—' }}
+                    </span>
+                    <span class="bpm-pill">
+                      <i class="fa-regular fa-clock"></i>
+                      {{ formatTimestamp(lastRecordedAt) }}
+                    </span>
+                    <span class="bpm-pill"
+                          [ngClass]="getBpmClass() === 'bpm-normal' ? 'text-success'
+                                     : getBpmClass() === 'bpm-high' ? 'text-danger'
+                                     : 'text-warning'">
+                      <i class="fa-solid fa-circle-dot"></i>
+                      {{ getBpmZone() }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ECG Waveform -->
+              <div class="ecg-container">
+                <div class="ecg-header">
+                  <span class="ecg-header__title">
+                    <i class="fa-solid fa-wave-square me-2"></i>
+                    Tracé ECG en direct
+                  </span>
+                  <span *ngIf="heartRateStatus === 'connected'"
+                        class="ecg-live-badge">
+                    <span class="ecg-live-badge__dot"></span>
+                    LIVE
+                  </span>
+                </div>
+                <div class="ecg-canvas-wrapper">
+                  <canvas #ecgCanvas width="900" height="100"
+                          style="display:block;width:100%;height:100px;"></canvas>
+                  <div *ngIf="heartRateStatus === 'disconnected'"
+                       class="ecg-overlay">
+                    <i class="fa-solid fa-link-slash"></i>
+                    <span>En attente du signal…</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stats mini-bar -->
+              <div class="stats-bar mb-4">
+                <div class="stat-card">
+                  <div class="stat-icon-wrapper"
+                       style="background:rgba(139,92,246,0.1);color:var(--primary);">
+                    <i class="fa-solid fa-chart-line"></i>
+                  </div>
+                  <div>
+                    <div class="stat-title">Moyenne</div>
+                    <div class="stat-value">{{ getAverageBpm() || '--' }}
+                      <small style="font-size:0.7rem;color:var(--text-subtle);">BPM</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon-wrapper"
+                       style="background:rgba(16,185,129,0.1);color:#10b981;">
+                    <i class="fa-solid fa-arrow-down"></i>
+                  </div>
+                  <div>
+                    <div class="stat-title">Min</div>
+                    <div class="stat-value" style="color:#10b981;">
+                      {{ getMinBpm() || '--' }}
+                      <small style="font-size:0.7rem;color:var(--text-subtle);">BPM</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon-wrapper"
+                       style="background:rgba(239,68,68,0.1);color:#ef4444;">
+                    <i class="fa-solid fa-arrow-up"></i>
+                  </div>
+                  <div>
+                    <div class="stat-title">Max</div>
+                    <div class="stat-value" style="color:#ef4444;">
+                      {{ getMaxBpm() || '--' }}
+                      <small style="font-size:0.7rem;color:var(--text-subtle);">BPM</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon-wrapper"
+                       style="background:rgba(14,165,233,0.1);color:#0ea5e9;">
+                    <i class="fa-solid fa-database"></i>
+                  </div>
+                  <div>
+                    <div class="stat-title">Lectures</div>
+                    <div class="stat-value" style="color:#0ea5e9;">
+                      {{ bpmHistory.length }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI Crisis Prediction Panel -->
+              <div class="ai-card">
+                <div class="ai-card__header">
+                  <h6 class="fw-bold mb-0">
+                    <i class="fa-solid fa-brain text-primary me-2"></i>
+                    Prédiction IA de Crise Cardiaque
+                  </h6>
+                  <span class="ai-status-pill"
+                        [ngClass]="{
+                          'bg-warning bg-opacity-10 text-warning': aiStatus === 'waiting',
+                          'bg-success bg-opacity-10 text-success': aiStatus === 'ready',
+                          'bg-secondary bg-opacity-10 text-secondary':
+                            aiStatus === 'disconnected' || aiStatus === 'idle',
+                          'bg-danger bg-opacity-10 text-danger': aiStatus === 'error'
+                        }">
+                    {{ aiStatus === 'waiting' ? 'Collecte en cours'
+                       : aiStatus === 'ready' ? 'Prédiction active'
+                       : aiStatus === 'disconnected' ? 'Déconnecté'
+                       : aiStatus === 'error' ? 'Erreur'
+                       : 'Initialisation' }}
+                  </span>
+                </div>
+                <div class="ai-card__body">
+
+                  <!-- Disconnected -->
+                  <div *ngIf="aiStatus === 'disconnected'"
+                       class="empty-state py-4">
+                    <div class="empty-state-icon">
+                      <i class="fa-solid fa-link-slash"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark">Appareil déconnecté</h6>
+                    <p class="text-subtle text-center mb-0">
+                      La prédiction IA reprendra dès la reconnexion de la smartwatch.
+                    </p>
+                  </div>
+
+                  <!-- Idle -->
+                  <div *ngIf="aiStatus === 'idle'" class="empty-state py-4">
+                    <div class="empty-state-icon">
+                      <i class="fa-solid fa-hourglass-start"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark">Initialisation</h6>
+                    <p class="text-subtle text-center mb-0">
+                      En attente des données de fréquence cardiaque…
+                    </p>
+                  </div>
+
+                  <!-- Waiting -->
+                  <div *ngIf="aiStatus === 'waiting' && aiResult" class="py-2">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                      <i class="fa-solid fa-spinner fa-spin text-warning"></i>
+                      <span class="fw-semibold text-subtle" style="font-size:0.85rem;">
+                        Collecte des mesures BPM…
+                      </span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="prog-track flex-grow-1" style="height:8px;">
+                        <div class="prog-fill bg-primary"
+                             [style.width.%]="getAiProgressPercent()">
+                        </div>
+                      </div>
+                      <span class="text-subtle fw-semibold" style="font-size:0.8rem;">
+                        {{ aiResult.readingsCollected }} / {{ aiResult.readingsRequired }}
+                      </span>
+                    </div>
+                    <p class="text-subtle mt-2 mb-0" style="font-size:0.8rem;">
+                      La prédiction démarrera après
+                      {{ aiResult.readingsRequired }} lectures.
+                    </p>
+                  </div>
+
+                  <!-- Error -->
+                  <div *ngIf="aiStatus === 'error' && aiResult"
+                       class="empty-state py-4">
+                    <div class="empty-state-icon text-danger">
+                      <i class="fa-solid fa-circle-exclamation"></i>
+                    </div>
+                    <h6 class="fw-bold text-danger">Erreur de prédiction</h6>
+                    <p class="text-subtle text-center mb-0">
+                      {{ aiResult.errorMessage || 'Une erreur est survenue. Nouvelle tentative automatique.' }}
+                    </p>
+                  </div>
+
+                  <!-- Ready -->
+                  <div *ngIf="aiStatus === 'ready' && aiResult" class="row g-3">
+                    <div class="col-md-3 col-6">
+                      <div class="p-3 rounded-4 text-center border h-100"
+                           [ngStyle]="{
+                             'border-color': getAiRiskColor() + '55',
+                             'background': getAiRiskColor() + '0d'
+                           }">
+                        <i class="fa-solid fa-2x mb-2"
+                           [ngClass]="getAiRiskIcon()"
+                           [style.color]="getAiRiskColor()"></i>
+                        <div class="fw-bold" style="font-size:0.85rem;"
+                             [style.color]="getAiRiskColor()">
+                          {{ aiResult.riskLevel }}
+                        </div>
+                        <div class="text-subtle" style="font-size:0.7rem;">
+                          Niveau de risque
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-9 col-6 d-flex flex-column gap-2">
+                      <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="fw-semibold text-subtle" style="font-size:0.8rem;">
+                          Probabilité de crise
+                        </span>
+                        <span class="fw-bold" [style.color]="getAiRiskColor()">
+                          {{ getAiProbabilityPercent() }}%
+                        </span>
+                      </div>
+                      <div class="prog-track mb-2" style="height:8px;">
+                        <div class="prog-fill"
+                             [style.width.%]="getAiProbabilityPercent()"
+                             [style.background]="getAiRiskColor()">
+                        </div>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-6">
+                          <div class="p-2 rounded-3 bg-light border"
+                               style="font-size:0.8rem;">
+                            <div class="text-subtle" style="font-size:0.7rem;">
+                              Résultat
+                            </div>
+                            <div class="fw-bold"
+                                 [ngClass]="aiResult.prediction === 'NORMAL'
+                                            ? 'text-success' : 'text-danger'">
+                              {{ aiResult.prediction === 'NORMAL'
+                                 ? '✅ Normal' : '⚠️ Pré-crise' }}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="p-2 rounded-3 bg-light border"
+                               style="font-size:0.8rem;">
+                            <div class="text-subtle" style="font-size:0.7rem;">
+                              BPM moyen 60s
+                            </div>
+                            <div class="fw-bold">{{ aiResult.bpmMean }}</div>
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <div class="p-2 rounded-3 bg-light border"
+                               style="font-size:0.8rem;">
+                            <div class="text-subtle" style="font-size:0.7rem;">
+                              Action recommandée
+                            </div>
+                            <div class="fw-semibold text-dark">{{ aiResult.action }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- BPM History Table -->
+              <div class="history-card">
+                <div class="history-card__header">
+                  <h6 class="fw-bold mb-0">
+                    <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>
+                    Historique récent
+                  </h6>
+                  <span class="history-badge">
+                    {{ history.length }} enregistrements
+                  </span>
+                </div>
+                <div class="card-body p-0">
+                  <div *ngIf="history.length === 0" class="empty-state py-4">
+                    <div class="empty-state-icon">
+                      <i class="fa-solid fa-heart-crack"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark">Aucune donnée</h6>
+                    <p class="text-subtle mb-0">
+                      Connectez la smartwatch pour commencer.
+                    </p>
+                  </div>
+                  <div class="table-responsive" *ngIf="history.length > 0">
+                    <table class="modern-table">
+                      <thead>
+                        <tr>
+                          <th>Heure</th>
+                          <th>BPM</th>
+                          <th>Appareil</th>
+                          <th>État</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let record of history; let i = index">
+                          <td>
+                            <span class="pill-info bg-white border shadow-sm"
+                                  style="font-size:0.75rem;">
+                              <i class="fa-regular fa-clock"></i>
+                              {{ formatTimestamp(record.recordedAt) }}
+                            </span>
+                          </td>
+                          <td>
+                            <div class="d-inline-flex align-items-center gap-1
+                                        rounded-pill px-3 py-1"
+                                 style="font-size:0.75rem;font-weight:600;"
+                                 [ngClass]="{
+                                   'bg-success text-white': record.bpm >= 60
+                                                            && record.bpm <= 100,
+                                   'bg-danger text-white': record.bpm > 100,
+                                   'bg-warning text-dark': record.bpm < 60
+                                 }">
+                              {{ record.bpm }}
+                            </div>
+                          </td>
+                          <td class="text-subtle" style="font-size:0.85rem;">
+                            {{ record.deviceName || '—' }}
+                          </td>
+                          <td>
+                            <span class="pill-info" style="font-size:0.75rem;"
+                                  [ngClass]="{
+                                    'text-success': record.bpm >= 60 && record.bpm <= 100,
+                                    'text-danger': record.bpm > 100,
+                                    'text-warning': record.bpm < 60
+                                  }">
+                              {{ record.bpm < 60 ? 'Bradycardie'
+                                 : record.bpm > 100 ? 'Tachycardie'
+                                 : 'Normal' }}
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <!-- ══ /Tab: Monitoring Live ══ -->
+
           </div> <!-- /section-body -->
         </div> <!-- /panel-card -->
       </div> <!-- /patient-detail -->
     </div> <!-- /dashboard-main -->
   </div> <!-- /container-fluid -->
 
-  <!-- Modal -->
-  <div class="modal fade show" *ngIf="showReminderModal" style="display: block; background: rgba(17, 24, 39, 0.4); backdrop-filter: blur(2px); z-index: 1050;">
+  <!-- ══ Reminder Modal ═══════════════════════════════════════════ -->
+  <div class="modal fade show" *ngIf="showReminderModal"
+       style="display:block; background:rgba(17,24,39,0.4);
+              backdrop-filter:blur(2px); z-index:1050;">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow-lg" style="border-radius: var(--radius-xl); overflow: hidden;">
-        <div class="bg-light px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
-          <h5 class="fw-bold mb-0">{{ isEditingReminder ? 'Modifier le rappel' : 'Nouveau Rappel' }}</h5>
-          <button type="button" class="btn-close" (click)="showReminderModal = false"></button>
+      <div class="modal-content border-0 shadow-lg"
+           style="border-radius:var(--radius-xl); overflow:hidden;">
+        <div class="bg-light px-4 py-3 border-bottom
+                    d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0">
+            {{ isEditingReminder ? 'Modifier le rappel' : 'Nouveau Rappel' }}
+          </h5>
+          <button type="button" class="btn-close"
+                  (click)="showReminderModal = false"></button>
         </div>
         <div class="modal-body p-4">
           <div class="mb-3">
             <label class="fw-semibold text-subtle mb-2 small">TITRE</label>
-            <input type="text" class="form-control input-modern" [(ngModel)]="reminderForm.titre" placeholder="Nom du rappel">
+            <input type="text" class="form-control input-modern"
+                   [(ngModel)]="reminderForm.titre" placeholder="Nom du rappel">
           </div>
           <div class="mb-3">
             <label class="fw-semibold text-subtle mb-2 small">DESCRIPTION</label>
-            <textarea class="form-control input-modern" rows="2" [(ngModel)]="reminderForm.description" placeholder="Notes complémentaires"></textarea>
+            <textarea class="form-control input-modern" rows="2"
+                      [(ngModel)]="reminderForm.description"
+                      placeholder="Notes complémentaires"></textarea>
           </div>
           <div class="row g-3 mb-4">
             <div class="col-6">
@@ -607,477 +1220,83 @@
             </div>
             <div class="col-6">
               <label class="fw-semibold text-subtle mb-2 small">HEURE</label>
-              <input type="time" class="form-control input-modern" [(ngModel)]="reminderForm.heure_rappel">
+              <input type="time" class="form-control input-modern"
+                     [(ngModel)]="reminderForm.heure_rappel">
             </div>
           </div>
           <div class="mb-2">
             <label class="fw-semibold text-subtle mb-2 small">RÉCURRENCE</label>
             <div class="d-flex flex-wrap gap-2">
-              <button type="button" class="btn btn-xs rounded-pill px-3" [class]="selectedDays.length === 7 ? 'btn-primary' : 'btn-outline-glass'" (click)="toggleDay('TOUS')">Tous les jours</button>
-              <button *ngFor="let d of ['LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI','DIMANCHE']" type="button" class="btn btn-xs rounded-pill" [class]="selectedDays.includes(d) ? 'btn-primary' : 'btn-outline-glass'" (click)="toggleDay(d)">{{ d.substring(0,3) }}</button>
+              <button type="button" class="btn btn-xs rounded-pill px-3"
+                      [class]="selectedDays.length === 7 ? 'btn-primary' : 'btn-outline-glass'"
+                      (click)="toggleDay('TOUS')">Tous les jours</button>
+              <button *ngFor="let d of ['LUNDI','MARDI','MERCREDI','JEUDI',
+                                        'VENDREDI','SAMEDI','DIMANCHE']"
+                      type="button" class="btn btn-xs rounded-pill"
+                      [class]="selectedDays.includes(d) ? 'btn-primary' : 'btn-outline-glass'"
+                      (click)="toggleDay(d)">{{ d.substring(0,3) }}</button>
             </div>
           </div>
 
-          <!-- NEW: Message Vocal Section -->
+          <!-- Voice Message -->
           <div class="mt-4 pt-3 border-top">
-            <label class="fw-semibold text-subtle mb-2 small">MESSAGE VOCAL (OPTIONNEL)</label>
-            
+            <label class="fw-semibold text-subtle mb-2 small">
+              MESSAGE VOCAL (OPTIONNEL)
+            </label>
             <div class="voice-recorder-box p-3 rounded-3 border bg-light">
-              <!-- Case 1: Recording in progress -->
-              <div *ngIf="isRecording" class="d-flex align-items-center justify-content-between">
+              <div *ngIf="isRecording"
+                   class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                   <div class="recording-dot"></div>
                   <span class="fw-bold">{{ formatTimer(recordingTimer) }}</span>
                 </div>
-                <button class="btn btn-danger btn-sm rounded-pill px-3" (click)="stopRecording()">
+                <button class="btn btn-danger btn-sm rounded-pill px-3"
+                        (click)="stopRecording()">
                   <i class="fa-solid fa-stop me-1"></i> Arrêter
                 </button>
               </div>
-
-              <!-- Case 2: Not recording, no record yet -->
               <div *ngIf="!isRecording && !recordedBlob" class="text-center">
-                <button class="btn btn-outline-primary btn-sm rounded-pill px-4" (click)="startRecording()">
+                <button class="btn btn-outline-primary btn-sm rounded-pill px-4"
+                        (click)="startRecording()">
                   <i class="fa-solid fa-microphone me-2"></i> Enregistrer un message
                 </button>
               </div>
-
-              <!-- Case 3: Recorded, waiting for upload/preview -->
-              <div *ngIf="!isRecording && recordedBlob" class="d-flex flex-column gap-2">
-                <audio [src]="recordedAudioUrl" controls class="w-100" style="height: 35px;"></audio>
+              <div *ngIf="!isRecording && recordedBlob"
+                   class="d-flex flex-column gap-2">
+                <audio [src]="recordedAudioUrl" controls class="w-100"
+                       style="height:35px;"></audio>
                 <div class="d-flex justify-content-end gap-2">
-                  <button class="btn btn-outline-danger btn-xs px-2" (click)="deleteRecording()">
+                  <button class="btn btn-outline-danger btn-xs px-2"
+                          (click)="deleteRecording()">
                     <i class="fa-solid fa-trash me-1"></i> Supprimer
                   </button>
-                  <button class="btn btn-outline-primary btn-xs px-2" (click)="startRecording()">
+                  <button class="btn btn-outline-primary btn-xs px-2"
+                          (click)="startRecording()">
                     <i class="fa-solid fa-rotate me-1"></i> Recommencer
                   </button>
                 </div>
               </div>
             </div>
-            
-            <!-- Case 4: Existing recording on server -->
-            <div *ngIf="isEditingReminder && reminderForm.voiceMessagePath && !recordedBlob" class="mt-2 small text-muted">
-              <i class="fa-solid fa-circle-check text-success me-1"></i> Un message vocal est déjà enregistré.
-              <button class="btn btn-link btn-xs p-0 ms-1 text-primary" (click)="startRecording()">Remplacer</button>
+            <div *ngIf="isEditingReminder && reminderForm.voiceMessagePath && !recordedBlob"
+                 class="mt-2 small text-muted">
+              <i class="fa-solid fa-circle-check text-success me-1"></i>
+              Un message vocal est déjà enregistré.
+              <button class="btn btn-link btn-xs p-0 ms-1 text-primary"
+                      (click)="startRecording()">Remplacer</button>
             </div>
           </div>
         </div>
         <div class="modal-footer bg-light border-0 p-3 px-4">
-          <button type="button" class="btn btn-outline-glass rounded-pill px-4" (click)="showReminderModal = false">Annuler</button>
-          <button type="button" class="btn btn-primary rounded-pill px-4" (click)="saveReminder()" [disabled]="!reminderForm.titre || !reminderForm.heure_rappel">Enregistrer</button>
+          <button type="button" class="btn btn-outline-glass rounded-pill px-4"
+                  (click)="showReminderModal = false">Annuler</button>
+          <button type="button" class="btn btn-primary rounded-pill px-4"
+                  (click)="saveReminder()"
+                  [disabled]="!reminderForm.titre || !reminderForm.heure_rappel">
+            Enregistrer
+          </button>
         </div>
-      <div class="d-flex gap-2">
-        <a routerLink="/doctor/heart-rate" class="btn btn-success btn-sm">
-          <i class="fa-solid fa-heart-pulse me-1"></i>Live Heart
-        </a>
-        <button class="btn btn-outline-primary btn-sm" (click)="loadPatients()" [disabled]="isLoadingPatients">
-          <i class="fa-solid fa-rotate-right me-1"></i>Actualiser
-        </button>
-         <a routerLink="/medecin/alertes" class="btn btn-danger btn-sm">
-    <i class="fa-solid fa-bell me-1"></i>Alertes
-    <span *ngIf="alertesCount > 0" class="badge bg-white text-danger ms-1">
-      {{ alertesCount }}
-    </span>
-  </a>
-        <a routerLink="/patients" class="btn btn-outline-secondary btn-sm">
-          <i class="fa-solid fa-arrow-left me-1"></i>Retour
-        </a>
       </div>
     </div>
   </div>
 
-  <div class="container-fluid px-4 pb-5">
-
-    <!-- ══ Success Banner ══════════════════════════════ -->
-    <div *ngIf="successMessage"
-         class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
-      <i class="fa-solid fa-circle-check fa-lg"></i>
-      <span>{{ successMessage }}</span>
-    </div>
-
-    <!-- ══ Stats Row ═══════════════════════════════════ -->
-    <div class="row g-3 mb-4">
-      <div class="col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex align-items-center gap-3 p-3">
-            <div class="stat-icon bg-soft-primary text-primary rounded-3">
-              <i class="fa-solid fa-users"></i>
-            </div>
-            <div>
-              <p class="mb-0 stat-label text-muted">Total Patients</p>
-              <h4 class="mb-0 fw-bold">{{ patients.length }}</h4>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex align-items-center gap-3 p-3">
-            <div class="stat-icon text-warning rounded-3" style="background:rgba(255,193,7,0.1)">
-              <i class="fa-solid fa-stethoscope"></i>
-            </div>
-            <div>
-              <p class="mb-0 stat-label text-muted">Analyses en cours</p>
-              <h4 class="mb-0 fw-bold text-warning">{{ analyses.length }}</h4>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex align-items-center gap-3 p-3">
-            <div class="stat-icon text-danger rounded-3" style="background:rgba(220,53,69,0.1)">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <div>
-              <p class="mb-0 stat-label text-muted">Risque élevé</p>
-              <h4 class="mb-0 fw-bold text-danger">
-                {{ highRiskCount }}
-              </h4>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex align-items-center gap-3 p-3">
-            <div class="stat-icon text-info rounded-3" style="background:rgba(13,202,240,0.1)">
-              <i class="fa-solid fa-comment-medical"></i>
-            </div>
-            <div>
-              <p class="mb-0 stat-label text-muted">Patient sélectionné</p>
-              <h4 class="mb-0 fw-bold text-info" style="font-size:1rem; margin-top:2px">
-                {{ selectedPatient ? selectedPatient.nom + ' ' + selectedPatient.prenom : '—' }}
-              </h4>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ Main Row: Patients List (left) + Analyses (right) ══ -->
-    <div class="row g-4">
-
-      <!-- ── Patient List ──────────────────────────── -->
-      <div class="col-lg-4">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-header bg-white border-0 py-3 px-4">
-            <h6 class="fw-bold mb-0">
-              <i class="fa-solid fa-list me-2 text-primary"></i>
-              Patients
-              <span class="badge bg-soft-primary text-primary ms-1">{{ patients.length }}</span>
-            </h6>
-          </div>
-
-          <!-- Loading patients -->
-          <div *ngIf="isLoadingPatients" class="card-body text-center py-5">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="text-muted mt-2 small">Chargement...</p>
-          </div>
-
-          <!-- Patient list -->
-          <div class="patient-list-container" *ngIf="!isLoadingPatients">
-            <div *ngFor="let p of patients"
-                 class="patient-card"
-                 [class.active-card]="selectedPatient?.id === p.id"
-                 (click)="selectPatient(p)">
-              <!-- Status Dot -->
-              <div class="status-dot" [ngClass]="(p.user?.actif !== false) ? 'active' : 'inactive'"></div>
-              
-              <div class="patient-avatar">
-                {{ p.nom?.charAt(0) }}{{ p.prenom?.charAt(0) }}
-              </div>
-              <div class="overflow-hidden">
-                <div class="fw-bold text-truncate text-dark mb-1">{{ p.nom }} {{ p.prenom }}</div>
-                <div class="d-flex gap-2">
-                  <span class="info-chip"><i class="fa-solid fa-calendar"></i>{{ p.age }} ans</span>
-                  <span class="info-chip"><i [class]="p.sexe === 'Homme' ? 'fa-solid fa-mars' : 'fa-solid fa-venus'"></i>{{ p.sexe }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div *ngIf="patients.length === 0"
-                 class="text-center py-5 text-muted">
-              <i class="fa-solid fa-users-slash fa-2x mb-2"></i>
-              <p class="small">Aucun patient trouvé</p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ── Analyses Panel ────────────────────────── -->
-      <div class="col-lg-8">
-
-        <!-- No patient selected -->
-        <div *ngIf="!selectedPatient" class="card border-0 shadow-sm text-center py-5">
-          <div class="card-body">
-            <i class="fa-solid fa-hand-point-left fa-3x text-muted mb-3"></i>
-            <h5 class="text-muted fw-semibold">Sélectionnez un patient</h5>
-            <p class="text-muted small">Cliquez sur un patient dans la liste pour afficher ses analyses.</p>
-          </div>
-        </div>
-
-        <!-- Patient selected -->
-        <div *ngIf="selectedPatient">
-
-          <!-- Patient Summary Card -->
-          <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
-            <div class="card-body p-4">
-              <div class="d-flex align-items-center gap-4 flex-wrap">
-                <div class="patient-avatar patient-avatar--lg">
-                  {{ selectedPatient.nom?.charAt(0) }}{{ selectedPatient.prenom?.charAt(0) }}
-                </div>
-                <div class="flex-grow-1">
-                  <h4 class="fw-bold text-dark mb-2">{{ selectedPatient.nom }} {{ selectedPatient.prenom }}</h4>
-                  <div class="d-flex gap-2 flex-wrap mb-2">
-                    <span class="info-chip"><i class="fa-solid fa-calendar text-primary"></i>{{ selectedPatient.age }} ans</span>
-                    <span class="info-chip"><i class="fa-solid fa-weight-scale text-primary"></i>{{ selectedPatient.poids }} kg</span>
-                    <span class="info-chip">
-                      <i [class]="selectedPatient.sexe === 'Homme' ? 'fa-solid fa-mars text-primary' : 'fa-solid fa-venus text-primary'"></i>
-                      {{ selectedPatient.sexe }}
-                    </span>
-                  </div>
-                </div>
-                <div class="text-end" *ngIf="analyses.length > 0">
-                  <div class="small text-muted fw-bold mb-1 text-uppercase">Dernier Statut IRM</div>
-                  <span class="badge px-3 py-2 fs-6 rounded-pill shadow-sm"
-                        [ngClass]="{'bg-danger': analyses[0].pourcentageRisque > 50, 'bg-success': analyses[0].pourcentageRisque <= 50, 'bg-secondary': analyses[0].pourcentageRisque == null}">
-                    <i class="fa-solid fa-brain me-1"></i> {{ analyses[0].interpretation || 'Non évalué' }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Progression Card -->
-          <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="!isLoadingProgression">
-            <div class="card-body p-4">
-              <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0"><i class="fa-solid fa-brain text-primary me-2"></i>Progression Cognitive du Patient</h5>
-                <h5 class="fw-bold text-success mb-0">Score Global: {{ progressionScoreFinal }} pts</h5>
-              </div>
-
-              <div class="row g-4">
-                <!-- Quiz Column -->
-                <div class="col-md-6 border-end">
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold text-muted text-uppercase mb-0">Parcours Quiz</h6>
-                    <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold" (click)="resetPatientProgression('QUIZ')" [disabled]="isResetting">
-                      <i class="fa-solid fa-rotate-left me-1"></i>Réinitialiser
-                    </button>
-                  </div>
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="text-start">
-                      <div class="small text-muted mb-1">Stade Diagnostiqué</div>
-                      <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill shadow-sm">{{ progressionStadeQuiz }}</span>
-                    </div>
-                    <div class="text-start ms-auto">
-                      <div class="small text-muted mb-1">Score Cumulé</div>
-                      <strong class="text-dark fs-5">{{ progressionScoreQuiz }} pts</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Game Column -->
-                <div class="col-md-6">
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold text-muted text-uppercase mb-0">Parcours Jeux</h6>
-                    <button class="btn btn-sm btn-outline-danger shadow-sm fw-bold" (click)="resetPatientProgression('GAME')" [disabled]="isResetting">
-                      <i class="fa-solid fa-rotate-left me-1"></i>Réinitialiser
-                    </button>
-                  </div>
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="text-start">
-                      <div class="small text-muted mb-1">Stade Diagnostiqué</div>
-                      <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill shadow-sm">{{ progressionStadeGame }}</span>
-                    </div>
-                    <div class="text-start ms-auto">
-                      <div class="small text-muted mb-1">Score Cumulé</div>
-                      <strong class="text-dark fs-5">{{ progressionScoreGame }} pts</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Analyses Table -->
-          <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
-              <h6 class="fw-bold mb-0">
-                <i class="fa-solid fa-microscope me-2 text-primary"></i>
-                Analyses IRM
-                <span class="badge bg-soft-primary text-primary ms-1">{{ analyses.length }}</span>
-              </h6>
-              <div *ngIf="isLoadingAnalyses" class="spinner-border spinner-border-sm text-primary" role="status"></div>
-            </div>
-
-            <div class="card-body px-4 pb-4">
-              <!-- Empty -->
-              <div *ngIf="!isLoadingAnalyses && analyses.length === 0" class="text-center py-4 text-muted">
-                <i class="fa-solid fa-flask fa-2x mb-2"></i>
-                <p class="small">Aucune analyse pour ce patient.</p>
-              </div>
-
-              <!-- Table -->
-              <div class="table-responsive" *ngIf="!isLoadingAnalyses && analyses.length > 0">
-                <table class="modern-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Statut</th>
-                      <th style="width: 25%;">Risque IA</th>
-                      <th>Interprétation</th>
-                      <th class="text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let a of analyses">
-                      <td><span class="info-chip"><i class="fa-regular fa-clock"></i>{{ a.date }}</span></td>
-                      <td>
-                        <span class="badge rounded-pill px-3 py-2"
-                              [ngClass]="{'bg-warning text-dark': a.statut === 'EN_COURS', 'bg-success': a.statut === 'TERMINÉ', 'bg-secondary': a.statut !== 'EN_COURS' && a.statut !== 'TERMINÉ'}">
-                          <i class="fa-solid fa-circle-dot me-1" style="font-size:0.6rem;"></i>{{ a.statut }}
-                        </span>
-                      </td>
-                      <td>
-                        <div *ngIf="a.pourcentageRisque != null">
-                          <span class="progress-label" [ngClass]="{'text-danger': a.pourcentageRisque > 50, 'text-success': a.pourcentageRisque <= 50}">
-                            {{ a.pourcentageRisque }}%
-                          </span>
-                          <div class="progress-container">
-                            <div class="progress-bar-fill"
-                                 [style.width.%]="a.pourcentageRisque"
-                                 [ngClass]="a.pourcentageRisque > 50 ? 'bg-danger' : 'bg-success'">
-                            </div>
-                          </div>
-                        </div>
-                        <span *ngIf="a.pourcentageRisque == null" class="text-muted fst-italic">Non évalué</span>
-                      </td>
-                      <td class="text-dark fw-bold">{{ a.interpretation || '—' }}</td>
-                      <td class="text-center">
-                        <button class="btn btn-sm btn-purple-outline rounded-pill px-3" (click)="viewAnalyseDetails(a)">
-                          <i class="fa-solid fa-pen-to-square me-1"></i>Éditer
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Medical Observation Panel -->
-          <div *ngIf="selectedAnalyse" class="card border-0 shadow-sm border-start border-4 border-primary">
-            <div class="card-header bg-white border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
-              <div>
-                <h5 class="fw-bold mb-0">
-                  <i class="fa-solid fa-notes-medical me-2 text-primary"></i>
-                  Observation Médicale
-                </h5>
-                <small class="text-muted">Analyse du {{ selectedAnalyse.date }}</small>
-              </div>
-              <button class="btn-close" (click)="selectedAnalyse = null"></button>
-            </div>
-            <div class="card-body px-4 pb-4">
-              <div class="row g-4">
-                <!-- Data -->
-                <div class="col-md-7">
-                  <div class="d-flex gap-2 flex-wrap mb-4">
-                    <span class="info-chip shadow-sm">
-                      <i class="fa-solid fa-chart-line text-primary"></i>
-                      Risque IA: <strong class="ms-1" [ngClass]="selectedAnalyse.pourcentageRisque > 50 ? 'text-danger' : 'text-success'">{{ selectedAnalyse.pourcentageRisque ?? 'N/A' }}%</strong>
-                    </span>
-                    <span class="info-chip shadow-sm">
-                      <i class="fa-solid fa-brain text-primary"></i>
-                      Score Cognitif: <strong class="ms-1">{{ selectedAnalyse.scoreJeu || 'N/A' }}</strong>
-                    </span>
-                    <span class="info-chip shadow-sm">
-                      <i class="fa-solid fa-robot text-primary"></i>
-                      Interprétation: <strong class="ms-1 text-dark">{{ selectedAnalyse.interpretation || 'Non évalué' }}</strong>
-                    </span>
-                  </div>
-
-                  <!-- Observation textarea -->
-                  <div class="form-group mt-2">
-                    <label class="fw-bold text-dark mb-2"><i class="fa-solid fa-user-doctor me-2 text-primary"></i>Avis du Médecin</label>
-                    <textarea class="form-control modern-textarea" rows="4"
-                              [(ngModel)]="observationToAdd"
-                              name="observation"
-                              placeholder="Rédigez votre diagnostic, recommandations..."></textarea>
-                  </div>
-
-                  <button id="btn-save-observation"
-                          class="btn btn-primary mt-3 px-4 fw-bold shadow-sm"
-                          style="background: #8b5cf6; border-color: #8b5cf6;"
-                          (click)="saveObservation()"
-                          [disabled]="isSavingObservation || !observationToAdd">
-                    <span *ngIf="isSavingObservation" class="spinner-border spinner-border-sm me-2"></span>
-                    <i class="fa-solid fa-floppy-disk me-1"></i>Enregistrer
-                  </button>
-                </div>
-
-                <!-- IRM Image -->
-                <div class="col-md-5 text-center d-flex align-items-center justify-content-center">
-                  <div class="bg-light w-100 p-2 rounded-4 shadow-sm border border-light">
-                    <img *ngIf="selectedAnalyse.imageIRM"
-                         [src]="selectedAnalyse.imageIRM"
-                         class="img-fluid rounded-3"
-                         alt="Image IRM">
-                    <div *ngIf="!selectedAnalyse.imageIRM" class="text-muted py-5">
-                      <i class="fa-solid fa-image fa-3x mb-3 opacity-50"></i>
-                      <p class="small mb-0">Aucune IRM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Activity History Table -->
-          <div class="card border-0 shadow-sm mb-4 mt-4" *ngIf="!isLoadingProgression && progressionHistory.length > 0">
-            <div class="card-header bg-white border-0 py-3 px-4">
-               <h6 class="fw-bold mb-0">
-                  <i class="fa-solid fa-gamepad me-2 text-primary"></i>Historique des Activités Cognitives
-               </h6>
-            </div>
-            <div class="card-body px-4 pb-4">
-               <div class="table-responsive">
-                  <table class="table table-hover align-middle">
-                     <thead class="table-light">
-                        <tr>
-                           <th>Date</th>
-                           <th>Activité</th>
-                           <th>Résultat</th>
-                           <th>Stade Final</th>
-                           <th>Score Gagné</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        <tr *ngFor="let h of progressionHistory">
-                           <td><span class="badge bg-secondary">{{ h.playedAt | date:'short' }}</span></td>
-                           <td>
-                             <span class="fw-semibold">{{ h.activity?.title }}</span>
-                             <span class="badge bg-light text-dark shadow-sm ms-2">{{ h.activity?.type }}</span>
-                           </td>
-                           <td>
-                             <span class="badge" [ngClass]="h.reussi ? 'bg-success' : 'bg-danger'">
-                               {{ h.reussi ? 'Réussi' : 'Échoué' }}
-                             </span>
-                           </td>
-                           <td class="fw-bold text-muted">{{ h.currentStade }}</td>
-                           <td class="text-success fw-bold">+{{ h.scoreSession }}</td>
-                        </tr>
-                     </tbody>
-                  </table>
-               </div>
-            </div>
-          </div>
-
-        </div><!-- /selectedPatient -->
-      </div><!-- /col analyses -->
-    </div><!-- /row -->
-  </div><!-- /container -->
-</div><!-- /medecin-space -->
+</div><!-- /dashboard-container -->
