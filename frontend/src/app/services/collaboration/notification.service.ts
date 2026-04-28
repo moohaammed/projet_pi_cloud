@@ -1,5 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../auth.service';
+import { environment } from '../../../environments/environment';
 
 /**
  * Represents a notification as returned by the backend.
@@ -34,7 +36,8 @@ export interface Notification {
 })
 export class NotificationService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:8080/api/notifications';
+  private authService = inject(AuthService);
+  private apiUrl = `${environment.apiUrl}/api/notifications`;
 
   /** All notifications for the current user, newest first */
   public notifications = signal<Notification[]>([]);
@@ -44,8 +47,12 @@ export class NotificationService {
 
   /** Loads all notifications for a user from the backend (called on page load) */
   fetchNotifications(uid: number) {
-    this.http.get<Notification[]>(`${this.baseUrl}/user/${uid}`).subscribe(data => {
-      this.notifications.set(data);
+    this.http.get<Notification[]>(`${this.apiUrl}/user/${uid}`).subscribe(data => {
+      // Filter out CareBot notifications if user is a DOCTOR
+      const filtered = this.authService.getRole() === 'DOCTOR' 
+        ? data.filter(n => n.type !== 'CAREBOT') 
+        : data;
+      this.notifications.set(filtered);
       this.updateUnreadCount();
     });
   }
@@ -55,7 +62,7 @@ export class NotificationService {
    * Updates the local signal immediately (optimistic update) without waiting for the server.
    */
   markAsRead(id: string) {
-    this.http.put(`${this.baseUrl}/${id}/read`, {}).subscribe(() => {
+    this.http.put(`${this.apiUrl}/${id}/read`, {}).subscribe(() => {
         this.notifications.update(list => list.map(n => n.id === id ? {...n, isRead: true} : n));
         this.updateUnreadCount();
     });
@@ -63,7 +70,7 @@ export class NotificationService {
 
   /** Permanently deletes a notification and removes it from the local signal */
   deleteNotification(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`).subscribe(() => {
+    return this.http.delete(`${this.apiUrl}/${id}`).subscribe(() => {
         this.notifications.update(list => list.filter(n => n.id !== id));
         this.updateUnreadCount();
     });
@@ -80,6 +87,10 @@ export class NotificationService {
    * so the UI updates instantly without an HTTP reload.
    */
   addNotification(notification: Notification) {
+    // Skip CareBot notifications if user is a DOCTOR
+    if (this.authService.getRole() === 'DOCTOR' && notification.type === 'CAREBOT') {
+      return;
+    }
     this.notifications.update(list => [notification, ...list]);
     this.updateUnreadCount();
   }

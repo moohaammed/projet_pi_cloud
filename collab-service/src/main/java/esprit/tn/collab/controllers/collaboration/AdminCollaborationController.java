@@ -21,11 +21,20 @@ public class AdminCollaborationController {
 
     private final AdminCollaborationService adminCollaborationService;
     private final ChatGroupService chatGroupService;
+    private final org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
     public AdminCollaborationController(AdminCollaborationService adminCollaborationService,
-                                        ChatGroupService chatGroupService) {
+                                        ChatGroupService chatGroupService,
+                                        org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate) {
         this.adminCollaborationService = adminCollaborationService;
         this.chatGroupService = chatGroupService;
+        this.messagingTemplate = messagingTemplate;
+    }
+
+    @PostMapping("/internal/live-status")
+    public ResponseEntity<Void> broadcastLiveStatus(@RequestBody Map<String, Object> payload) {
+        messagingTemplate.convertAndSend("/topic/live-status", payload);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/health/kpis")
@@ -212,5 +221,18 @@ public class AdminCollaborationController {
                                                    @PathVariable String id) {
         adminCollaborationService.adminDeleteMessage(adminUserId, id);
         return ResponseEntity.ok().build();
+    }
+
+    // TEMPORARY DEV ENDPOINT FOR SEEDING AND FIXING DB
+    @GetMapping("/dev/seed-database")
+    public ResponseEntity<String> seedDatabase() {
+        return ResponseEntity.ok(adminCollaborationService.seedDatabase());
+    }
+
+    @GetMapping("/content/messages/direct/{userAId}/{userBId}")
+    public ResponseEntity<List<ContentItemDto>> getDirectMessageThread(@RequestHeader(ADMIN_USER_HEADER) Long adminUserId,
+                                                                       @PathVariable Long userAId,
+                                                                       @PathVariable Long userBId) {
+        return ResponseEntity.ok(adminCollaborationService.getDirectMessageThread(adminUserId, userAId, userBId));
     }
 }

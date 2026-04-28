@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { environment } from '../../../environments/environment';
 
 export interface SearchResponseDto {
   id: string;
@@ -17,7 +18,7 @@ export interface SearchResponseDto {
 export class GlobalSearchService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private apiUrl = 'http://localhost:8081/api/v1/collab/search';
+  private apiUrl = `${environment.apiUrl}/api/v1/collab/search`;
 
   search(q?: string, tags?: string[]): Observable<SearchResponseDto[]> {
     let params = new HttpParams();

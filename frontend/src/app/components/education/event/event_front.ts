@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/education/event.service';
@@ -837,8 +837,10 @@ export class EventFrontComponent implements OnInit {
 
   filteredGroups = computed(() => {
     const q = this.shareSearchQuery().toLowerCase();
+    const userId = this.authService.getCurrentUser()?.id;
     return this.chatGroupService.groups().filter(g =>
-      !q || g.name.toLowerCase().includes(q) || (g.description || '').toLowerCase().includes(q)
+      (!q || g.name.toLowerCase().includes(q) || (g.description || '').toLowerCase().includes(q)) &&
+      g.members.some(m => m.id === userId)
     );
   });
 
@@ -1038,6 +1040,7 @@ export class EventFrontComponent implements OnInit {
       next: () => {
         this.isSharing.set(false);
         this.closeShareModal();
+        this.chatGroupService.fetchGroups(); // Refresh groups to update membership
         this.successMessage.set('Evenement partage avec succes !');
         setTimeout(() => this.successMessage.set(''), 4000);
       },

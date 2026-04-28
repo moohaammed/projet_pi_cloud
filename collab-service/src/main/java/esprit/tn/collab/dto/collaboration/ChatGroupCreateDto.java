@@ -17,6 +17,7 @@ public class ChatGroupCreateDto {
     private List<Long> memberIds;
     private Long ownerId;
     private List<String> tags;
+    @com.fasterxml.jackson.annotation.JsonProperty("isDefault")
     private boolean isDefault = false;
     private String defaultForRole;
 

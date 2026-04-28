@@ -57,22 +57,28 @@ export class MiniChatWidgetComponent implements OnInit {
     '🔥','✨','⭐','🌟','☁️','☀️','🌈','☘️','🍀','🌸','🌹','🌻','🌱','🌿','🍃','🍂','🍁','🍄','🌾','🌵','🌴','🌳','🌲'
   ];
 
-  chatUsers = computed(() => this.userService.users().filter(u => u.id !== this.currentUserId()));
-  filteredChatUsers = computed(() => {
+  chattedPeerIds = signal<number[]>([]);
+
+  chatUsers = computed(() => {
+    const peers = this.chattedPeerIds();
+    const uid = this.currentUserId();
     const q = this.miniChatSearch().toLowerCase();
-    if (!q) return this.chatUsers();
-    return this.chatUsers().filter(u => {
-      const fullName = (u.prenom + ' ' + u.nom).toLowerCase();
-      return fullName.includes(q);
-    });
+    let users = this.userService.users().filter(u => u.id !== uid && peers.includes(Number(u.id)));
+    if (q) users = users.filter(u => `${u.prenom} ${u.nom}`.toLowerCase().includes(q));
+    return users;
   });
 
-  chatGroups = computed(() => this.chatGroupService.groups());
-  filteredChatGroups = computed(() => {
+  filteredChatUsers = computed(() => this.chatUsers());
+
+  chatGroups = computed(() => {
+    const uid = this.currentUserId();
     const q = this.miniChatSearch().toLowerCase();
-    if (!q) return this.chatGroups();
-    return this.chatGroups().filter((g: ChatGroupDto) => g.name?.toLowerCase().includes(q));
+    let groups = this.chatGroupService.groups().filter(g => g.members.some((m: any) => m.id === uid));
+    if (q) groups = groups.filter((g: ChatGroupDto) => g.name?.toLowerCase().includes(q));
+    return groups;
   });
+
+  filteredChatGroups = computed(() => this.chatGroups());
 
   mentionSuggestions = computed(() => {
     const q = this.mentionQuery().toLowerCase();
@@ -185,6 +191,12 @@ export class MiniChatWidgetComponent implements OnInit {
             if (!this.isMiniChatOpen()) {
               this.unreadCount.update(n => n + 1);
             }
+            // Update chatted peers list when a new DM arrives
+            if (!newMsg.chatGroupId && newMsg.receiverId === uid) {
+              if (!this.chattedPeerIds().includes(newMsg.senderId)) {
+                this.chattedPeerIds.update(ids => [...ids, newMsg.senderId]);
+              }
+            }
           }
 
           let shouldAdd = false;
@@ -210,6 +222,12 @@ export class MiniChatWidgetComponent implements OnInit {
   ngOnInit() {
     this.userService.fetchUsers();
     this.chatGroupService.fetchGroups();
+    const uid = this.currentUserId();
+    if (uid) {
+      this.messageService.fetchDirectMessagePeers(uid).subscribe(ids => {
+        this.chattedPeerIds.set(ids);
+      });
+    }
   }
 
   toggleMiniChat() {
@@ -220,8 +238,14 @@ export class MiniChatWidgetComponent implements OnInit {
   }
 
   openMiniChatConversation(userId: number) {
+    this.miniChatSearch.set('');
+    this.activeMiniChatType.set('users');
     this.activeMiniChatUserId.set(userId);
     this.activeMiniChatGroupId.set(null);
+    // Ensure this peer is in the chatted list
+    if (!this.chattedPeerIds().includes(userId)) {
+      this.chattedPeerIds.update(ids => [...ids, userId]);
+    }
     this.messageService.fetchDirectMessages(this.currentUserId(), userId)
       .subscribe(msgs => {
         const realtime = this.webSocketService.realtimeMessage() as any;

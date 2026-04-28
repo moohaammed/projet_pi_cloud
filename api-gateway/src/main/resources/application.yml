@@ -34,7 +34,7 @@ spring:
         - id: collab-rest
           uri: lb://collab-service
           predicates:
-            - Path=/api/messages/**,/api/groups/**,/api/publications/**,/api/comments/**,/api/notifications/**,/api/handover/**,/api/care-relay/**,/api/carebot/**,/api/admin/collaboration/**
+            - Path=/api/messages/**,/api/groups/**,/api/publications/**,/api/comments/**,/api/notifications/**,/api/handover/**,/api/care-relay/**,/api/carebot/**,/api/admin/collaboration/**,/ws/**
 
         # ── RendezVous service ──────────────────────────────────────────
         - id: rendezvous-rest
@@ -79,7 +79,7 @@ spring:
         - id: main-service
           uri: lb://backpi
           predicates:
-            - Path=/api/**,/ws/**,/uploads/**
+            - Path=/api/**,/uploads/**
 
 eureka:
   client:

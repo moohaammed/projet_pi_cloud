@@ -59,6 +59,7 @@ public class ChatGroup {
 
     private String defaultForRole;
 
+    @com.fasterxml.jackson.annotation.JsonProperty("isDefault")
     public boolean isDefault() { return isDefault; }
     public void setDefault(boolean aDefault) { isDefault = aDefault; }
     public String getDefaultForRole() { return defaultForRole; }

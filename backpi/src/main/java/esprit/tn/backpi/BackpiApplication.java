@@ -16,6 +16,11 @@ public class BackpiApplication {
     }
 
     @Bean
+    public org.springframework.web.client.RestTemplate restTemplate() {
+        return new org.springframework.web.client.RestTemplate();
+    }
+
+    @Bean
     public CommandLineRunner fixDatabaseSchema(JdbcTemplate jdbcTemplate) {
         return args -> {
             try {

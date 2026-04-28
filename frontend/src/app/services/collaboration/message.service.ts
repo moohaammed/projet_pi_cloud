@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface PollOptionDto {
   id: string;
@@ -58,26 +59,26 @@ export interface MessageCreateRequest {
 @Injectable({ providedIn: 'root' })
 export class MessageService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:8080/api/messages';
+  private apiUrl = `${environment.apiUrl}/api/messages`;
 
   public messages = signal<MessageDto[]>([]);
 
   fetchMessagesByUser(uid: number) {
-    this.http.get<MessageDto[]>(`${this.baseUrl}/user/${uid}`).subscribe(data => this.messages.set(data));
+    this.http.get<MessageDto[]>(`${this.apiUrl}/user/${uid}`).subscribe(data => this.messages.set(data));
   }
 
   fetchMessagesByGroup(gid: string) {
-    this.http.get<MessageDto[]>(`${this.baseUrl}/group/${gid}`).subscribe(data => this.messages.set(data));
+    this.http.get<MessageDto[]>(`${this.apiUrl}/group/${gid}`).subscribe(data => this.messages.set(data));
   }
 
   fetchMessagesByGroupPaged(gid: string, page = 0, size = 30) {
-    return this.http.get<MessageDto[]>(`${this.baseUrl}/group/${gid}/page`, {
+    return this.http.get<MessageDto[]>(`${this.apiUrl}/group/${gid}/page`, {
       params: { page: String(page), size: String(size) }
     });
   }
 
   fetchMessagesByGroupSync(gid: string) {
-    return this.http.get<MessageDto[]>(`${this.baseUrl}/group/${gid}`);
+    return this.http.get<MessageDto[]>(`${this.apiUrl}/group/${gid}`);
   }
 
   createMessage(req: MessageCreateRequest, files?: File[]) {
@@ -96,23 +97,23 @@ export class MessageService {
       files.forEach(file => formData.append('files', file));
     }
     
-    return this.http.post<MessageDto>(this.baseUrl, formData);
+    return this.http.post<MessageDto>(this.apiUrl, formData);
   }
 
   fetchDirectMessages(userId1: number, userId2: number) {
-    return this.http.get<MessageDto[]>(`${this.baseUrl}/direct/${userId1}/${userId2}`);
+    return this.http.get<MessageDto[]>(`${this.apiUrl}/direct/${userId1}/${userId2}`);
   }
 
   fetchBotMessages(userId: number) {
-    return this.http.get<MessageDto[]>(`${this.baseUrl}/bot/${userId}`);
+    return this.http.get<MessageDto[]>(`${this.apiUrl}/bot/${userId}`);
   }
 
   fetchDirectMessagePeers(userId: number) {
-    return this.http.get<number[]>(`${this.baseUrl}/peers/${userId}`);
+    return this.http.get<number[]>(`${this.apiUrl}/peers/${userId}`);
   }
 
   deleteMessage(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   updateMessage(id: string, req: MessageCreateRequest, file?: File) {
@@ -122,27 +123,27 @@ export class MessageService {
     if (req.receiverId) formData.append('receiverId', req.receiverId.toString());
     if (req.chatGroupId) formData.append('chatGroupId', req.chatGroupId);
     if (file) formData.append('file', file);
-    return this.http.put<MessageDto>(`${this.baseUrl}/${id}`, formData);
+    return this.http.put<MessageDto>(`${this.apiUrl}/${id}`, formData);
   }
 
   voteOnPoll(messageId: string, userId: number, optionId: string) {
-    return this.http.post<MessageDto>(`${this.baseUrl}/${messageId}/vote`, null, {
+    return this.http.post<MessageDto>(`${this.apiUrl}/${messageId}/vote`, null, {
       params: { userId, optionId }
     });
   }
 
   markAsRead(messageId: string, userId: number) {
-    return this.http.post<void>(`${this.baseUrl}/${messageId}/read`, null, {
+    return this.http.post<void>(`${this.apiUrl}/${messageId}/read`, null, {
       params: { userId: String(userId) }
     });
   }
 
   togglePin(messageId: string) {
-    return this.http.post<MessageDto>(`${this.baseUrl}/${messageId}/pin`, {});
+    return this.http.post<MessageDto>(`${this.apiUrl}/${messageId}/pin`, {});
   }
 
   sendLiveComment(senderId: number, broadcasterId: number, content: string) {
-    return this.http.post<MessageDto>(`${this.baseUrl}/live-comment`, null, {
+    return this.http.post<MessageDto>(`${this.apiUrl}/live-comment`, null, {
       params: { senderId: String(senderId), broadcasterId: String(broadcasterId), content }
     });
   }

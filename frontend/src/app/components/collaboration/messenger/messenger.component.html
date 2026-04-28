@@ -51,7 +51,7 @@
                 (click)="activeChatType.set('DM')"
                 speakOnHover="Private messages" hoverContextType="button" hoverPage="messenger">Private</button>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" *ngIf="authService.getRole() !== 'DOCTOR'">
               <button class="nav-link py-2 rounded-pill fs-11 fw-black text-uppercase letter-spacing-1"
                 [class.active]="activeChatType() === 'BOT'"
                 (click)="openBotChat()"
