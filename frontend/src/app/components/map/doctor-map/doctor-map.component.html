@@ -83,7 +83,55 @@
     </div>
 
     <!-- Hôpitaux -->
-    <div class="border-top p-2" style="max-height:160px; overflow-y:auto">
+    <div class="border-top p-2" style="max-height:210px; overflow-y:auto">
+      <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+        <small class="fw-bold text-uppercase" style="letter-spacing:0.5px; color:#198754">
+          <i class="fa-solid fa-truck-medical me-1"></i>Hopitaux IA
+          <span *ngIf="latestRecommendedHospitals.length > 0" class="badge bg-success rounded-pill ms-1">
+            {{ latestRecommendedHospitals.length }}
+          </span>
+        </small>
+        <button class="btn py-0 px-2"
+                style="font-size:10px; border-radius:20px"
+                [style.background]="showRecommendedHospitals ? '#198754' : ''"
+                [style.color]="showRecommendedHospitals ? 'white' : ''"
+                [class.btn-outline-secondary]="!showRecommendedHospitals"
+                (click)="toggleRecommendedHospitals()">
+          {{ showRecommendedHospitals ? 'Masquer' : 'Afficher' }}
+        </button>
+      </div>
+
+      <ng-container *ngIf="showRecommendedHospitals">
+        <div *ngFor="let item of latestRecommendedHospitals.slice(0,6)"
+             class="p-2 rounded-2 mb-1 d-flex align-items-start gap-2"
+             [style.background]="item.rank === 0 ? '#f0fff4' : '#f8f9fa'"
+             [style.border-left]="item.rank === 0 ? '3px solid #198754' : '3px solid #adb5bd'"
+             style="font-size:11px; cursor:pointer"
+             (click)="focusRecommendedHospital(item)">
+          <i class="fa-solid fa-hospital mt-1 flex-shrink-0"
+             [style.color]="item.rank === 0 ? '#198754' : '#6c757d'"></i>
+          <div class="overflow-hidden">
+            <div class="fw-semibold text-truncate" [style.color]="item.rank === 0 ? '#146c43' : '#495057'">
+              {{ item.hospital.nom }}
+            </div>
+            <div class="text-muted text-truncate">
+              {{ patientNameById(item.prediction.patientId) }} - {{ hospitalDistance(item.hospital) }} km
+            </div>
+            <div class="text-muted" style="font-size:10px">
+              Cliquer pour afficher le chemin le plus court
+            </div>
+            <div *ngIf="item.rank === 0" class="fw-bold" style="color:#198754; font-size:10px">
+              RECOMMANDE
+            </div>
+          </div>
+        </div>
+        <div *ngIf="latestRecommendedHospitals.length === 0" class="text-center py-2" style="font-size:11px; color:#8a9a8f">
+          Aucun hopital IA recommande
+        </div>
+      </ng-container>
+    </div>
+
+    <div *ngIf="false" class="border-top p-2" style="max-height:160px; overflow-y:auto">
       <div class="d-flex justify-content-between align-items-center mb-2 px-1">
         <small class="fw-bold text-muted text-uppercase" style="letter-spacing:0.5px">
           Hôpitaux ({{ hospitals.length }})
@@ -395,16 +443,46 @@
 
         <hr class="my-3">
         <h6 class="fw-semibold mb-2 small">
+          <i class="fa-solid fa-hospital text-success me-1"></i>Hopital IA le plus proche
+        </h6>
+        <div *ngIf="selectedPatientRecommendedHospital as recommendation" class="card border-success border-opacity-25 mb-3">
+          <div class="card-body p-2">
+            <div class="fw-semibold small text-success">{{ recommendation.hospital.nom }}</div>
+            <div class="text-muted" style="font-size:11px">{{ recommendation.hospital.adresse }}</div>
+            <div class="mt-1 d-flex flex-wrap gap-1" style="font-size:11px">
+              <span class="badge bg-success">{{ hospitalDistance(recommendation.hospital) }} km</span>
+              <span class="badge bg-light text-dark border">{{ recommendation.hospital.specialite }}</span>
+            </div>
+            <div *ngIf="recommendation.hospital.telephone" style="font-size:11px" class="mt-1">
+              <i class="fa-solid fa-phone me-1 text-success"></i>{{ recommendation.hospital.telephone }}
+            </div>
+            <a [href]="recommendedHospitalMapsUrl(recommendation.prediction, recommendation.hospital)"
+               target="_blank"
+               class="btn btn-outline-success btn-sm w-100 mt-2 py-0" style="font-size:11px">
+              <i class="fa-solid fa-compass me-1"></i>Itineraire
+            </a>
+            <button class="btn btn-success btn-sm w-100 mt-2 py-0" style="font-size:11px"
+                    (click)="focusRecommendedHospital(recommendation)">
+              <i class="fa-solid fa-route me-1"></i>Afficher le chemin le plus court
+            </button>
+          </div>
+        </div>
+        <div *ngIf="!selectedPatientRecommendedHospital" class="text-muted small text-center py-2">
+          Aucune recommandation IA disponible pour ce patient
+        </div>
+
+        <div *ngIf="false">
+        <h6 class="fw-semibold mb-2 small">
           <i class="fa-solid fa-hospital text-danger me-1"></i>Hôpital le plus proche
         </h6>
         <div *ngIf="nearestHospital" class="card border-danger border-opacity-25">
           <div class="card-body p-2">
-            <div class="fw-semibold small text-danger">{{ nearestHospital.nom }}</div>
-            <div class="text-muted" style="font-size:11px">{{ nearestHospital.adresse }}, {{ nearestHospital.ville }}</div>
-            <div *ngIf="nearestHospital.telephone" style="font-size:11px" class="mt-1">
-              <i class="fa-solid fa-phone me-1 text-success"></i>{{ nearestHospital.telephone }}
+            <div class="fw-semibold small text-danger">{{ nearestHospital?.nom }}</div>
+            <div class="text-muted" style="font-size:11px">{{ nearestHospital?.adresse }}, {{ nearestHospital?.ville }}</div>
+            <div *ngIf="nearestHospital?.telephone" style="font-size:11px" class="mt-1">
+              <i class="fa-solid fa-phone me-1 text-success"></i>{{ nearestHospital?.telephone }}
             </div>
-            <a [href]="'https://maps.google.com/?q=' + nearestHospital.latitude + ',' + nearestHospital.longitude"
+            <a [href]="'https://maps.google.com/?q=' + nearestHospital?.latitude + ',' + nearestHospital?.longitude"
                target="_blank"
                class="btn btn-outline-danger btn-sm w-100 mt-2 py-0" style="font-size:11px">
               <i class="fa-solid fa-compass me-1"></i>Itinéraire
@@ -417,6 +495,8 @@
       </div>
 
       <!-- ══ ONGLET HISTORIQUE ══ -->
+      </div>
+
       <div *ngIf="activeTab === 'history'">
         <h6 class="fw-semibold mb-2">
           <i class="fa-solid fa-route me-1" style="color:#6f42c1"></i>

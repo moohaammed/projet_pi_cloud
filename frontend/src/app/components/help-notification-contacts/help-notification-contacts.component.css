@@ -1,0 +1,136 @@
+:host {
+  display: block;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* ── Page Header ─────────────────────────────────── */
+.page-header {
+  background: linear-gradient(135deg, rgba(128, 0, 128, 0.06) 0%, rgba(255,255,255,0) 60%);
+  border-bottom: 1px solid rgba(128, 0, 128, 0.1);
+}
+
+.header-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(128, 0, 128, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #800080;
+}
+
+/* ── Override primary colors ─────────────────────── */
+.text-primary {
+  color: #800080 !important;
+}
+
+.btn-primary {
+  background-color: #800080 !important;
+  border-color: #800080 !important;
+}
+
+.btn-primary:hover {
+  background-color: #660066 !important;
+  border-color: #660066 !important;
+}
+
+.btn-outline-primary {
+  color: #800080 !important;
+  border-color: #800080 !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #800080 !important;
+  color: #ffffff !important;
+}
+
+.badge.bg-primary {
+  background-color: #800080 !important;
+}
+
+.border-primary {
+  border-color: #800080 !important;
+}
+
+/* ── Help Notification Button ────────────────────── */
+.btn-help-notification {
+  background: linear-gradient(135deg, #800080, #b300b3);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(128, 0, 128, 0.3);
+}
+
+.btn-help-notification:hover:not(:disabled) {
+  background: linear-gradient(135deg, #660066, #990099);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(128, 0, 128, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-help-notification:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  color: #fff;
+}
+
+/* ── Relation Type Badges ────────────────────────── */
+.badge-doctor {
+  background-color: rgba(0, 123, 255, 0.12) !important;
+  color: #0d6efd !important;
+}
+
+.badge-parent {
+  background-color: rgba(255, 165, 0, 0.12) !important;
+  color: #e68a00 !important;
+}
+
+.badge-caregiver {
+  background-color: rgba(40, 167, 69, 0.12) !important;
+  color: #28a745 !important;
+}
+
+.badge-relation {
+  background-color: rgba(128, 0, 128, 0.12) !important;
+  color: #800080 !important;
+}
+
+/* ── Linked Status Badges ────────────────────────── */
+.bg-success-subtle {
+  background-color: rgba(40, 167, 69, 0.1) !important;
+}
+
+.bg-secondary-subtle {
+  background-color: rgba(108, 117, 125, 0.1) !important;
+}
+
+/* ── Animations ──────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Custom scrollbar ────────────────────────────── */
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}

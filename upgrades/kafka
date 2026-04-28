@@ -1,0 +1,132 @@
+# Kafka & AI Pipeline Upgrade Documentation
+
+## Overview
+
+This document tracks architectural changes made to the MediSync platform for the real-time AI heart-rate prediction pipeline.
+
+## Date
+
+2026-04-27
+
+## Changes Summary
+
+### New Kafka Consumer: `HeartRateAiConsumer`
+
+- **Consumer Group**: `heartrate-ai`
+- **Topic**: `heartrate.raw` (same as other consumers)
+- **Purpose**: Accumulates BPM readings per-user in a sliding window of 60 readings, then triggers AI prediction via Python inference API
+- **Fault Tolerance**: All exceptions are caught internally — the consumer NEVER crashes or blocks other consumers
+
+### New Services
+
+| Service | Location | Purpose |
+|---------|----------|---------|
+| `HeartRateAiService` | smartwatch-service | Core AI pipeline: sliding window, metadata fetch, inference call |
+| `HeartRateAiStreamingService` | smartwatch-service | SSE broadcast for AI prediction results |
+| `HeartRateAiController` | smartwatch-service | REST + SSE endpoints for frontend |
+
+### New Python Service: `pkl_inference_api`
+
+- **Port**: 5001
+- **Endpoint**: `POST /predict`
+- **Model**: `best_model_Random_Forest.pkl` (Random Forest classifier)
+- **Features computed**: bpm_mean, bpm_std, bpm_max, bpm_min, bpm_delta, bpm_slope, hrv_rmssd, bpm_current, bpm_iqr
+- **Patient modifiers**: age > 80 → ×1.10, poids < 55 → ×1.05
+
+### Backpi Changes
+
+- Added `GET /api/patients/by-user/{userId}` endpoint returning `PatientMetadataDto` (age, sexe, poids)
+- Added `findByUser_Id` to `PatientRepository`
+- Added `retrievePatientByUserId` to patient service
+
+### Frontend Changes
+
+- Added `HeartRateAiService` (Angular) for SSE + REST communication
+- Updated `LiveHeartRateComponent` with AI prediction panel
+- 5 UI states: idle, waiting (progress bar), ready (risk card), error, disconnected
+
+## Architecture Flow
+
+```
+BLE Script → POST /api/heart-rate/ingest → HeartRateProducer → Kafka [heartrate.raw]
+                                                                    ↓
+                                            ┌───────────────────────┼──────────────────────┐
+                                            ↓                       ↓                      ↓
+                                  HeartRateStreamConsumer   HeartRateAlertConsumer   HeartRateAiConsumer
+                                            ↓                       ↓                      ↓
+                                       SSE → Angular           Alert Pipeline        HeartRateAiService
+                                                                                          ↓
+                                                                              ┌───────────┴───────────┐
+                                                                              ↓                       ↓
+                                                                    backpi REST API          pkl_inference_api
+                                                                    (patient metadata)       (Python /predict)
+                                                                              └───────────┬───────────┘
+                                                                                          ↓
+                                                                              HeartRateAiStreamingService
+                                                                                          ↓
+                                                                                    SSE → Angular
+                                                                                   (AI prediction panel)
+```
+
+## Configuration
+
+### smartwatch-service `application.properties`
+
+```properties
+# AI prediction pipeline
+heartrate.ai.inference-url=http://localhost:5001/predict
+heartrate.ai.backpi-url=http://localhost:8082/api/patients/by-user
+heartrate.ai.window-size=60
+```
+
+### Timeouts
+
+| Call | Timeout |
+|------|---------|
+| backpi metadata fetch | 3 seconds |
+| Python inference API | 5 seconds |
+
+## Fault Tolerance
+
+### Failure Scenarios
+
+| Scenario | Behavior |
+|----------|----------|
+| backpi unavailable | AI status → ERROR, consumer continues |
+| Python inference API unavailable | AI status → ERROR, consumer continues |
+| Incomplete patient metadata | AI status → ERROR, consumer continues |
+| Unexpected exception | Caught, logged, AI status → ERROR, consumer continues |
+| Watch disconnected | Frontend shows "Disconnected" state, clears last prediction |
+
+### Key Design Decisions
+
+1. **processEvent() never throws** — wrapped in try-catch with catch-all fallback
+2. **Metadata cached per userId** — fetched once from backpi, stored in ConcurrentHashMap
+3. **Independent consumer group** — `heartrate-ai` group ensures no interference with existing consumers
+4. **Angular disconnected propagation** — when main SSE errors, AI panel immediately shows "Disconnected"
+
+## Deployment Notes
+
+### Prerequisites
+
+1. Kafka + Zookeeper running
+2. Eureka service registry running
+3. backpi running on port 8082
+4. smartwatch-service running on port 8095
+5. Python 3.x with dependencies installed
+
+### Starting the Python Inference Service
+
+```bash
+cd pkl_inference_api
+pip install -r requirements.txt
+python app.py
+```
+
+### Testing
+
+1. Start all services
+2. Run BLE simulator to send heart-rate data
+3. Verify AI panel transitions: idle → waiting (0-59 readings) → ready (60+ readings)
+4. Verify disconnect: stop BLE simulator → AI panel shows "Disconnected"
+5. Verify error: stop pkl_inference_api → AI panel shows "Error"

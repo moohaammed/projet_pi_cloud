@@ -41,6 +41,9 @@ export class AppComponent implements OnDestroy {
   notificationPermissionDenied = signal<boolean>(false);
   private videoCallInviteSub?: Subscription;
 
+  // Help Notification Popup State
+  helpNotificationPopup = signal<{ content: string; patientName: string; relationType: string; timestamp: string } | null>(null);
+
   constructor() {
     // Reactive connection to WebSocket and VideoCall when user is logged in
     this.auth.getLoggedIn$().subscribe(loggedIn => {
@@ -66,6 +69,23 @@ export class AppComponent implements OnDestroy {
       }
     });
 
+    // Help Notification popup effect (separate from SOS/GPS)
+    effect(() => {
+      const helpNotif = this.webSocketService.helpNotificationMessage();
+      if (helpNotif) {
+        untracked(() => {
+          this.helpNotificationPopup.set({
+            content: helpNotif.content || 'Help notification received',
+            patientName: helpNotif.patientName || 'Unknown',
+            relationType: helpNotif.relationType || '',
+            timestamp: helpNotif.timestamp || new Date().toISOString()
+          });
+          // Auto-dismiss after 15 seconds
+          setTimeout(() => this.dismissHelpNotification(), 15000);
+        });
+      }
+    });
+    
     // Initial check if already logged in (e.g. page refresh)
     if (this.auth.isLoggedIn()) {
       const user = this.auth.getCurrentUser();
@@ -236,6 +256,10 @@ export class AppComponent implements OnDestroy {
       return '/admin/dashboard';
     }
     return '/patient-dashboard';
+  }
+
+  dismissHelpNotification(): void {
+    this.helpNotificationPopup.set(null);
   }
 
   isLoggedIn(): boolean {

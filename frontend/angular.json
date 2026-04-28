@@ -16,10 +16,15 @@
             "outputPath": "dist/frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              { "glob": "**/*", "input": "public" }
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
               "public/template/assets/plugins/bootstrap/css/bootstrap.min.css",
@@ -56,39 +61,48 @@
           "defaultConfiguration": "development"
         },
         "serve": {
-  "builder": "@angular-devkit/build-angular:dev-server",
-  "options": {
-    "host": "0.0.0.0",
-    "port": 4200,
-    "allowedHosts": ["exorcistic-joie-duckie.ngrok-free.dev"]
-  },
-  "configurations": {
-    "production": {
-      "buildTarget": "frontend:build:production"
-    },
-    "development": {
-      "buildTarget": "frontend:build:development"
-    }
-  },
-  "defaultConfiguration": "development"
-},
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json",
+            "host": "0.0.0.0",
+            "port": 4200,
+            "allowedHosts": [
+              "exorcistic-joie-duckie.ngrok-free.dev"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "frontend:build:production"
+            },
+            "development": {
+              "buildTarget": "frontend:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": ["zone.js", "zone.js/testing"],
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              { "glob": "**/*", "input": "public" }
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
               "public/template/assets/plugins/bootstrap/css/bootstrap.min.css",
               "public/template/assets/plugins/fontawesome/css/all.min.css",
               "public/template/assets/plugins/themify-icons/themify-icons.css",
               "public/template/assets/css/style.css",
-              "src/styles.css"
+              "src/styles.css",
             ],
             "scripts": []
           }

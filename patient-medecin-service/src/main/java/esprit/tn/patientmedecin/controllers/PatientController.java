@@ -1,12 +1,14 @@
 package esprit.tn.patientmedecin.controllers;
 
 import esprit.tn.patientmedecin.entities.Patient;
+import esprit.tn.patientmedecin.entities.UserInfo;
 import esprit.tn.patientmedecin.repositories.PatientRepository;
 import esprit.tn.patientmedecin.services.IPatientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -55,6 +57,34 @@ public class PatientController {
         patientService.removePatient(id);
     }
 
+    /**
+     * PATCH /api/patients/{id}/patch-email
+     * Updates the email (and optionally telephone) stored inside the patient's
+     * embedded UserInfo. This is used to sync emails from the main backend.
+     * Body: { "email": "patient@example.com", "telephone": "..." }
+     */
+    @PatchMapping("/{id}/patch-email")
+    public ResponseEntity<Patient> patchEmail(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, String> body) {
+
+        Patient p = patientRepository.findById(id).orElse(null);
+        if (p == null) return ResponseEntity.notFound().build();
+
+        UserInfo user = p.getUser();
+        if (user == null) {
+            user = new UserInfo();
+        }
+        if (body.containsKey("email")) {
+            user.setEmail(body.get("email"));
+        }
+        if (body.containsKey("telephone")) {
+            user.setTelephone(body.get("telephone"));
+        }
+        p.setUser(user);
+        return ResponseEntity.ok(patientRepository.save(p));
+    }
+
     // ── Assignment endpoints ────────────────────────────────────────────────
 
     @GetMapping("/by-medecin/{medecinId}")
@@ -73,7 +103,7 @@ public class PatientController {
         if (opt.isEmpty() || opt.get().getMedecinId() == null) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(java.util.Map.of("medecinId", opt.get().getMedecinId()));
+        return ResponseEntity.ok(Map.of("medecinId", opt.get().getMedecinId()));
     }
 
     @PostMapping("/{patientId}/assign/{medecinId}")

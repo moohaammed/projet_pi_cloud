@@ -8,8 +8,8 @@ import { Patient, Analyse } from '../models/patient.model';
 })
 export class PatientService {
 
-  private apiUrl = 'http://localhost:8080/api/patients';
-  private analyseUrl = 'http://localhost:8080/api/analyses';
+  private apiUrl = 'http://localhost:8082/api/patients';
+  private analyseUrl = 'http://localhost:8082/api/analyses';
 
   constructor(private http: HttpClient) {}
 

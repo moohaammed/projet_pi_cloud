@@ -91,6 +91,16 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   startX = 0;
   startY = 0;
 
+  // --- Voice Recording ---
+  mediaRecorder: any;
+  audioChunks: any[] = [];
+  isRecording = false;
+  recordedBlob: Blob | null = null;
+  recordedAudioUrl: string | null = null;
+  isUploadingVoice = false;
+  recordingTimer: number = 0;
+  timerInterval: any;
+
   constructor(
     private patientService: PatientService,
     private analyseService: AnalyseService,
@@ -346,12 +356,90 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
       this.rappelService.create(payload);
 
     action.subscribe({
-      next: () => {
+      next: (res: any) => {
         this.showSuccess(this.isEditingReminder ? "Rappel mis à jour." : "Nouveau rappel créé.");
-        this.showReminderModal = false;
-        this.loadReminders(this.selectedPatient.id);
+        
+        // If we have a recorded voice, upload it now
+        if (this.recordedBlob && res.id) {
+          this.uploadVoice(res.id);
+        } else {
+          this.showReminderModal = false;
+          this.loadReminders(this.selectedPatient.id);
+        }
       }
     });
+  }
+
+  // --- Voice Recording Logic ---
+  async startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaRecorder = new MediaRecorder(stream);
+      this.audioChunks = [];
+      this.recordedBlob = null;
+      this.recordedAudioUrl = null;
+
+      this.mediaRecorder.ondataavailable = (event: any) => {
+        this.audioChunks.push(event.data);
+      };
+
+      this.mediaRecorder.onstop = () => {
+        this.recordedBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+        this.recordedAudioUrl = URL.createObjectURL(this.recordedBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      this.mediaRecorder.start();
+      this.isRecording = true;
+      this.recordingTimer = 0;
+      this.timerInterval = setInterval(() => this.recordingTimer++, 1000);
+    } catch (err) {
+      alert("Veuillez autoriser l'accès au microphone.");
+    }
+  }
+
+  stopRecording() {
+    if (this.mediaRecorder && this.isRecording) {
+      this.mediaRecorder.stop();
+      this.isRecording = false;
+      clearInterval(this.timerInterval);
+    }
+  }
+
+  deleteRecording() {
+    this.recordedBlob = null;
+    this.recordedAudioUrl = null;
+    this.audioChunks = [];
+    this.recordingTimer = 0;
+  }
+
+  uploadVoice(rappelId: number) {
+    if (!this.recordedBlob) return;
+    this.isUploadingVoice = true;
+    this.rappelService.uploadVoice(rappelId, this.recordedBlob).subscribe({
+      next: () => {
+        this.showSuccess("Message vocal enregistré avec succès.");
+        this.isUploadingVoice = false;
+        this.recordedBlob = null;
+        this.recordedAudioUrl = null;
+        this.showReminderModal = false;
+        this.loadReminders(this.selectedPatient.id);
+      },
+      error: () => {
+        this.isUploadingVoice = false;
+        alert("Erreur lors de l'envoi du message vocal.");
+      }
+    });
+  }
+
+  formatTimer(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  getExistingVoiceUrl(rappel: any): string | null {
+    return rappel.voiceMessagePath ? this.rappelService.getVoiceUrl(rappel.id) : null;
   }
 
   deleteReminder(id: number) {

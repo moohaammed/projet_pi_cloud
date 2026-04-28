@@ -32,7 +32,9 @@ export interface IncidentRequest {
 
 @Injectable({ providedIn: 'root' })
 export class IncidentService {
-  private readonly baseUrl = `${environment.apiUrl}/api/incidents`;
+
+  // ← pointe vers le geo-service, pas backpi
+  private readonly baseUrl = `${environment.geoApiUrl}/api/incidents`;
 
   constructor(private http: HttpClient) {}
 
@@ -41,9 +43,13 @@ export class IncidentService {
     return this.http.post<Incident>(this.baseUrl, payload);
   }
 
-  /** POST /api/incidents/ai */
+  /**
+   * POST /api/incidents
+   * Alias de create() — /api/incidents/ai n'existe pas dans le backend.
+   * Les deux methodes utilisent le meme endpoint.
+   */
   createFromAi(req: IncidentRequest): Observable<Incident> {
-    return this.http.post<Incident>(`${this.baseUrl}/ai`, req);
+    return this.http.post<Incident>(this.baseUrl, req);
   }
 
   /** GET /api/incidents */
@@ -56,17 +62,17 @@ export class IncidentService {
     return this.http.get<Incident[]>(`${this.baseUrl}/patient/${patientId}`);
   }
 
-  /** PATCH /api/incidents/:id/resoudre → statut RESOLU */
+  /** PATCH /api/incidents/:id/resoudre */
   resoudre(id: string): Observable<Incident> {
     return this.http.patch<Incident>(`${this.baseUrl}/${id}/resoudre`, {});
   }
 
-  /** PATCH /api/incidents/:id/fermer → statut FERME */
+  /** PATCH /api/incidents/:id/fermer */
   fermer(id: string): Observable<Incident> {
     return this.http.patch<Incident>(`${this.baseUrl}/${id}/fermer`, {});
   }
 
-  /** PATCH /api/incidents/:id/reouvrir → statut EN_COURS */
+  /** PATCH /api/incidents/:id/reouvrir */
   reouvrir(id: string): Observable<Incident> {
     return this.http.patch<Incident>(`${this.baseUrl}/${id}/reouvrir`, {});
   }

@@ -17,7 +17,6 @@ public class DonationCampaignService {
 
     @Autowired
     private DonationRepository donationRepository;
-
     // CREATE
     public DonationCampaign createCampaign(DonationCampaign campaign) {
         return campaignRepository.save(campaign);
@@ -37,6 +36,10 @@ public class DonationCampaignService {
     public DonationCampaign getCampaignById(String id) {
         return campaignRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Campaign non trouvée : " + id));
+    }
+
+    public DonationCampaign saveCampaign(DonationCampaign campaign) {
+        return campaignRepository.save(campaign);
     }
 
     // UPDATE

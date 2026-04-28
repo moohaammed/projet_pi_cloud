@@ -6,7 +6,6 @@
           <div class="d-flex align-items-center justify-content-between">
             <div>
               <h2 class="mb-1 fw-bold">Détails du Rendez-vous</h2>
-              <p class="mb-0 opacity-75">ID: #{{ rv.id }}</p>
             </div>
             <span [class]="'badge rounded-pill px-3 py-2 border border-white border-opacity-50 ' + 
                             (rv.etat === 'Valide' ? 'bg-success bg-opacity-75' : 
@@ -31,7 +30,7 @@
                   <hr class="my-3 opacity-25">
                   <div class="detail-item">
                     <label class="text-secondary small text-uppercase fw-bold">Nom du Patient</label>
-                    <p class="fs-5 mb-0 fw-semibold">{{ rv.nomPatient }}</p>
+                    <p class="fs-5 mb-0 fw-semibold">{{ rv.nomPatient || ('Patient ID: ' + rv.patientId) }}</p>
                   </div>
                 </div>
               </div>
@@ -45,12 +44,12 @@
                 <div class="space-y-3">
                   <div class="detail-item">
                     <label class="text-secondary small text-uppercase fw-bold">Médecin</label>
-                    <p class="fs-5 mb-0 fw-semibold">Dr. {{ rv.medecinNom }}</p>
+                    <p class="fs-5 mb-0 fw-semibold">Dr. {{ rv.medecinNom || rv.medecinId }}</p>
                   </div>
                   <hr class="my-3 opacity-25">
                   <div class="detail-item">
                     <label class="text-secondary small text-uppercase fw-bold">Hôpital</label>
-                    <p class="fs-5 mb-0 fw-semibold">{{ rv.hopitalNom }}</p>
+                    <p class="fs-5 mb-0 fw-semibold">{{ rv.hopitalNom || 'Hôpital Général (PI Cloud)' }}</p>
                   </div>
                 </div>
               </div>

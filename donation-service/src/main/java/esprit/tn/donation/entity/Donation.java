@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Document(collection = "donations")
 public class Donation {
@@ -14,7 +15,8 @@ public class Donation {
     private Double amount;
 
     private String donorFirstName;
-
+    private String aiSummary;
+    private Date aiGeneratedAt;
     private String donorLastName;
 
     private String donorEmail;

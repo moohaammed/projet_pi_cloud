@@ -7,6 +7,7 @@ import { MapService } from '../../../services/map.service';
 import { AlzUserService } from '../../../services/alz-user.service';
 import { AuthService } from '../../../services/auth.service';
 import { HospitalService } from '../../../services/hospital.service';
+import { HospitalPrediction, HospitalPredictionService, RecommendedHospital } from '../../../services/hospital-prediction.service';
 import { IncidentService, Incident } from '../../../services/incident.service';
 import { SafeZone, GeoAlert, PatientLocation } from '../../../models/map.model';
 import { User, Role } from '../../../models/user.model';
@@ -37,6 +38,10 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private redCircles:           Map<number, L.Circle>     = new Map();
   private historyLayers:        Map<number, L.Polyline[]> = new Map();
   private hospitalMarkers:      L.Marker[] = [];
+  private recommendedHospitalMarkers: L.Marker[] = [];
+  private hospitalRouteLine: L.Polyline | null = null;
+  private hospitalRouteEndpointMarkers: L.Marker[] = [];
+  private hospitalPredictionKeys: Map<number, string> = new Map();
   private centerMarker:         L.Marker | null = null;
   private houseMarkers:         Map<number, L.Marker> = new Map();
   private incidentMarkers:      L.Marker[] = [];
@@ -45,6 +50,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── Données ──────────────────────────────────────────────────────────────
   patients:        User[]      = [];
   hospitals:       Hospital[]  = [];
+  hospitalPredictions: HospitalPrediction[] = [];
   incidents:       Incident[]  = [];
   patientIncidents: Incident[] = [];
   selectedPatient: User | null = null;
@@ -56,6 +62,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
   loading          = false;
   editingZone      = false;
   showHospitals    = true;
+  showRecommendedHospitals = true;
   showHistory      = false;
   showIncidents    = true;
   loadingIncidents = false;
@@ -116,6 +123,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     private alzUserService:  AlzUserService,
     private authService:     AuthService,
     private hospitalService: HospitalService,
+    private hospitalPredictionService: HospitalPredictionService,
     private incidentService: IncidentService
   ) {}
 
@@ -128,7 +136,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.initMap();
       this.loadPatients();
-      this.loadHospitals();
+      this.loadHospitalPredictions();
       this.loadAlerts();
       this.loadIncidents();
     }, 300);
@@ -738,6 +746,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     marker.addTo(this.map);
     this.patientMarkers.set(patient.id!, marker);
     this.loadPatientZones(patient.id!, loc);
+    this.predictHospitalForPatient(patient, loc);
   }
 
   private addOfflineMarker(patient: User): void {
@@ -1067,6 +1076,229 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
   // ALERTES
   // ═══════════════════════════════════════════════════════════════════════════
 
+  loadHospitalPredictions(): void {
+    this.hospitalPredictionService.latest().subscribe({
+      next: (data) => {
+        this.hospitalPredictions = data || [];
+        this.addRecommendedHospitalMarkers();
+      },
+      error: () => {
+        this.hospitalPredictions = [];
+        this.recommendedHospitalMarkers.forEach(m => m.remove());
+        this.recommendedHospitalMarkers = [];
+      }
+    });
+  }
+
+  private addRecommendedHospitalMarkers(): void {
+    this.recommendedHospitalMarkers.forEach(m => m.remove());
+    this.recommendedHospitalMarkers = [];
+
+    this.latestRecommendedHospitals.forEach((item) => {
+      const hospital = item.hospital;
+      if (hospital.latitude == null || hospital.longitude == null) return;
+
+      const isRecommended = hospital.recommande || item.rank === 0;
+      const color = isRecommended ? '#198754' : '#6c757d';
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="position:relative;width:38px;height:38px">
+                 <div style="background:${color};color:white;border-radius:50% 50% 50% 6px;
+                             width:38px;height:38px;transform:rotate(-45deg);
+                             display:flex;align-items:center;justify-content:center;
+                             border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.35)">
+                   <span style="transform:rotate(45deg);font-size:16px;font-weight:800">H</span>
+                 </div>
+               </div>`,
+        iconSize: [38, 38],
+        iconAnchor: [19, 38]
+      });
+
+      const patientName = this.patientNameById(item.prediction.patientId);
+      const marker = L.marker([hospital.latitude, hospital.longitude], { icon, zIndexOffset: isRecommended ? 1200 : 900 })
+        .bindPopup(`<div style="min-width:220px">
+          <div style="background:${color};color:white;padding:8px 12px;margin:-8px -12px 8px;border-radius:4px 4px 0 0">
+            <strong>${isRecommended ? 'Recommande - ' : ''}${hospital.nom}</strong>
+          </div>
+          <div style="font-size:12px;padding:4px 0">
+            <div><b>Patient :</b> ${patientName}</div>
+            <div><b>Distance :</b> ${this.hospitalDistance(hospital)} km</div>
+            <div><b>Specialite :</b> ${hospital.specialite}</div>
+            <div><b>Telephone :</b> ${hospital.telephone}</div>
+            <div><b>Adresse :</b> ${hospital.adresse}</div>
+          </div>
+          <a href="${this.recommendedHospitalMapsUrl(item.prediction, hospital)}" target="_blank"
+             style="display:block;margin-top:6px;padding:5px 8px;background:#0d6efd;color:white;
+                    border-radius:4px;text-decoration:none;text-align:center;font-size:12px">
+            Itineraire
+          </a>
+        </div>`);
+
+      marker.on('click', () => this.drawHospitalRoute(item.prediction, hospital));
+
+      if (this.showRecommendedHospitals) marker.addTo(this.map);
+      this.recommendedHospitalMarkers.push(marker);
+    });
+  }
+
+  toggleRecommendedHospitals(): void {
+    this.showRecommendedHospitals = !this.showRecommendedHospitals;
+    this.recommendedHospitalMarkers.forEach(m => this.showRecommendedHospitals ? m.addTo(this.map) : m.remove());
+  }
+
+  focusRecommendedHospital(item: { prediction: HospitalPrediction; hospital: RecommendedHospital; rank: number }): void {
+    if (item.hospital.latitude == null || item.hospital.longitude == null) return;
+    this.map.setView([item.hospital.latitude, item.hospital.longitude], 15);
+    this.drawHospitalRoute(item.prediction, item.hospital);
+  }
+
+  private predictHospitalForPatient(patient: User, loc: PatientLocation): void {
+    if (!patient.id || loc.latitude == null || loc.longitude == null) return;
+
+    const key = `${loc.latitude.toFixed(5)},${loc.longitude.toFixed(5)}`;
+    if (this.hospitalPredictionKeys.get(patient.id) === key) return;
+    this.hospitalPredictionKeys.set(patient.id, key);
+
+    this.hospitalPredictionService.predict({
+      patientId: patient.id,
+      patientName: `${patient.nom} ${patient.prenom}`.trim(),
+      patientLatitude: loc.latitude,
+      patientLongitude: loc.longitude,
+      typeIncident: 'malaise'
+    }).subscribe({
+      next: (prediction) => {
+        this.hospitalPredictions = [
+          prediction,
+          ...this.hospitalPredictions.filter(existing => existing.patientId !== prediction.patientId)
+        ];
+        this.addRecommendedHospitalMarkers();
+      },
+      error: () => {}
+    });
+  }
+
+  private drawHospitalRoute(prediction: HospitalPrediction, hospital: RecommendedHospital): void {
+    if (
+      prediction.patientLatitude == null ||
+      prediction.patientLongitude == null ||
+      hospital.latitude == null ||
+      hospital.longitude == null
+    ) return;
+
+    this.clearHospitalRoute();
+
+    const start = L.latLng(prediction.patientLatitude, prediction.patientLongitude);
+    const end = L.latLng(hospital.latitude, hospital.longitude);
+    const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson&steps=false`;
+
+    fetch(url)
+      .then(response => response.ok ? response.json() : null)
+      .then((data) => {
+        if (data?.code === 'Ok' && data.routes?.length > 0) {
+          const route = data.routes[0];
+          const points = route.geometry.coordinates.map(([lng, lat]: [number, number]) => L.latLng(lat, lng));
+          this.hospitalRouteLine = L.polyline(points, {
+            color: '#198754',
+            weight: 6,
+            opacity: 0.9
+          }).addTo(this.map);
+
+          const distanceKm = (route.distance / 1000).toFixed(1);
+          const durationMin = Math.round(route.duration / 60);
+          this.hospitalRouteLine.bindTooltip(`Chemin le plus court: ${distanceKm} km - ${durationMin} min`, {
+            permanent: false,
+            sticky: true
+          });
+        } else {
+          this.hospitalRouteLine = L.polyline([start, end], {
+            color: '#198754',
+            weight: 4,
+            opacity: 0.8,
+            dashArray: '8 8'
+          }).addTo(this.map);
+        }
+
+        this.addHospitalRouteEndpoints(start, end, hospital.nom);
+        if (this.hospitalRouteLine) {
+          this.map.fitBounds(this.hospitalRouteLine.getBounds(), { padding: [40, 40] });
+        }
+      })
+      .catch(() => {
+        this.hospitalRouteLine = L.polyline([start, end], {
+          color: '#198754',
+          weight: 4,
+          opacity: 0.8,
+          dashArray: '8 8'
+        }).addTo(this.map);
+        this.addHospitalRouteEndpoints(start, end, hospital.nom);
+        this.map.fitBounds(this.hospitalRouteLine.getBounds(), { padding: [40, 40] });
+      });
+  }
+
+  private addHospitalRouteEndpoints(start: L.LatLng, end: L.LatLng, hospitalName: string): void {
+    const startIcon = L.divIcon({
+      className: '',
+      html: `<div style="background:#dc3545;color:white;border-radius:50%;width:24px;height:24px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px">P</div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+    const endIcon = L.divIcon({
+      className: '',
+      html: `<div style="background:#198754;color:white;border-radius:50%;width:26px;height:26px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px">H</div>`,
+      iconSize: [26, 26],
+      iconAnchor: [13, 13]
+    });
+
+    this.hospitalRouteEndpointMarkers = [
+      L.marker(start, { icon: startIcon, zIndexOffset: 1500 }).bindTooltip('Position patient').addTo(this.map),
+      L.marker(end, { icon: endIcon, zIndexOffset: 1500 }).bindTooltip(hospitalName).addTo(this.map)
+    ];
+  }
+
+  private clearHospitalRoute(): void {
+    this.hospitalRouteLine?.remove();
+    this.hospitalRouteLine = null;
+    this.hospitalRouteEndpointMarkers.forEach(marker => marker.remove());
+    this.hospitalRouteEndpointMarkers = [];
+  }
+
+  get latestRecommendedHospitals(): { prediction: HospitalPrediction; hospital: RecommendedHospital; rank: number }[] {
+    const latestByPatient = new Map<number | string, HospitalPrediction>();
+    this.hospitalPredictions.forEach((prediction) => {
+      const key = prediction.patientId ?? prediction.alertId ?? prediction.id ?? `${prediction.patientLatitude},${prediction.patientLongitude}`;
+      if (!latestByPatient.has(key)) latestByPatient.set(key, prediction);
+    });
+
+    const result: { prediction: HospitalPrediction; hospital: RecommendedHospital; rank: number }[] = [];
+    latestByPatient.forEach((prediction) => {
+      (prediction.hopitaux || []).forEach((hospital, rank) => {
+        result.push({ prediction, hospital, rank });
+      });
+    });
+    return result;
+  }
+
+  get selectedPatientRecommendedHospital(): { prediction: HospitalPrediction; hospital: RecommendedHospital; rank: number } | null {
+    if (!this.selectedPatient?.id) return null;
+    return this.latestRecommendedHospitals.find(item =>
+      item.prediction.patientId === this.selectedPatient?.id && item.rank === 0
+    ) || null;
+  }
+
+  patientNameById(patientId?: number): string {
+    if (!patientId) return 'Patient';
+    const patient = this.patients.find(p => p.id === patientId);
+    return patient ? `${patient.nom} ${patient.prenom}` : `Patient ${patientId}`;
+  }
+
+  hospitalDistance(hospital: RecommendedHospital): string {
+    return hospital.distanceKm || hospital.distance_km || '';
+  }
+
+  recommendedHospitalMapsUrl(prediction: HospitalPrediction, hospital: RecommendedHospital): string {
+    return `https://www.google.com/maps/dir/?api=1&origin=${prediction.patientLatitude},${prediction.patientLongitude}&destination=${hospital.latitude},${hospital.longitude}`;
+  }
+
   loadAlerts(): void {
     this.mapService.getAllAlerts().subscribe({
       next: (data) => this.alerts = data.filter(a => !a.resolue)
@@ -1107,6 +1339,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
   refreshAllPositions(): void {
     this.patients.forEach(p => this.loadPatientPosition(p));
     this.loadIncidents();
+    this.loadHospitalPredictions();
   }
 
   get nearestHospital(): Hospital | null {
