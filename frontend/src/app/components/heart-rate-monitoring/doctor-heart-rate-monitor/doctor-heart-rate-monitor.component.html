@@ -1,0 +1,99 @@
+<div class="monitor-page">
+
+  <!-- ── Header ── -->
+  <div class="monitor-header">
+    <div>
+      <p class="eyebrow">Doctor monitoring</p>
+      <h1>Live heart-rate dashboard</h1>
+      <p class="subtitle">Assigned patients only, updated from the shared smartwatch stream.</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="refresh-button" (click)="loadPatients()" [disabled]="isLoading">
+        <i class="fa-solid fa-rotate-right"></i>
+        <span>Refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Summary strip ── -->
+  <div class="summary-grid">
+    <div class="summary-item item-total">
+      <span>Total patients</span>
+      <strong>{{ patients.length }}</strong>
+    </div>
+    <div class="summary-item item-live">
+      <span>Streaming now</span>
+      <strong class="success">{{ connectedCount }}</strong>
+    </div>
+    <div class="summary-item item-offline">
+      <span>Offline</span>
+      <strong class="muted">{{ offlineCount }}</strong>
+    </div>
+  </div>
+
+  <!-- ── Error alert ── -->
+  <div *ngIf="errorMessage" class="alert-message">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- ── Loading ── -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner-border text-primary" role="status"></div>
+    <span>Loading patients…</span>
+  </div>
+
+  <!-- ── Empty state ── -->
+  <div *ngIf="!isLoading && patients.length === 0" class="empty-panel">
+    <i class="fa-solid fa-heart-pulse"></i>
+    <h2>No assigned patients</h2>
+    <p>Patients appear here once they link your doctor account in the app.</p>
+  </div>
+
+  <!-- ── Patient cards ── -->
+  <div class="patient-monitor-grid" *ngIf="!isLoading && patients.length > 0">
+    <article
+      class="patient-monitor-card"
+      [class.is-alert]="getBpmClass(patient) === 'high'"
+      *ngFor="let patient of patients; trackBy: trackByPatientId"
+    >
+      <!-- Card header -->
+      <div class="patient-card-header">
+        <div class="patient-avatar">
+          {{ patient.prenom?.charAt(0) || '?' }}{{ patient.nom?.charAt(0) || '' }}
+        </div>
+        <div class="patient-title">
+          <h2>{{ getPatientName(patient) }}</h2>
+          <span>Patient</span>
+        </div>
+        <div class="state-pill" [class.connected]="isConnected(patient)">
+          <span class="dot"></span>
+          {{ isConnected(patient) ? 'Live' : 'Offline' }}
+        </div>
+      </div>
+
+      <!-- BPM -->
+      <div class="bpm-row" [ngClass]="getBpmClass(patient)">
+        <strong>{{ getBpm(patient) }}</strong>
+        <span class="bpm-label">BPM</span>
+      </div>
+
+      <!-- Detail chips -->
+      <div class="details-grid">
+        <div>
+          <span>State</span>
+          <strong>{{ getZone(patient) }}</strong>
+        </div>
+        <div>
+          <span>Last update</span>
+          <strong>{{ getLastReceived(patient) }}</strong>
+        </div>
+        <div>
+          <span>Device</span>
+          <strong>{{ getState(patient)?.deviceName || '—' }}</strong>
+        </div>
+      </div>
+    </article>
+  </div>
+
+</div>

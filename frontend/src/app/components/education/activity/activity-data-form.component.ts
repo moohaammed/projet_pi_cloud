@@ -58,13 +58,13 @@ export interface ExerciceData {
               <i class="fa-solid fa-clipboard-question fs-5"></i>
             </div>
             <div>
-              <h6 class="mb-0 fw-bold text-dark">Configuration du Quiz</h6>
-              <p class="text-muted small mb-0">{{ quizData.questions.length }} questions configurées</p>
+              <h6 class="mb-0 fw-bold text-dark">Quiz Configuration</h6>
+              <p class="text-muted small mb-0">{{ quizData.questions.length }} questions configured</p>
             </div>
           </div>
           <div class="d-flex align-items-center gap-3">
             <div class="d-flex align-items-center gap-2">
-              <span class="small fw-bold text-muted text-uppercase" style="font-size: 10px;">Temps (min)</span>
+              <span class="small fw-bold text-muted text-uppercase" style="font-size: 10px;">Time (min)</span>
               <input type="number" class="form-control form-control-sm bg-light border-0 rounded-pill px-3 shadow-sm text-center fw-bold" 
                      style="width: 60px;" [value]="quizData.timer / 60" (input)="updateQuizTimer($event)" min="1" max="10" />
             </div>
@@ -75,7 +75,7 @@ export interface ExerciceData {
         </div>
 
         <div class="card border-0 bg-white rounded-4 shadow-sm mb-4 overflow-hidden animate-fade-in" 
-             *ngFor="let q of quizData.questions; let i = index">
+             *ngFor="let q of quizData.questions; let i = index; trackBy: trackByIndex">
           <div class="card-header bg-soft-light border-0 p-3 d-flex justify-content-between align-items-center">
             <span class="badge bg-white shadow-sm text-dark px-3 py-2 rounded-pill fw-bold border" style="font-size: 11px;">
               <i class="fa-solid fa-hashtag text-primary me-1"></i> Question {{ i + 1 }}
@@ -86,22 +86,22 @@ export interface ExerciceData {
           </div>
           <div class="card-body p-4 pt-3">
             <div class="mb-4">
-              <label class="form-label fw-bold text-muted small text-uppercase">Intitulé de la question</label>
+              <label class="form-label fw-bold text-muted small text-uppercase">Question Title</label>
               <input type="text" class="form-control bg-light border-0 rounded-3 px-3 py-2 shadow-sm" 
                      [value]="q.texte" (input)="updateQuestionText(i, $event)" 
-                     placeholder="Tapez ici votre question..." />
+                     placeholder="Type your question here..." />
             </div>
 
             <div class="mb-4">
               <div class="d-flex align-items-center justify-content-between mb-2">
-                <label class="form-label fw-bold text-muted small text-uppercase mb-0">Choix (Cochez la bonne réponse)</label>
+                <label class="form-label fw-bold text-muted small text-uppercase mb-0">Choices (Check the correct answer)</label>
                 <button type="button" class="btn btn-link btn-sm text-decoration-none fw-bold p-0" 
                         (click)="addOption(i)" *ngIf="q.options.length < 6">
-                  <i class="fa-solid fa-plus-circle me-1"></i> Ajouter un choix
+                  <i class="fa-solid fa-plus-circle me-1"></i> Add a choice
                 </button>
               </div>
               <div class="row g-3">
-                <div class="col-md-6" *ngFor="let opt of q.options; let j = index">
+                <div class="col-md-6" *ngFor="let opt of q.options; let j = index; trackBy: trackByIndex">
                   <div class="input-group shadow-sm rounded-pill overflow-hidden border-0">
                     <span class="input-group-text cursor-pointer transition-all border-0 px-3" 
                           [class.bg-primary]="q.reponse_correcte === j"
@@ -123,17 +123,17 @@ export interface ExerciceData {
             </div>
 
             <div>
-              <label class="form-label fw-bold text-muted small text-uppercase">Explication pédagogique (Affichée après réponse)</label>
+              <label class="form-label fw-bold text-muted small text-uppercase">Pedagogical explanation (Shown after answering)</label>
               <textarea class="form-control bg-light border-0 rounded-3 p-3 shadow-sm small" 
                         rows="2" [value]="q.explication" (input)="updateExplication(i, $event)"
-                        placeholder="Expliquez pourquoi c'est la bonne réponse..."></textarea>
+                        placeholder="Explain why this is the correct answer..."></textarea>
             </div>
           </div>
         </div>
 
         <div *ngIf="quizData.questions.length === 0" class="text-center py-5 border-2 border-dashed rounded-4 bg-light text-muted">
            <i class="fa-solid fa-plus-circle fs-2 opacity-25 mb-2 d-block"></i>
-           Cliquez sur "Question" pour démarrer votre quiz.
+           Click "Question" to start your quiz.
         </div>
       </ng-container>
 
@@ -145,12 +145,12 @@ export interface ExerciceData {
               <i class="fa-solid fa-puzzle-piece fs-5"></i>
             </div>
             <div>
-              <h6 class="mb-0 fw-bold text-dark">Paramètres du Memory</h6>
-              <p class="text-muted small mb-0">Définissez les règles du jeu</p>
+              <h6 class="mb-0 fw-bold text-dark">Memory Settings</h6>
+              <p class="text-muted small mb-0">Define the game rules</p>
             </div>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <span class="small fw-bold text-muted text-uppercase" style="font-size: 10px;">Chrono (min)</span>
+            <span class="small fw-bold text-muted text-uppercase" style="font-size: 10px;">Timer (min)</span>
             <input type="number" class="form-control form-control-sm bg-light border-0 rounded-pill px-3 shadow-sm text-center fw-bold" 
                    style="width: 60px;" [value]="gameData.timer / 60" (input)="updateGameTimer($event)" min="1" max="10" />
           </div>
@@ -159,23 +159,23 @@ export interface ExerciceData {
         <div class="row g-4 mb-4">
           <div class="col-md-6">
             <div class="card border-0 bg-light p-4 rounded-4 shadow-sm h-100">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-3"><i class="fa-solid fa-palette me-2 text-primary"></i>Univers Visuel</label>
+              <label class="form-label fw-bold text-muted small text-uppercase mb-3"><i class="fa-solid fa-palette me-2 text-primary"></i>Visual Universe</label>
               <select class="form-select border-0 bg-white rounded-3 p-3 shadow-sm fw-bold text-dark" [value]="gameData.theme" (change)="updateGameTheme($event)">
-                <option value="animaux">🐘 Animaux Sauvages</option>
-                <option value="fleurs">🌸 Jardin de Fleurs</option>
-                <option value="fruits">🍎 Corbeille de Fruits</option>
-                <option value="transport">🚗 Moyens de Transport</option>
+                <option value="animaux">🐘 Wild Animals</option>
+                <option value="fleurs">🌸 Flower Garden</option>
+                <option value="fruits">🍎 Fruit Basket</option>
+                <option value="transport">🚗 Means of Transport</option>
               </select>
             </div>
           </div>
           <div class="col-md-6">
             <div class="card border-0 bg-light p-4 rounded-4 shadow-sm h-100">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-3"><i class="fa-solid fa-layer-group me-2 text-primary"></i>Nombre de Paires</label>
+              <label class="form-label fw-bold text-muted small text-uppercase mb-3"><i class="fa-solid fa-layer-group me-2 text-primary"></i>Number of Pairs</label>
               <select class="form-select border-0 bg-white rounded-3 p-3 shadow-sm fw-bold text-dark" [value]="gameData.nombreCartes" (change)="updateGameCards($event)">
-                <option [value]="6">6 (Trés facile - Débutant)</option>
-                <option [value]="8">8 (Facile - Standard)</option>
-                <option [value]="10">10 (Moyen - Challenge)</option>
-                <option [value]="12">12 (Difficile - Expert)</option>
+                <option [value]="6">6 (Very easy - Beginner)</option>
+                <option [value]="8">8 (Easy - Standard)</option>
+                <option [value]="10">10 (Medium - Challenge)</option>
+                <option [value]="12">12 (Hard - Expert)</option>
               </select>
             </div>
           </div>
@@ -189,17 +189,17 @@ export interface ExerciceData {
               <i class="fa-solid fa-display fs-5"></i>
             </div>
             <div>
-              <h6 class="mb-0 fw-bold text-dark">Informations du Contenu</h6>
-              <p class="text-muted small mb-0">Intégrez une vidéo ou un article externe</p>
+              <h6 class="mb-0 fw-bold text-dark">Content Information</h6>
+              <p class="text-muted small mb-0">Integrate a video or an external article</p>
             </div>
          </div>
 
          <div class="card border-0 bg-light p-4 rounded-4 shadow-sm mb-4">
            <div class="mb-4">
-              <label class="form-label fw-bold text-muted small text-uppercase"><i class="fa-solid fa-link me-2 text-warning"></i>Source (URL ou Lien)</label>
+              <label class="form-label fw-bold text-muted small text-uppercase"><i class="fa-solid fa-link me-2 text-warning"></i>Source (URL or Link)</label>
               <input type="text" class="form-control border-0 bg-white rounded-3 p-3 shadow-sm" 
                      [value]="contentData.videoUrl" 
-                     placeholder="Collez ici l'URL du contenu (ex: https://youtube.com/...)" 
+                     placeholder="Paste content URL here (e.g.: https://youtube.com/...)" 
                      (input)="updateContentSource($event)">
            </div>
          </div>
@@ -213,27 +213,27 @@ export interface ExerciceData {
               <i class="fa-solid fa-person-running fs-5"></i>
             </div>
             <div>
-              <h6 class="mb-0 fw-bold text-dark">Séquence d'Exercices</h6>
-              <p class="text-muted small mb-0">{{ exerciceData.etapes.length }} étapes programmées</p>
+              <h6 class="mb-0 fw-bold text-dark">Exercise Sequence</h6>
+              <p class="text-muted small mb-0">{{ exerciceData.etapes.length }} steps programmed</p>
             </div>
           </div>
           <button type="button" class="btn btn-dark btn-sm fw-bold rounded-pill px-3 shadow-sm " (click)="addEtape()">
-             <i class="fa-solid fa-plus me-1"></i> Étape
+             <i class="fa-solid fa-plus me-1"></i> Step
           </button>
         </div>
 
         <div class="row g-3 mb-4">
           <div class="col-md-6">
             <div class="bg-light p-3 rounded-4 shadow-sm border-0">
-               <label class="form-label fw-bold text-muted small text-uppercase mb-2">Sous-type d'exercice</label>
+               <label class="form-label fw-bold text-muted small text-uppercase mb-2">Exercise sub-type</label>
                <input type="text" class="form-control border-0 bg-white rounded-3 p-2 shadow-sm" 
                       [value]="exerciceData.sousType" (input)="updateExerciceSousType($event)" 
-                      placeholder="Ex: Respiration, Physique..." />
+                      placeholder="e.g.: Breathing, Physical..." />
             </div>
           </div>
           <div class="col-md-6">
             <div class="bg-light p-3 rounded-4 shadow-sm border-0">
-               <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre de répétitions</label>
+               <label class="form-label fw-bold text-muted small text-uppercase mb-2">Number of repetitions</label>
                <input type="number" class="form-control border-0 bg-white rounded-3 p-2 shadow-sm fw-bold" 
                       [value]="exerciceData.repetitions" (input)="updateExerciceRepetitions($event)" min="1" />
             </div>
@@ -241,7 +241,7 @@ export interface ExerciceData {
         </div>
 
         <div class="card border-0 bg-white rounded-4 shadow-sm mb-3 overflow-hidden animate-fade-in border-start border-danger border-5" 
-             *ngFor="let e of exerciceData.etapes; let idx = index">
+             *ngFor="let e of exerciceData.etapes; let idx = index; trackBy: trackByIndex">
           <div class="card-body p-4 d-flex align-items-center gap-3">
             <div class="bg-light text-dark rounded-circle fw-bold d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px; min-width: 40px;">
                {{ idx + 1 }}
@@ -249,15 +249,15 @@ export interface ExerciceData {
             <div class="flex-grow-1">
               <div class="row g-3 align-items-center">
                 <div class="col-md-8">
-                  <label class="form-label fw-bold text-muted small text-uppercase mb-0" style="font-size: 10px;">Consigne pour cette étape</label>
+                  <label class="form-label fw-bold text-muted small text-uppercase mb-0" style="font-size: 10px;">Instruction for this step</label>
                   <input type="text" class="form-control border-0 bg-light p-2 shadow-sm rounded-3" 
                          [value]="e.consigne" (input)="updateEtapeConsigne(idx, $event)" 
-                         placeholder="Ex: Inspirez profondément..." />
+                         placeholder="e.g.: Breathe deeply..." />
                 </div>
                 <div class="col-md-4">
                   <div class="d-flex align-items-center gap-2">
                     <div class="flex-grow-1">
-                      <label class="form-label fw-bold text-muted small text-uppercase mb-0" style="font-size: 10px;">Durée (sec)</label>
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-0" style="font-size: 10px;">Duration (sec)</label>
                       <input type="number" class="form-control border-0 bg-light p-2 shadow-sm rounded-3 fw-bold text-center" 
                              [value]="e.dureeSecondes" (input)="updateEtapeDuree(idx, $event)" min="1" />
                     </div>
@@ -273,7 +273,7 @@ export interface ExerciceData {
 
         <div *ngIf="exerciceData.etapes.length === 0" class="text-center py-5 border-2 border-dashed rounded-4 bg-light text-muted">
            <i class="fa-solid fa-person-arrow-up-from-line fs-2 opacity-25 mb-2 d-block"></i>
-           Ajoutez une étape pour configurer l'exercice.
+           Add a step to configure the exercise.
         </div>
       </ng-container>
 
@@ -291,6 +291,15 @@ export interface ExerciceData {
     .bg-soft-light { background-color: #f8f9fa !important; }
     .border-dashed { border-style: dashed !important; }
     .fs-12 { font-size: 12px; }
+    .form-select {
+      height: auto !important;
+      line-height: 1.6 !important;
+      padding-top: 0.8rem !important;
+      padding-bottom: 0.8rem !important;
+    }
+    .form-control, .form-select {
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    }
   `]
 })
 export class ActivityDataFormComponent implements OnInit, OnChanges {
@@ -309,6 +318,10 @@ export class ActivityDataFormComponent implements OnInit, OnChanges {
   private internalUpdate = false;
 
   constructor() { }
+
+  trackByIndex(index: number, item: any): any {
+    return index;
+  }
 
   ngOnInit(): void {
     this.loadInitialData();

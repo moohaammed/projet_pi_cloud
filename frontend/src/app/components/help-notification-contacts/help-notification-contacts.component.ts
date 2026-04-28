@@ -19,7 +19,6 @@ export class HelpNotificationContactsComponent implements OnInit {
 
   contacts: PatientContact[] = [];
   isLoading = false;
-  isSending = false;
 
   // Form state
   showForm = false;
@@ -33,9 +32,7 @@ export class HelpNotificationContactsComponent implements OnInit {
   // Relation type options
   relationTypes = [
     { value: RelationType.DOCTOR, label: 'Doctor' },
-    { value: RelationType.PARENT, label: 'Parent' },
-    { value: RelationType.CAREGIVER, label: 'Caregiver' },
-    { value: RelationType.RELATION, label: 'Relation' }
+    { value: RelationType.RELATION, label: 'Relation / Parent' }
   ];
 
   ngOnInit(): void {
@@ -47,6 +44,14 @@ export class HelpNotificationContactsComponent implements OnInit {
     return user?.id || null;
   }
 
+  get doctorContacts(): PatientContact[] {
+    return this.contacts.filter(contact => contact.relationType === RelationType.DOCTOR);
+  }
+
+  get relationContacts(): PatientContact[] {
+    return this.contacts.filter(contact => contact.relationType !== RelationType.DOCTOR);
+  }
+
   loadContacts(): void {
     if (!this.userId) return;
     this.isLoading = true;
@@ -56,7 +61,7 @@ export class HelpNotificationContactsComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        this.showError('Failed to load contacts.');
+        this.showError('Failed to load account links.');
         console.error(err);
         this.isLoading = false;
       }
@@ -86,30 +91,30 @@ export class HelpNotificationContactsComponent implements OnInit {
   saveContact(): void {
     if (!this.userId) return;
     if (!this.formContact.relationType) {
-      this.showError('Relation type is required.');
+      this.showError('Account type is required.');
       return;
     }
 
     if (this.isEditing && this.formContact.id) {
       this.helpService.updateContact(this.userId, this.formContact.id, this.formContact).subscribe({
         next: () => {
-          this.showSuccess('Contact updated successfully.');
+          this.showSuccess('Account link updated successfully.');
           this.showForm = false;
           this.loadContacts();
         },
         error: (err) => {
-          this.showError(err?.error?.message || 'Failed to update contact.');
+          this.showError(err?.error?.message || 'Failed to update account link.');
         }
       });
     } else {
       this.helpService.createContact(this.userId, this.formContact).subscribe({
         next: () => {
-          this.showSuccess('Contact added successfully.');
+          this.showSuccess('Account linked successfully.');
           this.showForm = false;
           this.loadContacts();
         },
         error: (err) => {
-          this.showError(err?.error?.message || 'Failed to add contact.');
+          this.showError(err?.error?.message || 'Failed to link account.');
         }
       });
     }
@@ -117,38 +122,15 @@ export class HelpNotificationContactsComponent implements OnInit {
 
   deleteContact(contact: PatientContact): void {
     if (!this.userId || !contact.id) return;
-    if (!confirm(`Are you sure you want to delete ${contact.prenom} ${contact.nom}?`)) return;
+    if (!confirm(`Remove the account link for ${contact.prenom} ${contact.nom}?`)) return;
 
     this.helpService.deleteContact(this.userId, contact.id).subscribe({
       next: () => {
-        this.showSuccess('Contact deleted.');
+        this.showSuccess('Account link removed.');
         this.loadContacts();
       },
       error: (err) => {
-        this.showError(err?.error?.message || 'Failed to delete contact.');
-      }
-    });
-  }
-
-  sendHelpNotification(): void {
-    if (!this.userId) return;
-    if (this.contacts.length === 0) {
-      this.showError('No contacts to notify. Please add contacts first.');
-      return;
-    }
-    if (!confirm('Send a help notification to all your emergency contacts?')) return;
-
-    this.isSending = true;
-    this.helpService.sendHelpNotification(this.userId).subscribe({
-      next: (res) => {
-        this.showSuccess(
-          `Help notification sent! ${res.platformNotificationsSent || 0} in-platform, ${res.emailsSent || 0} emails.`
-        );
-        this.isSending = false;
-      },
-      error: (err) => {
-        this.showError(err?.error?.message || 'Failed to send help notification.');
-        this.isSending = false;
+        this.showError(err?.error?.message || 'Failed to remove account link.');
       }
     });
   }
@@ -161,8 +143,6 @@ export class HelpNotificationContactsComponent implements OnInit {
   getRelationBadgeClass(type: string): string {
     switch (type) {
       case 'DOCTOR': return 'badge-doctor';
-      case 'PARENT': return 'badge-parent';
-      case 'CAREGIVER': return 'badge-caregiver';
       case 'RELATION': return 'badge-relation';
       default: return '';
     }

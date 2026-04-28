@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AlzUserService } from '../../../services/alz-user.service';
 import { AuthService } from '../../../services/auth.service';
+import { HeartRateAccessService, MonitoredPatient } from '../../../services/heart-rate-access.service';
 import { User, Role } from '../../../models/user.model';
 
 @Component({
@@ -23,7 +24,8 @@ export class PatientListComponent implements OnInit {
 
   constructor(
     private alzUserService: AlzUserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private heartRateAccessService: HeartRateAccessService
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +37,26 @@ export class PatientListComponent implements OnInit {
 
   load(): void {
     this.loading = true;
+    if (this.isDoctor) {
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser?.id) {
+        this.patients = [];
+        this.filtered = [];
+        this.loading = false;
+        return;
+      }
+
+      this.heartRateAccessService.getDoctorPatients(currentUser.id).subscribe({
+        next: (data) => {
+          this.patients = (data || []).map(patient => this.toUser(patient));
+          this.filtered = this.patients;
+          this.loading = false;
+        },
+        error: () => this.loading = false
+      });
+      return;
+    }
+
     this.alzUserService.getByRole(Role.PATIENT).subscribe({
       next: (data) => {
         this.patients = data;
@@ -43,6 +65,17 @@ export class PatientListComponent implements OnInit {
       },
       error: () => this.loading = false
     });
+  }
+
+  private toUser(patient: MonitoredPatient): User {
+    return {
+      id: patient.userId ?? undefined,
+      nom: patient.nom || '',
+      prenom: patient.prenom || '',
+      email: '',
+      role: Role.PATIENT,
+      actif: true
+    };
   }
 
   onSearch(): void {

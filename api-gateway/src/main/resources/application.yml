@@ -13,13 +13,12 @@ spring:
             allowedOrigins: 
               - "http://localhost:4200"
               - "http://127.0.0.1:4200"
-              - "http://192.168.1.169:4200"
+              - "http://192.168.1.126:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
 
-      # Remove duplicate CORS headers coming from upstream services
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
 
@@ -43,8 +42,6 @@ spring:
             - Path=/api/rendezvous/**,/api/rendezvous
 
         # ── Geo service ──────────────────────────────────────────────────────
-        # Must be declared BEFORE the backpi catch-all (/api/**) so these
-        # more-specific paths are matched first by Spring Cloud Gateway.
         - id: geo-service
           uri: lb://geo-service
           predicates:
@@ -75,9 +72,8 @@ spring:
             - Path=/api/patients/**,/api/patients,/api/analyses/**,/api/analyses,/api/rappel-quotidien/**,/api/rappel-quotidien,/api/patient-notification/**,/api/patient-notification,/api/jeux/**,/api/jeux
 
         # ── Main service (backpi) ──────────────────────────────────────────
-        # ── Main service (backpi) ────────────────────────────────────────
         - id: main-service
-          uri: lb://backpi
+          uri: lb://BACKPI
           predicates:
             - Path=/api/**,/uploads/**
 

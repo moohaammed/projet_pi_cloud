@@ -5,15 +5,15 @@
     <div class="d-flex align-items-center gap-4">
       <div class="section-header text-start mb-0">
         <h2 class="fw-black mb-1 section-header__title text-capitalize fs-28 ls-n1">
-          Gestion des <span class="underline text-primary position-relative">Activités</span>
+          Activity <span class="underline text-primary position-relative">Management</span>
         </h2>
-        <div class="sub-title fs-14 text-muted opacity-75">Créez et gérez le socle thérapeutique (Quiz, Jeux, Contenus).</div>
+        <div class="sub-title fs-14 text-muted opacity-75">Create and manage the therapeutic foundation (Quizzes, Games, Content).</div>
       </div>
     </div>
     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
       <button class="btn btn-primary fw-black rounded-pill shadow-sm d-flex justify-content-center align-items-center py-2 hov-grow" 
               style="width: 180px;" (click)="showForm = true">
-        <i class="fa-solid fa-plus me-2"></i> Nouvelle Activité
+        <i class="fa-solid fa-plus me-2"></i> New Activity
       </button>
     </div>
   </div>
@@ -21,7 +21,7 @@
   <!-- Stats Section Premium (Purple Palette) -->
   <section class="stats-section mb-5 mt-4" *ngIf="!showForm">
     <div class="stats-header">
-      <span class="stats-label">📊 Vue d'ensemble</span>
+      <span class="stats-label">📊 Overview</span>
     </div>
     <div class="row g-3">
 
@@ -31,7 +31,7 @@
           <div class="stat-icon-wrap">🎯</div>
           <div class="stat-value">{{ totalActivities }}</div>
           <div class="stat-title">Total</div>
-          <div class="stat-sub">activités créées</div>
+          <div class="stat-sub">activities created</div>
         </div>
       </div>
 
@@ -40,8 +40,8 @@
         <div class="stat-card stat-green">
           <div class="stat-icon-wrap">✅</div>
           <div class="stat-value">{{ activeCount }}</div>
-          <div class="stat-title">Actives</div>
-          <div class="stat-sub">publiées aux patients</div>
+          <div class="stat-title">Active</div>
+          <div class="stat-sub">published to patients</div>
         </div>
       </div>
 
@@ -51,7 +51,7 @@
           <div class="stat-icon-wrap">🧠</div>
           <div class="stat-value">{{ quizCount }}</div>
           <div class="stat-title">Quiz</div>
-          <div class="stat-sub">évaluation cognitive</div>
+          <div class="stat-sub">cognitive assessment</div>
         </div>
       </div>
 
@@ -60,7 +60,7 @@
         <div class="stat-card stat-indigo">
           <div class="stat-icon-wrap">🎮</div>
           <div class="stat-value">{{ gameCount }}</div>
-          <div class="stat-title">Jeux</div>
+          <div class="stat-title">Games</div>
           <div class="stat-sub">memory & puzzles</div>
         </div>
       </div>
@@ -70,8 +70,8 @@
         <div class="stat-card stat-amber">
           <div class="stat-icon-wrap">📹</div>
           <div class="stat-value">{{ contentCount }}</div>
-          <div class="stat-title">Contenus</div>
-          <div class="stat-sub">vidéos & articles</div>
+          <div class="stat-title">Content</div>
+          <div class="stat-sub">videos & articles</div>
         </div>
       </div>
 
@@ -80,8 +80,8 @@
         <div class="stat-card stat-rose">
           <div class="stat-icon-wrap">🧘</div>
           <div class="stat-value">{{ exerciceCount }}</div>
-          <div class="stat-title">Exercices</div>
-          <div class="stat-sub">séances relaxation</div>
+          <div class="stat-title">Exercises</div>
+          <div class="stat-sub">relaxation sessions</div>
         </div>
       </div>
 
@@ -89,22 +89,22 @@
 
     <!-- Stades Progress Bar -->
     <div class="stades-bar-wrap mt-4">
-      <div class="stade-bar-label">Répartition par stade cognitif</div>
+      <div class="stade-bar-label">Distribution by cognitive stage</div>
       <div class="stades-bar">
         <div class="stade-segment seg-leger"
              [style.width.%]="totalActivities > 0 ? (legerCount / totalActivities) * 100 : 33"
-             title="Léger: {{ legerCount }}">
-          <span *ngIf="totalActivities > 0">Léger {{ legerCount }}</span>
+             title="Mild: {{ legerCount }}">
+          <span *ngIf="totalActivities > 0">Mild {{ legerCount }}</span>
         </div>
         <div class="stade-segment seg-modere"
              [style.width.%]="totalActivities > 0 ? (modereCount / totalActivities) * 100 : 33"
-             title="Modéré: {{ modereCount }}">
-          <span *ngIf="totalActivities > 0">Modéré {{ modereCount }}</span>
+             title="Moderate: {{ modereCount }}">
+          <span *ngIf="totalActivities > 0">Moderate {{ modereCount }}</span>
         </div>
         <div class="stade-segment seg-severe"
              [style.width.%]="totalActivities > 0 ? (severeCount / totalActivities) * 100 : 34"
-             title="Sévère: {{ severeCount }}">
-          <span *ngIf="totalActivities > 0">Sévère {{ severeCount }}</span>
+             title="Severe: {{ severeCount }}">
+          <span *ngIf="totalActivities > 0">Severe {{ severeCount }}</span>
         </div>
       </div>
     </div>
@@ -113,7 +113,7 @@
     <div class="row g-4 mt-2">
       <div class="col-lg-4">
         <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
-          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-shapes me-2 text-primary" style="color: #6c2bd9 !important"></i>Type d'Activité</h6>
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-shapes me-2 text-primary" style="color: #6c2bd9 !important"></i>Activity Type</h6>
           <div style="height: 230px; position: relative;">
             <canvas #chartCanvas></canvas>
           </div>
@@ -121,7 +121,7 @@
       </div>
       <div class="col-lg-4">
         <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
-          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-brain me-2 text-primary" style="color: #9333ea !important"></i>Stades Cognitifs</h6>
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-brain me-2 text-primary" style="color: #9333ea !important"></i>Cognitive Stages</h6>
           <div style="height: 230px; position: relative;">
             <canvas #chartCanvas></canvas>
           </div>
@@ -129,7 +129,7 @@
       </div>
       <div class="col-lg-4">
         <div class="card border-0 shadow-doc rounded-4 p-4 h-100 bg-white">
-          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-power-off me-2 text-primary" style="color: #10b981 !important"></i>Statut de Publication</h6>
+          <h6 class="fw-black mb-4 text-muted small text-uppercase letter-spacing-1"><i class="fa-solid fa-power-off me-2 text-primary" style="color: #10b981 !important"></i>Publication Status</h6>
           <div style="height: 230px; position: relative;">
             <canvas #chartCanvas></canvas>
           </div>
@@ -146,7 +146,7 @@
         <button class="btn btn-sm btn-white rounded-circle shadow-sm me-3 text-primary bg-white px-2 py-1" (click)="reset()" title="Retour à la liste">
           <i class="fa-solid fa-arrow-left"></i>
         </button>
-        <span class="fw-black fs-20 text-primary ls-n1"><i class="fa-solid fa-gamepad me-2"></i> {{ isEditing ? 'Modifier l\'activité' : 'Nouvelle activité' }}</span>
+        <span class="fw-black fs-20 text-primary ls-n1"><i class="fa-solid fa-gamepad me-2"></i> {{ isEditing ? 'Edit Activity' : 'New Activity' }}</span>
       </div>
     </div>
     <div class="card-body p-4 pt-4">
@@ -154,9 +154,9 @@
 
         <!-- Titre -->
         <div class="col-md-6">
-          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Titre de l'activité *</label>
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Activity Title *</label>
           <input class="form-control-doc w-100 ps-3" [class.is-invalid]="errors['title']" [(ngModel)]="newActivity.title"
-            placeholder="ex : Quiz Saisons, Jeu des animaux">
+            placeholder="e.g.: Season Quiz, Animal Game">
           <div class="invalid-feedback" *ngIf="errors['title']">
             {{ errors['title'] }}
           </div>
@@ -175,19 +175,19 @@
 
         <!-- Stade -->
         <div class="col-md-3">
-          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Stade cognitif *</label>
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Cognitive Stage *</label>
           <select class="form-select-doc w-100 ps-3" [(ngModel)]="newActivity.stade">
-            <option value="LEGER">Léger</option>
-            <option value="MODERE">Modéré</option>
-            <option value="SEVERE">Sévère</option>
+            <option value="LEGER">Mild</option>
+            <option value="MODERE">Moderate</option>
+            <option value="SEVERE">Severe</option>
           </select>
         </div>
 
         <!-- Description -->
         <div class="col-md-12">
-          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Description pédagogique *</label>
+          <label class="form-label fw-black text-muted small text-uppercase letter-spacing-1">Pedagogical Description *</label>
           <textarea class="form-control-doc w-100 p-3" [class.is-invalid]="errors['description']"
-            [(ngModel)]="newActivity.description" placeholder="Décrivez l'activité pour les soignants…" rows="3" style="resize:none; height: auto;">
+            [(ngModel)]="newActivity.description" placeholder="Describe the activity for caregivers…" rows="3" style="resize:none; height: auto;">
           </textarea>
           <div class="invalid-feedback" *ngIf="errors['description']">
             {{ errors['description'] }}
@@ -197,7 +197,7 @@
         <!-- Contenu dynamique -->
         <div class="col-12 mt-4" *ngIf="newActivity.type">
           <label class="form-label fw-black text-primary small text-uppercase mb-3 letter-spacing-1">
-            <i class="fa-solid fa-code me-2"></i> Configuration du contenu
+            <i class="fa-solid fa-code me-2"></i> Content Configuration
           </label>
 
           <div class="border-0 shadow-sm rounded-4 p-4 bg-light">
@@ -212,10 +212,10 @@
 
       <div class="mt-4 d-flex gap-2">
         <button class="btn btn-primary fw-black rounded-pill px-5 shadow transition-all hov-grow" (click)="save()">
-          <i class="fa-solid fa-check me-2"></i> {{ isEditing ? 'Sauvegarder' : 'Publier l\'activité' }}
+          <i class="fa-solid fa-check me-2"></i> {{ isEditing ? 'Save' : 'Publish Activity' }}
         </button>
         <button class="btn btn-soft-secondary fw-bold rounded-pill px-4" (click)="reset()" *ngIf="isEditing">
-          Annuler
+          Cancel
         </button>
       </div>
     </div>
@@ -225,7 +225,7 @@
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 animate-fade-in" *ngIf="!showForm">
     <div class="d-flex flex-wrap gap-2">
       <button class="filter-pill" [class.active]="filterType === ''" (click)="loadByType('')">
-        <i class="fa-solid fa-layer-group me-2"></i> Tous
+        <i class="fa-solid fa-layer-group me-2"></i> All
       </button>
       <button class="filter-pill quiz" [class.active]="filterType === 'QUIZ'" (click)="loadByType('QUIZ')">
         <i class="fa-solid fa-clipboard-question me-2"></i> QUIZ
@@ -247,7 +247,7 @@
         <i class="fa-solid fa-magnifying-glass fs-14"></i>
       </span>
       <input type="text" class="form-control bg-transparent border-0 fs-14 fw-medium" 
-             placeholder="Rechercher une activité..." 
+             placeholder="Search an activity..." 
              [(ngModel)]="searchTerm">
     </div>
   </div>
@@ -258,7 +258,7 @@
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="ps-4 py-3 text-uppercase small fw-black text-muted letter-spacing-1">Activité / Identifiant</th>
+            <th class="ps-4 py-3 text-uppercase small fw-black text-muted letter-spacing-1">Activity / ID</th>
             <th class="py-3 text-uppercase small fw-black text-muted letter-spacing-1 text-center">Classification</th>
             <th class="text-end pe-4 py-3 text-uppercase small fw-black text-muted letter-spacing-1">Actions</th>
           </tr>
@@ -290,10 +290,10 @@
               <div class="text-muted extra-small fw-black text-uppercase opacity-75 letter-spacing-1 mt-1">{{ a.stade }} — cognitive stage</div>
             </td>
             <td class="text-end pe-4">
-              <button class="btn btn-sm btn-white border shadow-sm rounded-circle me-2 hov-primary" (click)="edit(a)" title="Modifier">
+              <button class="btn btn-sm btn-white border shadow-sm rounded-circle me-2 hov-primary" (click)="edit(a)" title="Edit">
                 <i class="fa-solid fa-pen-to-square text-primary"></i>
               </button>
-              <button class="btn btn-sm btn-white border shadow-sm rounded-circle text-danger hov-danger" (click)="delete(a.id!)" title="Supprimer">
+              <button class="btn btn-sm btn-white border shadow-sm rounded-circle text-danger hov-danger" (click)="delete(a.id!)" title="Delete">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </td>
@@ -301,8 +301,8 @@
           <tr *ngIf="filteredActivities.length === 0">
             <td colspan="3" class="text-center py-5 text-muted bg-light">
               <i class="fa-solid fa-folder-open fs-1 opacity-25 mb-3 d-block"></i>
-              <div class="fw-black text-uppercase letter-spacing-1 small">Aucun enregistrement</div>
-              <p class="mb-0 small">Assurez-vous que les filtres de recherche sont corrects.</p>
+              <div class="fw-black text-uppercase letter-spacing-1 small">No records found</div>
+              <p class="mb-0 small">Make sure the search filters are correct.</p>
             </td>
           </tr>
         </tbody>
