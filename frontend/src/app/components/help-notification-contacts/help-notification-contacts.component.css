@@ -56,30 +56,6 @@
 }
 
 /* ── Help Notification Button ────────────────────── */
-.btn-help-notification {
-  background: linear-gradient(135deg, #800080, #b300b3);
-  color: #fff;
-  border: none;
-  font-weight: 600;
-  padding: 0.5rem 1.2rem;
-  border-radius: 50px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(128, 0, 128, 0.3);
-}
-
-.btn-help-notification:hover:not(:disabled) {
-  background: linear-gradient(135deg, #660066, #990099);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(128, 0, 128, 0.4);
-  transform: translateY(-1px);
-}
-
-.btn-help-notification:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  color: #fff;
-}
-
 /* ── Relation Type Badges ────────────────────────── */
 .badge-doctor {
   background-color: rgba(0, 123, 255, 0.12) !important;
@@ -108,6 +84,27 @@
 
 .bg-secondary-subtle {
   background-color: rgba(108, 117, 125, 0.1) !important;
+}
+
+.section-row td {
+  background: rgba(128, 0, 128, 0.04);
+  color: #343a40;
+  padding: 1rem;
+}
+
+.section-row strong {
+  display: block;
+  color: #800080;
+}
+
+.section-row span {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+.link-section-title {
+  color: #343a40;
+  font-weight: 700;
 }
 
 /* ── Animations ──────────────────────────────────── */

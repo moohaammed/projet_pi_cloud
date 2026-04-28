@@ -15,6 +15,9 @@
         </div>
       </div>
       <div class="d-flex gap-2">
+        <a routerLink="/doctor/heart-rate" class="btn btn-success btn-sm">
+          <i class="fa-solid fa-heart-pulse me-1"></i>Live Heart
+        </a>
         <button class="btn btn-outline-primary btn-sm" (click)="loadPatients()" [disabled]="isLoadingPatients">
           <i class="fa-solid fa-rotate-right me-1"></i>Actualiser
         </button>

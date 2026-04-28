@@ -229,6 +229,12 @@ export const routes: Routes = [
             .then(m => m.AdminGestionPatientComponent)
       },
       {
+        path: 'heart-rate',
+        loadComponent: () =>
+          import('./components/heart-rate-monitoring/admin-heart-rate-monitor/admin-heart-rate-monitor.component')
+            .then(m => m.AdminHeartRateMonitorComponent)
+      },
+      {
         path: 'medecins',
         loadComponent: () =>
           import('./components/admin-gestion-medecin/admin-gestion-medecin.component')
@@ -246,7 +252,16 @@ export const routes: Routes = [
   {
     path: 'medecin-dashboard',
     component: MedecinDashboardComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['DOCTOR'] }
+  },
+  {
+    path: 'doctor/heart-rate',
+    loadComponent: () =>
+      import('./components/heart-rate-monitoring/doctor-heart-rate-monitor/doctor-heart-rate-monitor.component')
+        .then(m => m.DoctorHeartRateMonitorComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['DOCTOR'] }
   },
   {
     path: 'gestion-patient-role',
@@ -296,7 +311,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/live-heart-rate/live-heart-rate.component')
         .then(m => m.LiveHeartRateComponent),
-    canActivate: [authGuard]
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['PATIENT', 'RELATION'] }
   },
 
   { path: '**', redirectTo: 'auth/login' }

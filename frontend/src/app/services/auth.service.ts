@@ -143,7 +143,7 @@ export class AuthService {
       case 'ADMIN':    this.router.navigate(['/admin/dashboard']); break;
       case 'DOCTOR':   this.router.navigate(['/medecin-dashboard']); break;
       case 'PATIENT':  this.router.navigate(['/home']); break;
-      case 'RELATION': this.router.navigate(['/patient-dashboard']); break;
+      case 'RELATION': this.router.navigate(['/heart-rate']); break;
       default:         this.router.navigate(['/auth/login']);
     }
   }

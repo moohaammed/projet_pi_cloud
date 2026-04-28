@@ -1,0 +1,81 @@
+<div class="monitor-page">
+  <div class="monitor-header">
+    <div>
+      <p class="eyebrow">Doctor monitoring</p>
+      <h1>Live heart-rate dashboard</h1>
+      <p class="subtitle">Assigned patients only, updated from the shared smartwatch stream.</p>
+    </div>
+    <button type="button" class="refresh-button" (click)="loadPatients()" [disabled]="isLoading">
+      <i class="fa-solid fa-rotate-right"></i>
+      <span>Refresh</span>
+    </button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <span>Total patients</span>
+      <strong>{{ patients.length }}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Streaming now</span>
+      <strong class="success">{{ connectedCount }}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Offline</span>
+      <strong class="muted">{{ offlineCount }}</strong>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert-message">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner-border text-primary" role="status"></div>
+    <span>Loading patients...</span>
+  </div>
+
+  <div *ngIf="!isLoading && patients.length === 0" class="empty-panel">
+    <i class="fa-solid fa-user-injured"></i>
+    <h2>No assigned patients</h2>
+    <p>Patients appear here after they link your doctor account.</p>
+  </div>
+
+  <div class="patient-monitor-grid" *ngIf="!isLoading && patients.length > 0">
+    <article class="patient-monitor-card" *ngFor="let patient of patients; trackBy: trackByPatientId">
+      <div class="patient-card-header">
+        <div class="patient-avatar">
+          {{ patient.prenom?.charAt(0) || '?' }}{{ patient.nom?.charAt(0) || '' }}
+        </div>
+        <div class="patient-title">
+          <h2>{{ getPatientName(patient) }}</h2>
+        </div>
+        <div class="state-pill" [class.connected]="isConnected(patient)">
+          <span></span>
+          {{ isConnected(patient) ? 'Live' : 'Offline' }}
+        </div>
+      </div>
+
+      <div class="bpm-row" [ngClass]="getBpmClass(patient)">
+        <strong>{{ getBpm(patient) }}</strong>
+        <span>BPM</span>
+      </div>
+
+      <div class="details-grid">
+        <div>
+          <span>State</span>
+          <strong>{{ getZone(patient) }}</strong>
+        </div>
+        <div>
+          <span>Last update</span>
+          <strong>{{ getLastReceived(patient) }}</strong>
+        </div>
+        <div>
+          <span>Device</span>
+          <strong>{{ getState(patient)?.deviceName || '--' }}</strong>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>

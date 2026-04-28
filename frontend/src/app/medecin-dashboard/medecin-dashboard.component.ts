@@ -6,6 +6,8 @@ import { PatientService } from '../services/patient.service';
 import { AnalyseService } from '../services/analyse.service';
 import { MapService } from '../services/map.service';
 import { PatientProgressionService } from '../services/patient-progression.service';
+import { AuthService } from '../services/auth.service';
+import { HeartRateAccessService, MonitoredPatient } from '../services/heart-rate-access.service';
 
 
 @Component({
@@ -42,7 +44,9 @@ export class MedecinDashboardComponent implements OnInit {
     private analyseService: AnalyseService,
 
     private mapService: MapService, // ← ajoute
-    private progressionService: PatientProgressionService
+    private progressionService: PatientProgressionService,
+    private authService: AuthService,
+    private heartRateAccessService: HeartRateAccessService
 
   ) { }
 
@@ -68,13 +72,34 @@ export class MedecinDashboardComponent implements OnInit {
 
   loadPatients() {
     this.isLoadingPatients = true;
-    this.patientService.getAllPatients().subscribe({
+    const currentUser = this.authService.getCurrentUser();
+    const patientsRequest = currentUser?.id
+      ? this.heartRateAccessService.getDoctorPatients(currentUser.id)
+      : this.patientService.getAllPatients();
+
+    patientsRequest.subscribe({
       next: (data) => {
-        this.patients = data || [];
+        this.patients = (data || []).map((patient: any) => this.normalizePatient(patient));
         this.isLoadingPatients = false;
       },
       error: () => this.isLoadingPatients = false
     });
+  }
+
+  private normalizePatient(patient: any): any {
+    if (patient.patientId) {
+      const monitoredPatient = patient as MonitoredPatient;
+      return {
+        id: monitoredPatient.patientId,
+        nom: monitoredPatient.nom,
+        prenom: monitoredPatient.prenom,
+        age: monitoredPatient.age,
+        poids: monitoredPatient.poids,
+        sexe: monitoredPatient.sexe,
+        user: monitoredPatient.userId ? { id: monitoredPatient.userId } : null
+      };
+    }
+    return patient;
   }
 
   selectPatient(patient: any) {
