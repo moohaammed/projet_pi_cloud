@@ -1,35 +1,35 @@
 <main class="location-dashboard">
   <header class="toolbar">
     <div>
-      <h1>Localisation patient</h1>
-      <p>Suivi actualise toutes les 30 secondes.</p>
+      <h1>Patient Location</h1>
+      <p>Updated every 30 seconds.</p>
     </div>
 
     <form class="patient-form" (ngSubmit)="startPolling()">
       <label for="patientId">Patient</label>
-      <input id="patientId" name="patientId" type="number" min="1" [(ngModel)]="patientId" placeholder="ID patient">
-      <button type="submit">Suivre</button>
+      <input id="patientId" name="patientId" type="number" min="1" [(ngModel)]="patientId" placeholder="Patient ID">
+      <button type="submit">Track</button>
     </form>
   </header>
 
   <section class="alert-banner" *ngIf="isUnknown">
-    Lieu inconnu detecte. Une alerte a ete creee automatiquement.
+    Unknown location detected. An alert was created automatically.
   </section>
 
   <section class="current-card" *ngIf="current" [class.unknown]="isUnknown">
-    <span class="label">Position actuelle</span>
+    <span class="label">Current position</span>
     <strong>{{ current.lieu }}</strong>
     <div class="metrics">
-      <span>Confiance {{ current.confiance }}</span>
+      <span>Confidence {{ current.confiance }}</span>
       <span>{{ current.date | date:'dd/MM/yyyy HH:mm:ss' }}</span>
     </div>
   </section>
 
   <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
-  <p class="loading" *ngIf="loading">Mise a jour en cours...</p>
+  <p class="loading" *ngIf="loading">Updating...</p>
 
   <section class="history">
-    <h2>Historique recent</h2>
+    <h2>Recent History</h2>
     <article class="history-row" *ngFor="let item of history" [class.unknown]="item.statut === 'ZONE_INCONNUE'">
       <div>
         <strong>{{ item.lieu }}</strong>
@@ -41,6 +41,6 @@
       </div>
     </article>
 
-    <p class="empty" *ngIf="!history.length && !loading">Aucun historique disponible.</p>
+    <p class="empty" *ngIf="!history.length && !loading">No history available.</p>
   </section>
 </main>

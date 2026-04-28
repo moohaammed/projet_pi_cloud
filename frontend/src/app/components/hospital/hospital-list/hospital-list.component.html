@@ -106,7 +106,7 @@
       <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
 
         <div class="card-header text-white p-3"
-             [style.background]="(i === 0 || h.recommande) && !searchAttempted ? 'linear-gradient(135deg,#198754,#0f5132)' : 'linear-gradient(135deg,#6f42c1,#3c3489)'">
+             [style.background]="!isAdmin && (i === 0 || h.recommande) && !searchAttempted ? 'linear-gradient(135deg,#198754,#0f5132)' : 'linear-gradient(135deg,#6f42c1,#3c3489)'">
           <div class="d-flex align-items-center justify-content-between gap-2">
             <div class="d-flex align-items-center gap-2">
               <div class="bg-white bg-opacity-20 rounded-circle p-2">
@@ -117,7 +117,7 @@
                 <div class="small opacity-75">{{ h.gouvernorat }}</div>
               </div>
             </div>
-            <span *ngIf="(i === 0 || h.recommande) && !searchAttempted" class="badge bg-light text-success">
+            <span *ngIf="!isAdmin && (i === 0 || h.recommande) && !searchAttempted" class="badge bg-light text-success">
               RECOMMANDE
             </span>
             <span *ngIf="searchAttempted" class="badge bg-light text-primary">

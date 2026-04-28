@@ -44,26 +44,26 @@
 
     <!-- État normal -->
     <div *ngIf="!sosEnvoye">
-      <p class="text-muted mb-1" style="font-size:16px">Bonjour,</p>
+      <p class="text-muted mb-1" style="font-size:16px">Hello,</p>
       <h2 class="fw-bold text-dark mb-2" style="font-size:30px">
         {{ currentUser.prenom }} {{ currentUser.nom }}
       </h2>
       <p class="text-muted mb-5" style="font-size:14px">
         <i class="fa-solid fa-shield-halved text-success me-1"></i>
-        Vous êtes protégé — votre médecin vous suit
+        You are protected - your doctor is monitoring you
       </p>
     </div>
 
     <!-- État SOS -->
     <div *ngIf="sosEnvoye" class="mb-5">
       <div class="fw-bold text-success mb-1" style="font-size:24px">
-        ✓ Alerte envoyée !
+        Alert sent!
       </div>
       <div class="text-muted" style="font-size:15px">
-        Votre famille a été prévenue
+        Your family has been notified
       </div>
       <div class="mt-2 text-muted small">
-        Restez où vous êtes — {{ sosCountdown }}s
+        Stay where you are - {{ sosCountdown }}s
       </div>
     </div>
 
@@ -103,22 +103,22 @@
     <!-- Texte sous le bouton -->
     <p class="text-muted" style="font-size:15px; max-width:280px; line-height:1.6">
       <span *ngIf="!sosEnvoye">
-        Appuyez sur le bouton si vous avez besoin d'aide
+        Press the button if you need help
       </span>
       <span *ngIf="sosEnvoye" class="text-success fw-semibold">
-        Les secours ont été alertés.<br>Ne bougez pas.
+        Help has been alerted.<br>Do not move.
       </span>
     </p>
 
     <div class="location-actions mt-2">
       <button type="button" class="location-action-btn primary" (click)="openLocationCamera()">
         <i class="fa-solid fa-video"></i>
-        <span>Ouvrir la camera</span>
+        <span>Open camera</span>
       </button>
 
       <label class="location-action-btn secondary">
         <i class="fa-solid fa-image"></i>
-        <span>Analyser une photo</span>
+        <span>Analyze a photo</span>
         <input type="file" accept="image/*" capture="environment" (change)="onLocationPhotoSelected($event)">
       </label>
     </div>
@@ -128,14 +128,14 @@
          [class.unknown]="locationIsUnknown">
       <div *ngIf="locationAnalysisLoading" class="d-flex align-items-center justify-content-center gap-2">
         <span class="spinner-border spinner-border-sm"></span>
-        <span>Analyse du lieu...</span>
+        <span>Analyzing location...</span>
       </div>
 
       <div *ngIf="locationResult && !locationAnalysisLoading">
         <div class="fw-bold">
-          <span *ngIf="!locationIsUnknown">Vous etes a : {{ locationResult.lieu }} ({{ locationResult.confiance }})</span>
-          <span *ngIf="locationIsUnknown && locationResult.incidentId">Lieu inconnu - alerte envoyee a votre famille</span>
-          <span *ngIf="locationIsUnknown && !locationResult.incidentId">Lieu inconnu - aucune alerte rouge detectee</span>
+          <span *ngIf="!locationIsUnknown">You are at: {{ locationResult.lieu }} ({{ locationResult.confiance }})</span>
+          <span *ngIf="locationIsUnknown && locationResult.incidentId">Unknown location - alert sent to your family</span>
+          <span *ngIf="locationIsUnknown && !locationResult.incidentId">Unknown location - no red-zone alert detected</span>
         </div>
       </div>
 
@@ -159,7 +159,7 @@
       </span>
       <span>
         <i class="fa-solid fa-location-dot text-success me-1"></i>
-        {{ positionsEnvoyees }} positions envoyées
+        {{ positionsEnvoyees }} positions sent
       </span>
     </div>
 
@@ -167,7 +167,7 @@
     <div *ngIf="status === 'starting'"
          class="d-flex align-items-center gap-2 text-warning">
       <div class="spinner-border spinner-border-sm"></div>
-      <span class="small">Recherche du signal GPS...</span>
+      <span class="small">Searching for GPS signal...</span>
     </div>
 
     <!-- Hors ligne -->
@@ -175,7 +175,7 @@
          class="alert alert-warning py-2 px-3 w-100 text-center mb-0 rounded-3"
          style="font-size:13px">
       <i class="fa-solid fa-wifi-slash me-2"></i>
-      GPS indisponible — reconnexion en cours...
+      GPS unavailable - reconnecting...
     </div>
 
     <!-- Alerte batterie faible -->
@@ -183,13 +183,13 @@
          class="alert alert-danger py-2 px-3 w-100 text-center mb-0 rounded-3"
          style="font-size:13px">
       <i class="fa-solid fa-battery-quarter me-2"></i>
-      Batterie faible — Branchez votre téléphone
+      Low battery - plug in your phone
     </div>
 
     <!-- Info arrière-plan -->
     <div class="text-muted text-center" style="font-size:11px; max-width:280px">
       <i class="fa-solid fa-info-circle me-1"></i>
-      Gardez cette page ouverte pour que le GPS reste actif
+      Keep this page open so GPS stays active
     </div>
 
     <!-- Déconnexion discrète -->
@@ -197,7 +197,7 @@
             style="font-size:12px; opacity:0.5"
             (click)="logout()">
       <i class="fa-solid fa-right-from-bracket me-1"></i>
-      Déconnexion
+      Logout
     </button>
 
   </div>

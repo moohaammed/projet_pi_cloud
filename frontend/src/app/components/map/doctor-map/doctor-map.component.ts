@@ -6,12 +6,10 @@ import * as L from 'leaflet';
 import { MapService } from '../../../services/map.service';
 import { AlzUserService } from '../../../services/alz-user.service';
 import { AuthService } from '../../../services/auth.service';
-import { HospitalService } from '../../../services/hospital.service';
 import { HospitalPrediction, HospitalPredictionService, RecommendedHospital } from '../../../services/hospital-prediction.service';
 import { IncidentService, Incident } from '../../../services/incident.service';
 import { SafeZone, GeoAlert, PatientLocation } from '../../../models/map.model';
 import { User, Role } from '../../../models/user.model';
-import { Hospital } from '../../../models/hospital.model';
 
 @Component({
   selector: 'app-doctor-map',
@@ -49,7 +47,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Données ──────────────────────────────────────────────────────────────
   patients:        User[]      = [];
-  hospitals:       Hospital[]  = [];
+  hospitals:       RecommendedHospital[]  = [];
   hospitalPredictions: HospitalPrediction[] = [];
   incidents:       Incident[]  = [];
   patientIncidents: Incident[] = [];
@@ -122,7 +120,6 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     private mapService:      MapService,
     private alzUserService:  AlzUserService,
     private authService:     AuthService,
-    private hospitalService: HospitalService,
     private hospitalPredictionService: HospitalPredictionService,
     private incidentService: IncidentService
   ) {}
@@ -136,6 +133,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.initMap();
       this.loadPatients();
+      this.loadHospitals();
       this.loadHospitalPredictions();
       this.loadAlerts();
       this.loadIncidents();
@@ -666,10 +664,16 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.map.setView([this.newZone.latitudeCentre, this.newZone.longitudeCentre], 15);
   }
 
-  private getHouseIcon(): L.DivIcon {
+  private getHouseIcon(patientName?: string): L.DivIcon {
+    const label = patientName
+      ? `<div style="position:absolute;top:52px;left:50%;transform:translateX(-50%);
+                     background:white;color:#3c3489;border:1px solid #d5b8ff;border-radius:999px;
+                     padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap;
+                     box-shadow:0 2px 8px rgba(60,52,137,.18)">${this.escapeHtml(patientName)}</div>`
+      : '';
     return L.divIcon({
       className: '',
-      html: `<div style="position:relative;width:50px;height:50px;filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.4))">
+      html: `<div style="position:relative;width:120px;height:${patientName ? '78px' : '50px'};filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.4))">
                <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-bottom:20px solid #c0392b"></div>
                <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:16px solid #e74c3c"></div>
                <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:36px;height:26px;background:linear-gradient(135deg,#f5f0e8,#e8dcc8);border:1px solid #c8b99a;border-radius:0 0 2px 2px">
@@ -677,8 +681,9 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
                  <div style="position:absolute;top:4px;left:3px;width:8px;height:7px;background:linear-gradient(135deg,#85c1e9,#5dade2);border:1px solid #aaa;border-radius:1px"></div>
                  <div style="position:absolute;top:4px;right:3px;width:8px;height:7px;background:linear-gradient(135deg,#85c1e9,#5dade2);border:1px solid #aaa;border-radius:1px"></div>
                </div>
+               ${label}
              </div>`,
-      iconSize: [50, 50], iconAnchor: [25, 50]
+      iconSize: [120, patientName ? 78 : 50], iconAnchor: [60, 50]
     });
   }
 
@@ -694,6 +699,15 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
   // ═══════════════════════════════════════════════════════════════════════════
   // PATIENTS
   // ═══════════════════════════════════════════════════════════════════════════
+
+  private clearAllPatientZones(): void {
+    this.greenCircles.forEach(circle => circle.remove());
+    this.redCircles.forEach(circle => circle.remove());
+    this.houseMarkers.forEach(marker => marker.remove());
+    this.greenCircles.clear();
+    this.redCircles.clear();
+    this.houseMarkers.clear();
+  }
 
   loadPatients(): void {
     this.alzUserService.getByRole(Role.PATIENT).subscribe({
@@ -745,8 +759,6 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
       </div>`);
     marker.addTo(this.map);
     this.patientMarkers.set(patient.id!, marker);
-    this.loadPatientZones(patient.id!, loc);
-    this.predictHospitalForPatient(patient, loc);
   }
 
   private addOfflineMarker(patient: User): void {
@@ -767,7 +779,13 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.patientMarkers.set(patient.id!, marker);
   }
 
-  private loadPatientZones(patientId: number, loc: PatientLocation): void {
+  private loadPatientZones(patient: User, loc: PatientLocation): void {
+    if (!patient.id) return;
+    const patientId = patient.id;
+    const patientName = [patient.prenom, patient.nom]
+      .filter(value => !!value && value !== 'undefined' && value !== 'null')
+      .join(' ')
+      .trim() || `Patient ${patient.id}`;
     this.mapService.getZoneByPatient(patientId).subscribe({
       next: (zones) => {
         this.greenCircles.get(patientId)?.remove();
@@ -786,7 +804,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
           const house = L.marker([zone.latitudeCentre, zone.longitudeCentre], { icon: this.getHouseIcon() })
             .bindPopup(`<div style="text-align:center">
-              <b>🏠 Maison de ${this.selectedPatient?.prenom}</b><br>
+              <b>Maison de ${this.escapeHtml(patientName)}</b><br>
               <small>Zone verte : ${zone.rayonVert}m — Zone rouge : ${zone.rayonRouge}m</small>
             </div>`).addTo(this.map);
 
@@ -968,6 +986,8 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.incidentFilter      = 'ALL';
     this.viewingAllIncidents = false;   // ← reset : on passe en mode patient
     this.clearPreview();
+    this.clearAllPatientZones();
+    this.clearHospitalRoute();
 
     if (patient.id) {
       this.newZone.patientId = patient.id;
@@ -985,6 +1005,13 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.loadPatientIncidents();
+      this.mapService.getLastLocation(patient.id).subscribe({
+        next: (loc) => {
+          this.loadPatientZones(patient, loc);
+          this.predictHospitalForPatient(patient, loc);
+        },
+        error: () => {}
+      });
 
       const marker = this.patientMarkers.get(patient.id);
       if (marker) { this.map.setView(marker.getLatLng(), 15); marker.openPopup(); }
@@ -1019,7 +1046,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clearPreview();
         if (this.selectedPatient?.id) {
           const loc = { latitude: saved.latitudeCentre, longitude: saved.longitudeCentre } as PatientLocation;
-          this.loadPatientZones(this.selectedPatient.id, loc);
+          this.loadPatientZones(this.selectedPatient, loc);
         }
       }
     });
@@ -1032,12 +1059,19 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
   // ═══════════════════════════════════════════════════════════════════════════
 
   loadHospitals(): void {
-    this.hospitalService.getAll().subscribe({
-      next: (data) => { this.hospitals = data; this.addHospitalMarkers(data); }
+    this.hospitalPredictionService.searchDataset('', undefined, undefined, 0).subscribe({
+      next: (data) => {
+        this.hospitals = data || [];
+        this.addHospitalMarkers(this.hospitals);
+      },
+      error: () => {
+        this.hospitals = [];
+        this.addHospitalMarkers([]);
+      }
     });
   }
 
-  private addHospitalMarkers(hospitals: Hospital[]): void {
+  private addHospitalMarkers(hospitals: RecommendedHospital[]): void {
     this.hospitalMarkers.forEach(m => m.remove());
     this.hospitalMarkers = [];
     hospitals.forEach(h => {
@@ -1055,7 +1089,8 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
             <strong>${h.nom}</strong>
           </div>
           <div style="font-size:12px;padding:4px 0">
-            <div>📍 ${h.adresse}, ${h.ville}</div>
+            <div>📍 ${this.escapeHtml(h.adresse || '')}${h.gouvernorat ? ', ' + this.escapeHtml(h.gouvernorat) : ''}</div>
+            <div>Spécialité: ${this.escapeHtml(h.specialite || 'general')}</div>
             ${h.telephone ? `<div>📞 ${h.telephone}</div>` : ''}
           </div>
           <a href="https://maps.google.com/?q=${h.latitude},${h.longitude}" target="_blank"
@@ -1093,8 +1128,11 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private addRecommendedHospitalMarkers(): void {
     this.recommendedHospitalMarkers.forEach(m => m.remove());
     this.recommendedHospitalMarkers = [];
+    if (!this.selectedPatient?.id) return;
 
-    this.latestRecommendedHospitals.forEach((item) => {
+    this.latestRecommendedHospitals
+      .filter(item => item.prediction.patientId === this.selectedPatient?.id)
+      .forEach((item) => {
       const hospital = item.hospital;
       if (hospital.latitude == null || hospital.longitude == null) return;
 
@@ -1271,6 +1309,7 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const result: { prediction: HospitalPrediction; hospital: RecommendedHospital; rank: number }[] = [];
     latestByPatient.forEach((prediction) => {
+      if (this.selectedPatient?.id && prediction.patientId !== this.selectedPatient.id) return;
       (prediction.hopitaux || []).forEach((hospital, rank) => {
         result.push({ prediction, hospital, rank });
       });
@@ -1342,12 +1381,12 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadHospitalPredictions();
   }
 
-  get nearestHospital(): Hospital | null {
+  get nearestHospital(): RecommendedHospital | null {
     if (!this.selectedPatient?.id) return null;
     const marker = this.patientMarkers.get(this.selectedPatient.id);
     if (!marker) return null;
     const { lat, lng } = marker.getLatLng();
-    let nearest: Hospital | null = null;
+    let nearest: RecommendedHospital | null = null;
     let minDist = Infinity;
     this.hospitals.forEach(h => {
       if (!h.latitude || !h.longitude) return;
@@ -1449,5 +1488,13 @@ export class DoctorMapComponent implements OnInit, AfterViewInit, OnDestroy {
       'ZONE_DANGEREUSE': { color: '#6f42c1', emoji: '☢️' },
     };
     return map[type] ?? { color: '#6c757d', emoji: '⚠️' };
+  }
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 }

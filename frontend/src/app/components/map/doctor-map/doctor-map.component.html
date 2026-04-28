@@ -83,7 +83,7 @@
     </div>
 
     <!-- Hôpitaux -->
-    <div class="border-top p-2" style="max-height:210px; overflow-y:auto">
+    <div *ngIf="selectedPatient" class="border-top p-2" style="max-height:210px; overflow-y:auto">
       <div class="d-flex justify-content-between align-items-center mb-2 px-1">
         <small class="fw-bold text-uppercase" style="letter-spacing:0.5px; color:#198754">
           <i class="fa-solid fa-truck-medical me-1"></i>Hopitaux IA
@@ -131,10 +131,10 @@
       </ng-container>
     </div>
 
-    <div *ngIf="false" class="border-top p-2" style="max-height:160px; overflow-y:auto">
+    <div *ngIf="!selectedPatient" class="border-top p-2" style="max-height:210px; overflow-y:auto">
       <div class="d-flex justify-content-between align-items-center mb-2 px-1">
         <small class="fw-bold text-muted text-uppercase" style="letter-spacing:0.5px">
-          Hôpitaux ({{ hospitals.length }})
+          Hôpitaux dataset ({{ hospitals.length }})
         </small>
         <button class="btn btn-xs py-0 px-1"
                 [class.btn-danger]="showHospitals"
@@ -148,7 +148,7 @@
            class="p-1 px-2 rounded mb-1 border-start border-danger border-2"
            style="font-size:11px; background:#fff5f5">
         <div class="fw-semibold text-danger">{{ h.nom }}</div>
-        <div class="text-muted">{{ h.ville }}</div>
+        <div class="text-muted">{{ h.gouvernorat }} - {{ h.specialite }}</div>
       </div>
     </div>
   </div>
@@ -478,7 +478,7 @@
         <div *ngIf="nearestHospital" class="card border-danger border-opacity-25">
           <div class="card-body p-2">
             <div class="fw-semibold small text-danger">{{ nearestHospital?.nom }}</div>
-            <div class="text-muted" style="font-size:11px">{{ nearestHospital?.adresse }}, {{ nearestHospital?.ville }}</div>
+            <div class="text-muted" style="font-size:11px">{{ nearestHospital?.adresse }}, {{ nearestHospital?.gouvernorat }}</div>
             <div *ngIf="nearestHospital?.telephone" style="font-size:11px" class="mt-1">
               <i class="fa-solid fa-phone me-1 text-success"></i>{{ nearestHospital?.telephone }}
             </div>
