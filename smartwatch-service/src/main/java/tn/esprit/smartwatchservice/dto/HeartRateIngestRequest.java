@@ -9,16 +9,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for the new async ingestion endpoint (POST /api/heart-rate/ingest).
- * Matches the contract expected by the Python BLE collector.
+ * DTO for the async ingestion endpoint (POST /api/heart-rate/ingest).
+ * The legacy dev collector sends userId directly. The token-based collector
+ * omits userId and lets the backend resolve it from Authorization: Bearer.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class HeartRateIngestRequest {
 
-    @NotNull(message = "userId is required")
     private Long userId;
+
+    private String eventId;
 
     @NotBlank(message = "deviceName is required")
     private String deviceName;

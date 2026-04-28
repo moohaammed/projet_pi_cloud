@@ -38,9 +38,22 @@
         </div>
       </div>
     </div>
-    <div class="connection-badge" [class.connected]="status === 'connected'" [class.disconnected]="status === 'disconnected'">
-      <span class="status-dot"></span>
-      {{ status === 'connected' ? 'Device Connected' : 'Disconnected' }}
+    <div class="header-actions">
+      <button type="button"
+              class="connect-smartwatch-button"
+              *ngIf="currentUserRole === 'PATIENT'"
+              [disabled]="isPreparingSmartwatch"
+              (click)="connectSmartwatch()">
+        <i class="fa-solid" [ngClass]="isPreparingSmartwatch ? 'fa-spinner fa-spin' : 'fa-watch'"></i>
+        {{ isPreparingSmartwatch ? 'Preparing...' : 'Connect Smartwatch' }}
+      </button>
+      <div class="smartwatch-config-message" *ngIf="smartwatchTokenMessage || smartwatchTokenError" [class.error]="smartwatchTokenError">
+        {{ smartwatchTokenError || smartwatchTokenMessage }}
+      </div>
+      <div class="connection-badge" [class.connected]="status === 'connected'" [class.disconnected]="status === 'disconnected'">
+        <span class="status-dot"></span>
+        {{ status === 'connected' ? 'Device Connected' : 'Disconnected' }}
+      </div>
     </div>
   </div>
 

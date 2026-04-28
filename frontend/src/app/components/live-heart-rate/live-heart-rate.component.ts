@@ -35,6 +35,10 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   relationUnlinked = false;
   monitoredPatient: MonitoredPatient | null = null;
   linkedPatients: MonitoredPatient[] = [];
+  currentUserRole = '';
+  isPreparingSmartwatch = false;
+  smartwatchTokenMessage = '';
+  smartwatchTokenError = '';
 
   // ECG waveform data
   ecgPoints: string = '';
@@ -80,6 +84,7 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
     // Try to get logged-in user ID
     const user = this.authService.getCurrentUser();
+    this.currentUserRole = user?.role || '';
     if (user && user.id) {
       this.userId = user.id;
     }
@@ -93,6 +98,57 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     }
 
     this.initializeMonitoring();
+  }
+
+  connectSmartwatch(): void {
+    if (!this.isBrowser || this.isPreparingSmartwatch) {
+      return;
+    }
+
+    this.smartwatchTokenMessage = '';
+    this.smartwatchTokenError = '';
+
+    const user = this.authService.getCurrentUser();
+    const patientUserId = Number(user?.id || this.userId);
+    if (!patientUserId) {
+      this.smartwatchTokenError = 'Could not resolve the logged-in patient.';
+      return;
+    }
+
+    this.isPreparingSmartwatch = true;
+    this.heartRateService.generateSmartwatchToken(patientUserId).subscribe({
+      next: (response) => {
+        const config = {
+          ingestUrl: this.heartRateService.getIngestUrl(),
+          token: response.token,
+          expiresAt: response.expiresAt,
+          deviceName: 'ST2',
+          watchNameKeyword: 'ST2',
+          characteristicUuid: '000033f2-0000-1000-8000-00805f9b34fb',
+          source: 'BLE_CLIENT_TOKEN'
+        };
+
+        this.downloadSmartwatchConfig(config);
+        this.smartwatchTokenMessage = `Config downloaded. Token expires at ${this.formatTimestamp(response.expiresAt)}.`;
+        this.isPreparingSmartwatch = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.smartwatchTokenError = 'Could not prepare smartwatch connection.';
+        this.isPreparingSmartwatch = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private downloadSmartwatchConfig(config: Record<string, unknown>): void {
+    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'medisync-smartwatch-config.json';
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   private initializeMonitoring(): void {

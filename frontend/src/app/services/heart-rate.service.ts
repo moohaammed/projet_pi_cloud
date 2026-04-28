@@ -28,6 +28,12 @@ export interface HeartRateLiveState {
   zone?: string;
 }
 
+export interface SmartwatchTokenResponse {
+  token: string;
+  userId: number;
+  expiresAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class HeartRateService {
 
@@ -59,6 +65,17 @@ export class HeartRateService {
     return this.http.get<HeartRateLiveState[]>(`${this.apiUrl}/states`, {
       params: { userIds: userIds.join(',') }
     });
+  }
+
+  /**
+   * Generate a short-lived token for the patient smartwatch collector.
+   */
+  generateSmartwatchToken(userId: number): Observable<SmartwatchTokenResponse> {
+    return this.http.post<SmartwatchTokenResponse>(`${this.apiUrl}/smartwatch-token`, { userId });
+  }
+
+  getIngestUrl(): string {
+    return `${this.apiUrl}/ingest`;
   }
 
   /**

@@ -1,0 +1,195 @@
+#!/usr/bin/env python
+import argparse
+import asyncio
+import json
+import os
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
+
+import requests
+from bleak import BleakClient, BleakScanner
+
+DEFAULT_CONFIG_NAMES = (
+    "medisync-smartwatch-config.json",
+    "smartwatch-token-config.json",
+)
+
+DEFAULT_WATCH_NAME_KEYWORD = "ST2"
+DEFAULT_CHAR_UUID = "000033f2-0000-1000-8000-00805f9b34fb"
+DEFAULT_SOURCE = "BLE_CLIENT_TOKEN"
+
+last_sent_bpm = None
+config = {}
+
+
+def find_config_path(cli_path=None):
+    if cli_path:
+        path = Path(cli_path).expanduser()
+        if path.exists():
+            return path
+        raise FileNotFoundError(f"Config file not found: {path}")
+
+    env_path = os.environ.get("MEDISYNC_SMARTWATCH_CONFIG")
+    if env_path:
+        path = Path(env_path).expanduser()
+        if path.exists():
+            return path
+        raise FileNotFoundError(f"Config file not found from MEDISYNC_SMARTWATCH_CONFIG: {path}")
+
+    candidates = []
+    for name in DEFAULT_CONFIG_NAMES:
+        candidates.append(Path.cwd() / name)
+        candidates.append(Path(__file__).resolve().parent / name)
+        candidates.append(Path.home() / "Downloads" / name)
+
+    for path in candidates:
+        if path.exists():
+            return path
+
+    names = ", ".join(DEFAULT_CONFIG_NAMES)
+    raise FileNotFoundError(
+        f"No smartwatch config found. Download {names} from the patient Connect Smartwatch button "
+        "or pass --config path/to/config.json."
+    )
+
+
+def load_config(path):
+    with path.open("r", encoding="utf-8") as f:
+        loaded = json.load(f)
+
+    if not loaded.get("token"):
+        raise ValueError("Config is missing token")
+    if not loaded.get("ingestUrl"):
+        raise ValueError("Config is missing ingestUrl")
+
+    loaded.setdefault("deviceName", DEFAULT_WATCH_NAME_KEYWORD)
+    loaded.setdefault("watchNameKeyword", DEFAULT_WATCH_NAME_KEYWORD)
+    loaded.setdefault("characteristicUuid", DEFAULT_CHAR_UUID)
+    loaded.setdefault("source", DEFAULT_SOURCE)
+    return loaded
+
+
+def parse_heart_rate(data: bytearray):
+    """
+    Expected useful packet:
+    E5 11 00 XX
+    where XX = BPM
+    """
+    if len(data) == 4 and data[0] == 0xE5 and data[1] == 0x11 and data[2] == 0x00:
+        return data[3]
+    return None
+
+
+def notification_handler(sender, data: bytearray):
+    global last_sent_bpm
+
+    raw_hex = data.hex(" ").upper()
+    print(f"[NOTIFY] {raw_hex}")
+
+    bpm = parse_heart_rate(data)
+    if bpm is None:
+        print("[INFO] Ignored non-heart-rate packet")
+        return
+
+    print(f"[HEART RATE] {bpm} BPM")
+
+    if bpm == last_sent_bpm:
+        return
+
+    last_sent_bpm = bpm
+
+    payload = {
+        "eventId": str(uuid.uuid4()),
+        "deviceName": config["deviceName"],
+        "bpm": bpm,
+        "source": config["source"],
+        "capturedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    }
+    headers = {"Authorization": f"Bearer {config['token']}"}
+
+    try:
+        response = requests.post(
+            config["ingestUrl"],
+            json=payload,
+            headers=headers,
+            timeout=3,
+        )
+        print(f"[POST] {response.status_code} -> {payload}")
+        if response.status_code not in (200, 201, 202):
+            print(f"[POST RESPONSE] {response.text}")
+        elif response.status_code == 202:
+            body = response.json()
+            print(f"[ACCEPTED] eventId={body.get('eventId', 'N/A')}")
+    except Exception as e:
+        print(f"[ERROR] Failed to send to backend: {e}")
+
+
+async def find_device():
+    watch_name_keyword = config["watchNameKeyword"]
+    print("[SCAN] Scanning for BLE devices...")
+    devices = await BleakScanner.discover(timeout=15.0)
+
+    for device in devices:
+        name = device.name or ""
+        print(f"Found: {name} - {device.address}")
+        if watch_name_keyword.lower() in name.lower():
+            print(f"[FOUND] Target device: {name} - {device.address}")
+            return device
+
+    return None
+
+
+async def main():
+    device = await find_device()
+
+    if not device:
+        print(f"[ERROR] Watch matching '{config['watchNameKeyword']}' not found.")
+        return
+
+    print(f"[CONNECT] Trying to connect to {device.name} - {device.address}")
+
+    try:
+        async with BleakClient(device, timeout=30.0) as client:
+            print("[CONNECTED] Connected to watch")
+
+            services = client.services
+            print("[SERVICES] Discovered services and characteristics:")
+            for service in services:
+                print(f"Service: {service.uuid}")
+                for char in service.characteristics:
+                    props = ",".join(char.properties)
+                    print(f"  Characteristic: {char.uuid} | Properties: {props}")
+
+            char_uuid = config["characteristicUuid"]
+            print(f"[SUBSCRIBE] Starting notifications on {char_uuid}")
+            await client.start_notify(char_uuid, notification_handler)
+            print("[LISTENING] Waiting for heart rate notifications... Press Ctrl+C to stop.")
+
+            try:
+                while True:
+                    await asyncio.sleep(1)
+            except KeyboardInterrupt:
+                print("[STOP] Graceful shutdown...")
+            finally:
+                await client.stop_notify(char_uuid)
+                print("[DISCONNECTED] Notifications stopped")
+
+    except Exception as e:
+        print(f"[ERROR] Connection or notification failed: {e}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="MediSync token-based smartwatch BLE collector")
+    parser.add_argument("--config", help="Path to medisync-smartwatch-config.json")
+    args = parser.parse_args()
+
+    try:
+        config_path = find_config_path(args.config)
+        config = load_config(config_path)
+        print(f"[CONFIG] Loaded {config_path}")
+        if config.get("expiresAt"):
+            print(f"[CONFIG] Token expires at {config['expiresAt']}")
+        asyncio.run(main())
+    except Exception as exc:
+        print(f"[ERROR] {exc}")

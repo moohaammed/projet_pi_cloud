@@ -149,6 +149,50 @@
   transition: all 0.3s ease;
 }
 
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+
+.connect-smartwatch-button {
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.connect-smartwatch-button:hover:not(:disabled) {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: rgba(34, 197, 94, 0.18);
+}
+
+.connect-smartwatch-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.smartwatch-config-message {
+  max-width: 280px;
+  color: #86efac;
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.smartwatch-config-message.error {
+  color: #fca5a5;
+}
+
 .connection-badge.connected {
   background: rgba(34, 197, 94, 0.12);
   color: #22c55e;
