@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/education/event.service';
@@ -128,7 +128,8 @@ import { AuthService } from '../../../services/auth.service';
       font-size: 1.1rem;
       color: var(--text-mid);
       margin: 0;
-      max-width: 600px;
+      max-width: none !important;
+      white-space: nowrap !important;
       line-height: 1.5;
     }
 
@@ -853,7 +854,7 @@ export class EventFrontComponent implements OnInit {
 
   updateTodayDate() {
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    this.todayDateStr = new Date().toLocaleDateString('fr-FR', options);
+    this.todayDateStr = new Date().toLocaleDateString('en-US', options);
   }
 
   load() {
@@ -901,18 +902,18 @@ export class EventFrontComponent implements OnInit {
 
   getMonth(dateStr?: string): string {
     if (!dateStr) return '';
-    const months = ['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     return months[new Date(dateStr).getMonth()];
   }
 
   formatDate(dateStr?: string): string {
     if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+    return new Date(dateStr).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   formatTime(dateStr?: string): string {
     if (!dateStr) return '';
-    return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    return new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   }
 
   isUpcoming(dateStr?: string): boolean {
@@ -926,7 +927,7 @@ export class EventFrontComponent implements OnInit {
     const now = new Date();
     
     if (eventDate <= now) {
-      return 'L\'événement est déjà passé';
+      return 'The event has already passed';
     }
 
     const diffMs = eventDate.getTime() - now.getTime();
@@ -934,12 +935,12 @@ export class EventFrontComponent implements OnInit {
     const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
     if (diffDays === 0) {
-      if (diffHours === 0) return 'Très bientôt (moins d\'une heure)';
-      return `Aujourd'hui, dans ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+      if (diffHours === 0) return 'Very soon (less than an hour)';
+      return `Today, in ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
     } else if (diffDays === 1) {
-      return `Demain, plus que ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+      return `Tomorrow, in ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
     } else {
-      return `Dans ${diffDays} jour${diffDays > 1 ? 's' : ''} et ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+      return `In ${diffDays} day${diffDays > 1 ? 's' : ''} and ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
     }
   }
 
@@ -980,7 +981,7 @@ export class EventFrontComponent implements OnInit {
 
   shareEvent(event: CalendarEvent) {
     if (!this.authService.isLoggedIn()) {
-      this.errorMessage.set('Veuillez vous connecter pour partager un Ã©vÃ©nement.');
+      this.errorMessage.set('Please log in to share an event.');
       setTimeout(() => this.errorMessage.set(''), 3000);
       return;
     }
@@ -1001,7 +1002,7 @@ export class EventFrontComponent implements OnInit {
     const userId = this.authService.getCurrentUser()?.id;
     if (!event || !userId) return;
     this.isSharing.set(true);
-    const content = this.shareCaption.trim() || `Regardez cet evenement : ${event.title}`;
+    const content = this.shareCaption.trim() || `Check out this event: ${event.title}`;
     this.publicationService.createPublicationJson({
       type: 'EVENT',
       content,
@@ -1011,12 +1012,12 @@ export class EventFrontComponent implements OnInit {
       next: () => {
         this.isSharing.set(false);
         this.closeShareModal();
-        this.successMessage.set('Evenement partage sur le fil communautaire !');
+        this.successMessage.set('Event shared on the community feed!');
         setTimeout(() => this.successMessage.set(''), 4000);
       },
       error: (err) => {
         this.isSharing.set(false);
-        this.errorMessage.set('Erreur : ' + (err.error?.message || 'Reessayez plus tard.'));
+        this.errorMessage.set('Error: ' + (err.error?.message || 'Please try again later.'));
         setTimeout(() => this.errorMessage.set(''), 4000);
       }
     });
@@ -1027,7 +1028,7 @@ export class EventFrontComponent implements OnInit {
     const userId = this.authService.getCurrentUser()?.id;
     if (!event || !userId) return;
     this.isSharing.set(true);
-    const content = this.shareCaption.trim() || `Regardez cet evenement : ${event.title}`;
+    const content = this.shareCaption.trim() || `Check out this event: ${event.title}`;
     this.publicationService.createPublicationJson({
       type: 'EVENT',
       content,
@@ -1038,12 +1039,12 @@ export class EventFrontComponent implements OnInit {
       next: () => {
         this.isSharing.set(false);
         this.closeShareModal();
-        this.successMessage.set('Evenement partage avec succes !');
+        this.successMessage.set('Event shared successfully!');
         setTimeout(() => this.successMessage.set(''), 4000);
       },
       error: (err) => {
         this.isSharing.set(false);
-        this.errorMessage.set('Erreur : ' + (err.error?.message || 'Reessayez plus tard.'));
+        this.errorMessage.set('Error: ' + (err.error?.message || 'Please try again later.'));
         setTimeout(() => this.errorMessage.set(''), 4000);
       }
     });

@@ -1,0 +1,8 @@
+{
+  "title": "Test Event from JSON",
+  "startDateTime": "2026-05-10T15:30:00",
+  "location": "Loc Test",
+  "description": "Description long enough to pass any validation.",
+  "capacity": 10,
+  "userId": 1
+}

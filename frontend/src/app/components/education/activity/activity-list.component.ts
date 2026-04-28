@@ -62,7 +62,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        const msg = err.error?.message || err.message || 'Erreur lors du chargement des activités';
+        const msg = err.error?.message || err.message || 'Error occurred while loading activities';
         alert(msg);
       }
     });
@@ -95,18 +95,18 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const title = this.newActivity.title?.trim();
     if (!title) {
-      this.errors['title'] = 'Le titre est obligatoire.';
+      this.errors['title'] = 'Title is required.';
     } else if (title.length < 3) {
-      this.errors['title'] = 'Le titre doit contenir au moins 3 caractères.';
+      this.errors['title'] = 'Title must be at least 3 characters long.';
     } else if (title.length > 100) {
-      this.errors['title'] = 'Le titre ne doit pas dépasser 100 caractères.';
+      this.errors['title'] = 'Title must not exceed 100 characters.';
     }
 
     const desc = this.newActivity.description?.trim();
     if (!desc) {
-      this.errors['description'] = 'La description est obligatoire.';
+      this.errors['description'] = 'Description is required.';
     } else if (desc.length > 500) {
-      this.errors['description'] = 'La description ne doit pas dépasser 500 caractères.';
+      this.errors['description'] = 'Description must not exceed 500 characters.';
     }
 
     return Object.keys(this.errors).length === 0;
@@ -123,7 +123,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
             this.reset();
           },
           error: (err) => {
-            const msg = err.error?.message || err.message || 'Erreur lors de la modification';
+            const msg = err.error?.message || err.message || 'Error occurred while updating';
             alert(msg);
           }
         });
@@ -135,7 +135,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
             this.reset();
           },
           error: (err) => {
-            const msg = err.error?.message || err.message || 'Erreur lors de la création';
+            const msg = err.error?.message || err.message || 'Error occurred while creating';
             alert(msg);
           }
         });
@@ -152,13 +152,13 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   delete(id: string): void {
-    if (confirm('Voulez-vous vraiment supprimer cette activité ?')) {
+    if (confirm('Are you sure you want to delete this activity?')) {
       this.activityService.delete(id).subscribe({
         next: () => {
           this.load();
         },
         error: (err) => {
-          const msg = err.error?.message || err.message || 'Erreur lors de la suppression';
+          const msg = err.error?.message || err.message || 'Error occurred while deleting';
           alert(msg);
         }
       });
@@ -227,7 +227,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.charts.push(new Chart(ctx1, {
         type: 'doughnut',
         data: {
-          labels: ['Quiz', 'Jeux', 'Contenus', 'Exercices'],
+          labels: ['Quiz', 'Games', 'Content', 'Exercises'],
           datasets: [{
             data: [this.quizCount, this.gameCount, this.contentCount, this.exerciceCount],
             backgroundColor: ['#059669', '#6c2bd9', '#d97706', '#e11d48'],
@@ -244,7 +244,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.charts.push(new Chart(ctx2, {
         type: 'pie',
         data: {
-          labels: ['Léger', 'Modéré', 'Sévère'],
+          labels: ['Mild', 'Moderate', 'Severe'],
           datasets: [{
             data: [this.legerCount, this.modereCount, this.severeCount],
             backgroundColor: ['#9333ea', '#7c3aed', '#6d28d9'],
@@ -261,7 +261,7 @@ export class ActivityListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.charts.push(new Chart(ctx3, {
         type: 'doughnut',
         data: {
-          labels: ['Actives', 'Inactives'],
+          labels: ['Active', 'Inactive'],
           datasets: [{
             data: [this.activeCount, this.inactiveCount],
             backgroundColor: ['#10b981', '#94a3b8'],

@@ -21,13 +21,13 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       <!-- Indicateur de chargement -->
       <div class="loading" *ngIf="isLoading">
         <div class="spinner"></div>
-        <p>Chargement des activités...</p>
+        <p>Loading activities...</p>
       </div>
 
       <!-- Message d'erreur -->
       <div class="error-message" *ngIf="errorMessage">
         <p>❌ {{ errorMessage }}</p>
-        <button class="btn-retry" (click)="loadActivities()">Réessayer</button>
+        <button class="btn-retry" (click)="loadActivities()">Retry</button>
       </div>
 
       <!-- Menu de sélection -->
@@ -37,9 +37,9 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
           <div class="edu-hero">
             <div class="edu-hero-glow"></div>
             <div class="edu-hero-content">
-              <div class="header-badge">Espace Santé & Cognitive</div>
-              <h1 class="edu-hero-title">Espace Thérapeutique</h1>
-              <p class="edu-hero-sub">Choisissez une activité pour progresser à votre rythme</p>
+              <div class="header-badge">Health & Cognitive Space</div>
+              <h1 class="edu-hero-title">Therapeutic Space</h1>
+              <p class="edu-hero-sub">Choose an activity to progress at your own pace</p>
             </div>
             <!-- Progression bar (stats-bar style) -->
             <div class="stats-bar" *ngIf="authService.getRole() === 'PATIENT'">
@@ -55,7 +55,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 <div class="stat-icon upcoming">🎮</div>
                 <div class="stat-info">
                   <span class="stat-number">{{ patientStadeGame }}</span>
-                  <span class="stat-label">Jeux</span>
+                  <span class="stat-label">Games</span>
                 </div>
               </div>
               <div class="stat-divider"></div>
@@ -72,32 +72,32 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
             <button class="type-btn quiz" (click)="selectType('QUIZ')">
               <div class="type-btn-glow"></div>
               <div class="icon">📝</div>
-              <div class="type-name">Quiz</div>
-              <div class="type-desc">Testez vos connaissances</div>
+              <div class="type-name">Quizzes</div>
+              <div class="type-desc">Test your knowledge</div>
               <div class="type-arrow">→</div>
             </button>
 
             <button class="type-btn game" (click)="selectType('GAME')">
               <div class="type-btn-glow"></div>
               <div class="icon">🎮</div>
-              <div class="type-name">Jeux</div>
-              <div class="type-desc">Memory et puzzles</div>
+              <div class="type-name">Games</div>
+              <div class="type-desc">Memory and puzzles</div>
               <div class="type-arrow">→</div>
             </button>
 
             <button class="type-btn content" (click)="selectType('CONTENT')">
               <div class="type-btn-glow"></div>
               <div class="icon">📺</div>
-              <div class="type-name">Contenu</div>
-              <div class="type-desc">Vidéos et articles</div>
+              <div class="type-name">Content</div>
+              <div class="type-desc">Videos and articles</div>
               <div class="type-arrow">→</div>
             </button>
 
             <button class="type-btn exercice" (click)="selectType('EXERCICE')">
               <div class="type-btn-glow"></div>
               <div class="icon">🧘</div>
-              <div class="type-name">Exercices</div>
-              <div class="type-desc">Respiration et méditation</div>
+              <div class="type-name">Exercises</div>
+              <div class="type-desc">Breathing and meditation</div>
               <div class="type-arrow">→</div>
             </button>
           </div>
@@ -112,12 +112,12 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
             <div class="edu-hero-content">
               <div class="header-badge">{{ selectedType }}</div>
               <h1 class="edu-hero-title">{{ getTypeLabel(selectedType) }}</h1>
-              <p class="edu-hero-sub">Parcourez les activités disponibles et progressez étape par étape.</p>
+              <p class="edu-hero-sub">Browse available activities and progress step by step.</p>
             </div>
             <button class="btn-reset" *ngIf="authService.getRole() === 'PATIENT' && (selectedType === 'QUIZ' || selectedType === 'GAME')" (click)="resetLevel()">
-              🔄 Réinitialiser mon niveau
+              🔄 Reset my level
             </button>
-            <button class="btn-back-floating" (click)="backToMenu()">← Retour</button>
+            <button class="btn-back-floating" (click)="backToMenu()">← Back</button>
           </div>
 
           <!-- Stage sections (for QUIZ and GAME with patient role) -->
@@ -129,11 +129,11 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <div class="stage-header">
                 <div class="stage-title-row">
                   <span class="stage-icon">🌱</span>
-                  <h3 class="stage-name">Stade Léger</h3>
-                  <span class="stage-badge badge-leger" *ngIf="getPatientStade() === 'LEGER' && !isStageCompleted('LEGER')">✅ Votre niveau actuel</span>
-                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('LEGER')">🏅 Complété</span>
+                  <h3 class="stage-name">Mild Stage</h3>
+                  <span class="stage-badge badge-leger" *ngIf="getPatientStade() === 'LEGER' && !isStageCompleted('LEGER')">✅ Your current level</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('LEGER')">🏅 Completed</span>
                 </div>
-                <div class="stage-lock" *ngIf="isStageLocked('LEGER')">🔒 Verrouillé</div>
+                <div class="stage-lock" *ngIf="isStageLocked('LEGER')">🔒 Locked</div>
               </div>
               <div class="activities-grid">
                 <div class="activity-card" [class.card-locked]="isStageLocked('LEGER')"
@@ -149,13 +149,13 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                     <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
                     <button class="btn-play" [class.btn-locked]="isStageLocked('LEGER')">
                       <ng-container *ngIf="isStageLocked('LEGER')">🔒</ng-container>
-                      <ng-container *ngIf="!isStageLocked('LEGER') && isStageCompleted('LEGER')">Rejouer →</ng-container>
-                      <ng-container *ngIf="!isStageLocked('LEGER') && !isStageCompleted('LEGER')">Jouer →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('LEGER') && isStageCompleted('LEGER')">Replay →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('LEGER') && !isStageCompleted('LEGER')">Play →</ng-container>
                     </button>
                   </div>
                 </div>
                 <div class="empty-stage" *ngIf="getActivitiesForStage('LEGER').length === 0">
-                  <p>Aucune activité pour ce stade</p>
+                  <p>No activity for this stage</p>
                 </div>
               </div>
             </div>
@@ -165,11 +165,11 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <div class="stage-header">
                 <div class="stage-title-row">
                   <span class="stage-icon">⚡</span>
-                  <h3 class="stage-name">Stade Modéré</h3>
-                  <span class="stage-badge badge-modere" *ngIf="getPatientStade() === 'MODERE' && !isStageCompleted('MODERE')">✅ Votre niveau actuel</span>
-                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('MODERE')">🏅 Complété</span>
+                  <h3 class="stage-name">Moderate Stage</h3>
+                  <span class="stage-badge badge-modere" *ngIf="getPatientStade() === 'MODERE' && !isStageCompleted('MODERE')">✅ Your current level</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('MODERE')">🏅 Completed</span>
                 </div>
-                <div class="stage-lock" *ngIf="isStageLocked('MODERE')">🔒 Verrouillé</div>
+                <div class="stage-lock" *ngIf="isStageLocked('MODERE')">🔒 Locked</div>
               </div>
               <div class="activities-grid">
                 <div class="activity-card" [class.card-locked]="isStageLocked('MODERE')"
@@ -185,13 +185,13 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                     <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
                     <button class="btn-play" [class.btn-locked]="isStageLocked('MODERE')">
                       <ng-container *ngIf="isStageLocked('MODERE')">🔒</ng-container>
-                      <ng-container *ngIf="!isStageLocked('MODERE') && isStageCompleted('MODERE')">Rejouer →</ng-container>
-                      <ng-container *ngIf="!isStageLocked('MODERE') && !isStageCompleted('MODERE')">Jouer →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('MODERE') && isStageCompleted('MODERE')">Replay →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('MODERE') && !isStageCompleted('MODERE')">Play →</ng-container>
                     </button>
                   </div>
                 </div>
                 <div class="empty-stage" *ngIf="getActivitiesForStage('MODERE').length === 0">
-                  <p>Aucune activité pour ce stade</p>
+                  <p>No activity for this stage</p>
                 </div>
               </div>
             </div>
@@ -201,11 +201,11 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <div class="stage-header">
                 <div class="stage-title-row">
                   <span class="stage-icon">🔥</span>
-                  <h3 class="stage-name">Stade Sévère</h3>
-                  <span class="stage-badge badge-severe" *ngIf="getPatientStade() === 'SEVERE' && !isStageCompleted('SEVERE')">✅ Votre niveau actuel</span>
-                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('SEVERE')">🏅 Complété</span>
+                  <h3 class="stage-name">Severe Stage</h3>
+                  <span class="stage-badge badge-severe" *ngIf="getPatientStade() === 'SEVERE' && !isStageCompleted('SEVERE')">✅ Your current level</span>
+                  <span class="stage-badge badge-done" *ngIf="isStageCompleted('SEVERE')">🏅 Completed</span>
                 </div>
-                <div class="stage-lock" *ngIf="isStageLocked('SEVERE')">🔒 Verrouillé</div>
+                <div class="stage-lock" *ngIf="isStageLocked('SEVERE')">🔒 Locked</div>
               </div>
               <div class="activities-grid">
                 <div class="activity-card" [class.card-locked]="isStageLocked('SEVERE')"
@@ -221,13 +221,13 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                     <span class="duration">⏱ {{ activity.estimatedMinutes }} min</span>
                     <button class="btn-play" [class.btn-locked]="isStageLocked('SEVERE')">
                       <ng-container *ngIf="isStageLocked('SEVERE')">🔒</ng-container>
-                      <ng-container *ngIf="!isStageLocked('SEVERE') && isStageCompleted('SEVERE')">Rejouer →</ng-container>
-                      <ng-container *ngIf="!isStageLocked('SEVERE') && !isStageCompleted('SEVERE')">Jouer →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('SEVERE') && isStageCompleted('SEVERE')">Replay →</ng-container>
+                      <ng-container *ngIf="!isStageLocked('SEVERE') && !isStageCompleted('SEVERE')">Play →</ng-container>
                     </button>
                   </div>
                 </div>
                 <div class="empty-stage" *ngIf="getActivitiesForStage('SEVERE').length === 0">
-                  <p>Aucune activité pour ce stade</p>
+                  <p>No activity for this stage</p>
                 </div>
               </div>
             </div>
@@ -247,10 +247,10 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <div class="content-card-glass">
                 <div class="activity-header">
                   <span class="activity-type content-badge-premium" [ngSwitch]="selectedType">
-                    <ng-container *ngSwitchCase="'CONTENT'"><i class="fa-solid fa-play-circle me-1"></i> Contenu</ng-container>
-                    <ng-container *ngSwitchCase="'EXERCICE'"><i class="fa-solid fa-person-running me-1"></i> Exercice</ng-container>
+                    <ng-container *ngSwitchCase="'CONTENT'"><i class="fa-solid fa-play-circle me-1"></i> Content</ng-container>
+                    <ng-container *ngSwitchCase="'EXERCICE'"><i class="fa-solid fa-person-running me-1"></i> Exercise</ng-container>
                     <ng-container *ngSwitchCase="'QUIZ'"><i class="fa-solid fa-clipboard-question me-1"></i> Quiz</ng-container>
-                    <ng-container *ngSwitchCase="'GAME'"><i class="fa-solid fa-gamepad me-1"></i> Jeu</ng-container>
+                    <ng-container *ngSwitchCase="'GAME'"><i class="fa-solid fa-gamepad me-1"></i> Game</ng-container>
                     <ng-container *ngSwitchDefault><i class="fa-solid fa-star me-1"></i> {{ selectedType }}</ng-container>
                   </span>
                   <span class="activity-stade premium-stade">{{ activity.stade }}</span>
@@ -259,10 +259,11 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 <p class="activity-desc content-desc-premium">{{ activity.description }}</p>
                 <div class="activity-footer content-footer-premium">
                   <span class="duration text-white-50"><i class="fa-regular fa-clock me-1"></i> {{ activity.estimatedMinutes }} min</span>
-                  <button class="btn-play premium-play">
-                    <ng-container *ngIf="selectedType === 'CONTENT'">Découvrir →</ng-container>
-                    <ng-container *ngIf="selectedType === 'EXERCICE'">S'entraîner →</ng-container>
-                    <ng-container *ngIf="selectedType !== 'CONTENT' && selectedType !== 'EXERCICE'">Jouer →</ng-container>
+                  <button class="btn-play premium-play" [ngSwitch]="selectedType">
+                    <ng-container *ngSwitchCase="'CONTENT'">Discover →</ng-container>
+                    <ng-container *ngSwitchCase="'EXERCICE'">Practice →</ng-container>
+                    <ng-container *ngSwitchCase="'QUIZ'">Play →</ng-container>
+                    <ng-container *ngSwitchCase="'GAME'">Play →</ng-container>
                   </button>
                 </div>
               </div>
@@ -270,8 +271,8 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
             </div>
 
             <div class="empty-state" *ngIf="filteredActivities.length === 0">
-              <p>Aucune activité disponible pour ce type</p>
-              <button class="btn-primary" (click)="backToMenu()">Retour au menu</button>
+              <p>No activities available for this type</p>
+              <button class="btn-primary" (click)="backToMenu()">Back to menu</button>
             </div>
           </div>
         </ng-template>
@@ -287,7 +288,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
 
           <!-- Floating Back Button -->
           <button class="btn-back-floating" (click)="stopActivity()">
-            <i class="fa-solid fa-arrow-left"></i> Quitter
+            <i class="fa-solid fa-arrow-left"></i> Exit
           </button>
 
           <div class="quiz-status-bar d-flex justify-content-between align-items-center mb-4 px-3 py-2 bg-light rounded-3 shadow-sm border border-secondary border-opacity-10">
@@ -315,13 +316,13 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
             </div>
 
             <div class="explanation" *ngIf="answered && currentQuestion.explication">
-              <strong>💡 Explication :</strong> {{ currentQuestion.explication }}
+              <strong>💡 Explanation:</strong> {{ currentQuestion.explication }}
             </div>
 
             <button class="btn-next"
                     *ngIf="answered"
                     (click)="nextQuestion()">
-              {{ isLastQuestion() ? 'Voir le résultat' : 'Question suivante' }}
+              {{ isLastQuestion() ? 'See results' : 'Next Question' }}
             </button>
           </div>
 
@@ -330,21 +331,21 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <!-- Échec / Timeout -->
               <ng-container *ngIf="isTimeout || isQuizFailed()">
                 <div class="result-icon">😔</div>
-                <h2 class="result-title">{{ isTimeout ? 'Temps écoulé !' : 'Essaye encore !' }}</h2>
+                <h2 class="result-title">{{ isTimeout ? 'Time is up!' : 'Try again!' }}</h2>
                 <div class="result-score">{{ quizScore }} / {{ quizQuestions.length }}</div>
                 <div class="points-earned" *ngIf="sessionPointsEarned !== null">
-                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ quizQuestions.length * 10 }} pts gagnés</span>
-                  <span class="pts-total">Score total : {{ sessionTotalPoints }} pts</span>
+                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ quizQuestions.length * 10 }} points earned</span>
+                  <span class="pts-total">Total score: {{ sessionTotalPoints }} pts</span>
                 </div>
                 <p class="result-message">
-                  Vous n’avez pas atteint le score requis cette fois-ci, mais ne vous découragez pas ! Continuez à vous entraîner pour progresser.
+                  You didn't reach the required score this time, but don't get discouraged! Keep practicing to improve.
                 </p>
                 <div class="result-actions">
                   <button class="btn-result-primary" (click)="goToNextStade()" *ngIf="!isLastStade()">
-                    Passer au stade suivant ⏩
+                    Go to next stage ⏩
                   </button>
                   <button class="btn-result-secondary" (click)="stopActivity()">
-                    Jouer à une autre activité 📚
+                    Play another activity 📚
                   </button>
                 </div>
               </ng-container>
@@ -352,16 +353,16 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <!-- Succès -->
               <ng-container *ngIf="!isTimeout && !isQuizFailed()">
                 <div class="result-icon">🎉</div>
-                <h2 class="result-title">Félicitations !</h2>
+                <h2 class="result-title">Congratulations!</h2>
                 <div class="result-score">{{ quizScore }} / {{ quizQuestions.length }}</div>
                 <div class="points-earned" *ngIf="sessionPointsEarned !== null">
-                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ quizQuestions.length * 10 }} pts gagnés</span>
-                  <span class="pts-total">Score total : {{ sessionTotalPoints }} pts</span>
+                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ quizQuestions.length * 10 }} points earned</span>
+                  <span class="pts-total">Total score: {{ sessionTotalPoints }} pts</span>
                 </div>
                 <p class="result-message">{{ getScoreMessage() }}</p>
                 <div class="result-actions">
                   <button class="btn-result-secondary" (click)="stopActivity()">
-                    Jouer à une autre activité 📚
+                    Play another activity 📚
                   </button>
                 </div>
               </ng-container>
@@ -377,17 +378,17 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
             <div class="game-header-glow"></div>
             <!-- Floating Back Button -->
             <button class="btn-back-floating" (click)="stopActivity()">
-              <i class="fa-solid fa-arrow-left"></i> Quitter
+              <i class="fa-solid fa-arrow-left"></i> Exit
             </button>
             <div class="game-header-inner">
-              <div class="game-category-badge">🎮 Jeu de Mémoire</div>
+              <div class="game-category-badge">🎮 Memory Game</div>
               <h2 class="game-main-title">{{ playingActivity.title }}</h2>
               <div class="game-header-stats">
                 <div class="game-stat-pill" [class.danger]="timerRemaining < 10">
                   <span class="game-stat-icon">⏱️</span>
                   <div class="game-stat-info">
                     <span class="game-stat-value">{{ getFormattedTime() }}</span>
-                    <span class="game-stat-label">Temps restant</span>
+                    <span class="game-stat-label">Time remaining</span>
                   </div>
                 </div>
                 <div class="game-stat-divider"></div>
@@ -395,7 +396,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                   <span class="game-stat-icon">🎯</span>
                   <div class="game-stat-info">
                     <span class="game-stat-value">{{ gameMoves }}</span>
-                    <span class="game-stat-label">Coups joués</span>
+                    <span class="game-stat-label">Moves</span>
                   </div>
                 </div>
                 <div class="game-stat-divider"></div>
@@ -403,7 +404,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                   <span class="game-stat-icon">✅</span>
                   <div class="game-stat-info">
                     <span class="game-stat-value">{{ getMatchedPairs() }} / {{ memoryCards.length / 2 }}</span>
-                    <span class="game-stat-label">Paires trouvées</span>
+                    <span class="game-stat-label">Pairs found</span>
                   </div>
                 </div>
               </div>
@@ -438,21 +439,21 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <!-- Échec -->
               <ng-container *ngIf="isTimeout || !gameSuccess">
                 <div class="result-icon">😔</div>
-                <h2 class="result-title">{{ isTimeout ? 'Temps écoulé !' : 'Dommage !' }}</h2>
-                <div class="result-score">{{ gameMoves }} coups</div>
+                <h2 class="result-title">{{ isTimeout ? 'Time is up!' : 'Too bad!' }}</h2>
+                <div class="result-score">{{ gameMoves }} moves</div>
                 <div class="points-earned" *ngIf="sessionPointsEarned !== null">
-                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ (memoryCards.length / 2) * 10 }} pts gagnés</span>
-                  <span class="pts-total">Score total : {{ sessionTotalPoints }} pts</span>
+                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ (memoryCards.length / 2) * 10 }} points earned</span>
+                  <span class="pts-total">Total score: {{ sessionTotalPoints }} pts</span>
                 </div>
                 <p class="result-message">
-                  Vous n'avez pas atteint le score requis cette fois-ci (max {{ (memoryCards.length / 2) * 3 }} coups), mais ne vous découragez pas ! Continuez à vous entraîner pour progresser.
+                  You didn't reach the required score this time (max {{ (memoryCards.length / 2) * 3 }} moves), but don't get discouraged! Keep practicing to improve.
                 </p>
                 <div class="result-actions">
                   <button class="btn-result-primary" (click)="goToNextStade()" *ngIf="!isLastStade()">
-                    Passer au stade suivant ⏩
+                    Go to next stage ⏩
                   </button>
                   <button class="btn-result-secondary" (click)="stopActivity()">
-                    Jouer à une autre activité 📚
+                    Play another activity 📚
                   </button>
                 </div>
               </ng-container>
@@ -460,14 +461,14 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <!-- Succès -->
               <ng-container *ngIf="!isTimeout && gameSuccess">
                 <div class="result-icon">🎉</div>
-                <h2 class="result-title">Bravo !</h2>
-                <div class="result-score">{{ gameMoves }} coups</div>
+                <h2 class="result-title">Well done!</h2>
+                <div class="result-score">{{ gameMoves }} moves</div>
                 <div class="points-earned" *ngIf="sessionPointsEarned !== null">
-                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ (memoryCards.length / 2) * 10 }} pts gagnés</span>
-                  <span class="pts-total">Score total : {{ sessionTotalPoints }} pts</span>
+                  <span class="pts-session">+{{ sessionPointsEarned }} / {{ (memoryCards.length / 2) * 10 }} points earned</span>
+                  <span class="pts-total">Total score: {{ sessionTotalPoints }} pts</span>
                 </div>
                 <p class="result-message">
-                  Félicitations, vous avez trouvé toutes les paires avec un excellent score ! (Maximum autorisé : {{ (memoryCards.length / 2) * 3 }} coups)
+                  Congratulations, you found all pairs with an excellent score! (Maximum allowed: {{ (memoryCards.length / 2) * 3 }} moves)
                 </p>
                 <div class="result-actions">
                   <button class="btn-result-secondary" (click)="stopActivity()">
@@ -491,9 +492,9 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <div class="content-meta premium-meta">
                 <span class="content-type-badge premium-badge" [class.video]="contentData.contentType === 'video'">
                   <i class="fa-solid" [class.fa-play-circle]="contentData.contentType === 'video'" [class.fa-file-alt]="contentData.contentType === 'article'"></i>
-                  {{ contentData.contentType === 'video' ? 'Vidéo' : 'Article' }}
+                  {{ contentData.contentType === 'video' ? 'Video' : 'Article' }}
                 </span>
-                <span class="content-duration premium-duration"><i class="fa-regular fa-clock me-1"></i> {{ playingActivity.estimatedMinutes }} min de lecture</span>
+                <span class="content-duration premium-duration"><i class="fa-regular fa-clock me-1"></i> {{ playingActivity.estimatedMinutes }} min reading</span>
               </div>
               <h1 class="content-view-title content-title-giant">{{ playingActivity.title }}</h1>
             </div>
@@ -506,7 +507,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                   <iframe
                     class="video-iframe"
                     [src]="safeVideoUrl"
-                    title="Lecteur vidéo"
+                    title="Video player"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen>
@@ -515,7 +516,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 <!-- Placeholder vidéo -->
                 <div class="video-placeholder-premium" *ngIf="!safeVideoUrl">
                   <div class="placeholder-icon">⚠️</div>
-                  <p>Lien vidéo non disponible ou incorrect</p>
+                  <p>Video link not available or incorrect</p>
                   <code class="url-hint">{{ contentData.videoUrl }}</code>
                 </div>
               </div>
@@ -531,7 +532,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 <!-- Placeholder image article -->
                 <div class="article-banner-placeholder" *ngIf="!contentData.imageUrl">
                   <div class="placeholder-icon">📖</div>
-                  <p>Lecture thématique</p>
+                  <p>Thematic reading</p>
                 </div>
               </div>
             </div>
@@ -539,7 +540,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
             <!-- Corps du texte / Description -->
             <div class="content-body-card content-body-premium">
               <div class="body-content">
-                <h3 class="section-label premium-label"><i class="fa-solid fa-book-open text-purple me-2"></i> À propos de cette activité</h3>
+                <h3 class="section-label premium-label"><i class="fa-solid fa-book-open text-purple me-2"></i> About this activity</h3>
                 <p class="description-text premium-desc">{{ playingActivity.description }}</p>
               </div>
               
@@ -551,7 +552,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 <!-- Language Toggle -->
                 <div class="lang-toggle-wrap">
                   <button class="lang-btn" [class.active]="audioLanguage === 'fr'" (click)="audioLanguage = 'fr'">
-                    🇫🇷 Français
+                    🇫🇷 French
                   </button>
                   <button class="lang-btn" [class.active]="audioLanguage === 'en'" (click)="audioLanguage = 'en'">
                     🇬🇧 English
@@ -559,18 +560,18 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 </div>
                 <button class="btn-start-audio" id="btn-start-audio-session" (click)="startAudioSession()">
                   <span class="audio-btn-icon">🎧</span>
-                  <span>{{ audioLanguage === 'en' ? 'Start audio exercise' : "Commencer l'exercice audio" }}</span>
+                  <span>{{ audioLanguage === 'en' ? 'Start audio exercise' : "Start audio exercise" }}</span>
                 </button>
                 <p class="audio-hint-text mt-2 mb-0">{{
                   audioLanguage === 'en'
                     ? 'A guided voice exercise to reinforce what you just watched'
-                    : 'Un exercice vocal guidé pour renforcer ce que vous venez de voir'
+                    : 'A guided voice exercise to reinforce what you just watched'
                 }}</p>
               </div>
               
               <div class="content-footer-actions mt-4" *ngIf="!showAudioSession">
                 <button class="btn-outline-purple" (click)="stopActivity()">
-                  Terminer sans l'exercice
+                  Finish without exercise
                 </button>
               </div>
             </div>
@@ -587,7 +588,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 <div class="asm-header-left">
                   <div class="asm-brain-icon">🧠</div>
                   <div>
-                    <h2 class="asm-title">Exercice Audio</h2>
+                    <h2 class="asm-title">Audio Exercise</h2>
                     <div class="asm-progress" *ngIf="audioTotalQuestions > 0">
                       Question {{ audioCurrentIndex + 1 }} / {{ audioTotalQuestions }}
                     </div>
@@ -595,10 +596,10 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 </div>
                 <!-- Live State Badge -->
                 <div class="asm-state-badge" [class]="'badge-' + audioState">
-                  <span *ngIf="audioState === 'idle'">⏳ Préparation…</span>
+                  <span *ngIf="audioState === 'idle'">⏳ Preparing…</span>
                   <span *ngIf="audioState === 'speaking'">🤖 Assistant</span>
-                  <span *ngIf="audioState === 'listening'">🎤 Votretour</span>
-                  <span *ngIf="audioState === 'done'">✅ Terminé</span>
+                  <span *ngIf="audioState === 'listening'">🎤 Your turn</span>
+                  <span *ngIf="audioState === 'done'">✅ Completed</span>
                 </div>
               </div>
 
@@ -618,7 +619,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                   <!-- Patient bubble -->
                   <div class="asm-bubble asm-bubble-patient" *ngIf="msg.speaker === 'patient'">
                     <div class="asm-bubble-body">
-                      <span class="asm-bubble-label">Vous</span>
+                      <span class="asm-bubble-label">You</span>
                       <p class="asm-bubble-text">{{ msg.text }}</p>
                     </div>
                     <div class="asm-avatar-patient">👤</div>
@@ -638,7 +639,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 <!-- Listening indicator -->
                 <div class="asm-bubble asm-bubble-patient asm-bubble-listening" *ngIf="audioState === 'listening'">
                   <div class="asm-bubble-body">
-                    <span class="asm-bubble-label">Votre réponse…</span>
+                    <span class="asm-bubble-label">Your response…</span>
                     <div class="asm-listen-content">
                       <div class="asm-mic-rings">
                         <div class="asm-mic-ring r1"></div>
@@ -672,13 +673,13 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                 <!-- Done: confetti card -->
                 <div class="asm-done-card" *ngIf="audioState === 'done'">
                   <div class="asm-complete-icon">🎉</div>
-                  <h3 class="asm-complete-title">Bravo !</h3>
-                  <p class="asm-complete-msg">Vous avez terminé l'exercice avec succès.</p>
+                  <h3 class="asm-complete-title">Well done!</h3>
+                  <p class="asm-complete-msg">You have successfully completed the exercise.</p>
                   <div class="asm-final-summary" *ngIf="audioFinalSummary.length > 0">
                     <p *ngFor="let line of audioFinalSummary" class="asm-final-line">{{ line }}</p>
                   </div>
                   <button class="btn-finish-content" style="margin-top:24px" (click)="stopActivity()">
-                    <span>Terminer la séance</span>
+                    <span>Finish session</span>
                     <i class="arrow-icon">→</i>
                   </button>
                 </div>
@@ -691,26 +692,26 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                         [disabled]="audioState === 'listening' || audioState === 'idle'"
                         (click)="onAudioSpeak()">
                   <span class="asm-btn-icon">🎤</span>
-                  <span class="asm-btn-label">Parler</span>
+                  <span class="asm-btn-label">Speak</span>
                 </button>
 
                 <button class="asm-btn asm-btn-repeat" id="btn-audio-repeat"
                         [disabled]="audioState === 'idle' || !audioSessionId"
                         (click)="onAudioRepeat()">
                   <span class="asm-btn-icon">🔁</span>
-                  <span class="asm-btn-label">Répéter</span>
+                  <span class="asm-btn-label">Repeat</span>
                 </button>
 
                 <button class="asm-btn asm-btn-stop" id="btn-audio-stop"
                         (click)="onAudioStop()">
                   <span class="asm-btn-icon">⏹</span>
-                  <span class="asm-btn-label">Arrêter</span>
+                  <span class="asm-btn-label">Stop</span>
                 </button>
               </div>
 
               <!-- STT not supported warning -->
               <div class="asm-warning" *ngIf="!speechRecognitionSupported">
-                ⚠️ Votre navigateur ne supporte pas la reconnaissance vocale. Utilisez Chrome pour une meilleure expérience.
+                ⚠️ Your browser does not support voice recognition. Use Chrome for the best experience.
               </div>
 
             </div>
@@ -784,10 +785,10 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
             <div class="exercice-header-glow"></div>
             <!-- Floating Back Button -->
             <button class="btn-back-floating" (click)="stopActivity()">
-              <i class="fa-solid fa-arrow-left"></i> Quitter
+              <i class="fa-solid fa-arrow-left"></i> Exit
             </button>
             <div class="exercice-header-inner">
-              <div class="exercice-category-badge">🧘 Exercice de relaxation</div>
+              <div class="exercice-category-badge">🧘 Relaxation Exercise</div>
               <h2 class="exercice-main-title">{{ playingActivity.title }}</h2>
               <div class="exercice-sub-info">
                 <span class="exercice-meta-pill">
@@ -795,7 +796,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
                   {{ playingActivity.estimatedMinutes }} min
                 </span>
                 <span class="exercice-meta-pill rep-pill">
-                  🔄 {{ exerciceCurrentRep }} / {{ exerciceData.repetitions }} répétitions
+                  🔄 {{ exerciceCurrentRep }} / {{ exerciceData.repetitions }} repetitions
                 </span>
               </div>
             </div>
@@ -806,8 +807,8 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
 
             <!-- Step number indicator -->
             <div class="etape-step-track">
-              <div class="etape-step-num">Étape {{ currentEtape.num }}</div>
-              <div class="etape-step-label">{{ exerciceData?.sousType || 'Exercice' }}</div>
+              <div class="etape-step-num">Step {{ currentEtape.num }}</div>
+              <div class="etape-step-label">{{ exerciceData?.sousType || 'Exercise' }}</div>
             </div>
 
             <!-- Breathing circle with countdown -->
@@ -816,7 +817,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
               <div class="breath-ring breath-ring-mid"></div>
               <div class="breath-circle">
                 <div class="breath-count">{{ exerciceCountdown }}</div>
-                <div class="breath-unit">secondes</div>
+                <div class="breath-unit">seconds</div>
               </div>
             </div>
 
@@ -839,10 +840,10 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
           <div class="result-overlay" *ngIf="exerciceFinished">
             <div class="result-card">
               <div class="result-icon">🧘</div>
-              <h2 class="result-title">Exercice terminé !</h2>
-              <p class="result-message">Excellent travail ! Cette séance de relaxation est terminée. Prenez un moment pour ressentir le calme.</p>
+              <h2 class="result-title">Exercise completed!</h2>
+              <p class="result-message">Excellent work! This relaxation session is finished. Take a moment to feel the calm.</p>
               <div class="result-actions">
-                <button class="btn-result-secondary" (click)="stopActivity()">Choisir une autre activité 📚</button>
+                <button class="btn-result-secondary" (click)="stopActivity()">Choose another activity 📚</button>
               </div>
             </div>
           </div>
@@ -3085,36 +3086,36 @@ export class EducationComponent implements OnInit, OnDestroy {
 
   private readonly THEME_PAIRS: Record<string, { id: number; emoji: string; nom: string }[]> = {
     animaux: [
-      { id: 1, emoji: '🐱', nom: 'Chat' },
-      { id: 2, emoji: '🐶', nom: 'Chien' },
-      { id: 3, emoji: '🐸', nom: 'Grenouille' },
-      { id: 4, emoji: '🦊', nom: 'Renard' },
+      { id: 1, emoji: '🐱', nom: 'Cat' },
+      { id: 2, emoji: '🐶', nom: 'Dog' },
+      { id: 3, emoji: '🐸', nom: 'Frog' },
+      { id: 4, emoji: '🦊', nom: 'Fox' },
       { id: 5, emoji: '🐼', nom: 'Panda' },
-      { id: 6, emoji: '🐧', nom: 'Pingouin' },
+      { id: 6, emoji: '🐧', nom: 'Penguin' },
     ],
     fleurs: [
-      { id: 1, emoji: '🌸', nom: 'Cerisier' },
-      { id: 2, emoji: '🌻', nom: 'Tournesol' },
+      { id: 1, emoji: '🌸', nom: 'Cherry Blossom' },
+      { id: 2, emoji: '🌻', nom: 'Sunflower' },
       { id: 3, emoji: '🌹', nom: 'Rose' },
-      { id: 4, emoji: '🌷', nom: 'Tulipe' },
-      { id: 5, emoji: '🌼', nom: 'Marguerite' },
+      { id: 4, emoji: '🌷', nom: 'Tulip' },
+      { id: 5, emoji: '🌼', nom: 'Daisy' },
       { id: 6, emoji: '💐', nom: 'Bouquet' },
     ],
     fruits: [
-      { id: 1, emoji: '🍎', nom: 'Pomme' },
-      { id: 2, emoji: '🍌', nom: 'Banane' },
-      { id: 3, emoji: '🍇', nom: 'Raisin' },
-      { id: 4, emoji: '🍓', nom: 'Fraise' },
+      { id: 1, emoji: '🍎', nom: 'Apple' },
+      { id: 2, emoji: '🍌', nom: 'Banana' },
+      { id: 3, emoji: '🍇', nom: 'Grape' },
+      { id: 4, emoji: '🍓', nom: 'Strawberry' },
       { id: 5, emoji: '🍊', nom: 'Orange' },
-      { id: 6, emoji: '🍑', nom: 'Pêche' },
+      { id: 6, emoji: '🍑', nom: 'Peach' },
     ],
     transport: [
-      { id: 1, emoji: '🚗', nom: 'Voiture' },
-      { id: 2, emoji: '✈️', nom: 'Avion' },
-      { id: 3, emoji: '🚢', nom: 'Bateau' },
+      { id: 1, emoji: '🚗', nom: 'Car' },
+      { id: 2, emoji: '✈️', nom: 'Airplane' },
+      { id: 3, emoji: '🚢', nom: 'Ship' },
       { id: 4, emoji: '🚂', nom: 'Train' },
-      { id: 5, emoji: '🚲', nom: 'Vélo' },
-      { id: 6, emoji: '🚁', nom: 'Hélicoptère' },
+      { id: 5, emoji: '🚲', nom: 'Bicycle' },
+      { id: 6, emoji: '🚁', nom: 'Helicopter' },
     ]
   };
 
@@ -3156,7 +3157,7 @@ export class EducationComponent implements OnInit, OnDestroy {
             this.selectType(this.selectedType);
           }
         },
-        error: (err) => console.error('Erreur chargement progression:', err)
+        error: (err) => console.error('Error loading progression:', err)
       });
     }
   }
@@ -3166,7 +3167,7 @@ export class EducationComponent implements OnInit, OnDestroy {
     if (!this.selectedType) return;
     if (this.selectedType !== 'QUIZ' && this.selectedType !== 'GAME') return;
 
-    const confirmReset = confirm(`Êtes-vous sûr de vouloir réinitialiser votre progression pour les ${this.selectedType === 'QUIZ' ? 'Quiz' : 'Jeux'} ? Cette action est irréversible.`);
+    const confirmReset = confirm(`Are you sure you want to reset your progress for ${this.selectedType === 'QUIZ' ? 'Quizzes' : 'Games'}? This action is irreversible.`);
     if (!confirmReset) return;
 
     const user = this.authService.getCurrentUser();
@@ -3174,13 +3175,13 @@ export class EducationComponent implements OnInit, OnDestroy {
       this.isLoading = true;
       this.progressionService.resetPatient(user.id, this.selectedType).subscribe({
         next: () => {
-          console.log('Progression réinitialisée !');
-          this.loadPatientProgression(); // Refreshes UI and returns to LEGER
+          console.log('Progress reset!');
+          this.loadPatientProgression(); // Refreshes UI and returns to BEGINNER
           this.isLoading = false;
         },
         error: (err) => {
-          console.error('Erreur lors de la réinitialisation:', err);
-          this.errorMessage = 'Une erreur est survenue lors de la réinitialisation.';
+          console.error('Error during reset:', err);
+          this.errorMessage = 'Please log in to play.';
           this.isLoading = false;
         }
       });
@@ -3202,8 +3203,8 @@ export class EducationComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Erreur lors du chargement des activités:', err);
-        this.errorMessage = 'Impossible de charger les activités. Veuillez réessayer.';
+        console.error('Error loading activities:', err);
+        this.errorMessage = 'Unable to load activities. Please try again.';
         this.isLoading = false;
       }
     });
@@ -3287,10 +3288,10 @@ export class EducationComponent implements OnInit, OnDestroy {
         next: (res) => {
           this.sessionPointsEarned = res.scoreSession;
           this.sessionTotalPoints = res.scoreCumule;
-          console.log('Session enregistrée ! Nouveau stade:', res.currentStade);
+          console.log('Session saved! New stage:', res.currentStade);
           this.loadPatientProgression(); // Recharge le nouveau stade
         },
-        error: (err) => console.error('Erreur de soumission:', err)
+        error: (err) => console.error('Submission error:', err)
       });
     }
   }
@@ -3352,8 +3353,8 @@ export class EducationComponent implements OnInit, OnDestroy {
         case 'EXERCICE': this.initExercice(data); break;
       }
     } catch (e) {
-      console.error('Erreur lors du parsing des données:', e);
-      this.errorMessage = 'Données d\'activité invalides';
+      console.error('Error parsing data:', e);
+      this.errorMessage = 'Activity type not supported.';
       this.playingActivity = null;
     }
   }
@@ -3426,7 +3427,7 @@ export class EducationComponent implements OnInit, OnDestroy {
   }
 
   getTypeLabel(type: string): string {
-    const labels: any = { 'QUIZ': 'Quiz', 'GAME': 'Jeux', 'CONTENT': 'Contenu', 'EXERCICE': 'Exercices' };
+    const labels: any = { 'QUIZ': 'Quiz', 'GAME': 'Games', 'CONTENT': 'Content', 'EXERCICE': 'Exercises' };
     return labels[type] || type;
   }
 
