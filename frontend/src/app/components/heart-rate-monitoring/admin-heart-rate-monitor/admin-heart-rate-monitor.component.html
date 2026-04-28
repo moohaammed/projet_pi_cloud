@@ -1,0 +1,139 @@
+<div class="monitor-page">
+  <div class="monitor-header">
+    <div>
+      <p class="eyebrow">Admin monitoring</p>
+      <h1>Patient heart-rate state and history</h1>
+      <p class="subtitle">All patients with live smartwatch state and recent historical records.</p>
+    </div>
+    <button type="button" class="refresh-button" (click)="loadPatients()" [disabled]="isLoading">
+      <i class="fa-solid fa-rotate-right"></i>
+      <span>Refresh</span>
+    </button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <span>Total patients</span>
+      <strong>{{ patients.length }}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Streaming now</span>
+      <strong class="success">{{ connectedCount }}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Attention zones</span>
+      <strong class="danger">{{ attentionCount }}</strong>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert-message">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner-border text-primary" role="status"></div>
+    <span>Loading patients...</span>
+  </div>
+
+  <div *ngIf="!isLoading && patients.length === 0" class="empty-panel">
+    <i class="fa-solid fa-user-injured"></i>
+    <h2>No patients found</h2>
+    <p>Patient user accounts will appear here for admin monitoring.</p>
+  </div>
+
+  <table class="monitor-table" *ngIf="!isLoading && patients.length > 0">
+    <thead>
+      <tr>
+        <th>Patient</th>
+        <th>Status</th>
+        <th>BPM</th>
+        <th>State</th>
+        <th>Last update</th>
+        <th>Device</th>
+        <th>History</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let patient of patients; trackBy: trackByPatientId">
+        <tr>
+          <td>
+            <div class="patient-card-header">
+              <div class="patient-avatar">
+                {{ patient.prenom?.charAt(0) || '?' }}{{ patient.nom?.charAt(0) || '' }}
+              </div>
+              <div class="patient-title">
+                <h2>{{ getPatientName(patient) }}</h2>
+                <span>#{{ patient.patientId }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="state-pill" [class.connected]="isConnected(patient)">
+              <span></span>
+              {{ isConnected(patient) ? 'Live' : 'Offline' }}
+            </div>
+          </td>
+          <td>
+            <span class="bpm-badge" [ngClass]="getBpmClass(patient)">
+              {{ getBpm(patient) }}
+            </span>
+          </td>
+          <td>{{ getZone(patient) }}</td>
+          <td>{{ getLastReceived(patient) }}</td>
+          <td>{{ getState(patient)?.deviceName || '--' }}</td>
+          <td>
+            <button type="button"
+                    class="history-button"
+                    (click)="toggleHistory(patient)"
+                    [disabled]="patient.userId == null">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span>{{ isHistoryOpen(patient) ? 'Hide' : 'View' }}</span>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="isHistoryOpen(patient)">
+          <td colspan="7">
+            <div class="history-panel">
+              <div *ngIf="isHistoryLoading(patient)" class="loading-state">
+                <div class="spinner-border text-primary" role="status"></div>
+                <span>Loading history...</span>
+              </div>
+
+              <div *ngIf="!isHistoryLoading(patient) && getHistory(patient).length === 0" class="empty-panel">
+                <i class="fa-solid fa-heart-crack"></i>
+                <h2>No heart-rate history</h2>
+                <p>This patient has no stored smartwatch records yet.</p>
+              </div>
+
+              <table class="history-table" *ngIf="!isHistoryLoading(patient) && getHistory(patient).length > 0">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>BPM</th>
+                    <th>State</th>
+                    <th>Device</th>
+                    <th>Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let record of getHistory(patient)">
+                    <td>{{ formatRecordTime(record) }}</td>
+                    <td>
+                      <span class="bpm-badge" [ngClass]="getRecordClass(record)">
+                        {{ record.bpm }}
+                      </span>
+                    </td>
+                    <td>{{ getRecordZone(record) }}</td>
+                    <td>{{ record.deviceName || '--' }}</td>
+                    <td>{{ record.source || '--' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>

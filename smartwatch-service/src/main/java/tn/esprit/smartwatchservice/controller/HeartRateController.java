@@ -3,9 +3,11 @@ package tn.esprit.smartwatchservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.smartwatchservice.dto.HeartRateLiveStateDto;
 import tn.esprit.smartwatchservice.entity.HeartRateRecord;
 import tn.esprit.smartwatchservice.service.HeartRateQueryService;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -49,6 +51,16 @@ public class HeartRateController {
         return ResponseEntity.ok(records);
     }
 
+    @GetMapping("/state/{userId}")
+    public ResponseEntity<HeartRateLiveStateDto> getState(@PathVariable Long userId) {
+        return ResponseEntity.ok(queryService.getState(userId));
+    }
+
+    @GetMapping("/states")
+    public ResponseEntity<List<HeartRateLiveStateDto>> getStates(@RequestParam String userIds) {
+        return ResponseEntity.ok(queryService.getStates(parseUserIds(userIds)));
+    }
+
     /**
      * GET /api/heart-rate/{id}
      * Return a specific heart-rate record by its MongoDB ID.
@@ -68,5 +80,16 @@ public class HeartRateController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         queryService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private List<Long> parseUserIds(String userIds) {
+        if (userIds == null || userIds.isBlank()) {
+            return List.of();
+        }
+        return Arrays.stream(userIds.split(","))
+                .map(String::trim)
+                .filter(value -> !value.isBlank())
+                .map(Long::valueOf)
+                .toList();
     }
 }

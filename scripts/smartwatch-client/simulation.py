@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timezone
 
 BACKEND_URL = "http://localhost:8080/api/heart-rate/ingest"
-USER_ID = 1
+USER_ID = 5
 DEVICE_NAME = "SIMULATOR_ST2"
 SOURCE = "SIMULATOR"
 

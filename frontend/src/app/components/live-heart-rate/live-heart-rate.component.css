@@ -16,6 +16,35 @@
   color: #e2e8f0;
 }
 
+.relation-empty-state {
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.75rem;
+  color: #94a3b8;
+}
+
+.relation-empty-state i {
+  font-size: 3rem;
+  color: #ef4444;
+}
+
+.relation-empty-state h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #f8fafc;
+  font-weight: 800;
+}
+
+.relation-empty-state p {
+  margin: 0;
+  max-width: 520px;
+  color: #64748b;
+}
+
 /* ── HEADER ── */
 .dashboard-header {
   display: flex;
@@ -62,6 +91,51 @@
   margin: 0.25rem 0 0;
 }
 
+.monitored-patient-name {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+  color: #cbd5e1;
+}
+
+.monitored-patient-name span {
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.monitored-patient-name strong {
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.linked-patient-switcher {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.linked-patient-button {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.75);
+  color: #cbd5e1;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.linked-patient-button.active {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(34, 197, 94, 0.14);
+  color: #86efac;
+}
+
 .connection-badge {
   display: flex;
   align-items: center;
@@ -73,6 +147,50 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+
+.connect-smartwatch-button {
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.connect-smartwatch-button:hover:not(:disabled) {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: rgba(34, 197, 94, 0.18);
+}
+
+.connect-smartwatch-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.smartwatch-config-message {
+  max-width: 280px;
+  color: #86efac;
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.smartwatch-config-message.error {
+  color: #fca5a5;
 }
 
 .connection-badge.connected {

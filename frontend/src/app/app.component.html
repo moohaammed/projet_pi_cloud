@@ -144,7 +144,9 @@
             <!-- Heart Rate -->
             <li class="nav-item w-100">
               <a class="nav-link w-100 text-dark py-3 px-3 rounded-4 border-0 transition-all d-flex align-items-center mb-1"
-                routerLink="/heart-rate" routerLinkActive="active-purple fw-semibold shadow-sm" style="cursor: pointer;"
+                routerLink="/admin/heart-rate"
+                routerLinkActive="active-purple fw-semibold shadow-sm"
+                style="cursor: pointer;"
                 [title]="isSidebarCollapsed ? 'Heart Rate' : ''">
                 <i class="fa-solid fa-heart-pulse fs-5" [class.me-3]="!isSidebarCollapsed"
                   [class.mx-auto]="isSidebarCollapsed"></i>
@@ -414,6 +416,30 @@ style="cursor:pointer"
               <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center gap-3">
 
+                  <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active"
+                      [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+                  <li class="nav-item"><a class="nav-link" routerLink="/rendezvous"
+                      routerLinkActive="active">Rendez-vous</a></li>
+                  <li class="nav-item"><a class="nav-link" routerLink="/education"
+                      routerLinkActive="active">Education</a></li>
+                  <li class="nav-item"><a class="nav-link" routerLink="/eventfront" routerLinkActive="active">Events</a>
+                  </li>
+                  <li class="nav-item"><a class="nav-link" routerLink="/collaboration/feed"
+                      routerLinkActive="active">Community</a></li>
+                  <li class="nav-item"><a class="nav-link" routerLink="/donations"
+                      routerLinkActive="active">Donations</a></li>
+                  <li class="nav-item" *ngIf="auth.getRole() === 'PATIENT' || auth.getRole() === 'RELATION'">
+                    <a class="nav-link" routerLink="/heart-rate"
+                      routerLinkActive="active"><i class="fa-solid fa-heart-pulse me-1"></i>Heart Rate</a>
+                  </li>
+                  <li class="nav-item" *ngIf="auth.getRole() === 'DOCTOR'">
+                    <a class="nav-link" routerLink="/doctor/heart-rate"
+                      routerLinkActive="active"><i class="fa-solid fa-heart-pulse me-1"></i>Heart Monitor</a>
+                  </li>
+                  <li class="nav-item ms-lg-3 d-flex gap-2" *ngIf="auth.isLoggedIn()">
+                    <a routerLink="/my-donations" class="btn btn-outline-primary btn-sm rounded-pill px-3">Mes Dons</a>
+                    <a [routerLink]="getAccountLink()" class="btn btn-primary btn-sm rounded-pill px-4">Compte</a>
+                  </li>
                   <li class="nav-item">
                     <a class="nav-link" routerLink="/home" routerLinkActive="active"
                       [routerLinkActiveOptions]="{exact: true}">Home</a>
@@ -500,8 +526,8 @@ style="cursor:pointer"
                        class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-bold
                               d-flex align-items-center gap-2"
                        routerLinkActive="active">
-                      <i class="fa-solid fa-address-book"></i>
-                      <span>Help Notification</span>
+                      <i class="fa-solid fa-link"></i>
+                      <span>Link Your Account</span>
                     </a>
                   </li>
 

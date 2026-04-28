@@ -252,8 +252,8 @@ export class AppComponent implements OnDestroy {
     if (role === 'DOCTOR') {
       return '/medecin-dashboard';
     }
-    if (role === 'ADMIN') {
-      return '/admin/dashboard';
+    if (role === 'RELATION') {
+      return '/heart-rate';
     }
     return '/patient-dashboard';
   }

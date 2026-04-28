@@ -14,4 +14,5 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
      * Used by the AI prediction pipeline to retrieve age/sexe/poids metadata.
      */
     Optional<Patient> findByUser_Id(Long userId);
+
 }
