@@ -37,7 +37,7 @@ export class LocationCaptureComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.currentUser = this.authService.getCurrentUser();
     if (this.currentUser?.role !== 'PATIENT') {
-      this.errorMessage = 'Cette surveillance est reservee au profil patient.';
+      this.errorMessage = 'This monitoring feature is reserved for patient profiles.';
       return;
     }
 
@@ -80,7 +80,7 @@ export class LocationCaptureComponent implements OnInit, OnDestroy {
       this.captureAndSend();
       this.intervalId = setInterval(() => this.captureAndSend(), 30000);
     } catch {
-      this.errorMessage = "Impossible d'ouvrir la camera. Autorisez l'acces camera pour activer AlzCare.";
+      this.errorMessage = 'Unable to open the camera. Allow camera access to activate AlzCare.';
     }
   }
 
@@ -91,7 +91,7 @@ export class LocationCaptureComponent implements OnInit, OnDestroy {
 
     const patientId = Number(this.currentUser?.userId ?? this.currentUser?.id);
     if (!patientId) {
-      this.errorMessage = 'Identifiant patient introuvable dans la session.';
+      this.errorMessage = 'Patient identifier not found in the session.';
       return;
     }
 
@@ -101,7 +101,7 @@ export class LocationCaptureComponent implements OnInit, OnDestroy {
     canvas.height = video.videoHeight || 480;
     const context = canvas.getContext('2d');
     if (!context) {
-      this.errorMessage = "Capture camera indisponible.";
+      this.errorMessage = 'Camera capture unavailable.';
       return;
     }
 
@@ -117,7 +117,7 @@ export class LocationCaptureComponent implements OnInit, OnDestroy {
         this.sending = false;
       },
       error: err => {
-        this.errorMessage = err?.error?.message || err?.error?.detail || "Analyse de localisation indisponible.";
+        this.errorMessage = err?.error?.message || err?.error?.detail || 'Location analysis unavailable.';
         this.sending = false;
       }
     });

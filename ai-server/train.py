@@ -3,7 +3,7 @@ from pathlib import Path
 
 import torch
 from torch import nn, optim
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset, WeightedRandomSampler
 from torchvision import datasets, models, transforms
 from torchvision.models import MobileNet_V2_Weights
 
@@ -35,18 +35,40 @@ def build_loaders(dataset_dir: Path, batch_size: int):
         train_dataset = datasets.ImageFolder(train_dir, transform=train_transform)
         val_dataset = datasets.ImageFolder(val_dir, transform=eval_transform)
     else:
-        full_dataset = datasets.ImageFolder(dataset_dir, transform=train_transform)
-        val_size = max(1, int(len(full_dataset) * 0.2))
-        train_size = len(full_dataset) - val_size
+        train_base = datasets.ImageFolder(dataset_dir, transform=train_transform)
+        val_base = datasets.ImageFolder(dataset_dir, transform=eval_transform)
         generator = torch.Generator().manual_seed(42)
-        train_dataset, val_dataset = torch.utils.data.random_split(
-            full_dataset, [train_size, val_size], generator=generator
-        )
-        val_dataset.dataset.transform = eval_transform
+        train_indices = []
+        val_indices = []
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+        for class_index in range(len(train_base.classes)):
+            indices = [idx for idx, target in enumerate(train_base.targets) if target == class_index]
+            permutation = torch.randperm(len(indices), generator=generator).tolist()
+            shuffled = [indices[i] for i in permutation]
+            val_count = max(1, int(len(shuffled) * 0.2)) if len(shuffled) >= 5 else 0
+            val_indices.extend(shuffled[:val_count])
+            train_indices.extend(shuffled[val_count:])
+
+        if not val_indices:
+            val_indices = train_indices.copy()
+
+        train_dataset = Subset(train_base, train_indices)
+        val_dataset = Subset(val_base, val_indices)
+
+    train_targets = [
+        train_dataset.dataset.targets[index] if isinstance(train_dataset, Subset) else target
+        for index, target in (
+            [(idx, None) for idx in train_dataset.indices]
+            if isinstance(train_dataset, Subset)
+            else list(enumerate(train_dataset.targets))
+        )
+    ]
+    class_counts = torch.bincount(torch.tensor(train_targets), minlength=len(class_names := (train_dataset.dataset.classes if hasattr(train_dataset, "dataset") else train_dataset.classes))).float()
+    sample_weights = [1.0 / max(class_counts[target].item(), 1.0) for target in train_targets]
+    sampler = WeightedRandomSampler(sample_weights, num_samples=len(sample_weights), replacement=True)
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=sampler, num_workers=0)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
-    class_names = train_dataset.dataset.classes if hasattr(train_dataset, "dataset") else train_dataset.classes
     return train_loader, val_loader, class_names
 
 
