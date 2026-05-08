@@ -32,7 +32,7 @@
                 <span class="badge"
                       [class.bg-success]="patient.actif"
                       [class.bg-secondary]="!patient.actif">
-                  {{ patient.actif ? 'Actif' : 'Inactif' }}
+                  {{ patient.actif ? 'Active' : 'Inactive' }}
                 </span>
               </div>
             </div>
@@ -54,15 +54,15 @@
             </div>
             <div class="col-md-6">
               <div class="p-3 bg-light rounded-3">
-                <div class="text-muted small">Téléphone</div>
-                <div class="fw-semibold">{{ patient.telephone || 'Non renseigné' }}</div>
+                <div class="text-muted small">Phone</div>
+                <div class="fw-semibold">{{ patient.telephone || 'No renseigné' }}</div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="p-3 bg-light rounded-3">
-                <div class="text-muted small">Âge</div>
+                <div class="text-muted small">Age</div>
                 <div class="fw-semibold">
-                  {{ getAge() ? getAge() + ' ans' : 'Non renseigné' }}
+                  {{ getAge() ? getAge() + ' years old' : 'No renseigné' }}
                 </div>
               </div>
             </div>
@@ -94,11 +94,11 @@
                       border border-danger border-opacity-25 mb-4">
             <div class="row g-2">
               <div class="col-md-4">
-                <div class="text-muted small">Nom</div>
+                <div class="text-muted small">Last Name</div>
                 <div class="fw-semibold">{{ contactUrgenceNom }}</div>
               </div>
               <div class="col-md-4">
-                <div class="text-muted small">Téléphone</div>
+                <div class="text-muted small">Phone</div>
                 <div class="fw-semibold">{{ contactUrgenceTelephone }}</div>
               </div>
               <div class="col-md-4">
@@ -133,7 +133,7 @@
               <span class="ms-auto badge rounded-pill"
                     [class.bg-success]="relation.actif"
                     [class.bg-secondary]="!relation.actif">
-                {{ relation.actif ? 'Actif' : 'Inactif' }}
+                {{ relation.actif ? 'Active' : 'Inactive' }}
               </span>
             </div>
             <div class="row g-2" style="font-size:13px">
@@ -142,7 +142,7 @@
                 <div class="fw-semibold">{{ relationEmail }}</div>
               </div>
               <div class="col-md-6">
-                <div class="text-muted small">Téléphone</div>
+                <div class="text-muted small">Phone</div>
                 <div class="fw-semibold">{{ relationTelephone }}</div>
               </div>
             </div>
@@ -152,13 +152,13 @@
                class="p-3 rounded-3 mb-4 d-flex align-items-center gap-2"
                style="background:#f8f9fa; border:2px dashed #dee2e6">
             <i class="fa-solid fa-user-slash text-muted"></i>
-            <span class="text-muted small">Aucun compte relation créé pour ce patient.</span>
+            <span class="text-muted small">No relation account created for this patient.</span>
             <a *ngIf="isAdmin || isDoctor"
                routerLink="/patient-profiles/creer"
                [queryParams]="{patientId: patient.id}"
                class="btn btn-sm rounded-pill ms-auto"
                style="background:#6f42c1;color:white;border:none;font-size:12px">
-              <i class="fa-solid fa-plus me-1"></i>Créer
+              <i class="fa-solid fa-plus me-1"></i>Create
             </a>
           </div>
 
@@ -184,7 +184,7 @@
             <a *ngIf="isAdmin || isDoctor"
                [routerLink]="['/patient-profiles/edit', patient.id]"
                class="btn btn-warning">
-              <i class="fa-solid fa-pen me-2"></i>Modifier la fiche
+              <i class="fa-solid fa-pen me-2"></i>Edit file
             </a>
 
             <a *ngIf="isAdmin || isDoctor"
@@ -193,7 +193,7 @@
    class="btn fw-bold"
    style="background:linear-gradient(135deg,#6f42c1,#3c3489);color:white;border:none;border-radius:8px">
   <i class="fa-solid fa-people-arrows me-2"></i>
-  Créer compte relation
+  Create compte relation
 </a>
             <button class="btn"
                     [class.btn-outline-secondary]="patient.actif"
@@ -202,12 +202,12 @@
               <i class="fa-solid me-2"
                  [class.fa-toggle-off]="patient.actif"
                  [class.fa-toggle-on]="!patient.actif"></i>
-              {{ patient.actif ? 'Désactiver' : 'Activer' }}
+              {{ patient.actif ? 'Deactivate' : 'Activate' }}
             </button>
 
             <a routerLink="/map" class="btn btn-outline-primary">
               <i class="fa-solid fa-map-location-dot me-2"></i>
-              Voir sur la carte
+              View on map
             </a>
 
           </div>
@@ -215,7 +215,7 @@
       </div>
 
       <a routerLink="/patient-profiles" class="btn btn-outline-secondary w-100">
-        <i class="fa-solid fa-arrow-left me-2"></i>Retour à la liste
+        <i class="fa-solid fa-arrow-left me-2"></i>Back to list
       </a>
     </div>
   </div>

@@ -61,7 +61,7 @@ export class PatientListComponent implements OnInit {
   }
 
   delete(id: number): void {
-    if (confirm('Supprimer ce patient ?')) {
+    if (confirm('Delete this patient ?')) {
       this.alzUserService.delete(id).subscribe({
         next: () => this.load()
       });

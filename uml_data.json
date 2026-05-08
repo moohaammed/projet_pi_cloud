@@ -1,0 +1,2166 @@
+[
+  {
+    "service": "backpi",
+    "class_name": "PatientContact",
+    "persistence": "JPA/SQL",
+    "fields": [
+      {
+        "type": "class",
+        "name": "PatientContact"
+      },
+      {
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientUserId"
+      },
+      {
+        "type": "Long",
+        "name": "contactUserId"
+      },
+      {
+        "type": "RelationType",
+        "name": "relationType"
+      },
+      {
+        "type": "String",
+        "name": "nom"
+      },
+      {
+        "type": "String",
+        "name": "prenom"
+      },
+      {
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "type": "String",
+        "name": "telephone"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "backpi",
+    "class_name": "RelationType",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "RelationType"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "backpi",
+    "class_name": "Role",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "Role"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "backpi",
+    "class_name": "SOSRequest",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "SOSRequest"
+      },
+      {
+        "type": "Double",
+        "name": "latitude"
+      },
+      {
+        "type": "Double",
+        "name": "longitude"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "backpi",
+    "class_name": "TypeAlerte",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "TypeAlerte"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "backpi",
+    "class_name": "User",
+    "persistence": "JPA/SQL",
+    "fields": [
+      {
+        "type": "class",
+        "name": "User"
+      },
+      {
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "nom"
+      },
+      {
+        "type": "String",
+        "name": "prenom"
+      },
+      {
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "type": "String",
+        "name": "password"
+      },
+      {
+        "type": "Role",
+        "name": "role"
+      },
+      {
+        "type": "String",
+        "name": "telephone"
+      },
+      {
+        "type": "String",
+        "name": "image"
+      },
+      {
+        "type": "boolean",
+        "name": "actif"
+      },
+      {
+        "type": "boolean",
+        "name": "isLive"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "Long",
+        "name": "relationId"
+      },
+      {
+        "type": "String",
+        "name": "lienAvecPatient"
+      },
+      {
+        "type": "String",
+        "name": "fcmToken"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "AppGuidance",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "AppGuidance"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "pageName"
+      },
+      {
+        "type": "String",
+        "name": "pageLabel"
+      },
+      {
+        "type": "List<String>",
+        "name": "instructions"
+      },
+      {
+        "type": "Instant",
+        "name": "updatedAt"
+      },
+      {
+        "type": "Long",
+        "name": "updatedByUserId"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "ChatGroup",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "ChatGroup"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "name"
+      },
+      {
+        "type": "GroupCategory",
+        "name": "category"
+      },
+      {
+        "type": "String",
+        "name": "description"
+      },
+      {
+        "type": "List<String>",
+        "name": "tags"
+      },
+      {
+        "type": "String",
+        "name": "theme"
+      },
+      {
+        "type": "Instant",
+        "name": "createdAt"
+      },
+      {
+        "type": "Set<Long>",
+        "name": "memberIds"
+      },
+      {
+        "type": "Long",
+        "name": "ownerId"
+      },
+      {
+        "type": "boolean",
+        "name": "isDefault"
+      },
+      {
+        "type": "String",
+        "name": "defaultForRole"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "Comment",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Comment"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "type": "Instant",
+        "name": "createdAt"
+      },
+      {
+        "type": "Long",
+        "name": "authorId"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "GroupCategory",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "GroupCategory"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "collab-service",
+    "class_name": "GroupJoinRequest",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "GroupJoinRequest"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "userId"
+      },
+      {
+        "type": "String",
+        "name": "groupId"
+      },
+      {
+        "type": "String",
+        "name": "groupName"
+      },
+      {
+        "type": "Long",
+        "name": "groupOwnerId"
+      },
+      {
+        "type": "JoinRequestStatus",
+        "name": "status"
+      },
+      {
+        "type": "Instant",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "JoinRequestStatus",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "JoinRequestStatus"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "collab-service",
+    "class_name": "Message",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Message"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "type": "List<String>",
+        "name": "mediaUrls"
+      },
+      {
+        "type": "List<String>",
+        "name": "mimeTypes"
+      },
+      {
+        "type": "String",
+        "name": "mediaUrl"
+      },
+      {
+        "type": "String",
+        "name": "mimeType"
+      },
+      {
+        "type": "Instant",
+        "name": "sentAt"
+      },
+      {
+        "type": "Long",
+        "name": "senderId"
+      },
+      {
+        "type": "Long",
+        "name": "receiverId"
+      },
+      {
+        "type": "String",
+        "name": "chatGroupId"
+      },
+      {
+        "type": "String",
+        "name": "parentMessageId"
+      },
+      {
+        "type": "String",
+        "name": "parentMessageContent"
+      },
+      {
+        "type": "String",
+        "name": "sharedPublicationId"
+      },
+      {
+        "type": "boolean",
+        "name": "isDistressed"
+      },
+      {
+        "type": "Double",
+        "name": "sentimentScore"
+      },
+      {
+        "type": "boolean",
+        "name": "isPinned"
+      },
+      {
+        "type": "List<Long>",
+        "name": "viewedByUserIds"
+      },
+      {
+        "type": "MessageType",
+        "name": "type"
+      },
+      {
+        "type": "String",
+        "name": "pollQuestion"
+      },
+      {
+        "type": "List<MessagePollOption>",
+        "name": "pollOptions"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "MessagePollOption",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "MessagePollOption"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "text"
+      },
+      {
+        "type": "int",
+        "name": "votesCount"
+      },
+      {
+        "type": "Set<Long>",
+        "name": "voterIds"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "MessageType",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "MessageType"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "collab-service",
+    "class_name": "ModerationReason",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "ModerationReason"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "collab-service",
+    "class_name": "ModerationStatus",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "ModerationStatus"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "collab-service",
+    "class_name": "Notification",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Notification"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "userId"
+      },
+      {
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "type": "String",
+        "name": "type"
+      },
+      {
+        "type": "boolean",
+        "name": "isRead"
+      },
+      {
+        "type": "Instant",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "Publication",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Publication"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "content"
+      },
+      {
+        "type": "List<String>",
+        "name": "tags"
+      },
+      {
+        "type": "List<String>",
+        "name": "mediaUrls"
+      },
+      {
+        "type": "List<String>",
+        "name": "mimeTypes"
+      },
+      {
+        "type": "String",
+        "name": "mediaUrl"
+      },
+      {
+        "type": "String",
+        "name": "mimeType"
+      },
+      {
+        "type": "PublicationType",
+        "name": "type"
+      },
+      {
+        "type": "Instant",
+        "name": "createdAt"
+      },
+      {
+        "type": "Long",
+        "name": "authorId"
+      },
+      {
+        "type": "List<Comment>",
+        "name": "comments"
+      },
+      {
+        "type": "boolean",
+        "name": "isDistressed"
+      },
+      {
+        "type": "Double",
+        "name": "sentimentScore"
+      },
+      {
+        "type": "boolean",
+        "name": "anonymous"
+      },
+      {
+        "type": "String",
+        "name": "pollQuestion"
+      },
+      {
+        "type": "List<PublicationPollOption>",
+        "name": "pollOptions"
+      },
+      {
+        "type": "String",
+        "name": "chatGroupId"
+      },
+      {
+        "type": "String",
+        "name": "chatGroupName"
+      },
+      {
+        "type": "String",
+        "name": "linkedEventId"
+      },
+      {
+        "type": "ModerationStatus",
+        "name": "moderationStatus"
+      },
+      {
+        "type": "ModerationReason",
+        "name": "moderationReason"
+      },
+      {
+        "type": "Instant",
+        "name": "moderationFlaggedAt"
+      },
+      {
+        "type": "String",
+        "name": "supportIds"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "PublicationPollOption",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "PublicationPollOption"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "text"
+      },
+      {
+        "type": "int",
+        "name": "votes"
+      },
+      {
+        "type": "Set<Long>",
+        "name": "voterIds"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "PublicationType",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "PublicationType"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "collab-service",
+    "class_name": "AdminAuditLog",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "AdminAuditLog"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "adminId"
+      },
+      {
+        "type": "String",
+        "name": "action"
+      },
+      {
+        "type": "String",
+        "name": "targetId"
+      },
+      {
+        "type": "String",
+        "name": "targetType"
+      },
+      {
+        "type": "String",
+        "name": "details"
+      },
+      {
+        "type": "Instant",
+        "name": "performedAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "MedicationComplianceLog",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "MedicationComplianceLog"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "boolean",
+        "name": "tookMedication"
+      },
+      {
+        "type": "Instant",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "SafetyAlertLog",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "SafetyAlertLog"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "SafetyAlertType",
+        "name": "alertType"
+      },
+      {
+        "type": "SafetyAlertStatus",
+        "name": "status"
+      },
+      {
+        "type": "Instant",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "collab-service",
+    "class_name": "SafetyAlertStatus",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "SafetyAlertStatus"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "collab-service",
+    "class_name": "SafetyAlertType",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "SafetyAlertType"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "donation-service",
+    "class_name": "AppConfig",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "AppConfig"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "donation-service",
+    "class_name": "Donation",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Donation"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Double",
+        "name": "amount"
+      },
+      {
+        "type": "String",
+        "name": "donorFirstName"
+      },
+      {
+        "type": "String",
+        "name": "aiSummary"
+      },
+      {
+        "type": "Date",
+        "name": "aiGeneratedAt"
+      },
+      {
+        "type": "String",
+        "name": "donorLastName"
+      },
+      {
+        "type": "String",
+        "name": "donorEmail"
+      },
+      {
+        "type": "String",
+        "name": "donorPhone"
+      },
+      {
+        "type": "String",
+        "name": "paymentMethod"
+      },
+      {
+        "type": "Boolean",
+        "name": "anonymous"
+      },
+      {
+        "type": "String",
+        "name": "message"
+      },
+      {
+        "type": "String",
+        "name": "campaignId"
+      },
+      {
+        "type": "String",
+        "name": "stripeSessionId"
+      },
+      {
+        "type": "String",
+        "name": "status"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "donation-service",
+    "class_name": "DonationCampaign",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "DonationCampaign"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "title"
+      },
+      {
+        "type": "String",
+        "name": "description"
+      },
+      {
+        "type": "Double",
+        "name": "goalAmount"
+      },
+      {
+        "type": "Double",
+        "name": "currentAmount"
+      },
+      {
+        "type": "String",
+        "name": "imageUrl"
+      },
+      {
+        "type": "Boolean",
+        "name": "active"
+      },
+      {
+        "type": "String",
+        "name": "aiSummary"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "education-service",
+    "class_name": "Activity",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Activity"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "title"
+      },
+      {
+        "type": "ActivityType",
+        "name": "type"
+      },
+      {
+        "type": "Stade",
+        "name": "stade"
+      },
+      {
+        "type": "String",
+        "name": "description"
+      },
+      {
+        "type": "String",
+        "name": "data"
+      },
+      {
+        "type": "Integer",
+        "name": "estimatedMinutes"
+      },
+      {
+        "type": "Boolean",
+        "name": "active"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "type": "enum",
+        "name": "ActivityType"
+      },
+      {
+        "type": "enum",
+        "name": "Stade"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "education-service",
+    "class_name": "AudioExchange",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "AudioExchange"
+      },
+      {
+        "type": "String",
+        "name": "speaker"
+      },
+      {
+        "type": "String",
+        "name": "text"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "timestamp"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "education-service",
+    "class_name": "AudioQuestion",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "AudioQuestion"
+      },
+      {
+        "type": "String",
+        "name": "questionText"
+      },
+      {
+        "type": "String",
+        "name": "expectedAnswer"
+      },
+      {
+        "type": "String",
+        "name": "patientAnswer"
+      },
+      {
+        "type": "String",
+        "name": "analysisStatus"
+      },
+      {
+        "type": "String",
+        "name": "feedbackText"
+      },
+      {
+        "type": "String",
+        "name": "hintText"
+      },
+      {
+        "type": "int",
+        "name": "attempts"
+      },
+      {
+        "type": "boolean",
+        "name": "completed"
+      },
+      {
+        "type": "boolean",
+        "name": "keyInfoReinforced"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "education-service",
+    "class_name": "AudioSession",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "AudioSession"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "activityId"
+      },
+      {
+        "type": "String",
+        "name": "patientId"
+      },
+      {
+        "type": "String",
+        "name": "sessionStatus"
+      },
+      {
+        "type": "List<String>",
+        "name": "summary"
+      },
+      {
+        "type": "List<AudioQuestion>",
+        "name": "questions"
+      },
+      {
+        "type": "int",
+        "name": "currentQuestionIndex"
+      },
+      {
+        "type": "int",
+        "name": "totalQuestions"
+      },
+      {
+        "type": "int",
+        "name": "correctAnswers"
+      },
+      {
+        "type": "int",
+        "name": "partialAnswers"
+      },
+      {
+        "type": "int",
+        "name": "incorrectAnswers"
+      },
+      {
+        "type": "int",
+        "name": "silenceCount"
+      },
+      {
+        "type": "String",
+        "name": "finalSummary"
+      },
+      {
+        "type": "String",
+        "name": "language"
+      },
+      {
+        "type": "List<AudioExchange>",
+        "name": "transcriptHistory"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "updatedAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "education-service",
+    "class_name": "Event",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Event"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "title"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "startDateTime"
+      },
+      {
+        "type": "String",
+        "name": "location"
+      },
+      {
+        "type": "String",
+        "name": "description"
+      },
+      {
+        "type": "Boolean",
+        "name": "remindEnabled"
+      },
+      {
+        "type": "Long",
+        "name": "userId"
+      },
+      {
+        "type": "String",
+        "name": "activityId"
+      },
+      {
+        "type": "String",
+        "name": "imageUrl"
+      },
+      {
+        "type": "Integer",
+        "name": "capacity"
+      },
+      {
+        "type": "Integer",
+        "name": "availablePlaces"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "education-service",
+    "class_name": "EventSeat",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "EventSeat"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "eventId"
+      },
+      {
+        "type": "String",
+        "name": "seatNumber"
+      },
+      {
+        "type": "SeatStatus",
+        "name": "status"
+      },
+      {
+        "type": "Long",
+        "name": "bookedByUserId"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "bookedAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "education-service",
+    "class_name": "PatientActivity",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "PatientActivity"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "userId"
+      },
+      {
+        "type": "String",
+        "name": "activityId"
+      },
+      {
+        "type": "Long",
+        "name": "scoreCumule"
+      },
+      {
+        "type": "Long",
+        "name": "scoreSession"
+      },
+      {
+        "type": "Integer",
+        "name": "bonnesReponses"
+      },
+      {
+        "type": "Integer",
+        "name": "mauvaisesReponses"
+      },
+      {
+        "type": "Boolean",
+        "name": "reussi"
+      },
+      {
+        "type": "Integer",
+        "name": "dureeSecondes"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "playedAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "education-service",
+    "class_name": "SeatStatus",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "SeatStatus"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "geo-service",
+    "class_name": "GeoAlert",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "GeoAlert"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "TypeAlerte",
+        "name": "typeAlerte"
+      },
+      {
+        "type": "Double",
+        "name": "latitude"
+      },
+      {
+        "type": "Double",
+        "name": "longitude"
+      },
+      {
+        "type": "boolean",
+        "name": "smsSent"
+      },
+      {
+        "type": "String",
+        "name": "message"
+      },
+      {
+        "type": "boolean",
+        "name": "resolue"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "declencheeAt"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "resolueAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "Hospital",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Hospital"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "nom"
+      },
+      {
+        "type": "String",
+        "name": "adresse"
+      },
+      {
+        "type": "String",
+        "name": "telephone"
+      },
+      {
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "type": "String",
+        "name": "siteWeb"
+      },
+      {
+        "type": "String",
+        "name": "description"
+      },
+      {
+        "type": "String",
+        "name": "ville"
+      },
+      {
+        "type": "Double",
+        "name": "rating"
+      },
+      {
+        "type": "Integer",
+        "name": "nombreAvis"
+      },
+      {
+        "type": "Double",
+        "name": "latitude"
+      },
+      {
+        "type": "Double",
+        "name": "longitude"
+      },
+      {
+        "type": "boolean",
+        "name": "active"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "HospitalPrediction",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "HospitalPrediction"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "String",
+        "name": "patientName"
+      },
+      {
+        "type": "String",
+        "name": "incidentId"
+      },
+      {
+        "type": "String",
+        "name": "alertId"
+      },
+      {
+        "type": "String",
+        "name": "typeIncident"
+      },
+      {
+        "type": "Double",
+        "name": "patientLatitude"
+      },
+      {
+        "type": "Double",
+        "name": "patientLongitude"
+      },
+      {
+        "type": "List<RecommendedHospital>",
+        "name": "hopitaux"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "Incident",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Incident"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "title"
+      },
+      {
+        "type": "String",
+        "name": "description"
+      },
+      {
+        "type": "IncidentType",
+        "name": "type"
+      },
+      {
+        "type": "IncidentStatus",
+        "name": "status"
+      },
+      {
+        "type": "Long",
+        "name": "reporterId"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "String",
+        "name": "aiAnalysis"
+      },
+      {
+        "type": "Double",
+        "name": "aiConfidence"
+      },
+      {
+        "type": "Double",
+        "name": "latitude"
+      },
+      {
+        "type": "Double",
+        "name": "longitude"
+      },
+      {
+        "type": "String",
+        "name": "media"
+      },
+      {
+        "type": "String",
+        "name": "recommendedHospitalName"
+      },
+      {
+        "type": "List<RecommendedHospital>",
+        "name": "recommendedHospitals"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "updatedAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "IncidentStatus",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "IncidentStatus"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "geo-service",
+    "class_name": "IncidentType",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "IncidentType"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "geo-service",
+    "class_name": "LocationRecognition",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "LocationRecognition"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "String",
+        "name": "lieu"
+      },
+      {
+        "type": "String",
+        "name": "confiance"
+      },
+      {
+        "type": "Double",
+        "name": "confidenceScore"
+      },
+      {
+        "type": "String",
+        "name": "statut"
+      },
+      {
+        "type": "String",
+        "name": "photo"
+      },
+      {
+        "type": "String",
+        "name": "incidentId"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "date"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "PatientLocation",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "PatientLocation"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "Double",
+        "name": "latitude"
+      },
+      {
+        "type": "Double",
+        "name": "longitude"
+      },
+      {
+        "type": "Integer",
+        "name": "batterie"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "timestamp"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "RecommendedHospital",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "RecommendedHospital"
+      },
+      {
+        "type": "String",
+        "name": "nom"
+      },
+      {
+        "type": "String",
+        "name": "gouvernorat"
+      },
+      {
+        "type": "String",
+        "name": "distanceKm"
+      },
+      {
+        "type": "String",
+        "name": "specialite"
+      },
+      {
+        "type": "String",
+        "name": "telephone"
+      },
+      {
+        "type": "String",
+        "name": "adresse"
+      },
+      {
+        "type": "Double",
+        "name": "latitude"
+      },
+      {
+        "type": "Double",
+        "name": "longitude"
+      },
+      {
+        "type": "Boolean",
+        "name": "recommande"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "Role",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "Role"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "geo-service",
+    "class_name": "SafeZone",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "SafeZone"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "Long",
+        "name": "doctorId"
+      },
+      {
+        "type": "String",
+        "name": "nom"
+      },
+      {
+        "type": "Double",
+        "name": "latitudeCentre"
+      },
+      {
+        "type": "Double",
+        "name": "longitudeCentre"
+      },
+      {
+        "type": "Integer",
+        "name": "rayonVert"
+      },
+      {
+        "type": "Integer",
+        "name": "rayonRouge"
+      },
+      {
+        "type": "boolean",
+        "name": "actif"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "updatedAt"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "SOSRequest",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "SOSRequest"
+      },
+      {
+        "type": "Double",
+        "name": "latitude"
+      },
+      {
+        "type": "Double",
+        "name": "longitude"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "geo-service",
+    "class_name": "TypeAlerte",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "TypeAlerte"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "patient-medecin-service",
+    "class_name": "Analyse",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Analyse"
+      },
+      {
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "type": "LocalDate",
+        "name": "date"
+      },
+      {
+        "type": "String",
+        "name": "statut"
+      },
+      {
+        "type": "String",
+        "name": "rapportMedical"
+      },
+      {
+        "type": "String",
+        "name": "imageIRM"
+      },
+      {
+        "type": "Double",
+        "name": "scoreJeu"
+      },
+      {
+        "type": "Double",
+        "name": "pourcentageRisque"
+      },
+      {
+        "type": "String",
+        "name": "interpretation"
+      },
+      {
+        "type": "String",
+        "name": "observationMedicale"
+      },
+      {
+        "type": "Patient",
+        "name": "patient"
+      },
+      {
+        "type": "JeuCognitif",
+        "name": "jeuCognitif"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "patient-medecin-service",
+    "class_name": "JeuCognitif",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "JeuCognitif"
+      },
+      {
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "nom"
+      },
+      {
+        "type": "String",
+        "name": "description"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "patient-medecin-service",
+    "class_name": "Notificationpatient",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Notificationpatient"
+      },
+      {
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "message"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "type": "boolean",
+        "name": "isRead"
+      },
+      {
+        "type": "String",
+        "name": "type"
+      },
+      {
+        "type": "Patient",
+        "name": "patient"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "patient-medecin-service",
+    "class_name": "Patient",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "Patient"
+      },
+      {
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "nom"
+      },
+      {
+        "type": "String",
+        "name": "prenom"
+      },
+      {
+        "type": "Integer",
+        "name": "age"
+      },
+      {
+        "type": "Double",
+        "name": "poids"
+      },
+      {
+        "type": "String",
+        "name": "sexe"
+      },
+      {
+        "type": "Long",
+        "name": "medecinId"
+      },
+      {
+        "type": "UserInfo",
+        "name": "user"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "patient-medecin-service",
+    "class_name": "RappelQuotidien",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "RappelQuotidien"
+      },
+      {
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "type": "Patient",
+        "name": "patient"
+      },
+      {
+        "type": "String",
+        "name": "titre"
+      },
+      {
+        "type": "String",
+        "name": "description"
+      },
+      {
+        "type": "LocalTime",
+        "name": "heureRappel"
+      },
+      {
+        "type": "String",
+        "name": "jours"
+      },
+      {
+        "type": "TypeRappel",
+        "name": "type"
+      },
+      {
+        "type": "boolean",
+        "name": "actif"
+      },
+      {
+        "type": "UserInfo",
+        "name": "createdBy"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "createdAt"
+      },
+      {
+        "type": "String",
+        "name": "voiceMessagePath"
+      },
+      {
+        "type": "enum",
+        "name": "TypeRappel"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "patient-medecin-service",
+    "class_name": "UserInfo",
+    "persistence": "Plain POJO",
+    "fields": [
+      {
+        "type": "class",
+        "name": "UserInfo"
+      },
+      {
+        "type": "Long",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "email"
+      },
+      {
+        "type": "String",
+        "name": "telephone"
+      },
+      {
+        "type": "String",
+        "name": "fcmToken"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "rendezvous-service",
+    "class_name": "RendezVous",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "RendezVous"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "Long",
+        "name": "patientId"
+      },
+      {
+        "type": "Long",
+        "name": "medecinId"
+      },
+      {
+        "type": "Date",
+        "name": "dateHeure"
+      },
+      {
+        "type": "String",
+        "name": "motif"
+      },
+      {
+        "type": "String",
+        "name": "observations"
+      },
+      {
+        "type": "StatutRendezVous",
+        "name": "statut"
+      }
+    ],
+    "is_enum": false
+  },
+  {
+    "service": "rendezvous-service",
+    "class_name": "StatutRendezVous",
+    "persistence": "Enum",
+    "fields": [
+      {
+        "type": "enum",
+        "name": "StatutRendezVous"
+      }
+    ],
+    "is_enum": true
+  },
+  {
+    "service": "smartwatch-service",
+    "class_name": "HeartRateRecord",
+    "persistence": "MongoDB",
+    "fields": [
+      {
+        "type": "class",
+        "name": "HeartRateRecord"
+      },
+      {
+        "type": "String",
+        "name": "id"
+      },
+      {
+        "type": "String",
+        "name": "eventId"
+      },
+      {
+        "type": "Long",
+        "name": "userId"
+      },
+      {
+        "type": "String",
+        "name": "deviceName"
+      },
+      {
+        "type": "Integer",
+        "name": "bpm"
+      },
+      {
+        "type": "String",
+        "name": "source"
+      },
+      {
+        "type": "Instant",
+        "name": "capturedAt"
+      },
+      {
+        "type": "Instant",
+        "name": "receivedAt"
+      },
+      {
+        "type": "LocalDateTime",
+        "name": "recordedAt"
+      }
+    ],
+    "is_enum": false
+  }
+]

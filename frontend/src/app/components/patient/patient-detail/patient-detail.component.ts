@@ -56,7 +56,7 @@ export class PatientDetailComponent implements OnInit {
     }
   }
 
-  /** Cherche l'utilisateur RELATION dont le patientId = id du patient */
+  /** Cherche l'utilisateur RELATION dont the patientId = id du patient */
   private loadRelationByPatientId(patientId: number): void {
     this.alzUserService.getAll().subscribe({
       next: (users: User[]) => {
@@ -92,7 +92,7 @@ export class PatientDetailComponent implements OnInit {
       case 'LEGER':  return 'Léger';
       case 'MODERE': return 'Modéré';
       case 'SEVERE': return 'Sévère';
-      default:       return 'Non défini';
+      default:       return 'No défini';
     }
   }
 
@@ -107,20 +107,20 @@ export class PatientDetailComponent implements OnInit {
 
   get contactUrgenceNom():      string {
     return this.patient?.contactUrgenceNom
-        || (this.relation ? `${this.relation.prenom} ${this.relation.nom}` : 'Non renseigné');
+        || (this.relation ? `${this.relation.prenom} ${this.relation.nom}` : 'No renseigné');
   }
   get contactUrgenceTelephone():string {
     return this.patient?.contactUrgenceTelephone
         || this.relation?.telephone
-        || 'Non renseigné';
+        || 'No renseigné';
   }
   get contactUrgenceRelation(): string {
     return this.patient?.contactUrgenceRelation
         || (this.relation as any)?.lienAvecPatient
-        || 'Non renseigné';
+        || 'No renseigné';
   }
   get notes():   string { return this.patient?.notes   || ''; }
-  get adresse(): string { return this.patient?.adresse || 'Non renseignée'; }
+  get adresse(): string { return this.patient?.adresse || 'No renseignée'; }
 
   // ── Infos relation ────────────────────────────────────────
   get relationNomComplet(): string {

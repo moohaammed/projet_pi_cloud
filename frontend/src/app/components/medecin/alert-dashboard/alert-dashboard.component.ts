@@ -22,12 +22,12 @@ export class AlertDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
-    this.chargerAlertes();
+    this.chargerAlerts();
     // Rafraîchit toutes les 30 secondes
-    setInterval(() => this.chargerAlertes(), 30000);
+    setInterval(() => this.chargerAlerts(), 30000);
   }
 
-  chargerAlertes(): void {
+  chargerAlerts(): void {
     this.mapService.getAllAlerts().subscribe({
       next: (data) => {
         this.alertes = data.sort((a: any, b: any) =>
@@ -57,7 +57,7 @@ export class AlertDashboardComponent implements OnInit {
     }
   }
 
-  get alertesNonResolues(): any[] {
+  get alertesNoResolues(): any[] {
     return this.alertes.filter(a => !a.resolue);
   }
 

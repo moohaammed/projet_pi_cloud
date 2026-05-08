@@ -54,7 +54,7 @@ export class PatientFormComponent implements OnInit {
 
   save(): void {
     if (!this.patient.nom || !this.patient.prenom || !this.patient.email) {
-      this.error = 'Nom, prénom et email sont obligatoires';
+      this.error = 'Last Name, first name and email are mandatory';
       return;
     }
     this.loading = true;
