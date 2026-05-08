@@ -57,7 +57,22 @@ public class PublicationService {
     }
 
     public List<PublicationResponseDto> getPersonalizedFeed(Long userId) {
-        return getAllPublications();
+        // Get all group IDs the user is a member of
+        Set<String> userGroupIds = chatGroupRepository.findAll().stream()
+                .filter(g -> g.getMemberIds().contains(userId))
+                .map(g -> g.getId())
+                .collect(Collectors.toSet());
+
+        return publicationRepository.findAll().stream()
+                .filter(p -> {
+                    // Include global posts (no group)
+                    if (p.getChatGroupId() == null || p.getChatGroupId().isEmpty()) return true;
+                    // Include group posts only if user is a member
+                    return userGroupIds.contains(p.getChatGroupId());
+                })
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 
     public List<PublicationResponseDto> getGroupFeed(String groupId) {

@@ -50,7 +50,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
   incidents:       Incident[]      = [];
   hospitals:       RecommendedHospital[] = [];
   history:         PatientLocation[] = [];
-  lastLocationAddress = 'Adresse indisponible';
+  lastLocationAddress = 'Address unavailable';
   private addressCache: Record<string, string> = {};
   private lastHospitalLocationKey = '';
 
@@ -70,15 +70,15 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
   newIncident = this.emptyIncident();
 
   readonly incidentTypes = [
-    { value: 'TROU', label: 'Trou', emoji: '🕳️', color: '#dc3545' },
+    { value: 'TROU', label: 'Hole', emoji: '🕳️', color: '#dc3545' },
     { value: 'OBSTACLE', label: 'Obstacle', emoji: '🚧', color: '#fd7e14' },
-    { value: 'ESCALIER', label: 'Escalier', emoji: '🪜', color: '#ffc107' },
+    { value: 'ESCALIER', label: 'Stairs', emoji: '🪜', color: '#ffc107' },
     { value: 'ACCIDENT', label: 'Accident', emoji: '🚨', color: '#6f42c1' },
-    { value: 'CHUTE_PERSONNE', label: 'Chute', emoji: '🆘', color: '#e83e8c' },
-    { value: 'INCENDIE', label: 'Incendie', emoji: '🔥', color: '#fd7e14' },
-    { value: 'INONDATION', label: 'Inondation', emoji: '🌊', color: '#0dcaf0' },
-    { value: 'ZONE_DANGEREUSE', label: 'Zone danger', emoji: '⚠️', color: '#6f42c1' },
-    { value: 'AUTRE', label: 'Autre', emoji: '⚠️', color: '#6c757d' },
+    { value: 'CHUTE_PERSONNE', label: 'Fall', emoji: '🆘', color: '#e83e8c' },
+    { value: 'INCENDIE', label: 'Fire', emoji: '🔥', color: '#fd7e14' },
+    { value: 'INONDATION', label: 'Flood', emoji: '🌊', color: '#0dcaf0' },
+    { value: 'ZONE_DANGEREUSE', label: 'Danger zone', emoji: '⚠️', color: '#6f42c1' },
+    { value: 'AUTRE', label: 'Other', emoji: '⚠️', color: '#6c757d' },
   ];
 
   private refreshInterval: any;
@@ -139,7 +139,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
         if (patientId) {
           this.alzUserService.getById(patientId).subscribe({
             next: (p) => { this.patient = p; this.loadAll(); },
-            error: () => console.error('Patient introuvable')
+            error: () => console.error('Patient not found')
           });
         }
       }
@@ -217,7 +217,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
             <strong>${this.patient?.nom} ${this.patient?.prenom}</strong>
           </div>
           <div style="font-size:13px;padding:4px 0">
-            <div style="color:#28a745;font-weight:700">● En ligne</div>
+            <div style="color:#28a745;font-weight:700">Online</div>
             <div>🔋 <span style="color:${bColor};font-weight:700">${batterie}%</span></div>
             <div style="color:#888;font-size:11px">
               ${loc.timestamp ? new Date(loc.timestamp).toLocaleString('fr') : ''}
@@ -251,7 +251,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.patientMarker = L.marker(
       [this.lastLocation.latitude, this.lastLocation.longitude], { icon }
     ).bindPopup(`<strong>${this.patient?.nom} ${this.patient?.prenom}</strong><br>
-                 <span style="color:#6c757d">● Hors ligne</span>`)
+                 <span style="color:#6c757d">Offline</span>`)
      .addTo(this.map);
   }
 
@@ -291,20 +291,20 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.greenCircle = L.circle([zone.latitudeCentre, zone.longitudeCentre], {
       radius: zone.rayonVert, color: '#28a745',
       fillColor: '#28a745', fillOpacity: 0.1, weight: 2, dashArray: '5 5'
-    }).bindTooltip(`✅ Zone verte — ${zone.rayonVert}m`).addTo(this.map);
+    }).bindTooltip(`Green zone - ${zone.rayonVert}m`).addTo(this.map);
 
     this.redCircle = L.circle([zone.latitudeCentre, zone.longitudeCentre], {
       radius: zone.rayonRouge, color: '#dc3545',
       fillColor: '#dc3545', fillOpacity: 0.05, weight: 2, dashArray: '5 5'
-    }).bindTooltip(`🔴 Zone rouge — ${zone.rayonRouge}m`).addTo(this.map);
+    }).bindTooltip(`Red zone - ${zone.rayonRouge}m`).addTo(this.map);
 
     this.houseMarker = L.marker([zone.latitudeCentre, zone.longitudeCentre], {
       icon: this.getHouseIcon()
     }).bindPopup(`
       <div style="text-align:center">
-        <b>🏠 Domicile de ${this.patient?.prenom}</b><br>
-        <small style="color:#28a745">Zone verte : ${zone.rayonVert}m</small><br>
-        <small style="color:#dc3545">Zone rouge : ${zone.rayonRouge}m</small>
+        <b>Home of ${this.patient?.prenom}</b><br>
+        <small style="color:#28a745">Green zone: ${zone.rayonVert}m</small><br>
+        <small style="color:#dc3545">Red zone: ${zone.rayonRouge}m</small>
       </div>`).addTo(this.map);
   }
 
@@ -539,7 +539,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   saveNewIncident(): void {
     if (!this.currentUser?.id || !this.patient?.id) {
-      this.incidentCreateError = 'Patient ou relation introuvable.';
+      this.incidentCreateError = 'Patient or relation not found.';
       return;
     }
     if (!this.newIncident.latitude || !this.newIncident.longitude || !this.newIncident.type) {
@@ -648,7 +648,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
                                  box-shadow:0 2px 6px rgba(0,0,0,.3)">D</div>`,
               iconSize: [22, 22], iconAnchor: [11, 11]
             })
-          }).bindTooltip('Départ').addTo(this.map);
+          }).bindTooltip('Start').addTo(this.map);
 
           // Arrivée
           this.historyEnd = L.marker(
@@ -662,7 +662,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
                                  box-shadow:0 2px 6px rgba(0,0,0,.3)">A</div>`,
               iconSize: [22, 22], iconAnchor: [11, 11]
             })
-          }).bindTooltip('Arrivée').addTo(this.map);
+          }).bindTooltip('End').addTo(this.map);
 
           this.map.fitBounds(this.historyLayer.getBounds(), { padding: [50, 50] });
         } else {
@@ -749,7 +749,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
         iconSize: [34, 34], iconAnchor: [17, 17]
       });
       const m = L.marker([h.latitude, h.longitude], { icon })
-        .bindPopup(`<b>${recommended ? 'Recommande - ' : ''}${h.nom}</b>
+        .bindPopup(`<b>${recommended ? 'Recommended - ' : ''}${h.nom}</b>
           <br><small>${h.adresse}${h.gouvernorat ? `, ${h.gouvernorat}` : ''}</small>
           <br><small><b>Specialite :</b> ${h.specialite || 'general'}</small>
           ${distance ? `<br><small><b>Distance :</b> ${distance} km</small>` : ''}
@@ -758,7 +758,7 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
                  target="_blank"
                  style="display:block;margin-top:6px;padding:3px 8px;background:${color};
                         color:white;border-radius:4px;text-decoration:none;text-align:center;font-size:11px">
-            Itineraire
+            Directions
           </a>`)
         .addTo(this.map);
       this.hospitalMarkers.push(m);
@@ -786,10 +786,10 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   locationAddress(loc: PatientLocation | null): string {
-    if (!loc) return 'Adresse indisponible';
+    if (!loc) return 'Address unavailable';
     const directAddress = (loc as any).adresse || (loc as any).address || (loc as any).displayName;
     if (directAddress) return directAddress;
-    return this.addressCache[this.locationKey(loc)] || 'Recherche de l adresse...';
+    return this.addressCache[this.locationKey(loc)] || 'Searching for address...';
   }
 
   private loadAddressForLocation(loc: PatientLocation): void {
@@ -805,15 +805,15 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.addressCache[key] = 'Recherche de l adresse...';
+    this.addressCache[key] = 'Searching for address...';
     fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${loc.latitude}&lon=${loc.longitude}&zoom=18&addressdetails=1`)
       .then(response => response.ok ? response.json() : null)
       .then(result => {
-        this.addressCache[key] = result?.display_name || 'Adresse indisponible';
+        this.addressCache[key] = result?.display_name || 'Address unavailable';
         if (loc === this.lastLocation) this.lastLocationAddress = this.addressCache[key];
       })
       .catch(() => {
-        this.addressCache[key] = 'Adresse indisponible';
+        this.addressCache[key] = 'Address unavailable';
         if (loc === this.lastLocation) this.lastLocationAddress = this.addressCache[key];
       });
   }
@@ -880,35 +880,35 @@ export class RelationMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private typeToTitle(type: string): string {
     const titles: Record<string, string> = {
-      TROU: 'Trou detecte',
-      OBSTACLE: 'Obstacle sur le chemin',
-      ESCALIER: 'Escalier dangereux',
-      ACCIDENT: 'Accident signale',
-      CHUTE_PERSONNE: 'Chute detectee',
-      INCENDIE: 'Incendie signale',
-      INONDATION: 'Inondation signalee',
-      ZONE_DANGEREUSE: 'Zone dangereuse',
-      AUTRE: 'Incident signale'
+      TROU: 'Hole detected',
+      OBSTACLE: 'Obstacle on the route',
+      ESCALIER: 'Dangerous stairs',
+      ACCIDENT: 'Accident reported',
+      CHUTE_PERSONNE: 'Fall detected',
+      INCENDIE: 'Fire reported',
+      INONDATION: 'Flood reported',
+      ZONE_DANGEREUSE: 'Danger zone',
+      AUTRE: 'Incident reported'
     };
     return titles[type] || titles['AUTRE'];
   }
 
   private typeToDescription(type: string): string {
     const descriptions: Record<string, string> = {
-      TROU: 'Un trou peut gener le passage du patient.',
-      OBSTACLE: 'Un obstacle est present sur le chemin du patient.',
-      ESCALIER: 'Un escalier peut presenter un risque de chute.',
-      ACCIDENT: 'Un accident a ete signale dans cette zone.',
-      CHUTE_PERSONNE: 'Une chute ou un risque de chute a ete detecte.',
-      INCENDIE: 'Un risque d incendie a ete signale.',
-      INONDATION: 'Une zone inondee peut bloquer ou mettre en danger le patient.',
-      ZONE_DANGEREUSE: 'Cette zone peut etre dangereuse pour le patient.',
-      AUTRE: 'Un incident a ete signale dans cette zone.'
+      TROU: 'A hole may block the patient path.',
+      OBSTACLE: 'An obstacle is present on the patient route.',
+      ESCALIER: 'Stairs may present a fall risk.',
+      ACCIDENT: 'An accident was reported in this area.',
+      CHUTE_PERSONNE: 'A fall or fall risk was detected.',
+      INCENDIE: 'A fire risk was reported.',
+      INONDATION: 'A flooded area may block or endanger the patient.',
+      ZONE_DANGEREUSE: 'This area may be dangerous for the patient.',
+      AUTRE: 'An incident was reported in this area.'
     };
     return descriptions[type] || descriptions['AUTRE'];
   }
 
   formatDate(d?: string): string {
-    return d ? new Date(d).toLocaleString('fr') : '';
+    return d ? new Date(d).toLocaleString('en') : '';
   }
 }

@@ -1056,84 +1056,155 @@
 
           <!-- DM ANALYTICS table -->
           <div *ngIf="!contentLoading && contentTab === 'dms'">
-            <div class="table-responsive">
-              <table class="table table-hover mb-0 align-middle">
-                <thead class="bg-light border-bottom">
-                  <tr>
-                    <th class="ps-4 py-3 fw-black text-muted text-uppercase fs-11">Conversation</th>
-                    <th class="py-3 text-center fw-black text-muted text-uppercase fs-11">Messages</th>
-                    <th class="py-3 text-center fw-black text-muted text-uppercase fs-11">Distress</th>
-                    <th class="pe-4 py-3 text-end fw-black text-muted text-uppercase fs-11">Last Active</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let d of paginatedDmMeta" class="border-bottom"
-                      [ngClass]="d.distressedMessageCount > 0 ? 'dm-row-distressed' : ''">
-                    <td class="ps-4 py-3">
-                      <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex align-items-center gap-1">
-                          <div class="avatar-xs bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-black fs-10">
-                            {{ getUserName(d.userIdA).substring(0,2).toUpperCase() }}
+            <!-- List View -->
+            <div *ngIf="!viewingDmPair">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                  <thead class="bg-light border-bottom">
+                    <tr>
+                      <th class="ps-4 py-3 fw-black text-muted text-uppercase fs-11">Conversation</th>
+                      <th class="py-3 text-center fw-black text-muted text-uppercase fs-11">Messages</th>
+                      <th class="py-3 text-center fw-black text-muted text-uppercase fs-11">Distress</th>
+                      <th class="pe-4 py-3 text-end fw-black text-muted text-uppercase fs-11">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let d of paginatedDmMeta" class="border-bottom"
+                        [ngClass]="d.distressedMessageCount > 0 ? 'dm-row-distressed' : ''">
+                      <td class="ps-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="d-flex align-items-center gap-1">
+                            <div class="avatar-xs bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-black fs-10">
+                              {{ getUserName(d.userIdA).substring(0,2).toUpperCase() }}
+                            </div>
+                            <i class="fa-solid fa-arrows-left-right text-muted fs-10 opacity-40 mx-1"></i>
+                            <div class="avatar-xs bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-black fs-10">
+                              {{ getUserName(d.userIdB).substring(0,2).toUpperCase() }}
+                            </div>
                           </div>
-                          <i class="fa-solid fa-arrows-left-right text-muted fs-10 opacity-40 mx-1"></i>
-                          <div class="avatar-xs bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center fw-black fs-10">
-                            {{ getUserName(d.userIdB).substring(0,2).toUpperCase() }}
+                          <div>
+                            <div class="fw-bold text-doc-heading fs-13">{{ getUserName(d.userIdA) }}</div>
+                            <div class="text-muted fs-11">{{ getUserName(d.userIdB) }}</div>
                           </div>
                         </div>
-                        <div>
-                          <div class="fw-bold text-doc-heading fs-13">{{ getUserName(d.userIdA) }}</div>
-                          <div class="text-muted fs-11">{{ getUserName(d.userIdB) }}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="text-center py-3">
-                      <span class="badge bg-soft-info text-info px-3 py-2 rounded-pill fw-black fs-12">{{ d.messageCount }}</span>
-                    </td>
-                    <td class="text-center py-3">
-                      <span *ngIf="d.distressedMessageCount > 0" class="badge bg-danger text-white px-3 py-2 rounded-pill fw-black fs-12">
-                        <i class="fa-solid fa-triangle-exclamation me-1"></i>{{ d.distressedMessageCount }}
-                      </span>
-                      <span *ngIf="d.distressedMessageCount === 0" class="badge bg-soft-success text-success px-3 py-2 rounded-pill fw-bold fs-12">
-                        <i class="fa-solid fa-check me-1"></i> 0
-                      </span>
-                    </td>
-                    <td class="text-end pe-4 py-3">
-                      <div class="fw-bold text-doc-heading fs-13">{{ d.lastActivity | date:'MMM d, y' }}</div>
-                      <div class="text-muted fs-11">{{ d.lastActivity | date:'h:mm a' }}</div>
-                    </td>
-                  </tr>
-                  <tr *ngIf="filteredDmMeta.length === 0 && dmMeta.length > 0">
-                    <td colspan="4" class="text-center py-5">
-                      <i class="fa-solid fa-filter-circle-xmark fs-2 text-muted opacity-25 mb-3 d-block"></i>
-                      <p class="text-muted fw-bold mb-0">No conversations match your filters.</p>
-                      <button class="btn btn-soft-primary btn-sm rounded-pill px-4 mt-2" (click)="clearDmFilters()">Clear Filters</button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="dmMeta.length === 0">
-                    <td colspan="4" class="text-center py-5">
-                      <i class="fa-solid fa-message-slash fs-2 text-muted opacity-25 mb-3 d-block"></i>
-                      <p class="text-muted fw-bold mb-0">No direct message activity recorded.</p>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div *ngIf="dmTotalPages > 1" class="d-flex justify-content-between align-items-center px-4 py-3 border-top bg-light">
-              <span class="text-muted fs-12 fw-medium">
-                {{ (dmCurrentPage - 1) * dmPageSize + 1 }}-{{ Math.min(dmCurrentPage * dmPageSize, filteredDmMeta.length) }} of {{ filteredDmMeta.length }}
-              </span>
-              <div class="d-flex gap-1">
-                <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold" [disabled]="dmCurrentPage === 1" (click)="prevPage()">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <button *ngFor="let page of dmPageNumbers" class="btn btn-sm fw-bold rounded-circle"
-                        style="width: 32px; height: 32px;"
-                        [ngClass]="page === dmCurrentPage ? 'btn-primary' : 'btn-light text-muted'"
-                        (click)="goToPage(page)">{{ page }}</button>
-                <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold" [disabled]="dmCurrentPage === dmTotalPages" (click)="nextPage()">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
+                      </td>
+                      <td class="text-center py-3">
+                        <span class="badge bg-soft-info text-info px-3 py-2 rounded-pill fw-black fs-12">{{ d.messageCount }}</span>
+                      </td>
+                      <td class="text-center py-3">
+                        <span *ngIf="d.distressedMessageCount > 0" class="badge bg-danger text-white px-3 py-2 rounded-pill fw-black fs-12">
+                          <i class="fa-solid fa-triangle-exclamation me-1"></i>{{ d.distressedMessageCount }}
+                        </span>
+                        <span *ngIf="d.distressedMessageCount === 0" class="badge bg-soft-success text-success px-3 py-2 rounded-pill fw-bold fs-12">
+                          <i class="fa-solid fa-check me-1"></i> 0
+                        </span>
+                      </td>
+                      <td class="text-end pe-4 py-3">
+                        <button class="btn btn-primary btn-sm fw-bold rounded-pill px-3 shadow-sm" (click)="viewDmThread(d)">
+                          <i class="fa-solid fa-eye me-1"></i> View Thread
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="filteredDmMeta.length === 0 && dmMeta.length > 0">
+                      <td colspan="4" class="text-center py-5">
+                        <i class="fa-solid fa-filter-circle-xmark fs-2 text-muted opacity-25 mb-3 d-block"></i>
+                        <p class="text-muted fw-bold mb-0">No conversations match your filters.</p>
+                        <button class="btn btn-soft-primary btn-sm rounded-pill px-4 mt-2" (click)="clearDmFilters()">Clear Filters</button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="dmMeta.length === 0">
+                      <td colspan="4" class="text-center py-5">
+                        <i class="fa-solid fa-message-slash fs-2 text-muted opacity-25 mb-3 d-block"></i>
+                        <p class="text-muted fw-bold mb-0">No direct message activity recorded.</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
+              <div *ngIf="dmTotalPages > 1" class="d-flex justify-content-between align-items-center px-4 py-3 border-top bg-light">
+                <span class="text-muted fs-12 fw-medium">
+                  {{ (dmCurrentPage - 1) * dmPageSize + 1 }}-{{ Math.min(dmCurrentPage * dmPageSize, filteredDmMeta.length) }} of {{ filteredDmMeta.length }}
+                </span>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold" [disabled]="dmCurrentPage === 1" (click)="prevPage()">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <button *ngFor="let page of dmPageNumbers" class="btn btn-sm fw-bold rounded-circle"
+                          style="width: 32px; height: 32px;"
+                          [ngClass]="page === dmCurrentPage ? 'btn-primary' : 'btn-light text-muted'"
+                          (click)="goToPage(page)">{{ page }}</button>
+                  <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold" [disabled]="dmCurrentPage === dmTotalPages" (click)="nextPage()">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detail View -->
+            <div *ngIf="viewingDmPair" class="animate-fade-in bg-light p-4 rounded-4" style="min-height: 400px; display: flex; flex-direction: column;">
+              <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                <div class="d-flex align-items-center gap-3">
+                  <button class="btn btn-white shadow-sm rounded-circle px-0" style="width: 40px; height: 40px;" (click)="closeDmThread()">
+                    <i class="fa-solid fa-arrow-left text-muted"></i>
+                  </button>
+                  <div>
+                    <h6 class="fw-black text-doc-heading mb-0">Auditing Private Thread</h6>
+                    <span class="text-muted small">Between {{ getUserName(viewingDmPair.userIdA) }} and {{ getUserName(viewingDmPair.userIdB) }}</span>
+                  </div>
+                </div>
+                <span class="badge bg-soft-danger text-danger fw-black px-3 py-2 rounded-pill small">
+                  ADMIN OVERRIDE
+                </span>
+              </div>
+
+              <!-- Messages List -->
+              <div *ngIf="dmThreadLoading" class="text-center py-5 flex-grow-1">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted small fw-bold mt-2">Decrypting thread...</p>
+              </div>
+
+              <div *ngIf="!dmThreadLoading && activeDmThread.length > 0" class="flex-grow-1 d-flex flex-column gap-3 overflow-auto pe-2" style="max-height: 500px;">
+                <div *ngFor="let m of activeDmThread" class="d-flex gap-3 align-items-end" [ngClass]="{'justify-content-end': m.authorId === viewingDmPair.userIdA}">
+                  
+                  <div *ngIf="m.authorId !== viewingDmPair.userIdA" class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-12 flex-shrink-0" style="width: 32px; height: 32px;">
+                    {{ getUserName(m.authorId).substring(0,2).toUpperCase() }}
+                  </div>
+
+                  <div class="p-3 shadow-sm position-relative" 
+                       [ngClass]="m.authorId === viewingDmPair.userIdA ? 'bg-primary text-white rounded-4 rounded-bottom-end-0' : 'bg-white text-dark rounded-4 rounded-bottom-start-0'"
+                       style="max-width: 75%; border: 1px solid rgba(0,0,0,0.05);"
+                       [class.border-danger]="m.distressed">
+                    
+                    <div *ngIf="m.distressed" class="position-absolute top-0 start-100 translate-middle">
+                      <i class="fa-solid fa-triangle-exclamation text-danger fs-4 drop-shadow"></i>
+                    </div>
+
+                    <div class="fs-11 mb-1 fw-bold opacity-75" [ngClass]="m.authorId === viewingDmPair.userIdA ? 'text-white' : 'text-primary'">
+                      {{ getUserName(m.authorId) }}
+                    </div>
+                    
+                    <div class="fs-14 fw-medium lh-sm" style="white-space: pre-wrap;">{{ m.content }}</div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" [ngStyle]="{'borderColor': m.authorId === viewingDmPair.userIdA ? 'rgba(255,255,255,0.2) !important' : 'rgba(0,0,0,0.05) !important'}">
+                      <span class="fs-10 fw-bold opacity-50">{{ m.createdAt | date:'MMM d, h:mm a' }}</span>
+                      <button class="btn btn-sm btn-link p-0 opacity-50 hover-opacity-100" (click)="adminDeleteMessage(m.id)" title="Force Delete Message">
+                        <i class="fa-solid fa-trash-can" [ngClass]="m.authorId === viewingDmPair.userIdA ? 'text-white' : 'text-danger'"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div *ngIf="m.authorId === viewingDmPair.userIdA" class="avatar-sm bg-doc-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-12 flex-shrink-0" style="width: 32px; height: 32px;">
+                    {{ getUserName(m.authorId).substring(0,2).toUpperCase() }}
+                  </div>
+
+                </div>
+              </div>
+
+              <div *ngIf="!dmThreadLoading && activeDmThread.length === 0" class="text-center py-5 flex-grow-1">
+                <i class="fa-solid fa-comment-slash fs-1 text-muted opacity-25 mb-3"></i>
+                <p class="text-muted fw-bold">No messages found in this thread.</p>
+              </div>
+
             </div>
           </div>
 

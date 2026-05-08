@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tn.esprit.smartwatchservice.service.HeartRateStreamingService;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * SSE endpoint for live heart-rate streaming to the Angular frontend.
  *
@@ -32,9 +36,24 @@ public class HeartRateStreamController {
      *               If omitted, the client receives events for ALL users.
      */
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter stream(@RequestParam(required = false) Long userId) {
-        log.info("📡 [SSE ENDPOINT] New frontend client subscribing to live stream (userId={})",
-                userId != null ? userId : "ALL");
-        return streamingService.subscribe(userId);
+    public SseEmitter stream(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String userIds) {
+        Set<Long> parsedUserIds = parseUserIds(userIds);
+        log.info("📡 [SSE ENDPOINT] New frontend client subscribing to live stream (userId={}, userIds={})",
+                userId != null ? userId : "ALL",
+                parsedUserIds != null ? parsedUserIds : "ALL");
+        return streamingService.subscribe(userId, parsedUserIds);
+    }
+
+    private Set<Long> parseUserIds(String userIds) {
+        if (userIds == null || userIds.isBlank()) {
+            return null;
+        }
+        return Arrays.stream(userIds.split(","))
+                .map(String::trim)
+                .filter(value -> !value.isBlank())
+                .map(Long::valueOf)
+                .collect(Collectors.toSet());
     }
 }

@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 /** A group member with their resolved display name */
 export interface MemberDto {
@@ -59,7 +60,7 @@ export interface ChatGroupCreateRequest {
 @Injectable({ providedIn: 'root' })
 export class ChatGroupService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:8080/api/groups';
+  private apiUrl = `${environment.apiUrl}/api/groups`;
 
   /** All available groups — loaded on app init and refreshed after mutations */
   public groups = signal<ChatGroupDto[]>([]);
@@ -69,32 +70,32 @@ export class ChatGroupService {
 
   /** Loads all groups and stores them in the groups signal */
   fetchGroups() {
-    this.http.get<ChatGroupDto[]>(this.baseUrl).subscribe(data => this.groups.set(data));
+    this.http.get<ChatGroupDto[]>(this.apiUrl).subscribe(data => this.groups.set(data));
   }
 
   /** Creates a new group. The owner is automatically added as a member by the backend. */
   createGroup(grp: ChatGroupCreateRequest) {
-    return this.http.post<ChatGroupDto>(this.baseUrl, grp);
+    return this.http.post<ChatGroupDto>(this.apiUrl, grp);
   }
 
   /** Fetches a single group by its MongoDB ObjectId */
   getGroupById(id: string) {
-    return this.http.get<ChatGroupDto>(`${this.baseUrl}/${id}`);
+    return this.http.get<ChatGroupDto>(`${this.apiUrl}/${id}`);
   }
 
   /** Permanently deletes a group */
   deleteGroup(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   /** Adds a user directly to a group (no approval needed) */
   joinGroup(groupId: string, userId: number) {
-    return this.http.post(`${this.baseUrl}/${groupId}/join/${userId}`, {});
+    return this.http.post(`${this.apiUrl}/${groupId}/join/${userId}`, {});
   }
 
   /** Removes a user from a group */
   leaveGroup(groupId: string, userId: number) {
-    return this.http.post(`${this.baseUrl}/${groupId}/leave/${userId}`, {});
+    return this.http.post(`${this.apiUrl}/${groupId}/leave/${userId}`, {});
   }
 
   /**
@@ -103,22 +104,22 @@ export class ChatGroupService {
    * Does nothing if a PENDING request already exists.
    */
   requestJoin(groupId: string, userId: number) {
-    return this.http.post(`${this.baseUrl}/${groupId}/request-join/${userId}`, {});
+    return this.http.post(`${this.apiUrl}/${groupId}/request-join/${userId}`, {});
   }
 
   /** Returns all PENDING join requests for groups owned by this user */
   getPendingRequests(ownerId: number) {
-    return this.http.get<GroupJoinRequest[]>(`${this.baseUrl}/owner/${ownerId}/pending-requests`);
+    return this.http.get<GroupJoinRequest[]>(`${this.apiUrl}/owner/${ownerId}/pending-requests`);
   }
 
   /** Approves a join request — user is added to the group and notified */
   approveRequest(requestId: string) {
-    return this.http.post(`${this.baseUrl}/requests/${requestId}/approve`, {});
+    return this.http.post(`${this.apiUrl}/requests/${requestId}/approve`, {});
   }
 
   /** Rejects a join request — user is not added */
   rejectRequest(requestId: string) {
-    return this.http.post(`${this.baseUrl}/requests/${requestId}/reject`, {});
+    return this.http.post(`${this.apiUrl}/requests/${requestId}/reject`, {});
   }
 
   /** Sets the active group signal (used by the messenger component) */
@@ -128,6 +129,6 @@ export class ChatGroupService {
 
   /** Updates a group's name, description, and theme, then refreshes the groups list */
   updateGroup(id: string, grp: ChatGroupCreateRequest) {
-    return this.http.put<ChatGroupDto>(`${this.baseUrl}/${id}`, grp).subscribe(() => this.fetchGroups());
+    return this.http.put<ChatGroupDto>(`${this.apiUrl}/${id}`, grp).subscribe(() => this.fetchGroups());
   }
 }

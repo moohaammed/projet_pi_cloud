@@ -195,14 +195,11 @@ export class MessengerComponent implements OnInit, OnDestroy {
     let targetUsers = [];
 
     if (!addingNew) {
-      targetUsers = allUsers.filter(u => historyIds.includes(Number(u.id)));
+      targetUsers = allUsers.filter(u => historyIds.map(Number).includes(Number(u.id)));
     } else {
-      const myGroupMemberIds = new Set<number>();
-      this.groups().forEach(g => g.members.forEach(m => myGroupMemberIds.add(Number(m.id))));
-      
+      // Allow searching and adding any user on the platform, bypassing former community restrictions
       targetUsers = allUsers.filter(u => 
         u.id !== uid && 
-        myGroupMemberIds.has(Number(u.id)) && 
         !historyIds.includes(Number(u.id))
       );
     }
@@ -292,6 +289,11 @@ export class MessengerComponent implements OnInit, OnDestroy {
             newMsg.type === 'BOT_MESSAGE' ||
             newMsg.type === 'MEDICATION_REMINDER' ||
             newMsg.fromBot === true;
+
+          // DOCTORS should not process bot messages
+          if (isBotPipe && this.authService.getRole() === 'DOCTOR') {
+            return;
+          }
 
           if (
             isBotPipe &&
@@ -456,6 +458,8 @@ export class MessengerComponent implements OnInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       this.refreshData();
       this.guidanceService.loadAndSpeak('messenger');
+      // Re-fetch peers after a short delay to ensure auth is ready
+      setTimeout(() => this.fetchChattedPeers(), 500);
       this.route.queryParams.subscribe(params => {
         if (params['dm']) {
           this.openDmChat(Number(params['dm']));
@@ -524,8 +528,10 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   fetchChattedPeers() {
-    this.messageService.fetchDirectMessagePeers(this.currentUserId()).subscribe(ids => {
-      this.chattedUserIds.set(ids);
+    const uid = this.authService.getCurrentUser()?.id || this.currentUserId();
+    this.messageService.fetchDirectMessagePeers(uid).subscribe(ids => {
+      const numericIds = ids.map(id => Number(id));
+      this.chattedUserIds.set(numericIds);
     });
   }
 
@@ -723,6 +729,7 @@ export class MessengerComponent implements OnInit, OnDestroy {
   }
 
   openBotChat() {
+    if (this.authService.getRole() === 'DOCTOR') return;
     this.activeChatType.set('BOT');
     this.activeDmUserId.set(null);
     this.chatGroupService.activeGroup.set(null);

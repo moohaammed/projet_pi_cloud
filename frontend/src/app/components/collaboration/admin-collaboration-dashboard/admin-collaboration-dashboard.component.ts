@@ -129,6 +129,10 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
   contentLoading = false;
   contentPage = 1;
   contentPageSize = 8;
+  
+  viewingDmPair: DirectMessageMetadata | null = null;
+  activeDmThread: ContentItem[] = [];
+  dmThreadLoading = false;
 
   get filteredContentItems(): ContentItem[] {
     const list = this.contentTab === 'posts' ? this.contentPosts :
@@ -172,7 +176,30 @@ export class AdminCollaborationDashboardComponent implements OnInit, AfterViewIn
     this.contentTab = tab;
     this.contentPage = 1;
     this.contentSearchQuery = '';
+    this.closeDmThread();
   }
+
+  viewDmThread(pair: DirectMessageMetadata): void {
+    this.viewingDmPair = pair;
+    this.dmThreadLoading = true;
+    this.activeDmThread = [];
+    this.adminApi.getDirectMessageThread(pair.userIdA, pair.userIdB).subscribe({
+      next: (msgs) => {
+        this.activeDmThread = msgs;
+        this.dmThreadLoading = false;
+      },
+      error: (e) => {
+        this.fail(e);
+        this.dmThreadLoading = false;
+      }
+    });
+  }
+
+  closeDmThread(): void {
+    this.viewingDmPair = null;
+    this.activeDmThread = [];
+  }
+  
   showCreateGroupForm = false;
   newGroupName = '';
   newGroupDescription = '';

@@ -30,10 +30,13 @@ public class Patient {
 
     private String sexe;
 
-    @Field("medecin_id")
+    @Column(name = "medecin_id")
     private Long medecinId;
 
-    private UserInfo user;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -56,6 +59,6 @@ public class Patient {
     public Long getMedecinId() { return medecinId; }
     public void setMedecinId(Long medecinId) { this.medecinId = medecinId; }
 
-    public UserInfo getUser() { return user; }
-    public void setUser(UserInfo user) { this.user = user; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

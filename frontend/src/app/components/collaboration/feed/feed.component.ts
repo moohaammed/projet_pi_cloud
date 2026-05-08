@@ -88,22 +88,73 @@ export class FeedComponent implements OnInit {
   }
 
   feedSearchType = signal<string>('ALL');
+  feedSearchQuery = signal<string>('');
+  selectedTopic = signal<string | null>(null);
+
+  readonly TRENDING_TOPICS = ['Alzheimer', 'CareBot', 'DailyCare', 'Support', 'Memory', 'Nutrition', 'Safety'];
 
   filteredPublications = computed(() => {
     const type = this.feedSearchType();
+    const query = this.feedSearchQuery().toLowerCase().trim();
+    const topic = this.selectedTopic();
     const currentGroupId = this.groupId();
-    let list = this.publicationService.publications();
+    const allPublictions = this.publicationService.publications();
+    
+    let list = [...allPublictions];
 
+    // Debugging (Remove after verification)
+    console.log(`[FeedFilter] Filtering ${list.length} posts. Filters:`, { type, query, topic, currentGroupId });
+
+    // 1. Filter by Group Context
     if (currentGroupId) {
       list = list.filter(p => p.groupId === currentGroupId);
     }
 
-    if (type !== 'ALL') {
+    // 2. Filter by Content Type (Tab)
+    if (type && type !== 'ALL') {
       list = list.filter(p => p.type === type);
+    }
+
+    // 3. Filter by Selected Topic (Tag or Content Mention)
+    if (topic) {
+      const lowerTopic = topic.toLowerCase();
+      list = list.filter(p => {
+        // Check explicit tags
+        const hasTag = p.tags && Array.isArray(p.tags) && p.tags.some(t => t && t.toLowerCase() === lowerTopic);
+        // Fallback: Check if the word is exactly mentioned in the content
+        const hasContentMention = p.content && p.content.toLowerCase().includes(lowerTopic);
+        
+        return hasTag || hasContentMention;
+      });
+    }
+
+    // 4. Filter by Text Query (Keyword)
+    if (query) {
+      list = list.filter(p => {
+        const contentMatch = p.content && p.content.toLowerCase().includes(query);
+        const authorMatch = p.authorName && p.authorName.toLowerCase().includes(query);
+        const tagMatch = p.tags && Array.isArray(p.tags) && p.tags.some(t => t && t.toLowerCase().includes(query));
+        const pollMatch = p.pollQuestion && p.pollQuestion.toLowerCase().includes(query);
+        return contentMatch || authorMatch || tagMatch || pollMatch;
+      });
     }
     
     return list;
   });
+
+  toggleTopic(topic: string) {
+    if (this.selectedTopic() === topic) {
+      this.selectedTopic.set(null);
+    } else {
+      this.selectedTopic.set(topic);
+    }
+  }
+
+  clearFilters() {
+    this.feedSearchQuery.set('');
+    this.selectedTopic.set(null);
+    this.feedSearchType.set('ALL');
+  }
 
   countByType(type: string): number {
     const currentGroupId = this.groupId();
@@ -207,9 +258,11 @@ export class FeedComponent implements OnInit {
   
   filteredGroups = computed(() => {
     const query = this.shareSearchQuery().toLowerCase();
+    const uid = this.currentUserId();
     return this.chatGroups().filter(g => 
-      g.name.toLowerCase().includes(query) || 
-      (g.description && g.description.toLowerCase().includes(query))
+      (g.name.toLowerCase().includes(query) || 
+      (g.description && g.description.toLowerCase().includes(query))) &&
+      g.members.some(m => m.id === uid)
     );
   });
 
@@ -453,9 +506,11 @@ export class FeedComponent implements OnInit {
     const gid = this.groupId();
     const uid = this.currentUserId();
 
+    // Always fetch groups to keep membership status up to date
+    this.chatGroupService.fetchGroups();
+
     if (gid) {
       this.publicationService.fetchGroupFeed(gid);
-      this.chatGroupService.fetchGroups();
       this.chatGroupService.getGroupById(gid).subscribe(grp => this.currentGroup.set(grp));
     } else if (uid) {
       this.publicationService.fetchPersonalizedFeed(uid);

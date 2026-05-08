@@ -28,16 +28,17 @@ public class HeartRateIngestionService {
      * @return the eventId assigned to this reading
      */
     public String ingest(HeartRateIngestRequest request) {
-        String eventId = UUID.randomUUID().toString();
+        String eventId = (request.getEventId() != null && !request.getEventId().isBlank())
+                ? request.getEventId()
+                : UUID.randomUUID().toString();
         Instant receivedAt = Instant.now();
 
-        // Parse capturedAt if provided
         Instant capturedAt = null;
         if (request.getCapturedAt() != null && !request.getCapturedAt().isBlank()) {
             try {
                 capturedAt = Instant.parse(request.getCapturedAt());
             } catch (Exception e) {
-                log.warn("⚠️ [INGESTION] Could not parse capturedAt='{}', ignoring. eventId={}",
+                log.warn("[INGESTION] Could not parse capturedAt='{}', ignoring. eventId={}",
                         request.getCapturedAt(), eventId);
             }
         }
@@ -56,7 +57,7 @@ public class HeartRateIngestionService {
                 .receivedAt(receivedAt)
                 .build();
 
-        log.info("✅ [INGESTION] Accepted — eventId={}, userId={}, bpm={}, source={}",
+        log.info("[INGESTION] Accepted eventId={}, userId={}, bpm={}, source={}",
                 eventId, request.getUserId(), request.getBpm(), source);
 
         heartRateProducer.publish(event);

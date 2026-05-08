@@ -15,7 +15,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
         
         <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center bg-soft-primary">
           <div>
-            <h4 class="mb-1 fw-bold text-primary"><i class="fa-solid fa-chair me-2"></i> Réservation des places</h4>
+            <h4 class="mb-1 fw-bold text-primary"><i class="fa-solid fa-chair me-2"></i> Seat Reservation</h4>
             <p class="text-muted small mb-0">{{ event.title }} — {{ event.location }}</p>
           </div>
           <button class="btn-close-custom" (click)="close()">
@@ -26,10 +26,10 @@ import { CalendarEvent } from '../../../models/education/event.model';
         <div class="card-body p-4 bg-white">
           
           <div class="d-flex justify-content-center gap-4 mb-5 legend">
-            <div class="legend-item"><span class="box free"></span> <span class="label">Libre</span></div>
-            <div class="legend-item"><span class="box booked"></span> <span class="label">Occupé</span></div>
-            <div class="legend-item"><span class="box mine"></span> <span class="label">Ma place</span></div>
-            <div class="legend-item"><span class="box selected"></span> <span class="label">Sélection</span></div>
+            <div class="legend-item"><span class="box free"></span> <span class="label">Available</span></div>
+            <div class="legend-item"><span class="box booked"></span> <span class="label">Occupied</span></div>
+            <div class="legend-item"><span class="box mine"></span> <span class="label">My Seat</span></div>
+            <div class="legend-item"><span class="box selected"></span> <span class="label">Selection</span></div>
           </div>
 
           <div class="seats-container" *ngIf="seats.length > 0">
@@ -52,20 +52,20 @@ import { CalendarEvent } from '../../../models/education/event.model';
 
           <div class="empty-seats-state text-center py-5" *ngIf="seats.length === 0">
             <i class="fa-solid fa-chair fs-1 text-muted opacity-25 mb-3 d-block"></i>
-            <p class="text-muted">Aucune place n'a été configurée pour cet événement.</p>
-            <p class="small text-muted">Vérifiez la capacité de l'événement dans l'espace administration.</p>
+            <p class="text-muted">No seats have been configured for this event.</p>
+            <p class="small text-muted">Check the event capacity in the administration area.</p>
           </div>
 
           <!-- Summary for Reservation -->
           <div class="booking-summary mt-5 p-4 rounded-4 bg-light border d-flex justify-content-between align-items-center animate-fade-in" *ngIf="selectedSeats.length > 0">
             <div>
-              <span class="text-muted small text-uppercase fw-bold d-block mb-1">Sièges sélectionnés ({{selectedSeats.length}})</span>
+              <span class="text-muted small text-uppercase fw-bold d-block mb-1">Selected seats ({{selectedSeats.length}})</span>
               <div class="fs-4 fw-bold text-primary">
-                <i class="fa-solid fa-chair me-2"></i> Places n° <span *ngFor="let s of selectedSeats; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span>
+                <i class="fa-solid fa-chair me-2"></i> Seats n° <span *ngFor="let s of selectedSeats; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span>
               </div>
             </div>
             <button class="btn btn-primary fw-bold rounded-pill px-5 py-2 shadow-sm" (click)="confirmBooking()" [disabled]="isLoading">
-              <span *ngIf="!isLoading">Réserver ({{selectedSeats.length}})</span>
+              <span *ngIf="!isLoading">Book ({{selectedSeats.length}})</span>
               <span *ngIf="isLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
             </button>
           </div>
@@ -73,13 +73,13 @@ import { CalendarEvent } from '../../../models/education/event.model';
           <!-- Summary for Cancellation -->
           <div class="booking-summary mt-5 p-4 rounded-4 border border-info bg-soft-info d-flex justify-content-between align-items-center animate-fade-in" *ngIf="selectedMySeats.length > 0">
             <div>
-              <span class="text-info small text-uppercase fw-bold d-block mb-1">Vos places sélectionnées ({{selectedMySeats.length}})</span>
+              <span class="text-info small text-uppercase fw-bold d-block mb-1">Your selected seats ({{selectedMySeats.length}})</span>
               <div class="fs-4 fw-bold text-info">
-                <i class="fa-solid fa-circle-check me-2"></i> Places n° <span *ngFor="let s of selectedMySeats; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span>
+                <i class="fa-solid fa-circle-check me-2"></i> Seats n° <span *ngFor="let s of selectedMySeats; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span>
               </div>
             </div>
             <button class="btn btn-outline-danger fw-bold rounded-pill px-4 py-2" (click)="initiateCancel()" [disabled]="isLoading">
-              <span *ngIf="!isLoading"><i class="fa-solid fa-xmark me-2"></i> Annuler ces réservations ({{selectedMySeats.length}})</span>
+              <span *ngIf="!isLoading"><i class="fa-solid fa-xmark me-2"></i> Cancel these reservations ({{selectedMySeats.length}})</span>
               <span *ngIf="isLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
             </button>
           </div>
@@ -87,7 +87,7 @@ import { CalendarEvent } from '../../../models/education/event.model';
         </div>
 
         <div class="card-footer bg-white border-top p-3 text-center">
-          <button class="btn btn-link text-muted text-decoration-none fw-bold" (click)="close()">Fermer</button>
+          <button class="btn btn-link text-muted text-decoration-none fw-bold" (click)="close()">Close</button>
         </div>
       </div>
 
@@ -97,12 +97,12 @@ import { CalendarEvent } from '../../../models/education/event.model';
           <div class="text-danger mb-3">
             <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem;"></i>
           </div>
-          <h4 class="fw-bold mb-2">Annuler les réservations ?</h4>
-          <p class="text-muted mb-4">Voulez-vous vraiment annuler vos réservations pour les places n°<strong><span *ngFor="let s of seatsToCancel; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span></strong> ? Cette action est irréversible.</p>
+          <h4 class="fw-bold mb-2">Cancel reservations?</h4>
+          <p class="text-muted mb-4">Are you sure you want to cancel your reservations for seats n°<strong><span *ngFor="let s of seatsToCancel; let last=last">{{s.seatNumber}}{{!last ? ', ' : ''}}</span></strong>? This action is irreversible.</p>
           <div class="d-flex justify-content-center gap-3">
-            <button class="btn btn-light fw-bold px-4 py-2 rounded-pill border" (click)="closeCancelModal()" [disabled]="isLoading">Non, garder</button>
+            <button class="btn btn-light fw-bold px-4 py-2 rounded-pill border" (click)="closeCancelModal()" [disabled]="isLoading">No, keep</button>
             <button class="btn btn-danger fw-bold px-4 py-2 rounded-pill" (click)="confirmCancel()" [disabled]="isLoading">
-              <span *ngIf="!isLoading">Oui, annuler ({{seatsToCancel.length}})</span>
+              <span *ngIf="!isLoading">Yes, cancel ({{seatsToCancel.length}})</span>
               <span *ngIf="isLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
             </button>
           </div>
@@ -228,18 +228,16 @@ export class EventSeatGridComponent implements OnInit {
   }
 
   checkIfAlreadyBooked() {
-    // Plus besoin de bloquer, mais on pourrait garder un indicateur visuel général si besoin
+    // Plus besoin de bloquer
   }
 
   getGridColumns() {
-    // Calculer le nombre de colonnes (racine carrée ou fixe à 10)
     const count = this.seats.length || 20;
     const cols = Math.ceil(Math.sqrt(count));
     return `repeat(${cols > 10 ? 10 : cols}, 1fr)`;
   }
 
   isSeatDisabled(seat: EventSeat): boolean {
-    // On ne désactive que si c'est quelqu'un d'autre
     return this.isSomeoneElsesSeat(seat);
   }
 
@@ -250,14 +248,13 @@ export class EventSeatGridComponent implements OnInit {
 
   isMySeat(seat: EventSeat): boolean {
     if (!seat.bookedByUserId || !this.currentUser) return false;
-    // Comparaison d'ID robuste
     return String(seat.bookedByUserId) === String(this.currentUser.id);
   }
 
   getSeatTooltip(seat: EventSeat): string {
-    if (this.isMySeat(seat)) return 'C’est votre place !';
-    if (seat.status === SeatStatus.BOOKED) return `Occupée`;
-    return `Place n°${seat.seatNumber} (Libre)`;
+    if (this.isMySeat(seat)) return 'This is your seat!';
+    if (seat.status === SeatStatus.BOOKED) return `Occupied`;
+    return `Seat n°${seat.seatNumber} (Available)`;
   }
 
   isSelected(seat: EventSeat): boolean {
@@ -304,7 +301,7 @@ export class EventSeatGridComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        const msg = err.error?.message || err.error || 'Erreur lors de la réservation';
+        const msg = err.error?.message || err.error || 'Error during reservation';
         alert(msg);
       }
     });
@@ -334,7 +331,7 @@ export class EventSeatGridComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        const msg = err.error?.message || err.error || 'Erreur lors de l’annulation';
+        const msg = err.error?.message || err.error || 'Error during cancellation';
         alert(msg);
       }
     });

@@ -25,8 +25,22 @@ public class SentimentAnalysisService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     private static final List<String> NEGATIVE_KEYWORDS = Arrays.asList(
-        "perdu", "perdue", "oublié", "oubliée", "mal", "douleur", "peur", "inquiétude", "stress", "mort", "suicide", "triste", "seul",
-        "lost", "forgot", "pain", "scared", "worried", "anxious", "where", "comment", "help", "aide", "died", "alone", "sad"
+        // English distress
+        "lost", "forgot", "forget", "pain", "scared", "worried", "anxious", "where", "help",
+        "died", "alone", "sad", "lonely", "miss", "missing", "depressed", "depression",
+        "cry", "crying", "hopeless", "worthless", "helpless", "tired", "exhausted",
+        "confused", "afraid", "desperate", "suffer", "suffering", "hurt", "hurting",
+        "anxious", "anxiety", "panic", "overwhelmed", "empty", "numb", "broken",
+        "scared", "terrified", "nightmare", "insomnia", "sleepless", "angry", "frustrated",
+        "hate", "useless", "abandoned", "neglected", "miserable", "gloomy", "dark",
+        "old days", "give up", "can't cope", "no one cares", "all alone", "feel bad",
+        // French distress
+        "perdu", "perdue", "oublié", "oubliée", "mal", "douleur", "peur", "inquiétude",
+        "stress", "mort", "suicide", "triste", "seul", "seule", "aide", "comment",
+        "déprimé", "déprimée", "pleurer", "souffrir", "souffrance", "désespoir",
+        "manque", "manquer", "fatigué", "fatiguée", "épuisé", "épuisée", "confus",
+        "effrayé", "effrayée", "cauchemar", "vide", "brisé", "brisée", "abandonné",
+        "misérable", "sombre", "angoisse", "panique"
     );
 
     private static final List<String> POSITIVE_KEYWORDS = Arrays.asList(
