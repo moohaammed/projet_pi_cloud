@@ -48,6 +48,7 @@ public class PatientServiceImpl implements IPatientService {
 
     @Override
     public Patient retrievePatientByUserId(Long userId) {
-        return patientRepository.findByUser_Id(userId).orElse(null);
+        List<Patient> patients = patientRepository.findByUser_Id(userId);
+        return patients.isEmpty() ? null : patients.get(0);
     }
 }

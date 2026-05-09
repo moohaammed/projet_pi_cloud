@@ -16,6 +16,7 @@ import { PredictionService } from '../services/prediction.service';
 import { HeartRateAccessService, MonitoredPatient } from '../services/heart-rate-access.service';
 import { HeartRateService, HeartRateRecord } from '../services/heart-rate.service';
 import { HeartRateAiService, HeartRateAiResult } from '../services/heart-rate-ai.service';
+import { AssignmentService } from '../services/assignment.service';
 
 
 @Component({
@@ -135,6 +136,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     private heartRateAccessService: HeartRateAccessService,
     private heartRateService: HeartRateService,
     private heartRateAiService: HeartRateAiService,
+    private assignmentService: AssignmentService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
   ) { }
@@ -165,12 +167,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
   loadPatients() {
     this.isLoadingPatients = true;
-    const currentUser = this.authService.getCurrentUser();
-    const patientsRequest = currentUser?.id
-      ? this.heartRateAccessService.getDoctorPatients(currentUser.id)
-      : this.patientService.getAllPatients();
-
-    patientsRequest.subscribe({
+    this.patientService.getAllPatients().subscribe({
       next: (data) => {
         this.patients = (data || []).map((patient: any) => this.normalizePatient(patient));
         this.isLoadingPatients = false;

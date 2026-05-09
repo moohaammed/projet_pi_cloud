@@ -30,13 +30,12 @@ public class Patient {
 
     private String sexe;
 
-    @Column(name = "medecin_id")
+    @Field("medecin_id")
     private Long medecinId;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    // Embedded user info - matches the existing MongoDB document structure
+    // Spring Data resolves findByUser_Id() as user.id nested field query
+    private UserInfo user;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -59,6 +58,6 @@ public class Patient {
     public Long getMedecinId() { return medecinId; }
     public void setMedecinId(Long medecinId) { this.medecinId = medecinId; }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public UserInfo getUser() { return user; }
+    public void setUser(UserInfo user) { this.user = user; }
 }
