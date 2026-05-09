@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { DonationService } from '../../../services/donation/donation.service';
 import { DonationCampaign } from '../../../models/donation/donation.model';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-donation-list',
@@ -566,15 +567,22 @@ export class DonationListComponent implements OnInit {
   searchQuery = '';
   currentPage = 1;
   pageSize = 6;
+  userRole = '';
 
   // AI Analysis
   analyzing = false;
   showAiModal = false;
   aiResult: any = null;
 
-  constructor(private donationService: DonationService) {}
+  constructor(
+    private donationService: DonationService,
+    private authService: AuthService
+  ) {}
 
-  ngOnInit() { this.load(); }
+  ngOnInit() { 
+    this.userRole = this.authService.getRole();
+    this.load(); 
+  }
 
   load() {
     this.donationService.getActiveCampaigns().subscribe((data: DonationCampaign[]) => {
