@@ -19,7 +19,7 @@ import { RappelService } from '../services/rappel.service';
 })
 export class PatientDashboardComponent implements OnInit {
   patientId: number | null = null;
-  patient: any = { nom: '', prenom: '', age: null, poids: null, sexe: 'Homme', user_id: null };
+  patient: any = { nom: '', prenom: '', age: null, poids: null, sexe: 'Male', user_id: null };
   analyses: any[] = [];
 
   newAnalyse: any = { rapport_medical: '', image_irm: '', score_jeu: null };
@@ -201,20 +201,20 @@ export class PatientDashboardComponent implements OnInit {
 
   addPatient() {
     if (!this.patient.nom || !this.patient.prenom) {
-      this.showError("Veuillez remplir au moins le nom et le prénom.");
+      this.showError("Please fill in at least the first and last name.");
       return;
     }
     this.isSubmitting = true;
     this.patientService.addPatient(this.patient).subscribe({
       next: (data) => {
-        this.showSuccess(`Patient "${data.nom} ${data.prenom}" créé avec succès (ID: ${data.id})`);
+        this.showSuccess(`Patient "${data.nom} ${data.prenom}" created successfully (ID: ${data.id})`);
         this.patientId = data.id;
         this.loadAnalyses();
         this.isSubmitting = false;
       },
       error: (err) => {
-        const msg = err?.error?.message || err?.message || 'Erreur lors de la création du patient.';
-        this.showError(`Erreur: ${msg}`);
+        const msg = err?.error?.message || err?.message || 'Error creating patient.';
+        this.showError(`Error: ${msg}`);
         console.error('[PatientDashboard] addPatient error:', err);
         this.isSubmitting = false;
       }
@@ -222,31 +222,31 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   updateProfile() {
-    if (!this.patientId) { this.showError('Aucun patient sélectionné. Créez-en un d\'abord.'); return; }
+    if (!this.patientId) { this.showError('No patient selected. Create one first.'); return; }
     this.isSubmitting = true;
     this.patientService.updatePatient(this.patientId!, this.patient).subscribe({
       next: () => {
-        this.showSuccess("Patient mis à jour avec succès");
+        this.showSuccess("Patient updated successfully");
         this.isSubmitting = false;
       },
       error: (err) => {
-        this.showError(err?.error?.message || 'Erreur de mise à jour.');
+        this.showError(err?.error?.message || 'Update error.');
         this.isSubmitting = false;
       }
     });
   }
 
   deletePatient() {
-    if (!this.patientId) { this.showError('Aucun patient à supprimer.'); return; }
-    if (confirm("Êtes-vous sûr de vouloir supprimer votre profil ?")) {
+    if (!this.patientId) { this.showError('No patient to delete.'); return; }
+    if (confirm("Are you sure you want to delete your profile?")) {
       this.patientService.deletePatient(this.patientId!).subscribe({
         next: () => {
-          this.showSuccess("Profil supprimé !");
+          this.showSuccess("Profile deleted!");
           this.patientId = null;
-          this.patient = { nom: '', prenom: '', age: null, poids: null, sexe: 'Homme', user_id: null };
+          this.patient = { nom: '', prenom: '', age: null, poids: null, sexe: 'Male', user_id: null };
           this.analyses = [];
         },
-        error: (err) => this.showError(err?.error?.message || 'Erreur de suppression.')
+        error: (err) => this.showError(err?.error?.message || 'Deletion error.')
       });
     }
   }
@@ -267,7 +267,7 @@ export class PatientDashboardComponent implements OnInit {
     this.isSubmitting = true;
     const dateStr = new Date().toISOString().split('T')[0];
 
-    if (!this.patientId) { this.showError('Sélectionnez ou créez un patient d\'abord.'); this.isSubmitting = false; return; }
+    if (!this.patientId) { this.showError('Select or create a patient first.'); this.isSubmitting = false; return; }
 
     const interpretation = this.newAnalyse.interpretation || null;
     const risque = this.newAnalyse.pourcentage_risque || null;
@@ -288,7 +288,7 @@ export class PatientDashboardComponent implements OnInit {
       this.analyseService.addAnalyse(payload).subscribe({
         next: (data) => {
           console.log('[PatientDashboard] Analyse insérée avec succès:', data);
-          this.showSuccess("Analyse envoyée et enregistrée dans la base de données !");
+          this.showSuccess("Analysis sent and saved in the database!");
           this.newAnalyse = { rapport_medical: '', image_irm: '', score_jeu: null, interpretation: null, pourcentage_risque: null };
           this.loadAnalyses();
           this.isSubmitting = false;
@@ -296,7 +296,7 @@ export class PatientDashboardComponent implements OnInit {
         error: (err) => {
           const msg = err?.error?.message || err?.message || err?.error || JSON.stringify(err);
           console.error('[PatientDashboard] Error submitAnalyse:', err);
-          this.showError(`Erreur lors de l'envoi de l'analyse: ${msg}`);
+          this.showError(`Error sending analysis: ${msg}`);
           this.isSubmitting = false;
         }
       });
@@ -307,8 +307,8 @@ export class PatientDashboardComponent implements OnInit {
       console.log('[PatientDashboard] Calling Gemini /analyze-report...');
       this.analyseService.analyzeReport(
         this.newAnalyse.rapport_medical,
-        interpretation || 'Pas de diagnostic IRM',
-        this.newAnalyse.score_jeu ? this.newAnalyse.score_jeu.toString() : 'Non évalué'
+        interpretation || 'No MRI diagnosis',
+        this.newAnalyse.score_jeu ? this.newAnalyse.score_jeu.toString() : 'Not evaluated'
       ).subscribe({
         next: (geminiData) => {
           console.log('[PatientDashboard] Gemini Success:', geminiData);
@@ -316,7 +316,7 @@ export class PatientDashboardComponent implements OnInit {
         },
         error: (err) => {
           console.error("Gemini API error:", err);
-          this.showError("Le serveur IA Gemini est indisponible. Enregistrement sans résumé...");
+          this.showError("The Gemini AI server is unavailable. Saving without summary...");
           saveToSpring(null);
         }
       });
@@ -349,7 +349,7 @@ export class PatientDashboardComponent implements OnInit {
             error: (err) => {
               this.isSubmitting = false;
               console.error("Machine Learning API error:", err);
-              this.showError("Impossible de joindre le serveur IA pour l'analyse immédiate.");
+              this.showError("Unable to reach the AI server for immediate analysis.");
             }
           });
         }
@@ -384,7 +384,7 @@ export class PatientDashboardComponent implements OnInit {
     if (!reportContent) {
       this.chatHistory.push({
         sender: 'bot', 
-        text: 'Aucun rapport médical disponible pour cette analyse.'
+        text: 'No medical report available for this analysis.'
       });
       return;
     }
@@ -403,7 +403,7 @@ export class PatientDashboardComponent implements OnInit {
         console.error("Chat error:", err);
         this.chatHistory.push({
           sender: 'bot', 
-          text: 'Désolé, une erreur technique est survenue avec l\'assistant IA.'
+          text: 'Sorry, a technical error occurred with the AI assistant.'
         });
         this.isChatting = false;
       }
@@ -453,7 +453,7 @@ export class PatientDashboardComponent implements OnInit {
         next: () => {
           this.notifications.forEach(n => n.isRead = true);
           this.unreadCount = 0;
-          this.showSuccess("Toutes les notifications sont marquées comme lues.");
+          this.showSuccess("All notifications have been marked as read.");
         }
       });
     }
@@ -495,7 +495,7 @@ export class PatientDashboardComponent implements OnInit {
         this.isSummarizing[rappel.id] = false;
       },
       error: (err) => {
-        this.summaries[rappel.id] = 'Résumé indisponible pour le moment.';
+        this.summaries[rappel.id] = 'Summary unavailable for now.';
         this.isSummarizing[rappel.id] = false;
       }
     });

@@ -2,18 +2,18 @@
   
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2> Tableau des Alertes</h2>
-    <button class="btn btn-primary" (click)="chargerAlertes()">
+    <h2> Alerts Board</h2>
+    <button class="btn btn-primary" (click)="chargerAlerts()">
        Rafraîchir
     </button>
   </div>
 
-  <!-- Alertes non résolues -->
+  <!-- Alerts non résolues -->
   <h4 class="text-danger">
-     Alertes en cours ({{ alertesNonResolues.length }})
+     Alerts en cours ({{ alertesNoResolues.length }})
   </h4>
 
-  <div *ngFor="let alerte of alertesNonResolues" 
+  <div *ngFor="let alerte of alertesNoResolues" 
        class="card mb-3 border-danger">
     <div class="card-body">
       
@@ -31,14 +31,14 @@
       <p>{{ alerte.message }}</p>
 
       <div class="d-flex gap-2">
-        <!-- Voir sur la carte -->
+        <!-- View on map -->
         <button class="btn btn-outline-primary btn-sm" 
                 (click)="ouvrirGPS(alerte)"
                 [disabled]="!alerte.latitude">
-           Voir position GPS
+           View position GPS
         </button>
 
-        <!-- Confirmer vue -->
+        <!-- Confirm vue -->
         <button class="btn btn-success btn-sm"
                 (click)="confirmerVu(alerte)">
            J'ai vu l'alerte
@@ -48,8 +48,8 @@
     </div>
   </div>
 
-  <div *ngIf="alertesNonResolues.length === 0" class="alert alert-success">
-     Aucune alerte en cours
+  <div *ngIf="alertesNoResolues.length === 0" class="alert alert-success">
+     Noe alerte en cours
   </div>
 
   <!-- Historique -->

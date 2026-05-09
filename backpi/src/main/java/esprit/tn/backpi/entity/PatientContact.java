@@ -1,45 +1,52 @@
 package esprit.tn.backpi.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "patient_contact")
+@Document(collection = "patient_contact")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PatientContact {
 
+    // ── Sequence name used by PatientContactModelListener ────────────────────
+    @Transient
+    public static final String SEQUENCE_NAME = "patient_contact_sequence";
+
+    // ── Fields ────────────────────────────────────────────────────────────────
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "patient_user_id", nullable = false)
+    /** Logical FK → users._id (role = PATIENT) */
+    @Field("patient_user_id")
     private Long patientUserId;
 
-    @Column(name = "contact_user_id")
+    /** Logical FK → users._id (role = RELATION) — nullable */
+    @Field("contact_user_id")
     private Long contactUserId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "relation_type", nullable = false)
+    @Field("relation_type")
     private RelationType relationType;
 
-    @Column(length = 255)
+    @Field("nom")
     private String nom;
 
-    @Column(length = 255)
+    @Field("prenom")
     private String prenom;
 
-    @Column(length = 255)
+    @Field("email")
     private String email;
 
-    @Column(length = 50)
+    @Field("telephone")
     private String telephone;
 
-    @Column(name = "created_at")
+    @Field("created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Getters and Setters
-
+    // ── Getters & Setters ─────────────────────────────────────────────────────
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

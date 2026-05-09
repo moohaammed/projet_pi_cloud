@@ -16,6 +16,7 @@ import { PredictionService } from '../services/prediction.service';
 import { HeartRateAccessService, MonitoredPatient } from '../services/heart-rate-access.service';
 import { HeartRateService, HeartRateRecord } from '../services/heart-rate.service';
 import { HeartRateAiService, HeartRateAiResult } from '../services/heart-rate-ai.service';
+import { AssignmentService } from '../services/assignment.service';
 
 
 @Component({
@@ -135,16 +136,17 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     private heartRateAccessService: HeartRateAccessService,
     private heartRateService: HeartRateService,
     private heartRateAiService: HeartRateAiService,
+    private assignmentService: AssignmentService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
     this.loadPatients();
-    this.chargerAlertes();
+    this.chargerAlerts();
   }
 
-  chargerAlertes(): void {
+  chargerAlerts(): void {
     this.mapService.getAllAlerts().subscribe({
       next: (alertes) => {
         this.alertesCount = alertes.filter((a: any) => !a.resolue).length;
@@ -165,12 +167,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
   loadPatients() {
     this.isLoadingPatients = true;
-    const currentUser = this.authService.getCurrentUser();
-    const patientsRequest = currentUser?.id
-      ? this.heartRateAccessService.getDoctorPatients(currentUser.id)
-      : this.patientService.getAllPatients();
-
-    patientsRequest.subscribe({
+    this.patientService.getAllPatients().subscribe({
       next: (data) => {
         this.patients = (data || []).map((patient: any) => this.normalizePatient(patient));
         this.isLoadingPatients = false;
@@ -271,14 +268,14 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   }
 
   resetPatientProgression(type: string = 'ALL') {
-    if (!this.selectedPatient || !confirm(`Êtes-vous sûr de vouloir réinitialiser la progression de ce patient pour la catégorie ${type} ?`)) return;
+    if (!this.selectedPatient || !confirm(`Are you sure you want to reset this patient's progression for the ${type} category?`)) return;
 
     const userId = this.selectedPatient.user ? this.selectedPatient.user.id : this.selectedPatient.id;
     this.isResetting = true;
 
     this.progressionService.resetPatient(userId, type).subscribe({
       next: () => {
-        this.showSuccess("Progression réinitialisée avec succès.");
+        this.showSuccess("Progression reset successfully.");
         this.loadProgression(userId);
         this.isResetting = false;
       },
@@ -323,7 +320,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     this.analyseService.updateAnalyse(this.selectedAnalyse.id, updated).subscribe({
       next: () => {
         this.selectedAnalyse.observationMedicale = this.observationToAdd;
-        this.showSuccess("Observation médicale enregistrée.");
+        this.showSuccess("Medical observation saved.");
         this.isSavingObservation = false;
         const idx = this.analyses.findIndex(a => a.id === this.selectedAnalyse.id);
         if (idx !== -1) this.analyses[idx].observationMedicale = this.observationToAdd;
@@ -412,7 +409,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
     action.subscribe({
       next: (res: any) => {
-        this.showSuccess(this.isEditingReminder ? "Rappel mis à jour." : "Nouveau rappel créé.");
+        this.showSuccess(this.isEditingReminder ? "Reminder updated." : "New reminder created.");
         
         // If we have a recorded voice, upload it now
         if (this.recordedBlob && res.id) {
@@ -449,7 +446,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
       this.recordingTimer = 0;
       this.timerInterval = setInterval(() => this.recordingTimer++, 1000);
     } catch (err) {
-      alert("Veuillez autoriser l'accès au microphone.");
+      alert("Please allow access to the microphone.");
     }
   }
 
@@ -473,7 +470,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     this.isUploadingVoice = true;
     this.rappelService.uploadVoice(rappelId, this.recordedBlob).subscribe({
       next: () => {
-        this.showSuccess("Message vocal enregistré avec succès.");
+        this.showSuccess("Voice message saved successfully.");
         this.isUploadingVoice = false;
         this.recordedBlob = null;
         this.recordedAudioUrl = null;
@@ -482,7 +479,7 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isUploadingVoice = false;
-        alert("Erreur lors de l'envoi du message vocal.");
+        alert("Error sending voice message.");
       }
     });
   }
@@ -498,20 +495,20 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
   }
 
   deleteReminder(id: number) {
-    if (!confirm("Supprimer ce rappel ?")) return;
+    if (!confirm("Delete this reminder?")) return;
     this.rappelService.delete(id).subscribe({
       next: () => {
-        this.showSuccess("Rappel supprimé.");
+        this.showSuccess("Reminder deleted.");
         this.loadReminders(this.selectedPatient.id);
       }
     });
   }
 
-  toggleReminderActif(rappel: any) {
+  toggleReminderActive(rappel: any) {
     this.rappelService.toggle(rappel.id).subscribe({
       next: () => {
         rappel.actif = !rappel.actif;
-        this.showSuccess(rappel.actif ? "Rappel activé." : "Rappel désactivé.");
+        this.showSuccess(rappel.actif ? "Reminder activated." : "Reminder deactivated.");
       }
     });
   }

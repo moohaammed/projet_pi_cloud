@@ -115,7 +115,7 @@ export class PatientCreateComponent implements OnInit {
         this.gpsLoading = false;
       },
       () => {
-        this.error      = 'Impossible de recuperer la position GPS.';
+        this.error      = 'Unable to retrieve GPS position.';
         this.gpsLoading = false;
       },
       { timeout: 10000 }
@@ -151,7 +151,7 @@ export class PatientCreateComponent implements OnInit {
         },
         error: (err) => {
           this.loading = false;
-          this.error = err.error?.message ?? err.error?.error ?? 'Erreur lors de la creation du contact relation.';
+          this.error = err.error?.message ?? err.error?.error ?? 'Error creating relation contact.';
         }
       });
       return;
@@ -187,7 +187,7 @@ export class PatientCreateComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.error   = err.error?.message ?? err.error?.error ?? 'Erreur lors de la creation.';
+        this.error   = err.error?.message ?? err.error?.error ?? 'Error during creation.';
       }
     });
   }

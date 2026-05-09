@@ -67,7 +67,7 @@ export class PatientService {
                     return JSON.parse(rawResponse);
                 } catch {
                     // Backend returned plain text (e.g. "BACKEND CREATED") — treat as success with empty object
-                    console.warn('[PatientService] Non-JSON response, treating as success:', rawResponse);
+                    console.warn('[PatientService] No-JSON response, treating as success:', rawResponse);
                     return { message: rawResponse };
                 }
             }),
@@ -101,7 +101,7 @@ export class PatientService {
                 try {
                     return JSON.parse(rawResponse);
                 } catch {
-                    console.warn('[PatientService] Non-JSON response, treating as success:', rawResponse);
+                    console.warn('[PatientService] No-JSON response, treating as success:', rawResponse);
                     return { message: rawResponse };
                 }
             }),

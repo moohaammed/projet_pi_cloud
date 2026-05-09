@@ -130,11 +130,22 @@ public class RappelQuotidienController {
         if (rappel == null || rappel.getVoiceMessagePath() == null) return ResponseEntity.notFound().build();
 
         try {
-            Path filePath = Paths.get("..").resolve(rappel.getVoiceMessagePath());
+            Path filePath = Paths.get("..").resolve(rappel.getVoiceMessagePath()).normalize();
             Resource resource = new UrlResource(filePath.toUri());
-            if (resource.exists() || resource.isReadable()) {
+            if (resource.exists() && resource.isReadable()) {
+                // Detect media type - default to audio/webm for recorded voice
+                String contentType = "audio/webm";
+                String filename = resource.getFilename();
+                if (filename != null) {
+                    if (filename.endsWith(".mp3"))  contentType = "audio/mpeg";
+                    else if (filename.endsWith(".ogg")) contentType = "audio/ogg";
+                    else if (filename.endsWith(".wav")) contentType = "audio/wav";
+                    else if (filename.endsWith(".mp4")) contentType = "audio/mp4";
+                }
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                        .header("Accept-Ranges", "bytes")
                         .body(resource);
             } else {
                 return ResponseEntity.notFound().build();
