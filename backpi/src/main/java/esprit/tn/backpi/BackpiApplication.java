@@ -4,6 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
 @SpringBootApplication
 @EnableScheduling
 public class BackpiApplication {
@@ -12,9 +15,8 @@ public class BackpiApplication {
         SpringApplication.run(BackpiApplication.class, args);
     }
 
-    // ── REMOVED: JdbcTemplate CommandLineRunner ──────────────────────────────
-    // The ALTER TABLE SQL statement that modified the 'analyse' table in MySQL
-    // is no longer needed: backpi now persists to MongoDB Atlas.
-    // The patient-medecin-service (which owns the 'analyses' collection) manages
-    // its own schema independently.
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 }
