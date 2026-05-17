@@ -16,11 +16,11 @@ import { RouterModule } from '@angular/router';
           </svg>
         </div>
         
-        <h1>Paiement Annulé</h1>
-        <p class="result-text">Vous avez annulé le processus de paiement. Aucun montant n'a été débité.</p>
+        <h1>Payment Cancelled</h1>
+        <p class="result-text">You have cancelled the payment process. No amount has been charged.</p>
         
         <div class="result-actions">
-          <a routerLink="/donations" class="btn btn-outline-primary">Retour aux campagnes</a>
+          <a routerLink="/donations" class="btn btn-outline-primary">Back to campaigns</a>
         </div>
       </div>
     </div>
@@ -30,8 +30,8 @@ import { RouterModule } from '@angular/router';
     
     :host {
       display: block;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #fdf5fd;
+      font-family: 'Quicksand', sans-serif;
+      background: #f8f9fa;
       min-height: 100vh;
       padding-top: 80px;
     }
@@ -63,8 +63,9 @@ import { RouterModule } from '@angular/router';
       transition: all 0.2s; text-decoration: none; display: inline-block;
     }
     .btn-outline-primary:hover {
-      background: #fdf5fd; transform: translateY(-2px);
+      background: #f8f9fa; transform: translateY(-2px);
     }
   `]
 })
 export class DonationCancelComponent {}
+

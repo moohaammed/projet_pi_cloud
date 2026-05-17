@@ -39,7 +39,7 @@
       </div>
       <div *ngIf="patients.length === 0" class="text-center text-muted py-4">
         <i class="fa-solid fa-user-slash d-block fs-3 mb-2"></i>
-        Aucun patient
+        No patient
       </div>
     </div>
 
@@ -56,7 +56,7 @@
                 [style.color]="showIncidents ? 'white' : ''"
                 [class.btn-outline-secondary]="!showIncidents"
                 (click)="toggleIncidents()">
-          {{ showIncidents ? 'Masquer' : 'Afficher' }}
+          {{ showIncidents ? 'Hide' : 'Show' }}
         </button>
       </div>
       <ng-container *ngIf="showIncidents">
@@ -71,7 +71,7 @@
           </div>
         </div>
         <div *ngIf="incidents.length === 0" class="text-center py-2" style="font-size:11px; color:#9490b0">
-          Aucun incident détecté
+          No incident detected
         </div>
         <button *ngIf="incidents.length > 5"
                 class="btn btn-sm w-100 mt-1 py-0"
@@ -97,7 +97,7 @@
                 [style.color]="showRecommendedHospitals ? 'white' : ''"
                 [class.btn-outline-secondary]="!showRecommendedHospitals"
                 (click)="toggleRecommendedHospitals()">
-          {{ showRecommendedHospitals ? 'Masquer' : 'Afficher' }}
+          {{ showRecommendedHospitals ? 'Hide' : 'Show' }}
         </button>
       </div>
 
@@ -118,7 +118,7 @@
               {{ patientNameById(item.prediction.patientId) }} - {{ hospitalDistance(item.hospital) }} km
             </div>
             <div class="text-muted" style="font-size:10px">
-              Cliquer pour afficher le chemin le plus court
+              Click to show shortest route
             </div>
             <div *ngIf="item.rank === 0" class="fw-bold" style="color:#198754; font-size:10px">
               RECOMMANDE
@@ -126,7 +126,7 @@
           </div>
         </div>
         <div *ngIf="latestRecommendedHospitals.length === 0" class="text-center py-2" style="font-size:11px; color:#8a9a8f">
-          Aucun hopital IA recommande
+          No AI hospital recommended
         </div>
       </ng-container>
     </div>
@@ -141,7 +141,7 @@
                 [class.btn-outline-secondary]="!showHospitals"
                 style="font-size:10px"
                 (click)="toggleHospitals()">
-          {{ showHospitals ? 'Masquer' : 'Afficher' }}
+          {{ showHospitals ? 'Hide' : 'Show' }}
         </button>
       </div>
       <div *ngFor="let h of hospitals"
@@ -164,11 +164,11 @@
       <div class="d-flex align-items-center gap-3 px-4 py-2 rounded-pill shadow"
            style="background:linear-gradient(135deg,#6f42c1,#3c3489); color:white; font-weight:700; font-size:13px">
         <i class="fa-solid fa-hand-pointer fa-beat"></i>
-        Cliquez sur la carte pour positionner l'incident
+        Click on the map to position the incident
         <button class="btn btn-sm rounded-pill px-3 py-0"
                 style="background:rgba(255,255,255,0.25); color:white; border:1px solid rgba(255,255,255,0.4); font-size:12px"
                 (click)="cancelAddIncident()">
-          <i class="fa-solid fa-xmark me-1"></i>Annuler
+          <i class="fa-solid fa-xmark me-1"></i>Cancel
         </button>
       </div>
     </div>
@@ -179,7 +179,7 @@
          style="z-index:1000">
       <div class="alert alert-warning shadow-sm py-2 px-3 mb-0 d-flex align-items-center gap-2">
         <i class="fa-solid fa-hand-pointer"></i>
-        <span class="small fw-medium">Cliquez sur la carte pour déplacer le centre de la zone</span>
+        <span class="small fw-medium">Click on the map to move the zone center</span>
       </div>
     </div>
 
@@ -217,23 +217,23 @@
         <div style="width:12px;height:12px;background:#0d6efd;border-radius:50%;margin-right:6px"></div>Patient en ligne
       </div>
       <div class="d-flex align-items-center mb-1">
-        <div style="width:12px;height:12px;background:#6c757d;border-radius:50%;margin-right:6px;opacity:.5"></div>Patient hors ligne
+        <div style="width:12px;height:12px;background:#6c757d;border-radius:50%;margin-right:6px;opacity:.5"></div>Patient offline
       </div>
       <div class="d-flex align-items-center mb-1">
-        <div style="width:12px;height:12px;background:#dc3545;border-radius:4px;margin-right:6px"></div>Hôpital
+        <div style="width:12px;height:12px;background:#dc3545;border-radius:4px;margin-right:6px"></div>Hospital
       </div>
       <div class="d-flex align-items-center mb-1">
-        <div style="width:14px;height:3px;background:#28a745;margin-right:6px"></div>Zone verte
+        <div style="width:14px;height:3px;background:#28a745;margin-right:6px"></div>Green zone
       </div>
       <div class="d-flex align-items-center mb-1">
-        <div style="width:14px;height:3px;background:#dc3545;margin-right:6px"></div>Zone rouge
+        <div style="width:14px;height:3px;background:#dc3545;margin-right:6px"></div>Red zone
       </div>
       <div class="d-flex align-items-center mb-2">
-        <div style="width:12px;height:12px;background:#6f42c1;border-radius:50%;margin-right:6px"></div>Incident IA ⚠️
+        <div style="width:12px;height:12px;background:#6f42c1;border-radius:50%;margin-right:6px"></div>AI Incident ⚠️
       </div>
       <button class="btn btn-outline-primary btn-sm w-100 py-0"
               style="font-size:11px" (click)="refreshAllPositions()">
-        <i class="fa-solid fa-rotate me-1"></i>Actualiser
+        <i class="fa-solid fa-rotate me-1"></i>Refresh
       </button>
     </div>
 
@@ -251,7 +251,7 @@
                      box-shadow:0 4px 18px rgba(111,66,193,0.45) !important"
               (click)="startAddIncident()">
         <i class="fa-solid fa-plus"></i>
-        Ajouter un incident
+        Add incident
       </button>
     </div>
   </div>
@@ -287,8 +287,8 @@
           <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
         <div>
-          <div class="fw-bold">Tous les incidents</div>
-          <div class="small opacity-75">{{ incidents.length }} incidents détectés</div>
+          <div class="fw-bold">All incidents</div>
+          <div class="small opacity-75">{{ incidents.length }} incidents detected</div>
         </div>
       </div>
       <button class="btn p-1" style="color:white;background:rgba(255,255,255,0.15);border-radius:8px"
@@ -345,11 +345,11 @@
       <!-- ══ ONGLET ZONES ══ -->
       <div *ngIf="activeTab === 'zone'">
         <div *ngIf="selectedZone && !editingZone">
-          <h6 class="fw-semibold mb-3">Zone de sécurité active</h6>
+          <h6 class="fw-semibold mb-3">Active safety zone</h6>
           <div class="mb-3 p-2 bg-light rounded-3 d-flex align-items-center gap-2">
             <i class="fa-solid fa-house text-primary"></i>
             <div class="small">
-              <div class="fw-semibold">Position maison</div>
+              <div class="fw-semibold">Home position</div>
               <div class="text-muted">
                 {{ selectedZone.latitudeCentre | number:'1.4-4' }},
                 {{ selectedZone.longitudeCentre | number:'1.4-4' }}
@@ -363,8 +363,8 @@
           <div class="mb-2 p-3 rounded-3 border border-success bg-success bg-opacity-10">
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                <div class="fw-bold text-success small">🟢 Zone verte</div>
-                <div class="text-muted" style="font-size:11px">Zone de confort</div>
+                <div class="fw-bold text-success small">🟢 Green zone</div>
+                <div class="text-muted" style="font-size:11px">Comfort zone</div>
               </div>
               <span class="badge bg-success fs-6">{{ selectedZone.rayonVert }}m</span>
             </div>
@@ -372,28 +372,28 @@
           <div class="mb-3 p-3 rounded-3 border border-danger bg-danger bg-opacity-10">
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                <div class="fw-bold text-danger small">🔴 Zone rouge</div>
-                <div class="text-muted" style="font-size:11px">Alerte critique</div>
+                <div class="fw-bold text-danger small">🔴 Red zone</div>
+                <div class="text-muted" style="font-size:11px">Critical alert</div>
               </div>
               <span class="badge bg-danger fs-6">{{ selectedZone.rayonRouge }}m</span>
             </div>
           </div>
           <button class="btn btn-outline-primary btn-sm w-100" (click)="startEditZone()">
-            <i class="fa-solid fa-pen me-1"></i>Modifier la zone
+            <i class="fa-solid fa-pen me-1"></i>Edit zone
           </button>
         </div>
 
         <div *ngIf="!selectedZone || editingZone">
           <h6 class="fw-semibold mb-1">
             <i class="fa-solid fa-draw-polygon text-primary me-1"></i>
-            {{ selectedZone ? 'Modifier' : 'Créer' }} la zone
+            {{ selectedZone ? 'Edit' : 'Create' }} zone
           </h6>
           <p class="text-muted small mb-3">
             <i class="fa-solid fa-hand-pointer me-1"></i>
-            Cliquez sur la carte pour positionner le centre
+            Click on the map to position the center
           </p>
           <button class="btn btn-outline-primary btn-sm w-100 mb-3" (click)="utiliserPositionActuelle()">
-            <i class="fa-solid fa-house me-1"></i>Utiliser position actuelle comme maison
+            <i class="fa-solid fa-house me-1"></i>Use current position as home
           </button>
           <div class="mb-2">
             <label class="form-label small fw-medium">Latitude centre</label>
@@ -434,16 +434,16 @@
           <div class="d-flex gap-2">
             <button class="btn btn-primary btn-sm flex-grow-1" (click)="saveZone()">
               <i class="fa-solid fa-floppy-disk me-1"></i>
-              {{ selectedZone ? 'Modifier' : 'Enregistrer' }}
+              {{ selectedZone ? 'Edit' : 'Save' }}
             </button>
             <button *ngIf="editingZone" class="btn btn-outline-secondary btn-sm"
-                    (click)="cancelEdit()">Annuler</button>
+                    (click)="cancelEdit()">Cancel</button>
           </div>
         </div>
 
         <hr class="my-3">
         <h6 class="fw-semibold mb-2 small">
-          <i class="fa-solid fa-hospital text-success me-1"></i>Hopital IA le plus proche
+          <i class="fa-solid fa-hospital text-success me-1"></i>Nearest AI Hospital
         </h6>
         <div *ngIf="selectedPatientRecommendedHospital as recommendation" class="card border-success border-opacity-25 mb-3">
           <div class="card-body p-2">
@@ -459,21 +459,21 @@
             <a [href]="recommendedHospitalMapsUrl(recommendation.prediction, recommendation.hospital)"
                target="_blank"
                class="btn btn-outline-success btn-sm w-100 mt-2 py-0" style="font-size:11px">
-              <i class="fa-solid fa-compass me-1"></i>Itineraire
+              <i class="fa-solid fa-compass me-1"></i>Directions
             </a>
             <button class="btn btn-success btn-sm w-100 mt-2 py-0" style="font-size:11px"
                     (click)="focusRecommendedHospital(recommendation)">
-              <i class="fa-solid fa-route me-1"></i>Afficher le chemin le plus court
+              <i class="fa-solid fa-route me-1"></i>Show shortest route
             </button>
           </div>
         </div>
         <div *ngIf="!selectedPatientRecommendedHospital" class="text-muted small text-center py-2">
-          Aucune recommandation IA disponible pour ce patient
+          No AI recommendation available for this patient
         </div>
 
         <div *ngIf="false">
         <h6 class="fw-semibold mb-2 small">
-          <i class="fa-solid fa-hospital text-danger me-1"></i>Hôpital le plus proche
+          <i class="fa-solid fa-hospital text-danger me-1"></i>Nearest Hospital
         </h6>
         <div *ngIf="nearestHospital" class="card border-danger border-opacity-25">
           <div class="card-body p-2">
@@ -485,12 +485,12 @@
             <a [href]="'https://maps.google.com/?q=' + nearestHospital?.latitude + ',' + nearestHospital?.longitude"
                target="_blank"
                class="btn btn-outline-danger btn-sm w-100 mt-2 py-0" style="font-size:11px">
-              <i class="fa-solid fa-compass me-1"></i>Itinéraire
+              <i class="fa-solid fa-compass me-1"></i>Directions
             </a>
           </div>
         </div>
         <div *ngIf="!nearestHospital" class="text-muted small text-center py-2">
-          Aucun hôpital avec coordonnées GPS
+          No hospital with GPS coordinates
         </div>
       </div>
 
@@ -500,7 +500,7 @@
       <div *ngIf="activeTab === 'history'">
         <h6 class="fw-semibold mb-2">
           <i class="fa-solid fa-route me-1" style="color:#6f42c1"></i>
-          Historique des 7 derniers jours
+          Last 7 days history
         </h6>
 
         <button class="btn w-100 mb-3"
@@ -511,13 +511,13 @@
                 [style.color]="showHistory ? 'white' : ''">
           <span *ngIf="historyLoading">
             <span class="spinner-border spinner-border-sm me-2"></span>
-            Calcul de l'itinéraire…
+            Calculating route…
           </span>
           <span *ngIf="!historyLoading">
             <i class="fa-solid me-1"
                [class.fa-eye-slash]="showHistory"
                [class.fa-eye]="!showHistory"></i>
-            {{ showHistory ? 'Masquer le trajet' : 'Afficher le trajet' }}
+            {{ showHistory ? 'Hide route' : 'Show route' }}
           </span>
         </button>
 
@@ -526,7 +526,7 @@
              class="d-flex align-items-center gap-2 mb-2 px-1"
              style="font-size:10px; color:#6f42c1">
           <i class="fa-solid fa-map-signs"></i>
-          <span>Tracé calculé via <strong>OSRM</strong> (routes réelles)</span>
+          <span>Route calculated via <strong>OSRM</strong> (real roads)</span>
         </div>
 
         <!-- Stats -->
@@ -550,18 +550,12 @@
         <div *ngIf="showHistory && !historyLoading && history.length > 0"
              class="d-flex gap-3 mb-3 px-1">
           <div class="d-flex align-items-center gap-1" style="font-size:11px">
-            <div style="width:18px;height:18px;border-radius:50%;background:#6f42c1;
-                        color:white;display:flex;align-items:center;justify-content:center;
-                        font-size:9px;font-weight:700;border:2px solid white;
-                        box-shadow:0 1px 4px rgba(0,0,0,.2)">D</div>
-            Départ
+            <div style="...">D</div>
+            Start
           </div>
           <div class="d-flex align-items-center gap-1" style="font-size:11px">
-            <div style="width:18px;height:18px;border-radius:50%;background:#28a745;
-                        color:white;display:flex;align-items:center;justify-content:center;
-                        font-size:9px;font-weight:700;border:2px solid white;
-                        box-shadow:0 1px 4px rgba(0,0,0,.2)">A</div>
-            Arrivée
+            <div style="...">A</div>
+            Arrival
           </div>
           <div class="d-flex align-items-center gap-1" style="font-size:11px">
             <div style="width:24px;height:4px;background:#6f42c1;border-radius:2px"></div>
@@ -572,12 +566,12 @@
         <div *ngIf="showHistory && !historyLoading && history.length === 0"
              class="text-center text-muted py-3">
           <i class="fa-solid fa-route d-block fs-2 mb-2 opacity-50"></i>
-          Aucun trajet enregistré
+          No route recorded
         </div>
 
         <!-- Dernières positions -->
         <div *ngIf="showHistory && !historyLoading && history.length > 0">
-          <h6 class="fw-semibold small text-muted mb-2">Dernières positions</h6>
+          <h6 class="fw-semibold small text-muted mb-2">Latest positions</h6>
           <div *ngFor="let loc of history.slice(0,5)"
                class="d-flex align-items-center gap-2 p-2 border-bottom small">
             <i class="fa-solid fa-location-dot text-primary flex-shrink-0"></i>
@@ -614,7 +608,7 @@
             <span *ngIf="alert.resolue" class="badge bg-success py-0">✓</span>
             <button *ngIf="!alert.resolue"
                     class="btn btn-sm btn-outline-success py-0 px-1" style="font-size:10px"
-                    (click)="resolveAlert(alert.id!)">Résoudre</button>
+                    (click)="resolveAlert(alert.id!)">Resolve</button>
           </div>
           <div class="text-muted mt-1" style="font-size:10px">{{ alert.declencheeAt | date:'dd/MM/yyyy HH:mm' }}</div>
           <div *ngIf="alert.latitude && alert.longitude" class="mt-1">
@@ -627,7 +621,7 @@
         </div>
         <div *ngIf="alerts.length === 0" class="text-center text-muted py-4">
           <i class="fa-solid fa-check-circle text-success d-block fs-2 mb-2"></i>
-          Aucune alerte
+          No alert
         </div>
       </div>
 
@@ -638,9 +632,9 @@
         <div class="d-flex align-items-center justify-content-between mb-2">
           <div style="font-size:12px; font-weight:700; color:#6f42c1">
             <i class="fa-solid fa-triangle-exclamation me-1"></i>
-            <span *ngIf="viewingAllIncidents">Tous les incidents</span>
+            <span *ngIf="viewingAllIncidents">All incidents</span>
             <span *ngIf="!viewingAllIncidents">
-              Incidents de {{ selectedPatient?.prenom }} {{ selectedPatient?.nom }}
+              Incidents for {{ selectedPatient?.prenom }} {{ selectedPatient?.nom }}
             </span>
           </div>
           <!-- Basculer entre tous / patient -->
@@ -700,7 +694,7 @@
         <!-- Loading -->
         <div *ngIf="loadingIncidents" class="text-center py-4">
           <div class="spinner-border spinner-border-sm me-2" style="color:#6f42c1"></div>
-          <span class="text-muted small">Chargement…</span>
+          <span class="text-muted small">Loading…</span>
         </div>
 
         <!-- Liste -->
@@ -804,9 +798,9 @@
 
           <div *ngIf="filteredPatientIncidents.length === 0" class="text-center py-4">
             <i class="fa-solid fa-shield-check d-block fs-2 mb-2" style="color:#6f42c1; opacity:.4"></i>
-            <div class="fw-semibold text-muted">Aucun incident</div>
+            <div class="fw-semibold text-muted">No incident</div>
             <div *ngIf="incidentFilter !== 'ALL'" class="small text-muted mt-1">
-              Aucun incident "{{ incidentFilter }}"
+              No "{{ incidentFilter }}" incident
             </div>
           </div>
         </ng-container>
@@ -821,9 +815,9 @@
        class="border-start bg-light d-flex flex-column align-items-center justify-content-center text-muted"
        style="width:320px; flex-shrink:0">
     <i class="fa-solid fa-hand-pointer fs-1 mb-3 text-primary opacity-50"></i>
-    <div class="fw-semibold">Sélectionnez un patient</div>
+    <div class="fw-semibold">Select a patient</div>
     <div class="small text-center px-3 mt-1">
-      Cliquez sur un patient dans la liste pour gérer ses zones et voir son historique
+      Click on a patient in the list to manage their zones and view their history
     </div>
   </div>
 
@@ -958,7 +952,7 @@
                        border:none; border-radius:12px; font-size:14px"
                 (click)="createIncidentFromAnalysis()">
           <i class="fa-solid fa-triangle-exclamation me-2"></i>
-          Créer un incident depuis cette analyse
+          Create incident from this analysis
         </button>
       </div>
 
@@ -969,7 +963,7 @@
                 style="border-radius:12px; font-size:13px"
                 (click)="createIncidentFromAnalysis()">
           <i class="fa-solid fa-plus me-2"></i>
-          Créer un incident quand même
+          Create incident anyway
         </button>
       </div>
 
@@ -1040,7 +1034,7 @@
        style="background:#fff8e1; border:1px solid #ffe082">
     <i class="fa-solid fa-hand-pointer" style="color:#f59e0b"></i>
     <span style="font-size:12px; color:#92400e; font-weight:600">
-      Cliquez sur la carte pour placer l'incident
+      Click on the map to place the incident
     </span>
   </div>
 
@@ -1197,7 +1191,7 @@
               [disabled]="savingIncident || !newIncident.latitude || !newIncident.type || panelAnalyzing"
               (click)="saveNewIncident()">
         <span *ngIf="!savingIncident">
-          <i class="fa-solid fa-floppy-disk me-2"></i>Enregistrer
+          <i class="fa-solid fa-floppy-disk me-2"></i>Save
         </span>
         <span *ngIf="savingIncident">
           <span class="spinner-border spinner-border-sm me-2"></span>Enregistrement…

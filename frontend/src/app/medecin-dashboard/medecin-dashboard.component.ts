@@ -348,12 +348,12 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
           datasets: [{
             label: 'Risque Alzheimer IA (%)',
             data: validAnalyses.map(a => parseFloat(a.pourcentageRisque)),
-            borderColor: '#8b5cf6',
-            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderColor: '#800080',
+            backgroundColor: 'rgba(128, 0, 128, 0.1)',
             fill: true,
             tension: 0.3,
             pointBackgroundColor: '#fff',
-            pointBorderColor: '#8b5cf6',
+            pointBorderColor: '#800080',
             pointBorderWidth: 2,
             pointRadius: 5
           }]

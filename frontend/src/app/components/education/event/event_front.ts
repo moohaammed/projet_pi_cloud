@@ -15,7 +15,7 @@ import { AuthService } from '../../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, EventSeatGridComponent],
   styles: [`
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800&display=swap');
+    
 
     :host {
       --primary:      #800080;
@@ -35,12 +35,12 @@ import { AuthService } from '../../../services/auth.service';
       --radius:       16px;
       --radius-sm:    10px;
       display: block;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #ffffff !important;
+      font-family: 'Quicksand', sans-serif;
+      background: #f8f9fa !important;
     }
 
     .events-page {
-      background: #ffffff !important;
+      background: #f8f9fa !important;
       min-height: 100vh;
       padding: 20px 32px 40px;
     }
@@ -112,7 +112,7 @@ import { AuthService } from '../../../services/auth.service';
     }
 
     .page-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 3.2rem;
       font-weight: 800;
       color: var(--text-dark);
@@ -173,7 +173,7 @@ import { AuthService } from '../../../services/auth.service';
     .search-input {
       background: transparent;
       border: none;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: .95rem;
       color: var(--text-dark);
       outline: none;
@@ -213,7 +213,7 @@ import { AuthService } from '../../../services/auth.service';
 
     .stat-info { display: flex; flex-direction: column; }
     .stat-number {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.15rem;
       font-weight: 700;
       color: var(--text-dark);
@@ -378,7 +378,7 @@ import { AuthService } from '../../../services/auth.service';
     }
     .card-share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .chip-day {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.4rem;
       font-weight: 800;
       color: var(--primary);
@@ -442,7 +442,7 @@ import { AuthService } from '../../../services/auth.service';
 
     /* ─── TITLE ─── */
     .card-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.15rem;
       font-weight: 800;
       color: var(--text-dark);
@@ -477,7 +477,7 @@ import { AuthService } from '../../../services/auth.service';
       letter-spacing: 0.05em;
     }
     .capacity-count {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 0.85rem;
       font-weight: 700;
       color: var(--primary);
@@ -531,7 +531,7 @@ import { AuthService } from '../../../services/auth.service';
       border: none;
       border-radius: 12px;
       padding: 11px 20px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Quicksand', sans-serif;
       font-weight: 800;
       font-size: 0.82rem;
       letter-spacing: 0.02em;
@@ -580,7 +580,7 @@ import { AuthService } from '../../../services/auth.service';
       border: 1.5px solid var(--border);
       background: var(--white);
       color: var(--text-mid);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: .875rem;
       font-weight: 600;
       cursor: pointer;
@@ -618,7 +618,7 @@ import { AuthService } from '../../../services/auth.service';
     }
     .empty-glass svg { width: 52px; height: 52px; color: var(--primary); }
     .empty-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.4rem;
       font-weight: 700;
       color: var(--text-dark);
@@ -1053,4 +1053,5 @@ export class EventFrontComponent implements OnInit {
     });
   }
 }
+
 

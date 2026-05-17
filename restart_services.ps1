@@ -13,22 +13,22 @@ foreach ($port in $ports) {
 }
 
 Write-Host "Starting Eureka Server..."
-Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd eureka-server; .\mvnw.cmd spring-boot:run`"" -WorkingDirectory "d:\projet_pi_\projet_pi_cloud"
+Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd eureka-server; .\mvnw.cmd spring-boot:run`"" -WorkingDirectory $PSScriptRoot
 Start-Sleep -Seconds 15
 
 Write-Host "Starting API Gateway..."
-Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd api-gateway; .\mvnw.cmd spring-boot:run`"" -WorkingDirectory "d:\projet_pi_\projet_pi_cloud"
+Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd api-gateway; .\mvnw.cmd spring-boot:run`"" -WorkingDirectory $PSScriptRoot
 
 Write-Host "Starting backpi..."
-Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd backpi; .\mvnw.cmd spring-boot:run`"" -WorkingDirectory "d:\projet_pi_\projet_pi_cloud"
+Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd backpi; .\mvnw.cmd spring-boot:run`"" -WorkingDirectory $PSScriptRoot
 
 Write-Host "Starting patient-medecin-service..."
-Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd patient-medecin-service; .\mvnw.cmd spring-boot:run`"" -WorkingDirectory "d:\projet_pi_\projet_pi_cloud"
+Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd patient-medecin-service; .\mvnw.cmd spring-boot:run`"" -WorkingDirectory $PSScriptRoot
 
 Write-Host "Starting Flask API..."
-Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd flask_api; python app.py`"" -WorkingDirectory "d:\projet_pi_\projet_pi_cloud"
+Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd flask_api; python app.py`"" -WorkingDirectory $PSScriptRoot
 
 Write-Host "Starting Angular Frontend..."
-Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd frontend; npm start`"" -WorkingDirectory "d:\projet_pi_\projet_pi_cloud"
+Start-Process "powershell.exe" -ArgumentList "-NoExit -Command `"cd frontend; npm start`"" -WorkingDirectory $PSScriptRoot
 
 Write-Host "All services have been launched in new terminal windows."

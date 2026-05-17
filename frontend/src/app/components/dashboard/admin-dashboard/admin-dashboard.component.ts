@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { RendezVousService } from '../../../services/rendezvous.service';
 import { RendezVous, StatutRendezVous } from '../../../models/rendezvous.model';
+import { UserService } from '../../../services/user.service';
+import { PatientService } from '../../../services/patient.service';
 
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
@@ -27,6 +29,10 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   filteredList: RendezVous[] = [];
   loading = true;
   error = '';
+  allUsers: any[] = [];
+  allPatients: any[] = [];
+  absentPatientsNames: string[] = [];
+  selectedPatientName = '';
   
   // Stats
   totalRv = 0;
@@ -59,15 +65,20 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
 
   statutOptions: StatutRendezVous[] = ['PLANIFIE', 'CONFIRME', 'ANNULE', 'TERMINE'];
   statutLabels: Record<StatutRendezVous, string> = {
-    PLANIFIE: 'Planifié',
-    CONFIRME: 'Confirmé',
-    ANNULE: 'Annulé',
-    TERMINE: 'Terminé'
+    PLANIFIE: 'Scheduled',
+    CONFIRME: 'Confirmed',
+    ANNULE: 'Cancelled',
+    TERMINE: 'Completed'
   };
 
   charts: Chart[] = [];
 
-  constructor(private rvService: RendezVousService, private router: Router) {
+  constructor(
+    private rvService: RendezVousService, 
+    private router: Router,
+    private userService: UserService,
+    private patientService: PatientService
+  ) {
     Chart.register(...registerables);
   }
 
@@ -89,18 +100,58 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   loadAll(): void {
     this.loading = true;
     this.error = '';
-    this.rvService.getAll().subscribe({
-      next: (data) => {
-        this.rendezvousList = data;
-        this.calculateStats();
-        this.applyFilters();
-        if (this.chartCanvases && this.chartCanvases.length > 0) {
-          this.buildCharts();
-        }
-        this.loading = false;
+    this.patientService.getAllPatients().subscribe({
+      next: (patients) => {
+        this.allPatients = patients || [];
+        const patientsMap = new Map<number, any>();
+        this.allPatients.forEach(p => patientsMap.set(Number(p.id), p));
+
+        this.userService.getByRole('DOCTOR').subscribe({
+          next: (users) => {
+            this.allUsers = users || [];
+            const usersMap = new Map<number, any>();
+            this.allUsers.forEach(u => usersMap.set(Number(u.id), u));
+
+            this.rvService.getAll().subscribe({
+              next: (data) => {
+                this.rendezvousList = data.map(rv => {
+                  const p = patientsMap.get(Number(rv.patientId));
+                  if (p) {
+                    rv.nomPatient = `${p.prenom || ''} ${p.nom || ''}`.trim();
+                  } else {
+                    const pu = usersMap.get(Number(rv.patientId));
+                    if (pu) rv.nomPatient = `${pu.prenom || ''} ${pu.nom || ''}`.trim();
+                  }
+
+                  const m = usersMap.get(Number(rv.medecinId));
+                  if (m) {
+                    rv.medecinNom = `Dr. ${m.prenom || ''} ${m.nom || ''}`.trim();
+                  } else {
+                    rv.medecinNom = `Doctor #${rv.medecinId}`;
+                  }
+                  return rv;
+                });
+                this.calculateStats();
+                this.applyFilters();
+                if (this.chartCanvases && this.chartCanvases.length > 0) {
+                  this.buildCharts();
+                }
+                this.loading = false;
+              },
+              error: () => {
+                this.error = 'Error loading appointments.';
+                this.loading = false;
+              }
+            });
+          },
+          error: () => {
+            this.error = 'Error loading doctors.';
+            this.loading = false;
+          }
+        });
       },
       error: () => {
-        this.error = 'Erreur lors du chargement des rendez-vous.';
+        this.error = 'Error loading patients.';
         this.loading = false;
       }
     });
@@ -157,6 +208,13 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     this.absentPatientsAlerts = Object.keys(absentMap)
       .filter(pId => absentMap[Number(pId)] >= 2)
       .map(pId => Number(pId));
+
+    this.absentPatientsNames = this.absentPatientsAlerts.map(pId => {
+      const patient = this.allPatients.find(p => p.id === Number(pId));
+      if (patient) return `${patient.prenom || ''} ${patient.nom || ''}`.trim();
+      const user = this.allUsers.find(u => u.id === Number(pId));
+      return user ? `${user.prenom || ''} ${user.nom || ''}`.trim() : `Patient #${pId}`;
+    });
   }
 
   applyFilters(): void {
@@ -176,6 +234,13 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   openPatientProfile(patientId: number | undefined): void {
     if (!patientId) return;
     this.selectedPatientId = patientId;
+    const patient = this.allPatients.find(p => p.id === patientId);
+    if (patient) {
+      this.selectedPatientName = `${patient.prenom || ''} ${patient.nom || ''}`.trim();
+    } else {
+      const user = this.allUsers.find(u => u.id === patientId);
+      this.selectedPatientName = user ? `${user.prenom || ''} ${user.nom || ''}`.trim() : `Patient #${patientId}`;
+    }
     
     // Historique
     this.patientHistory = this.rendezvousList.filter(rv => rv.patientId === patientId).sort((a, b) => {
@@ -185,19 +250,19 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     // Notes Médicales (extraites depuis les motifs des RDV terminés)
     this.patientNotes = this.patientHistory
       .filter(rv => rv.statut === 'TERMINE' && rv.motif)
-      .map(rv => `Consultation le ${new Date(rv.dateHeure!).toLocaleDateString('fr-FR')} : ${rv.motif}`);
-    if (this.patientNotes.length === 0) this.patientNotes.push("Aucune note médicale disponible.");
+      .map(rv => `Consultation on ${new Date(rv.dateHeure!).toLocaleDateString('en-US')} : ${rv.motif}`);
+    if (this.patientNotes.length === 0) this.patientNotes.push("No medical notes available.");
 
     // Calcul du Statut (fidele, annulateur, standard)
     const total = this.patientHistory.length;
     const annules = this.patientHistory.filter(rv => rv.statut === 'ANNULE').length;
     
     if (total === 0) {
-      this.patientStatus = { label: 'Nouveau', color: 'primary' };
+      this.patientStatus = { label: 'New', color: 'primary' };
     } else if ((annules / total) >= 0.5 && annules >= 2) {
-      this.patientStatus = { label: 'Absences courantes (Risque)', color: 'danger' };
+      this.patientStatus = { label: 'Frequent Absences (Risk)', color: 'danger' };
     } else if (total >= 3 && annules === 0) {
-      this.patientStatus = { label: 'Fidèle', color: 'success' };
+      this.patientStatus = { label: 'Loyal', color: 'success' };
     } else {
       this.patientStatus = { label: 'Standard', color: 'info' };
     }
@@ -253,7 +318,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         this.buildCharts();
       },
       error: () => {
-        alert('Erreur lors du déplacement du rendez-vous.');
+        alert('Error moving appointment.');
         info.revert();
       }
     });
@@ -265,7 +330,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   deleteRv(id: string): void {
-    if (confirm('Voulez-vous vraiment supprimer ce rendez-vous ?')) {
+    if (confirm('Are you sure you want to delete this appointment?')) {
       this.rvService.delete(id).subscribe({
         next: () => {
           this.rendezvousList = this.rendezvousList.filter(rv => rv.id !== id);
@@ -274,7 +339,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           this.buildCharts();
         },
         error: () => {
-          this.error = 'Erreur lors de la suppression.';
+          this.error = 'Error deleting appointment.';
         }
       });
     }
@@ -292,7 +357,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         }
       },
       error: () => {
-        this.error = 'Erreur lors de la mise à jour du statut.';
+        this.error = 'Error updating status.';
       }
     });
   }
@@ -320,7 +385,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     this.charts.push(new Chart(ctxPie, {
       type: 'doughnut',
       data: {
-        labels: ['Confirmés/Terminés', 'Annulés', 'Planifiés'],
+        labels: ['Confirmed/Completed', 'Cancelled', 'Scheduled'],
         datasets: [{
           data: [this.confirme + this.termine, this.annule, this.planifie],
           backgroundColor: ['#2ecc71', '#e74c3c', '#f39c12']
@@ -358,7 +423,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       data: {
         labels: shortDates,
         datasets: [{
-          label: 'Nombre de Rendez-vous',
+          label: 'Number of Appointments',
           data: shortData,
           borderColor: '#3498db',
           backgroundColor: 'rgba(52, 152, 219, 0.2)',
@@ -379,7 +444,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       data: {
         labels: hoursSorted.map(h => h + 'h00'),
         datasets: [{
-          label: 'Volume de RDV',
+          label: 'Appointment Volume',
           data: hoursData,
           backgroundColor: '#9b59b6',
           borderRadius: 5

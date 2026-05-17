@@ -3,9 +3,9 @@
   <!-- HEADER -->
   <div class="page-header">
     <div class="title-container">
-      <div class="header-badge">Faire un Don</div>
-      <h1 class="page-title">Soutien aux <span class="highlight">Patients</span> & Familles</h1>
-      <p class="page-subtitle">Votre générosité fait la différence dans la vie des personnes atteintes d'Alzheimer.</p>
+      <div class="header-badge">Make a Donation</div>
+      <h1 class="page-title">Support for <span class="highlight">Patients</span> & Families</h1>
+      <p class="page-subtitle">Your generosity makes a difference in the lives of those affected by Alzheimer's.</p>
     </div>
   </div>
 
@@ -22,7 +22,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
           </svg>
-          Expliquer ✨
+          Explain ✨
         </button>
         <p class="preview-desc">{{ campaign.description }}</p>
 
@@ -30,24 +30,24 @@
         <div class="progress-section">
           <div class="progress-header">
             <span class="progress-raised">
-              <strong>{{ campaign.currentAmount | number:'1.0-0' }} DT</strong> collectés
+              <strong>{{ campaign.currentAmount | number:'1.0-0' }} DT</strong> raised
             </span>
-            <span class="progress-goal">sur {{ campaign.goalAmount | number:'1.0-0' }} DT</span>
+            <span class="progress-goal">of {{ campaign.goalAmount | number:'1.0-0' }} DT</span>
           </div>
           <div class="progress-bar-track">
             <div class="progress-bar-fill" [style.width.%]="getProgress()"></div>
           </div>
-          <span class="progress-percent">{{ getProgress() | number:'1.0-0' }}% atteint</span>
+          <span class="progress-percent">{{ getProgress() | number:'1.0-0' }}% reached</span>
         </div>
       </div>
 
       <!-- My Donations Lookup -->
       <div class="my-donations-card">
-        <h4 class="section-title">Mes <span class="highlight">Dons</span></h4>
-        <p class="section-desc">Vérifiez votre email pour consulter votre historique de dons.</p>
+        <h4 class="section-title">My <span class="highlight">Donations</span></h4>
+        <p class="section-desc">Verify your email to consult your donation history.</p>
         <div class="lookup-form">
-          <input type="email" class="form-input" placeholder="votre@email.com" [(ngModel)]="lookupEmail">
-          <button class="btn-lookup" (click)="lookupDonations()">Vérifier</button>
+          <input type="email" class="form-input" placeholder="your@email.com" [(ngModel)]="lookupEmail">
+          <button class="btn-lookup" (click)="lookupDonations()">Verify</button>
         </div>
         <div class="lookup-results" *ngIf="lookupResults.length > 0">
           <div class="lookup-item" *ngFor="let d of lookupResults">
@@ -68,16 +68,16 @@
           <polyline points="22 4 12 14.01 9 11.01"/>
         </svg>
         <div>
-          <strong>Merci pour votre don !</strong>
-          <p>Votre contribution de {{ lastDonationAmount | number:'1.2-2' }} DT a été enregistrée avec succès.</p>
+          <strong>Thank you for your donation!</strong>
+          <p>Your contribution of {{ lastDonationAmount | number:'1.2-2' }} DT has been successfully recorded.</p>
         </div>
       </div>
 
       <!-- Amount Section -->
       <div class="form-section">
-        <h4 class="section-title">Montant du <span class="highlight">Don</span></h4>
+        <h4 class="section-title">Donation <span class="highlight">Amount</span></h4>
         <div class="form-group">
-          <label class="form-label required">Montant (DT)</label>
+          <label class="form-label required">Amount (DT)</label>
           <input type="number" class="form-input amount-input" placeholder="10.00"
                  [(ngModel)]="donation.amount" min="1">
           <div class="error-msg" *ngIf="errors['amount']">{{ errors['amount'] }}</div>
@@ -91,7 +91,7 @@
 
       <!-- Payment Method -->
       <div class="form-section">
-        <h4 class="section-title">Méthode de <span class="highlight">Paiement</span></h4>
+        <h4 class="section-title">Payment <span class="highlight">Method</span></h4>
         <div class="payment-options">
           <label class="payment-option" [class.selected]="donation.paymentMethod === 'ONLINE'">
             <input type="radio" name="payment" value="ONLINE" [(ngModel)]="donation.paymentMethod">
@@ -99,7 +99,7 @@
               <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
               <line x1="1" y1="10" x2="23" y2="10"/>
             </svg>
-            <span>Paiement en ligne</span>
+            <span>Online payment</span>
           </label>
           <label class="payment-option" [class.selected]="donation.paymentMethod === 'OFFLINE'">
             <input type="radio" name="payment" value="OFFLINE" [(ngModel)]="donation.paymentMethod">
@@ -107,7 +107,7 @@
               <line x1="12" y1="1" x2="12" y2="23"/>
               <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
-            <span>Paiement hors ligne</span>
+            <span>Offline payment</span>
           </label>
         </div>
         <div class="error-msg" *ngIf="errors['paymentMethod']">{{ errors['paymentMethod'] }}</div>
@@ -115,17 +115,17 @@
 
       <!-- Personal Info -->
       <div class="form-section">
-        <h4 class="section-title">Informations <span class="highlight">Personnelles</span></h4>
+        <h4 class="section-title">Personal <span class="highlight">Information</span></h4>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label required">Prénom</label>
-            <input type="text" class="form-input" [(ngModel)]="donation.donorFirstName" placeholder="Votre prénom">
+            <label class="form-label required">First Name</label>
+            <input type="text" class="form-input" [(ngModel)]="donation.donorFirstName" placeholder="Your first name">
             <div class="error-msg" *ngIf="errors['donorFirstName']">{{ errors['donorFirstName'] }}</div>
           </div>
           <div class="form-group">
-            <label class="form-label required">Nom</label>
-            <input type="text" class="form-input" [(ngModel)]="donation.donorLastName" placeholder="Votre nom">
+            <label class="form-label required">Last Name</label>
+            <input type="text" class="form-input" [(ngModel)]="donation.donorLastName" placeholder="Your last name">
             <div class="error-msg" *ngIf="errors['donorLastName']">{{ errors['donorLastName'] }}</div>
           </div>
         </div>
@@ -133,26 +133,26 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label required">Email</label>
-            <input type="email" class="form-input" [(ngModel)]="donation.donorEmail" placeholder="votre@email.com">
+            <input type="email" class="form-input" [(ngModel)]="donation.donorEmail" placeholder="your@email.com">
             <div class="error-msg" *ngIf="errors['donorEmail']">{{ errors['donorEmail'] }}</div>
           </div>
           <div class="form-group">
-            <label class="form-label">Téléphone</label>
+            <label class="form-label">Phone</label>
             <input type="tel" class="form-input" [(ngModel)]="donation.donorPhone" placeholder="+216">
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Message personnel (optionnel)</label>
+          <label class="form-label">Personal message (optional)</label>
           <textarea class="form-input form-textarea" rows="3" [(ngModel)]="donation.message"
-                    placeholder="Un mot d'encouragement..."></textarea>
+                    placeholder="A word of encouragement..."></textarea>
         </div>
 
         <div class="form-check-row">
           <label class="custom-checkbox">
             <input type="checkbox" [(ngModel)]="donation.anonymous">
             <span class="checkmark"></span>
-            Don anonyme (votre nom ne sera pas affiché publiquement)
+            Anonymous donation (your name will not be publicly displayed)
           </label>
         </div>
 
@@ -160,7 +160,7 @@
           <label class="custom-checkbox">
             <input type="checkbox" [(ngModel)]="agreeTerms">
             <span class="checkmark"></span>
-            J'accepte que mes données soient collectées et stockées.
+            I agree that my data can be collected and stored.
           </label>
           <div class="error-msg" *ngIf="errors['agree']">{{ errors['agree'] }}</div>
         </div>
@@ -169,14 +169,14 @@
       <!-- Total & Submit -->
       <div class="donation-summary">
         <div class="summary-row">
-          <span class="summary-label">Total du don :</span>
+          <span class="summary-label">Total donation:</span>
           <span class="summary-amount">{{ donation.amount || 0 | number:'1.2-2' }} DT</span>
         </div>
         <button class="btn-donate" (click)="submitDonation()" [disabled]="submitting">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!submitting">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
-          {{ submitting ? 'Traitement en cours...' : 'Confirmer le Don' }}
+          {{ submitting ? 'Processing...' : 'Confirm Donation' }}
         </button>
       </div>
 
@@ -191,7 +191,7 @@
         <polyline points="12 6 12 12 16 14"/>
       </svg>
     </div>
-    <h3 class="empty-title">Chargement de la campagne...</h3>
+    <h3 class="empty-title">Loading campaign...</h3>
   </div>
 
   <!-- AI MODAL -->
@@ -210,15 +210,15 @@
           </svg>
         </div>
         <div class="ai-title-group">
-          <h2>Analyse de l'IA</h2>
-          <p class="ai-subtitle">Propulsé par Llama 3 (Ollama)</p>
+          <h2>AI Analysis</h2>
+          <p class="ai-subtitle">Powered by Llama 3 (Ollama)</p>
         </div>
       </div>
 
       <!-- LOADING STATE -->
       <div class="ai-loading" *ngIf="analyzing">
         <div class="spinner"></div>
-        <p>L'IA analyse l'impact de votre don...</p>
+        <p>AI is analyzing the impact of your donation...</p>
       </div>
 
       <!-- RESULT STATE -->
@@ -229,11 +229,11 @@
 
         <div class="ai-tags-grid">
           <div class="ai-tag-item">
-            <span class="tag-label">Catégorie</span>
+            <span class="tag-label">Category</span>
             <span class="tag-value">{{ aiResult.category }}</span>
           </div>
           <div class="ai-tag-item">
-            <span class="tag-label">Région</span>
+            <span class="tag-label">Region</span>
             <span class="tag-value">{{ aiResult.region }}</span>
           </div>
           <div class="ai-tag-item">
@@ -241,9 +241,9 @@
             <span class="tag-value">{{ aiResult.beneficiaries }}</span>
           </div>
           <div class="ai-tag-item">
-            <span class="tag-label">Urgence</span>
+            <span class="tag-label">Urgency</span>
             <span class="tag-value urgency">
-              <span class="urgency-dot" [ngClass]="aiResult.urgency?.toLowerCase() === 'haute' ? 'haute' : (aiResult.urgency?.toLowerCase() === 'moyenne' ? 'moyenne' : 'basse')"></span>
+              <span class="urgency-dot" [ngClass]="aiResult.urgency?.toLowerCase() === 'haute' || aiResult.urgency?.toLowerCase() === 'high' ? 'haute' : (aiResult.urgency?.toLowerCase() === 'moyenne' || aiResult.urgency?.toLowerCase() === 'medium' ? 'moyenne' : 'basse')"></span>
               {{ aiResult.urgency }}
             </span>
           </div>

@@ -1,0 +1,155 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   ALZCARE PREMIUM PATIENT DETAIL STYLES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:host {
+  display: block;
+  font-family: 'Quicksand', sans-serif;
+  --primary-purple: #800080;
+  --primary-purple-soft: rgba(128, 0, 128, 0.06);
+  --primary-purple-glow: rgba(128, 0, 128, 0.15);
+  --text-dark: #2c3038;
+  --text-muted: #555a64;
+  --card-bg: #ffffff;
+  --border-light: rgba(128, 0, 128, 0.08);
+}
+
+:host-context(body.dark) {
+  --text-dark: #e2e8f0;
+  --text-muted: #94a3b8;
+  --card-bg: #1a1d27;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --primary-purple-soft: rgba(128, 0, 128, 0.2);
+}
+
+.container.py-4 {
+  padding-top: 2rem !important;
+}
+
+/* ── Custom Cards ──────────────────────────────────────────────────────── */
+.card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+.card-header {
+  border: none !important;
+}
+
+.card-body {
+  padding: 24px !important;
+}
+
+/* Info grid boxes */
+.bg-light.rounded-3 {
+  background-color: var(--primary-purple-soft) !important;
+  border: 1.5px solid var(--border-light) !important;
+  transition: all 0.2s ease;
+}
+
+.bg-light.rounded-3:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-purple) !important;
+}
+
+.text-muted.small {
+  color: var(--primary-purple) !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.fw-semibold {
+  color: var(--text-dark) !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* ── Section Titles ─────────────────────────────────────────────────────── */
+h6.fw-bold.text-muted {
+  color: var(--primary-purple) !important;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border-light);
+  padding-bottom: 8px;
+  margin-top: 8px;
+}
+
+/* ── Emergency Contact Card ────────────────────────────────────────────── */
+.p-3.bg-danger.bg-opacity-10 {
+  background-color: rgba(239, 68, 68, 0.04) !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.15) !important;
+  border-radius: 12px !important;
+}
+
+.p-3.bg-danger.bg-opacity-10 .text-muted {
+  color: #ef4444 !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+/* ── Relation Account details block ────────────────────────────────────── */
+.relation-box {
+  background-color: rgba(128, 0, 128, 0.03) !important;
+  border: 1.5px solid rgba(128, 0, 128, 0.15) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+}
+
+/* ── Actions Buttons ────────────────────────────────────────────────────── */
+.btn {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 10px 16px;
+  transition: all 0.2s ease;
+}
+
+.btn-warning {
+  background: #f59e0b !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+}
+
+.btn-warning:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(245, 158, 11, 0.3);
+}
+
+.btn-outline-secondary {
+  border-color: var(--text-muted) !important;
+  color: var(--text-muted) !important;
+}
+
+.btn-outline-secondary:hover {
+  background: var(--text-muted) !important;
+  color: #fff !important;
+}
+
+.btn-outline-primary {
+  border-color: var(--primary-purple) !important;
+  color: var(--primary-purple) !important;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-purple) !important;
+  color: #fff !important;
+}
+
+.btn-outline-success {
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+.btn-outline-success:hover {
+  background: #10b981 !important;
+  color: #fff !important;
+}

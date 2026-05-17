@@ -2,9 +2,9 @@
   <div class="col-12 text-center text-lg-start">
     <div class="section-header mb-4">
       <h2 class="fw-bold mb-1 text-capitalize fs-28">
-        {{ isEdit ? 'Modifier' : 'Créer' }} <span class="underline position-relative text-primary">Utilisateur</span>
+        {{ isEdit ? 'Edit' : 'Create' }} <span class="underline position-relative text-primary">User</span>
       </h2>
-      <div class="sub-title fs-15 text-muted">Ajustez les permissions, les rôles et la sécurité du compte des membres de la plateforme.</div>
+      <div class="sub-title fs-15 text-muted">Adjust permissions, roles and account security for platform members.</div>
     </div>
   </div>
 </div>
@@ -28,7 +28,7 @@
         <form (ngSubmit)="save()" #uForm="ngForm" class="row g-4">
 
           <div class="col-md-6">
-            <label class="form-label">Prénom <span class="text-danger">*</span></label>
+            <label class="form-label">First Name <span class="text-danger">*</span></label>
             <input type="text" class="form-control" name="prenom" [(ngModel)]="user.prenom" required
               placeholder="Prénom">
           </div>
@@ -77,11 +77,11 @@
               </div>
               <div class="d-flex gap-3 w-100 w-md-auto ms-auto">
                 <button type="button" class="btn btn-white border px-4 py-2 rounded-3 fw-bold" (click)="cancel()">
-                  Annuler
+                  Cancel
                 </button>
                 <button type="submit" class="btn btn-primary px-5 py-2 rounded-3 fw-bold shadow-sm"
                   [disabled]="!uForm.valid || loading">
-                  <span *ngIf="!loading">{{ isEdit ? 'Mettre à jour' : 'Créer le compte' }}</span>
+                  <span *ngIf="!loading">{{ isEdit ? 'Update' : 'Create account' }}</span>
                   <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status"></span>
                 </button>
               </div>

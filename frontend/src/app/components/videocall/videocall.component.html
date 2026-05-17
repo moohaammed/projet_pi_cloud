@@ -15,7 +15,7 @@
 
   <!-- ── Toggle Agent Button ───────────────────────────────────────────────── -->
   <button class="btn-toggle-agent animate-fade-in" (click)="toggleAgentPanel()" [class.active]="showAgentPanel"
-    title="{{ showAgentPanel ? 'Masquer l\'agent IA' : 'Afficher l\'agent IA' }}">
+    title="{{ showAgentPanel ? 'Hide AI agent' : 'Show AI agent' }}">
     <span class="agent-btn-pulse" *ngIf="!showAgentPanel"></span>
     🧠 IA
   </button>

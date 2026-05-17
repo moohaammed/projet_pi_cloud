@@ -5,12 +5,12 @@
         <div class="card-header bg-gradient-primary py-4 px-5 text-white">
           <div class="d-flex align-items-center justify-content-between">
             <div>
-              <h2 class="mb-1 fw-bold">Détails du Rendez-vous</h2>
+              <h2 class="mb-1 fw-bold">Appointment Details</h2>
             </div>
-            <span [class]="'badge rounded-pill px-3 py-2 border border-white border-opacity-50 ' + 
-                            (rv.etat === 'Valide' ? 'bg-success bg-opacity-75' : 
+            <span [class]="'badge rounded-pill px-3 py-2 border border-white border-opacity-50 ' +
+                            (rv.etat === 'Valide' ? 'bg-success bg-opacity-75' :
                             (rv.etat === 'En Attente' ? 'bg-warning bg-opacity-75' : 'bg-danger bg-opacity-75'))">
-              {{ (rv.etat || 'PLANIFIE') | uppercase }}
+              {{ (rv.etat || 'SCHEDULED') | uppercase }}
             </span>
           </div>
         </div>
@@ -20,16 +20,16 @@
             <div class="col-md-6">
               <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-start border-4 border-primary">
                 <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
-                  <i class="fa-solid fa-calendar-check me-2"></i>Informations Patient
+                  <i class="fa-solid fa-calendar-check me-2"></i>Patient Information
                 </h5>
                 <div class="space-y-3">
                   <div class="detail-item">
-                    <label class="text-secondary small text-uppercase fw-bold">Date & Heure</label>
+                    <label class="text-secondary small text-uppercase fw-bold">Date & Time</label>
                     <p class="fs-5 mb-0 fw-semibold">{{ rv.dateHeure | date:'dd MMMM yyyy HH:mm' }}</p>
                   </div>
                   <hr class="my-3 opacity-25">
                   <div class="detail-item">
-                    <label class="text-secondary small text-uppercase fw-bold">Nom du Patient</label>
+                    <label class="text-secondary small text-uppercase fw-bold">Patient Name</label>
                     <p class="fs-5 mb-0 fw-semibold">{{ rv.nomPatient || ('Patient ID: ' + rv.patientId) }}</p>
                   </div>
                 </div>
@@ -39,17 +39,17 @@
             <div class="col-md-6">
               <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-start border-4 border-info">
                 <h5 class="text-info fw-bold mb-4 d-flex align-items-center">
-                  <i class="fa-solid fa-hospital-user me-2"></i>Informations Médicales
+                  <i class="fa-solid fa-hospital-user me-2"></i>Medical Information
                 </h5>
                 <div class="space-y-3">
                   <div class="detail-item">
-                    <label class="text-secondary small text-uppercase fw-bold">Médecin</label>
+                    <label class="text-secondary small text-uppercase fw-bold">Doctor</label>
                     <p class="fs-5 mb-0 fw-semibold">Dr. {{ rv.medecinNom || rv.medecinId }}</p>
                   </div>
                   <hr class="my-3 opacity-25">
                   <div class="detail-item">
-                    <label class="text-secondary small text-uppercase fw-bold">Hôpital</label>
-                    <p class="fs-5 mb-0 fw-semibold">{{ rv.hopitalNom || 'Hôpital Général (PI Cloud)' }}</p>
+                    <label class="text-secondary small text-uppercase fw-bold">Hospital</label>
+                    <p class="fs-5 mb-0 fw-semibold">{{ rv.hopitalNom || 'General Hospital (AlzCare)' }}</p>
                   </div>
                 </div>
               </div>
@@ -59,23 +59,19 @@
 
         <div class="card-footer bg-light p-4 px-5 border-top border-opacity-10">
           <div class="d-flex flex-wrap gap-3 align-items-center">
-
             <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="toggleVideoCall()">
-              <i class="fa-solid fa-video me-2"></i>Lancer l'Appel
+              <i class="fa-solid fa-video me-2"></i>Start Call
             </button>
-
             <button class="btn btn-warning px-4 py-2 rounded-pill fw-bold shadow-sm"
               [routerLink]="['/rendezvous', rv.id, 'edit']">
-              <i class="fa-solid fa-pen-to-square me-2"></i>Modifier
+              <i class="fa-solid fa-pen-to-square me-2"></i>Edit
             </button>
-
             <button class="btn btn-danger px-4 py-2 rounded-pill fw-bold shadow-sm" (click)="deleteConfirm = true">
-              <i class="fa-solid fa-trash-can me-2"></i>Supprimer
+              <i class="fa-solid fa-trash-can me-2"></i>Delete
             </button>
-
             <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold ms-md-auto"
               routerLink="/rendezvous">
-              <i class="fa-solid fa-chevron-left me-2"></i>Retour à la liste
+              <i class="fa-solid fa-chevron-left me-2"></i>Back to list
             </button>
           </div>
         </div>
@@ -84,7 +80,6 @@
   </div>
 </div>
 
-<!-- Delete confirm modal -->
 <div class="modal fade show" tabindex="-1" *ngIf="deleteConfirm"
   style="display: block; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
   <div class="modal-dialog modal-dialog-centered">
@@ -93,13 +88,11 @@
         <div class="text-danger mb-4">
           <i class="fa-solid fa-circle-exclamation fa-4x animate-bounce"></i>
         </div>
-        <h3 class="fw-bold mb-3">Êtes-vous sûr ?</h3>
-        <p class="text-secondary mb-4">Voulez-vous vraiment supprimer ce rendez-vous ? Cette action est irréversible.
-        </p>
+        <h3 class="fw-bold mb-3">Are you sure?</h3>
+        <p class="text-secondary mb-4">Do you really want to delete this appointment? This action is irreversible.</p>
         <div class="d-flex justify-content-center gap-3">
-          <button class="btn btn-light px-4 rounded-pill fw-bold" (click)="deleteConfirm = false">Abandonner</button>
-          <button class="btn btn-danger px-4 rounded-pill fw-bold" *ngIf="rv" (click)="deleteRv(rv!.id)">Confirmer la
-            suppression</button>
+          <button class="btn btn-light px-4 rounded-pill fw-bold" (click)="deleteConfirm = false">Cancel</button>
+          <button class="btn btn-danger px-4 rounded-pill fw-bold" *ngIf="rv" (click)="deleteRv(rv!.id)">Confirm deletion</button>
         </div>
       </div>
     </div>

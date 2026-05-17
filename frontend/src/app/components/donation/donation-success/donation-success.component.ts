@@ -16,20 +16,20 @@ import { DonationService } from '../../../services/donation/donation.service';
           </svg>
         </div>
         
-        <h1 *ngIf="!verified && !error">Vérification du paiement...</h1>
-        <h1 *ngIf="verified">Paiement Réussi !</h1>
-        <h1 *ngIf="error" class="text-danger">Erreur de vérification</h1>
+        <h1 *ngIf="!verified && !error">Verifying payment...</h1>
+        <h1 *ngIf="verified">Payment Successful!</h1>
+        <h1 *ngIf="error" class="text-danger">Verification Error</h1>
 
         <div *ngIf="verified">
-          <p class="result-text">Merci pour votre générosité ! Votre don a été enregistré avec succès.</p>
+          <p class="result-text">Thank you for your generosity! Your donation has been successfully recorded.</p>
           <div class="result-actions">
-            <a routerLink="/donations" class="btn btn-primary">Retour aux campagnes</a>
+            <a routerLink="/donations" class="btn btn-primary">Back to campaigns</a>
           </div>
         </div>
         
         <div *ngIf="error">
           <p class="result-text">{{ errorMsg }}</p>
-          <button class="btn btn-outline-danger" (click)="retry()">Réessayer</button>
+          <button class="btn btn-outline-danger" (click)="retry()">Retry</button>
         </div>
 
         <!-- Loader -->
@@ -44,8 +44,8 @@ import { DonationService } from '../../../services/donation/donation.service';
     
     :host {
       display: block;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #fdf5fd;
+      font-family: 'Quicksand', sans-serif;
+      background: #f8f9fa;
       min-height: 100vh;
       padding-top: 80px;
     }
@@ -136,7 +136,7 @@ export class DonationSuccessComponent implements OnInit {
       this.verify();
     } else {
       this.error = true;
-      this.errorMsg = 'Session de paiement introuvable.';
+      this.errorMsg = 'Payment session not found.';
     }
   }
 
@@ -147,7 +147,7 @@ export class DonationSuccessComponent implements OnInit {
       },
       error: () => {
         this.error = true;
-        this.errorMsg = 'Impossible de vérifier le paiement avec le serveur. Si vous avez été débité, le statut se mettra à jour automatiquement.';
+        this.errorMsg = 'Unable to verify payment with server. If you were charged, status will update automatically.';
       }
     });
   }
@@ -157,3 +157,4 @@ export class DonationSuccessComponent implements OnInit {
     this.verify();
   }
 }
+

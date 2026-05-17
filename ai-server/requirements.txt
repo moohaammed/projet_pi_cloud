@@ -5,3 +5,4 @@ torch
 torchvision
 pydantic
 scikit-learn
+transformers

@@ -1,0 +1,193 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   ALZCARE PREMIUM PATIENT LIST STYLES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:host {
+  display: block;
+  font-family: 'Quicksand', sans-serif;
+  --primary-purple: #800080;
+  --primary-purple-soft: rgba(128, 0, 128, 0.06);
+  --primary-purple-glow: rgba(128, 0, 128, 0.15);
+  --text-dark: #2c3038;
+  --text-muted: #555a64;
+  --card-bg: #ffffff;
+  --border-light: rgba(128, 0, 128, 0.08);
+}
+
+:host-context(body.dark) {
+  --text-dark: #e2e8f0;
+  --text-muted: #94a3b8;
+  --card-bg: #1a1d27;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --primary-purple-soft: rgba(128, 0, 128, 0.2);
+}
+
+.container.py-4 {
+  padding-top: 2rem !important;
+}
+
+/* ── Header Area ───────────────────────────────────────────────────────── */
+h3.fw-bold {
+  color: var(--text-dark);
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* ── Search Input Styles ────────────────────────────────────────────────── */
+.input-group {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  border: 1.5px solid var(--border-light);
+  transition: all 0.3s ease;
+  background: var(--card-bg);
+}
+
+.input-group:focus-within {
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3.5px var(--primary-purple-glow);
+}
+
+.input-group-text {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-muted);
+  padding-left: 16px;
+}
+
+.form-control {
+  border: none !important;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  background: transparent !important;
+  padding: 12px 16px;
+}
+
+.form-control:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Premium Card & Table ────────────────────────────────────────────────── */
+.card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+  transition: var(--doc-transition);
+}
+
+.table {
+  color: var(--text-dark) !important;
+}
+
+.table-light {
+  --bs-table-bg: var(--primary-purple-soft) !important;
+  color: var(--primary-purple) !important;
+}
+
+.table th {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  border-bottom: 1.5px solid var(--border-light) !important;
+}
+
+.table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light) !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--primary-purple-soft) !important;
+}
+
+/* ── Avatar Circle ──────────────────────────────────────────────────────── */
+.patient-avatar {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, var(--primary-purple), #a855f7);
+  box-shadow: 0 4px 10px rgba(128, 0, 128, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* ── Badges & Buttons ───────────────────────────────────────────────────── */
+.badge {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 6px 12px;
+}
+
+.btn-sm {
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-primary {
+  border-color: var(--primary-purple) !important;
+  color: var(--primary-purple) !important;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-purple) !important;
+  color: #fff !important;
+}
+
+.btn-warning {
+  background: #f59e0b !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+.btn-warning:hover {
+  background: #d97706 !important;
+}
+
+.btn-outline-secondary {
+  border-color: var(--text-muted) !important;
+  color: var(--text-muted) !important;
+}
+
+.btn-outline-secondary:hover {
+  background: var(--text-muted) !important;
+  color: #fff !important;
+}
+
+.btn-outline-success {
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+.btn-outline-success:hover {
+  background: #10b981 !important;
+  color: #fff !important;
+}
+
+.btn-danger {
+  background: #ef4444 !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+.btn-danger:hover {
+  background: #dc2626 !important;
+}

@@ -11,14 +11,14 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="my-donations-page bg-light min-vh-100 py-5" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+    <div class="my-donations-page bg-light min-vh-100 py-5" style="font-family: 'Quicksand', sans-serif;">
       <div class="container">
         
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h2 class="fw-bold" style="color: #2e152e;">
-            <i class="fa-solid fa-hand-holding-heart me-2 text-primary"></i>Mes Dons
+            <i class="fa-solid fa-hand-holding-heart me-2 text-primary"></i>My Donations
           </h2>
-          <a routerLink="/donations" class="btn btn-outline-primary rounded-pill fw-bold">Parcourir les campagnes</a>
+          <a routerLink="/donations" class="btn btn-outline-primary rounded-pill fw-bold">Browse campaigns</a>
         </div>
 
         <!-- Summary Cards -->
@@ -30,7 +30,7 @@ import { forkJoin } from 'rxjs';
                   <i class="fa-solid fa-coins fs-4 text-primary"></i>
                 </div>
                 <div>
-                  <p class="text-muted small mb-0 fw-semibold">Total Donné (Complété)</p>
+                  <p class="text-muted small mb-0 fw-semibold">Total Donated (Completed)</p>
                   <h3 class="fw-bold text-dark mb-0">{{ totalDonated | number:'1.2-2' }} <span class="fs-6">DT</span></h3>
                 </div>
               </div>
@@ -43,7 +43,7 @@ import { forkJoin } from 'rxjs';
                   <i class="fa-solid fa-check fs-4 text-success"></i>
                 </div>
                 <div>
-                  <p class="text-muted small mb-0 fw-semibold">Dons Réussis</p>
+                  <p class="text-muted small mb-0 fw-semibold">Successful Donations</p>
                   <h3 class="fw-bold text-dark mb-0">{{ completedCount }}</h3>
                 </div>
               </div>
@@ -56,7 +56,7 @@ import { forkJoin } from 'rxjs';
                   <i class="fa-solid fa-clock fs-4 text-warning"></i>
                 </div>
                 <div>
-                  <p class="text-muted small mb-0 fw-semibold">Dons en attente</p>
+                  <p class="text-muted small mb-0 fw-semibold">Pending Donations</p>
                   <h3 class="fw-bold text-dark mb-0">{{ pendingCount }}</h3>
                 </div>
               </div>
@@ -71,11 +71,11 @@ import { forkJoin } from 'rxjs';
               <table class="table table-hover align-middle mb-0 custom-table">
                 <thead class="bg-light text-muted small text-uppercase">
                   <tr>
-                    <th class="ps-4 py-3 rounded-top-start">Campagne</th>
+                    <th class="ps-4 py-3 rounded-top-start">Campaign</th>
                     <th class="py-3">Date</th>
-                    <th class="py-3">Méthode</th>
-                    <th class="py-3">Montant</th>
-                    <th class="pe-4 py-3 rounded-top-end">Statut</th>
+                    <th class="py-3">Method</th>
+                    <th class="py-3">Amount</th>
+                    <th class="pe-4 py-3 rounded-top-end">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -92,7 +92,7 @@ import { forkJoin } from 'rxjs';
                     </td>
                     <td class="py-4">
                       <span class="badge bg-light text-dark border">
-                        <i class="fa-solid" [class.fa-credit-card]="don.paymentMethod === 'ONLINE'" [class.fa-building-columns]="don.paymentMethod === 'OFFLINE'"></i>
+                         <i class="fa-solid" [class.fa-credit-card]="don.paymentMethod === 'ONLINE'" [class.fa-building-columns]="don.paymentMethod === 'OFFLINE'"></i>
                         {{ don.paymentMethod }}
                       </span>
                     </td>
@@ -122,16 +122,16 @@ import { forkJoin } from 'rxjs';
                         <div class="icon-circle bg-light text-muted mx-auto mb-3" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                           <i class="fa-solid fa-box-open fs-2"></i>
                         </div>
-                        <h5 class="fw-bold text-dark">Aucun don trouvé</h5>
-                        <p class="text-muted mb-4">Vous n'avez pas encore effectué de don via votre compte.</p>
-                        <a routerLink="/donations" class="btn btn-primary rounded-pill px-4">Faire un don maintenant</a>
+                        <h5 class="fw-bold text-dark">No donations found</h5>
+                        <p class="text-muted mb-4">You have not made any donations through your account yet.</p>
+                        <a routerLink="/donations" class="btn btn-primary rounded-pill px-4">Donate now</a>
                       </div>
                     </td>
                   </tr>
                   <tr *ngIf="loading">
                     <td colspan="5" class="text-center py-5">
                       <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Chargement...</span>
+                        <span class="visually-hidden">Loading...</span>
                       </div>
                     </td>
                   </tr>
@@ -204,8 +204,9 @@ export class MyDonationsComponent implements OnInit {
   }
 
   getCampaignTitle(campaignId?: string): string {
-    if (!campaignId) return 'Campagne inconnue';
+    if (!campaignId) return 'Unknown campaign';
     const c = this.campaignsList.find(c => c.id === campaignId);
-    return c ? (c.title || 'Inconnue') : `Campagne (#${campaignId})`;
+    return c ? (c.title || 'Unknown') : `Campaign (#${campaignId})`;
   }
 }
+

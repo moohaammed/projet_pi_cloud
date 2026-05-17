@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ALZCARE PREMIUM PATIENT FORM STYLES
+   ALZCARE PREMIUM PATIENT WIZARD STYLES
    ══════════════════════════════════════════════════════════════════════════ */
 
 :host {
@@ -22,11 +22,11 @@
   --primary-purple-soft: rgba(128, 0, 128, 0.2);
 }
 
-.container.py-4 {
-  padding-top: 2rem !important;
+.container.py-5 {
+  padding-top: 3rem !important;
 }
 
-/* ── Form Card ─────────────────────────────────────────────────────────── */
+/* ── Wizard Card ───────────────────────────────────────────────────────── */
 .card {
   background: var(--card-bg) !important;
   border: 1px solid var(--border-light) !important;
@@ -35,22 +35,7 @@
   overflow: hidden;
 }
 
-.card-header {
-  background: linear-gradient(135deg, var(--primary-purple), #5c005c) !important;
-  border: none !important;
-}
-
-/* Titles */
-h6.fw-bold.text-muted {
-  color: var(--primary-purple) !important;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  border-bottom: 2px solid var(--border-light);
-  padding-bottom: 8px;
-  margin-top: 8px;
-}
-
-/* Inputs */
+/* Inputs & Form Controls */
 .form-label {
   color: var(--text-dark) !important;
   font-weight: 700 !important;
@@ -59,55 +44,20 @@ h6.fw-bold.text-muted {
 
 /* Inputs are handled globally in styles.css for consistent modern aesthetic */
 
-/* Stage selection blocks */
-.flex-fill.text-center.p-3 {
-  border-radius: 12px !important;
-  border: 1.5px solid var(--border-light) !important;
-  transition: all 0.2s ease;
-  font-weight: 700;
+/* ── Step Titles ────────────────────────────────────────────────────────── */
+h5.fw-bold {
+  color: var(--primary-purple) !important;
+  font-weight: 800;
+  margin-bottom: 20px;
 }
 
-.flex-fill.text-center.p-3:hover {
-  transform: translateY(-2px);
-}
-
-.bg-success {
-  background-color: #10b981 !important;
-  border-color: #10b981 !important;
-  color: #fff !important;
-}
-
-.bg-warning {
-  background-color: #f59e0b !important;
-  border-color: #f59e0b !important;
-  color: #fff !important;
-}
-
-.bg-danger {
-  background-color: #ef4444 !important;
-  border-color: #ef4444 !important;
-  color: #fff !important;
-}
-
-/* Action Buttons */
+/* ── Action Buttons ────────────────────────────────────────────────────── */
 .btn {
   font-family: 'Quicksand', sans-serif;
   font-weight: 700;
-  border-radius: 10px;
-  padding: 12px 20px;
+  border-radius: 25px;
+  padding: 10px 24px;
   transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary-purple), #5c005c) !important;
-  border: none !important;
-  color: #fff !important;
-  box-shadow: 0 4px 12px rgba(128, 0, 128, 0.25);
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(128, 0, 128, 0.35);
 }
 
 .btn-outline-secondary {
@@ -118,4 +68,19 @@ h6.fw-bold.text-muted {
 .btn-outline-secondary:hover:not(:disabled) {
   background: var(--text-muted) !important;
   color: #fff !important;
+}
+
+.btn-outline-primary {
+  border-color: var(--primary-purple) !important;
+  color: var(--primary-purple) !important;
+}
+
+.btn-outline-primary:hover:not(:disabled) {
+  background: var(--primary-purple) !important;
+  color: #fff !important;
+}
+
+/* Range Inputs */
+.form-range {
+  accent-color: var(--primary-purple);
 }

@@ -47,8 +47,8 @@ export class PatientFormComponent {
     onDrop(event: DragEvent): void {
         event.preventDefault();
         this.dragOver = false;
-        if (event.dataTryears oldfer?.files && event.dataTryears oldfer.files.length > 0) {
-            this.selectedFile = event.dataTryears oldfer.files[0];
+        if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+            this.selectedFile = event.dataTransfer.files[0];
         }
     }
 

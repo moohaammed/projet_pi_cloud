@@ -19,7 +19,7 @@
 
   <section class="state-card empty" *ngIf="!loading && !error && predictions.length === 0">
     <i class="fa-solid fa-shield-heart"></i>
-    Aucune alerte hospitaliere recente.
+    No recent hospital alert.
   </section>
 
   <section class="alert-card" *ngFor="let prediction of predictions">

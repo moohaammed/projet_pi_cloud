@@ -13,7 +13,7 @@ foreach ($port in $ports) {
     }
 }
 
-$workDir = "d:\projet_pi_\projet_pi_cloud"
+$workDir = $PSScriptRoot
 
 function Start-ServiceWindow {
     param($name, $dir, $command)

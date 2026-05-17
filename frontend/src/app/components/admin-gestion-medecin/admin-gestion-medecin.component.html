@@ -4,7 +4,7 @@
   <!-- Header -->
   <div class="gp-header">
     <div>
-      <h2 class="gp-title"><i class="fa-solid fa-user-doctor me-2"></i>Gestion Doctors</h2>
+      <h2 class="gp-title"><i class="fa-solid fa-user-doctor me-2"></i>Doctor Management</h2>
       <p class="gp-subtitle">Administration of doctor accounts and platform access</p>
     </div>
     <button class="btn-primary-purple" (click)="openCreate()">
@@ -22,7 +22,7 @@
       <i class="fa-solid fa-list me-2"></i>Doctor List
     </button>
     <button [class.tab-active]="activeTab==='stats'" (click)="setTab('stats')">
-      <i class="fa-solid fa-chart-pie me-2"></i>Statistiques
+      <i class="fa-solid fa-chart-pie me-2"></i>Statistics
     </button>
     <button [class.tab-active]="activeTab==='assign'" (click)="setTab('assign')">
       <i class="fa-solid fa-link me-2"></i>Assignment
@@ -39,15 +39,15 @@
       </div>
       <div class="kpi-card kpi-blue">
         <div class="kpi-icon"><i class="fa-solid fa-user-plus"></i></div>
-        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Newx ce mois</div></div>
+        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">New this month</div></div>
       </div>
       <div class="kpi-card kpi-green">
         <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
-        <div><div class="kpi-val">{{ activeCount }}</div><div class="kpi-lbl">Comptes actifs</div></div>
+        <div><div class="kpi-val">{{ activeCount }}</div><div class="kpi-lbl">Active accounts</div></div>
       </div>
       <div class="kpi-card kpi-red">
         <div class="kpi-icon"><i class="fa-solid fa-ban"></i></div>
-        <div><div class="kpi-val">{{ inactiveCount }}</div><div class="kpi-lbl">Comptes suspendus</div></div>
+        <div><div class="kpi-val">{{ inactiveCount }}</div><div class="kpi-lbl">Suspended accounts</div></div>
       </div>
     </div>
 
@@ -55,13 +55,13 @@
     <div class="gp-filters">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Rechercher nom, prénom, email…"
+        <input type="text" placeholder="Search by last name, first name, email…"
                [(ngModel)]="searchQuery" (ngModelChange)="onFilter()">
       </div>
       <select [(ngModel)]="filterActive" (ngModelChange)="onFilter()" class="filter-select">
-        <option value="">Tous statuts</option>
+        <option value="">All statuses</option>
         <option value="true">Active</option>
-        <option value="false">Suspendu</option>
+        <option value="false">Suspended</option>
       </select>
     </div>
 
@@ -96,7 +96,7 @@
             <td>
               <span class="status-badge" [class.status-active]="d.actif" [class.status-inactive]="!d.actif">
                 <i class="fa-solid fa-circle me-1" style="font-size:8px"></i>
-                {{ d.actif ? 'Active' : 'Suspendu' }}
+                {{ d.actif ? 'Active' : 'Suspended' }}
               </span>
             </td>
             <td class="text-muted-sm">{{ fmt(d.createdAt) }}</td>
@@ -105,16 +105,16 @@
                 <button class="act-btn act-view"   title="View profil"         (click)="openDetail(d)"><i class="fa-solid fa-eye"></i></button>
                 <button class="act-btn act-edit"   title="Edit"            (click)="openEdit(d)"><i class="fa-solid fa-pen"></i></button>
                 <button class="act-btn" [class.act-suspend]="d.actif" [class.act-activate]="!d.actif"
-                        [title]="d.actif?'Suspendre':'Activate'" (click)="toggleActif(d)">
+                        [title]="d.actif?'Suspend':'Activate'" (click)="toggleActif(d)">
                   <i class="fa-solid" [class.fa-lock]="d.actif" [class.fa-lock-open]="!d.actif"></i>
                 </button>
-                <button class="act-btn act-key"    title="Reset mot de passe"  (click)="resetPassword(d)"><i class="fa-solid fa-key"></i></button>
+                <button class="act-btn act-key"    title="Reset password"  (click)="resetPassword(d)"><i class="fa-solid fa-key"></i></button>
                 <button class="act-btn act-delete" title="Delete"           (click)="openDelete(d)"><i class="fa-solid fa-trash"></i></button>
               </div>
             </td>
           </tr>
           <tr *ngIf="paginated.length===0">
-            <td colspan="7" class="empty-row"><i class="fa-solid fa-inbox me-2"></i>Aucun médecin trouvé.</td>
+            <td colspan="7" class="empty-row"><i class="fa-solid fa-inbox me-2"></i>No doctor found.</td>
           </tr>
         </tbody>
       </table>
@@ -136,11 +136,11 @@
       </div>
       <div class="kpi-card kpi-blue">
         <div class="kpi-icon"><i class="fa-solid fa-user-plus"></i></div>
-        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Newx ce mois</div></div>
+        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">New this month</div></div>
       </div>
       <div class="kpi-card kpi-green">
         <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
-        <div><div class="kpi-val">{{ allPatients.length }}</div><div class="kpi-lbl">Patients visibles</div></div>
+        <div><div class="kpi-val">{{ allPatients.length }}</div><div class="kpi-lbl">Visible patients</div></div>
       </div>
       <div class="kpi-card kpi-violet">
         <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
@@ -153,15 +153,15 @@
 
     <div class="chart-grid">
       <div class="chart-card">
-        <div class="chart-title"><i class="fa-solid fa-circle-half-stroke me-2"></i>Comptes Actives vs Suspendus</div>
+        <div class="chart-title"><i class="fa-solid fa-circle-half-stroke me-2"></i>Active vs Suspended Accounts</div>
         <canvas id="chartDocActive" height="220"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title"><i class="fa-solid fa-chart-bar me-2"></i>Inscriptions par Mois (6 derniers)</div>
+        <div class="chart-title"><i class="fa-solid fa-chart-bar me-2"></i>Registrations by Month (last 6)</div>
         <canvas id="chartDocMonth" height="220"></canvas>
       </div>
       <div class="chart-card chart-wide">
-        <div class="chart-title"><i class="fa-solid fa-users me-2"></i>Patients par Doctor</div>
+        <div class="chart-title"><i class="fa-solid fa-users me-2"></i>Patients per Doctor</div>
         <div class="info-note">
           <i class="fa-solid fa-info-circle me-2"></i>
           All doctors access all patients registered on the platform.
@@ -175,28 +175,28 @@
   <div *ngIf="activeTab==='assign'">
     <div class="kpi-row" style="margin-bottom: 24px;">
       <div class="kpi-card" style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
-        <h4 style="margin: 0; color: var(--text-dark);"><i class="fa-solid fa-user-doctor me-2"></i>Sélecteur Doctor</h4>
+        <h4 style="margin: 0; color: var(--text-dark);"><i class="fa-solid fa-user-doctor me-2"></i>Doctor Selector</h4>
         <select class="gp-input" [(ngModel)]="selectedAssignMedecin" (ngModelChange)="onMedecinSelectChange()">
-          <option [ngValue]="null">-- Sélectionner un Doctor --</option>
+          <option [ngValue]="null">-- Select a Doctor --</option>
           <option *ngFor="let m of allDoctors" [ngValue]="m.id">Dr. {{ m.prenom }} {{ m.nom }} ({{m.email}})</option>
         </select>
       </div>
       <div class="kpi-card" style="flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: start;">
-        <h4 style="margin: 0; color: var(--text-dark);"><i class="fa-solid fa-user me-2"></i>Assigner Patient</h4>
+        <h4 style="margin: 0; color: var(--text-dark);"><i class="fa-solid fa-user me-2"></i>Assign Patient</h4>
         <div style="display: flex; gap: 12px; width: 100%;">
           <select class="gp-input" style="flex: 1" [(ngModel)]="selectedAssignPatient" [disabled]="!selectedAssignMedecin">
-             <option [ngValue]="null">-- Sélectionner Patient (non assigné) --</option>
+             <option [ngValue]="null">-- Select Patient (unassigned) --</option>
              <option *ngFor="let p of unassignedPatientsList" [ngValue]="p.id">{{ p.prenom }} {{ p.nom }}</option>
           </select>
           <button class="btn-primary-purple" (click)="assignPatient()" [disabled]="!selectedAssignMedecin || !selectedAssignPatient || isSubmitting">
-            <i class="fa-solid fa-link"></i> Assigner
+            <i class="fa-solid fa-link"></i> Assign
           </button>
         </div>
       </div>
     </div>
 
     <div class="table-card" *ngIf="selectedAssignMedecin">
-      <h4 style="padding: 20px; margin: 0; border-bottom: 1px solid var(--border-light);"><i class="fa-solid fa-list-check me-2"></i>Patients Actuellement Assigneds</h4>
+      <h4 style="padding: 20px; margin: 0; border-bottom: 1px solid var(--border-light);"><i class="fa-solid fa-list-check me-2"></i>Currently Assigned Patients</h4>
       <div *ngIf="isLoading" class="loading-state"><div class="spinner"></div><span>Loading…</span></div>
       <table class="gp-table" *ngIf="!isLoading">
         <thead>
@@ -231,7 +231,7 @@
             </td>
           </tr>
           <tr *ngIf="assignedPatients.length === 0">
-             <td colspan="6" class="empty-row text-center"><i class="fa-solid fa-user-xmark me-2"></i>No patient assigned à ce médecin.</td>
+             <td colspan="6" class="empty-row text-center"><i class="fa-solid fa-user-xmark me-2"></i>No patient assigned to this doctor.</td>
           </tr>
         </tbody>
       </table>
@@ -255,13 +255,13 @@
       <div class="text-center mb-4">
         <div class="detail-avatar mx-auto">{{ (movingPatient.prenom||'?')[0] }}{{ (movingPatient.nom||'?')[0] }}</div>
         <h5 class="mt-2">{{ movingPatient.prenom }} {{ movingPatient.nom }}</h5>
-        <p class="text-muted small">Reassign this patient à un autre médecin</p>
+        <p class="text-muted small">Reassign this patient to another doctor</p>
       </div>
 
       <div class="form-group">
         <label>New Doctor</label>
         <select class="gp-input" [(ngModel)]="newDoctorId">
-          <option [ngValue]="null">-- Choisir un Doctor --</option>
+          <option [ngValue]="null">-- Choose a Doctor --</option>
           <ng-container *ngFor="let m of allDoctors">
             <option *ngIf="m.id !== selectedAssignMedecin" [ngValue]="m.id">
               Dr. {{ m.prenom }} {{ m.nom }}
@@ -284,7 +284,7 @@
 <div class="modal-backdrop" *ngIf="showDetail" (click)="closeDetail()">
   <div class="modal-box" (click)="$event.stopPropagation()">
     <div class="modal-head">
-      <span><i class="fa-solid fa-user-doctor me-2"></i>Profil Doctor</span>
+      <span><i class="fa-solid fa-user-doctor me-2"></i>Doctor Profile</span>
       <button class="modal-close" (click)="closeDetail()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body" *ngIf="selectedDoc">
@@ -293,16 +293,16 @@
         <h4 class="fw-bold mt-2">Dr. {{ selectedDoc.prenom }} {{ selectedDoc.nom }}</h4>
         <span class="status-badge mx-auto" style="display:inline-flex;margin-top:6px"
               [class.status-active]="selectedDoc.actif" [class.status-inactive]="!selectedDoc.actif">
-          {{ selectedDoc.actif ? 'Compte Active' : 'Compte Suspendu' }}
+          {{ selectedDoc.actif ? 'Active Account' : 'Suspended Account' }}
         </span>
       </div>
       <div class="detail-info-grid">
         <div><strong>Email:</strong> {{ selectedDoc.email || '—' }}</div>
         <div><strong>Phone:</strong> {{ selectedDoc.telephone || '—' }}</div>
-        <div><strong>Rôle:</strong> {{ selectedDoc.role }}</div>
+        <div><strong>Role:</strong> {{ selectedDoc.role }}</div>
         <div><strong>Registered on:</strong> {{ fmt(selectedDoc.createdAt) }}</div>
-        <div><strong>Patients accessibles:</strong> {{ allPatients.length }}</div>
-        <div><strong>ID Compte:</strong> #{{ selectedDoc.id }}</div>
+        <div><strong>Accessible patients:</strong> {{ allPatients.length }}</div>
+        <div><strong>Account ID:</strong> #{{ selectedDoc.id }}</div>
       </div>
       <div class="info-note mt-4">
         <i class="fa-solid fa-stethoscope me-2"></i>
@@ -326,7 +326,7 @@
       <button class="modal-close" (click)="closeForm()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
-      <h6 class="section-label">Informations personnelles</h6>
+      <h6 class="section-label">Personal Information</h6>
       <div class="form-grid">
         <div class="form-group">
           <label>Last Name <span class="req">*</span></label>
@@ -345,14 +345,14 @@
           <input type="tel" [(ngModel)]="dForm.telephone" placeholder="+216 XX XXX XXX" class="gp-input">
         </div>
         <div class="form-group" *ngIf="!isEditMode">
-          <label>Mot de passe initial</label>
+          <label>Initial password</label>
           <input type="password" [(ngModel)]="dForm.password" placeholder="AlzCare2026!" class="gp-input">
         </div>
         <div class="form-group" *ngIf="isEditMode">
-          <label>Accès plateforme</label>
+          <label>Platform access</label>
           <select [(ngModel)]="dForm.actif" class="gp-input">
             <option [ngValue]="true">Active</option>
-            <option [ngValue]="false">Suspendu</option>
+            <option [ngValue]="false">Suspended</option>
           </select>
         </div>
       </div>

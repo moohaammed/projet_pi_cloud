@@ -12,7 +12,7 @@
   <!-- Loading -->
   <div class="pi-loading" *ngIf="loading">
     <div class="pi-spinner"></div>
-    Chargement des incidents…
+    Loading incidents…
   </div>
 
   <!-- Error -->
@@ -23,20 +23,20 @@
   <!-- Empty state -->
   <div class="pi-empty" *ngIf="!loading && !error && incidents.length === 0">
     <i class="fa-solid fa-shield-check"></i>
-    <p>Aucun incident enregistré. Votre chemin est sûr !</p>
+    <p>No incident recorded. Your path is safe!</p>
   </div>
   <!-- Pas de zone définie -->
 <div *ngIf="!loading && !zoneDefinie" class="alert alert-warning text-center">
   <i class="fa-solid fa-house-circle-exclamation fa-2x mb-2 d-block"></i>
-  <strong>Aucune zone définie</strong><br>
-  <small>Votre médecin n'a pas encore défini votre zone de sécurité.</small>
+  <strong>No zone defined</strong><br>
+  <small>Your doctor has not yet defined your safety zone.</small>
 </div>
 
 <!-- Zone définie mais aucun incident -->
 <div *ngIf="!loading && zoneDefinie && incidents.length === 0"
      class="alert alert-success text-center">
   <i class="fa-solid fa-shield-check fa-2x mb-2 d-block"></i>
-  ✅ Aucun incident dans votre zone ({{ rayonZone }}m autour de votre maison)
+  ✅ No incident in your zone ({{ rayonZone }}m around your home)
 </div>
 
   <!-- Incident cards -->

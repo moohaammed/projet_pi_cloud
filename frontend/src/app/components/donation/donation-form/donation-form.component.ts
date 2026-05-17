@@ -12,7 +12,7 @@ import { AuthService } from '../../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   styles: [`
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800&display=swap');
+    
 
     :host {
       --primary:      #800080;
@@ -32,12 +32,12 @@ import { AuthService } from '../../../services/auth.service';
       --shadow-card:  0 4px 24px rgba(128, 0, 128, 0.10);
       --radius:       16px;
       display: block;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #ffffff !important;
+      font-family: 'Quicksand', sans-serif;
+      background: #f8f9fa !important;
     }
 
     .donation-form-page {
-      background: #ffffff !important;
+      background: #f8f9fa !important;
       min-height: 100vh;
       padding: 20px 32px 40px;
     }
@@ -75,7 +75,7 @@ import { AuthService } from '../../../services/auth.service';
       border-radius: 50px; border: 1px solid var(--primary-light);
     }
     .page-title {
-      font-family: 'Fraunces', serif; font-size: 2.8rem; font-weight: 800;
+      font-family: 'Quicksand', sans-serif; font-size: 2.8rem; font-weight: 800;
       color: var(--text-dark);
       background: linear-gradient(to right, var(--text-dark), var(--primary));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -109,7 +109,7 @@ import { AuthService } from '../../../services/auth.service';
     .preview-image img { width: 100%; height: 100%; object-fit: cover; }
 
     .preview-title {
-      font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700;
+      font-family: 'Quicksand', sans-serif; font-size: 1.1rem; font-weight: 700;
       color: var(--text-dark); margin: 0 0 8px;
     }
     .preview-desc {
@@ -135,7 +135,7 @@ import { AuthService } from '../../../services/auth.service';
     }
 
     .section-title {
-      font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700;
+      font-family: 'Quicksand', sans-serif; font-size: 1.05rem; font-weight: 700;
       color: var(--text-dark); margin: 0 0 8px;
     }
     .section-desc { font-size: .82rem; color: var(--text-mid); margin: 0 0 12px; }
@@ -146,7 +146,7 @@ import { AuthService } from '../../../services/auth.service';
       padding: 10px 16px; background: var(--primary); color: var(--white);
       border: none; border-radius: 10px; font-weight: 700; font-size: .78rem;
       cursor: pointer; transition: all .2s; white-space: nowrap;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Quicksand', sans-serif;
     }
     .btn-lookup:hover { background: var(--primary-hover); }
 
@@ -195,7 +195,7 @@ import { AuthService } from '../../../services/auth.service';
     .form-input {
       width: 100%; padding: 11px 16px;
       border: 1.5px solid var(--border); border-radius: 10px;
-      font-family: 'Plus Jakarta Sans', sans-serif; font-size: .88rem;
+      font-family: 'Quicksand', sans-serif; font-size: .88rem;
       color: var(--text-dark); background: var(--white);
       transition: all .2s; outline: none;
       box-sizing: border-box;
@@ -216,7 +216,7 @@ import { AuthService } from '../../../services/auth.service';
       padding: 10px 20px;
       border: 1.5px solid var(--border); border-radius: 50px;
       background: var(--white); color: var(--text-mid);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: .85rem; font-weight: 700;
       cursor: pointer; transition: all .2s;
     }
@@ -268,7 +268,7 @@ import { AuthService } from '../../../services/auth.service';
     .summary-row { display: flex; align-items: baseline; gap: 10px; }
     .summary-label { font-size: .95rem; color: var(--text-mid); font-weight: 500; }
     .summary-amount {
-      font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 800;
+      font-family: 'Quicksand', sans-serif; font-size: 1.6rem; font-weight: 800;
       color: var(--text-dark);
     }
 
@@ -277,7 +277,7 @@ import { AuthService } from '../../../services/auth.service';
       padding: 14px 32px;
       background: linear-gradient(135deg, var(--primary), #a855a8);
       color: var(--white); border: none; border-radius: 50px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: .95rem; font-weight: 800;
       cursor: pointer; transition: all .25s;
       letter-spacing: 0.02em;
@@ -301,7 +301,7 @@ import { AuthService } from '../../../services/auth.service';
     }
     .empty-glass svg { width: 42px; height: 42px; color: var(--primary); }
     .empty-title {
-      font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700;
+      font-family: 'Quicksand', sans-serif; font-size: 1.2rem; font-weight: 700;
       color: var(--text-dark); margin: 0;
     }
 
@@ -348,7 +348,7 @@ import { AuthService } from '../../../services/auth.service';
     }
     .ai-logo svg { width: 24px; height: 24px; }
     .ai-title-group h2 { 
-      font-family: 'Fraunces', serif; font-size: 1.4rem; margin: 0; color: var(--text-dark);
+      font-family: 'Quicksand', sans-serif; font-size: 1.4rem; margin: 0; color: var(--text-dark);
     }
     .ai-subtitle { font-size: .8rem; color: var(--text-mid); margin: 0; }
 
@@ -361,7 +361,7 @@ import { AuthService } from '../../../services/auth.service';
     }
     .ai-pitch-card::before {
       content: '"'; position: absolute; top: -10px; left: 10px; 
-      font-size: 4rem; color: var(--primary-mid); opacity: 0.5; font-family: 'Fraunces', serif;
+      font-size: 4rem; color: var(--primary-mid); opacity: 0.5; font-family: 'Quicksand', sans-serif;
     }
 
     .ai-tags-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -471,34 +471,34 @@ export class DonationFormComponent implements OnInit {
     this.errors = {};
 
     if (!this.donation.amount || this.donation.amount <= 0) {
-      this.errors['amount'] = 'Le montant doit être supérieur à 0.';
+      this.errors['amount'] = 'The amount must be greater than 0.';
     } else if (this.donation.amount > 100000) {
-      this.errors['amount'] = 'Le montant ne peut pas dépasser 100 000 DT.';
+      this.errors['amount'] = 'The amount cannot exceed 100,000 DT.';
     }
 
     if (!this.donation.donorFirstName?.trim()) {
-      this.errors['donorFirstName'] = 'Le prénom est obligatoire.';
+      this.errors['donorFirstName'] = 'First name is required.';
     }
 
     if (!this.donation.donorLastName?.trim()) {
-      this.errors['donorLastName'] = 'Le nom est obligatoire.';
+      this.errors['donorLastName'] = 'Last name is required.';
     }
 
     if (!this.donation.donorEmail?.trim()) {
-      this.errors['donorEmail'] = 'L\'email est obligatoire.';
+      this.errors['donorEmail'] = 'Email is required.';
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.donation.donorEmail)) {
-        this.errors['donorEmail'] = 'L\'email n\'est pas valide.';
+        this.errors['donorEmail'] = 'Email is not valid.';
       }
     }
 
     if (!this.donation.paymentMethod) {
-      this.errors['paymentMethod'] = 'Veuillez choisir une méthode de paiement.';
+      this.errors['paymentMethod'] = 'Please choose a payment method.';
     }
 
     if (!this.agreeTerms) {
-      this.errors['agree'] = 'Vous devez accepter les conditions.';
+      this.errors['agree'] = 'You must agree to the conditions.';
     }
 
     return Object.keys(this.errors).length === 0;
@@ -516,7 +516,7 @@ export class DonationFormComponent implements OnInit {
         },
         error: () => {
           this.submitting = false;
-          alert('Erreur lors de la communication avec le serveur de paiement. Veuillez réessayer.');
+          alert('Error communicating with the payment server. Please try again.');
         }
       });
     } else {
@@ -545,7 +545,7 @@ export class DonationFormComponent implements OnInit {
         },
         error: () => {
           this.submitting = false;
-          alert('Erreur lors de l\'enregistrement du don. Veuillez réessayer.');
+          alert('Error saving donation. Please try again.');
         }
       });
     }
@@ -573,7 +573,7 @@ export class DonationFormComponent implements OnInit {
         console.error('AI Analysis Error:', err);
         this.analyzing = false;
         this.showAiModal = false;
-        alert('Désolé, l\'IA n\'a pas pu analyser cette campagne pour le moment.');
+        alert('Sorry, the AI could not analyze this campaign at the moment.');
       }
     });
   }
@@ -583,3 +583,4 @@ export class DonationFormComponent implements OnInit {
     this.aiResult = null;
   }
 }
+
