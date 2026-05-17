@@ -11,7 +11,8 @@ import { User, Role } from '../../../models/user.model';
   selector: 'app-patient-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
-  templateUrl: './patient-list.component.html'
+  templateUrl: './patient-list.component.html',
+  styleUrls: ['./patient-list.component.css']
 })
 export class PatientListComponent implements OnInit {
 

@@ -10,7 +10,8 @@ import { User, Role } from '../../../models/user.model';
   selector: 'app-patient-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
-  templateUrl: './patient-detail.component.html'
+  templateUrl: './patient-detail.component.html',
+  styleUrls: ['./patient-detail.component.css']
 })
 export class PatientDetailComponent implements OnInit {
 
@@ -89,10 +90,10 @@ export class PatientDetailComponent implements OnInit {
 
   getStadeLabel(): string {
     switch (this.patient?.stade) {
-      case 'LEGER':  return 'Léger';
-      case 'MODERE': return 'Modéré';
-      case 'SEVERE': return 'Sévère';
-      default:       return 'No défini';
+      case 'LEGER':  return 'Mild';
+      case 'MODERE': return 'Moderate';
+      case 'SEVERE': return 'Severe';
+      default:       return 'Not defined';
     }
   }
 
@@ -107,24 +108,24 @@ export class PatientDetailComponent implements OnInit {
 
   get contactUrgenceNom():      string {
     return this.patient?.contactUrgenceNom
-        || (this.relation ? `${this.relation.prenom} ${this.relation.nom}` : 'No renseigné');
+        || (this.relation ? `${this.relation.prenom} ${this.relation.nom}` : 'Not provided');
   }
   get contactUrgenceTelephone():string {
     return this.patient?.contactUrgenceTelephone
         || this.relation?.telephone
-        || 'No renseigné';
+        || 'Not provided';
   }
   get contactUrgenceRelation(): string {
     return this.patient?.contactUrgenceRelation
         || (this.relation as any)?.lienAvecPatient
-        || 'No renseigné';
+        || 'Not provided';
   }
   get notes():   string { return this.patient?.notes   || ''; }
-  get adresse(): string { return this.patient?.adresse || 'No renseignée'; }
+  get adresse(): string { return this.patient?.adresse || 'Not provided'; }
 
-  // ── Infos relation ────────────────────────────────────────
+  // ── Relation info ────────────────────────────────────────
   get relationNomComplet(): string {
-    if (!this.relation) return 'Aucun compte relation créé';
+    if (!this.relation) return 'No relation account created';
     return `${this.relation.prenom ?? ''} ${this.relation.nom ?? ''}`.trim();
   }
   get relationEmail():    string { return this.relation?.email     || '—'; }

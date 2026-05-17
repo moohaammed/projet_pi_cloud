@@ -54,6 +54,12 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
     private userSvc:   UserService
   ) {}
 
+  mergedPatients: any[] = [];
+  filteredPatients: any[] = [];
+  paginatedPatients: any[] = [];
+  pageNumsList: number[] = [];
+  totalPagesCount = 1;
+
   ngOnInit(): void { this.loadAll(); }
 
   ngOnDestroy(): void { this.destroyCharts(); }
@@ -64,16 +70,27 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
       next: pts => {
         this.allPatients = pts || [];
         this.anSvc.getAllAnalyses().subscribe({
-          next: an => { this.allAnalyses = an || []; this.isLoading = false; },
-          error: ()  => { this.isLoading = false; }
+          next: an => {
+            this.allAnalyses = an || [];
+            this.isLoading = false;
+            this.refresh();
+          },
+          error: ()  => {
+            this.isLoading = false;
+            this.refresh();
+          }
         });
       },
-      error: () => { this.isLoading = false; }
+      error: () => {
+        this.isLoading = false;
+        this.refresh();
+      }
     });
   }
 
-  get merged(): any[] {
-    return this.allPatients.map(p => ({
+  refresh(): void {
+    // 1. Merge user info into patient profiles
+    this.mergedPatients = this.allPatients.map(p => ({
       ...p,
       email: p.user?.email ?? '',
       telephone: p.user?.telephone ?? '',
@@ -81,32 +98,59 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
       createdAt: p.user?.createdAt ?? null,
       userId: p.user?.id ?? null,
     }));
-  }
 
-  get filtered(): any[] {
-    let l = this.merged;
+    // 2. Apply search and filters
+    let l = this.mergedPatients;
     if (this.searchQuery.trim()) {
       const q = this.searchQuery.toLowerCase();
       l = l.filter(p => `${p.nom} ${p.prenom} ${p.email}`.toLowerCase().includes(q));
     }
-    if (this.filterSex)   l = l.filter(p => p.sexe === this.filterSex);
-    if (this.filterActive !== '') l = l.filter(p => p.actif === (this.filterActive === 'true'));
-    return l;
+    if (this.filterSex) {
+      l = l.filter(p => p.sexe === this.filterSex);
+    }
+    if (this.filterActive !== '') {
+      l = l.filter(p => p.actif === (this.filterActive === 'true'));
+    }
+    this.filteredPatients = l;
+
+    // 3. Update total pages
+    this.totalPagesCount = Math.max(1, Math.ceil(this.filteredPatients.length / this.PAGE));
+
+    // 4. Extract paginated slice
+    const s = (this.currentPage - 1) * this.PAGE;
+    this.paginatedPatients = this.filteredPatients.slice(s, s + this.PAGE);
+
+    // 5. Generate page numbers array
+    const arr: number[] = [];
+    for (let i = Math.max(1, this.currentPage-2); i <= Math.min(this.totalPagesCount, this.currentPage+2); i++) {
+      arr.push(i);
+    }
+    this.pageNumsList = arr;
   }
 
   get paginated(): any[] {
-    const s = (this.currentPage - 1) * this.PAGE;
-    return this.filtered.slice(s, s + this.PAGE);
+    return this.paginatedPatients;
   }
 
-  get totalPages(): number { return Math.max(1, Math.ceil(this.filtered.length / this.PAGE)); }
-  get pageNums(): number[] {
-    const arr: number[] = [];
-    for (let i = Math.max(1, this.currentPage-2); i <= Math.min(this.totalPages, this.currentPage+2); i++) arr.push(i);
-    return arr;
+  get totalPages(): number {
+    return this.totalPagesCount;
   }
-  changePage(p: number): void { if (p>=1 && p<=this.totalPages) this.currentPage = p; }
-  onFilter(): void { this.currentPage = 1; }
+
+  get pageNums(): number[] {
+    return this.pageNumsList;
+  }
+
+  changePage(p: number): void {
+    if (p>=1 && p<=this.totalPages) {
+      this.currentPage = p;
+      this.refresh();
+    }
+  }
+
+  onFilter(): void {
+    this.currentPage = 1;
+    this.refresh();
+  }
 
   // Stats
   get totalPat(): number { return this.allPatients.length; }
@@ -196,6 +240,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
         const idx = this.allPatients.findIndex(x => x.id===p.id);
         if (idx>=0 && this.allPatients[idx].user) this.allPatients[idx].user.actif = u.actif;
         this.showSuccess(u.actif ? 'Compte activé.' : 'Compte suspendu.');
+        this.refresh();
       },
       error: () => this.showError('Erreur toggle accès.')
     });
@@ -222,7 +267,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
     // Sex donut
     const sexMap: Record<string,number> = {};
     this.allPatients.forEach(p => { const k=p.sexe||'Unknown'; sexMap[k]=(sexMap[k]||0)+1; });
-    this.makeDonut('chartSex', Object.keys(sexMap), Object.values(sexMap), ['#8b5cf6','#f472b6','#a78bfa','#c4b5fd']);
+    this.makeDonut('chartSex', Object.keys(sexMap), Object.values(sexMap), ['#800080', '#a855a8', '#c88bc8', '#e8c8e8']);
 
     // Age groups bar
     const ag: Record<string,number> = {'0-20':0,'21-40':0,'41-60':0,'61-80':0,'80+':0};
@@ -237,13 +282,13 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
     const alzMap: Record<string,number> = {};
     this.allAnalyses.forEach(a => { if (a.interpretation) { const k=a.interpretation; alzMap[k]=(alzMap[k]||0)+1; } });
     if (!Object.keys(alzMap).length) alzMap['Noe donnée']=1;
-    this.makeDonut('chartAlz', Object.keys(alzMap), Object.values(alzMap), ['#10b981','#f59e0b','#ef4444','#3b82f6','#8b5cf6','#ec4899']);
+    this.makeDonut('chartAlz', Object.keys(alzMap), Object.values(alzMap), ['#10b981','#f59e0b','#ef4444','#3b82f6','#800080','#ec4899']);
 
     // Analyses per patient (top 8)
     const anPat: {name:string; count:number}[] = this.allPatients
       .map(p => ({ name:`${p.prenom} ${p.nom}`, count: this.allAnalyses.filter(a=>a.patient?.id===p.id).length }))
       .sort((a,b)=>b.count-a.count).slice(0,8);
-    this.makeBar('chartAnPat', anPat.map(x=>x.name), anPat.map(x=>x.count), '#a78bfa');
+    this.makeBar('chartAnPat', anPat.map(x=>x.name), anPat.map(x=>x.count), '#a855a8');
   }
 
   private makeDonut(id: string, labels: string[], data: number[], colors: string[]): void {
@@ -256,7 +301,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
     });
     this.charts.push(c);
   }
-  private makeBar(id: string, labels: string[], data: number[], color='#8b5cf6'): void {
+  private makeBar(id: string, labels: string[], data: number[], color='#800080'): void {
     const el = document.getElementById(id) as HTMLCanvasElement;
     if (!el) return;
     const c = new Chart(el, {

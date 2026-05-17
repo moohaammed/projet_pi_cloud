@@ -12,9 +12,9 @@
      style="height:60vh">
   <div class="text-center p-4">
     <i class="fa-solid fa-user-slash d-block fs-1 mb-3" style="color:#d5b8ff"></i>
-    <h5 class="fw-bold" style="color:#3c3489">Aucun patient lié</h5>
+    <h5 class="fw-bold" style="color:#3c3489">No linked patient</h5>
     <p class="text-muted">Your account is not yet associated with a patient.<br>
-       Contactez l'administrateur.</p>
+       Contact the administrator.</p>
   </div>
 </div>
 
@@ -120,7 +120,7 @@
       {key:'activite',label:'Incidents IA',  icon:'fa-triangle-exclamation'}
     ]"
             class="btn btn-sm rounded-pill px-4 py-2 fw-semibold"
-            style="font-size:13px; tryears oldition:all .2s"
+            style="font-size:13px; transition:all .2s"
             [style.background]="activeSection === s.key ? '#6f42c1' : '#f5f0ff'"
             [style.color]="activeSection === s.key ? 'white' : '#4a2a8a'"
             [style.border]="'1.5px solid ' + (activeSection === s.key ? '#6f42c1' : '#d5b8ff')"
@@ -224,7 +224,7 @@
                  target="_blank"
                  class="btn btn-sm btn-outline-primary rounded-pill mt-1"
                  style="font-size:12px">
-                <i class="fa-solid fa-map-location-dot me-1"></i>Ouvrir dyears old Maps
+                <i class="fa-solid fa-map-location-dot me-1"></i>Ouvrir dans Maps
               </a>
             </div>
 
@@ -363,7 +363,7 @@
                  style="width:32px;height:32px;background:#f5f0ff">
               <i class="fa-solid fa-brain" style="color:#6f42c1;font-size:14px"></i>
             </div>
-            Incidents détectés par l'IA
+            AI-detected incidents
           </h6>
           <span class="badge rounded-pill px-3"
                 style="background:#6f42c1;font-size:12px">
@@ -405,7 +405,7 @@
 
         <div *ngIf="incidents.length === 0" class="text-center text-muted py-4">
           <i class="fa-solid fa-shield-check d-block fs-1 mb-2" style="color:#6f42c1;opacity:.3"></i>
-          Aucun incident détecté
+          No incident detected
         </div>
       </div>
     </div>

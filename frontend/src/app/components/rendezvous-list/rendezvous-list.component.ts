@@ -6,6 +6,7 @@ import { RendezVous, StatutRendezVous } from '../../models/rendezvous.model';
 import { RendezVousService } from '../../services/rendezvous.service';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
+import { PatientService } from '../../services/patient.service';
 
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
@@ -25,8 +26,9 @@ export class RendezVousListComponent implements OnInit {
   filteredList: RendezVous[] = [];
   loading = true;
   error = '';
-  searchPatientId = '';
-  searchMedecinId = '';
+  allPatients: any[] = [];
+  searchPatientName = '';
+  searchMedecinName = '';
   filterStatut = '';
   deleteConfirmId: string | null = null;
   currentUser: any = null;
@@ -63,7 +65,8 @@ export class RendezVousListComponent implements OnInit {
     private service: RendezVousService,
     private authService: AuthService,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private patientService: PatientService
   ) {
     this.currentUser = this.authService.getCurrentUser();
   }
@@ -79,19 +82,42 @@ export class RendezVousListComponent implements OnInit {
       next: (data) => {
         this.rendezvousList = data;
         
-        // --- Fetch user names ---
-        this.userService.getAll().subscribe({
-          next: (users: any[]) => {
-            const usersMap = new Map<number, any>();
-            users.forEach(u => usersMap.set(u.id, u));
-            this.rendezvousList.forEach(rv => {
-              const p = usersMap.get(Number(rv.patientId));
-              if (p) rv.nomPatient = `${p.prenom || ''} ${p.nom || ''}`.trim();
-              const m = usersMap.get(Number(rv.medecinId));
-              if (m) rv.medecinNom = `${m.prenom || ''} ${m.nom || ''}`.trim();
+        // --- Fetch patient names and user names ---
+        this.patientService.getAllPatients().subscribe({
+          next: (patients: any[]) => {
+            this.allPatients = patients || [];
+            this.userService.getByRole('DOCTOR').subscribe({
+              next: (users: any[]) => {
+                const patientsMap = new Map<number, any>();
+                this.allPatients.forEach(p => patientsMap.set(Number(p.id), p));
+
+                const usersMap = new Map<number, any>();
+                users.forEach(u => usersMap.set(Number(u.id), u));
+
+                this.rendezvousList.forEach(rv => {
+                  const p = patientsMap.get(Number(rv.patientId));
+                  if (p) {
+                    rv.nomPatient = `${p.prenom || ''} ${p.nom || ''}`.trim();
+                  } else {
+                    const pu = usersMap.get(Number(rv.patientId));
+                    if (pu) rv.nomPatient = `${pu.prenom || ''} ${pu.nom || ''}`.trim();
+                  }
+
+                  const m = usersMap.get(Number(rv.medecinId));
+                  if (m) {
+                    rv.medecinNom = `Dr. ${m.prenom || ''} ${m.nom || ''}`.trim();
+                  } else {
+                    rv.medecinNom = `Doctor #${rv.medecinId}`;
+                  }
+                });
+                this.applyFilters();
+                this.loading = false;
+              },
+              error: () => {
+                this.applyFilters();
+                this.loading = false;
+              }
             });
-            this.applyFilters();
-            this.loading = false;
           },
           error: () => {
             this.applyFilters();
@@ -118,8 +144,10 @@ export class RendezVousListComponent implements OnInit {
     }
 
     this.filteredList = baseList.filter(rv => {
-      const matchPatient = this.searchPatientId === '' || rv.patientId?.toString().includes(this.searchPatientId);
-      const matchMedecin = this.searchMedecinId === '' || rv.medecinId?.toString().includes(this.searchMedecinId);
+      const matchPatient = this.searchPatientName === '' || 
+        (rv.nomPatient || '').toLowerCase().includes(this.searchPatientName.toLowerCase());
+      const matchMedecin = this.searchMedecinName === '' || 
+        (rv.medecinNom || '').toLowerCase().includes(this.searchMedecinName.toLowerCase());
       const matchStatut = this.filterStatut === '' || rv.statut === this.filterStatut;
       return matchPatient && matchMedecin && matchStatut;
     });
@@ -257,14 +285,15 @@ export class RendezVousListComponent implements OnInit {
   }
 
   resetFilters(): void {
-    this.searchPatientId = '';
-    this.searchMedecinId = '';
+    this.searchPatientName = '';
+    this.searchMedecinName = '';
     this.filterStatut = '';
     this.applyFilters();
   }
 
   // --- Patient Profile View ---
   selectedPatientId: number | null = null;
+  selectedPatientName = '';
   patientHistory: RendezVous[] = [];
   patientStatus: { label: string, color: string } = { label: 'Inconnu', color: 'secondary' };
   patientNotes: string[] = [];
@@ -272,6 +301,8 @@ export class RendezVousListComponent implements OnInit {
   openPatientProfile(patientId: number | undefined): void {
     if (!patientId) return;
     this.selectedPatientId = patientId;
+    const patient = this.allPatients.find(p => p.id === patientId);
+    this.selectedPatientName = patient ? `${patient.prenom || ''} ${patient.nom || ''}`.trim() : `Patient #${patientId}`;
     
     // Historique
     this.patientHistory = this.rendezvousList.filter(rv => Number(rv.patientId) === Number(patientId)).sort((a, b) => {

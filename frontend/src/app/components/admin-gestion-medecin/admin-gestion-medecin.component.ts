@@ -288,7 +288,7 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
     this.makeBar('chartPatDoc',
       topDocs.map(d=>`Dr. ${d.prenom} ${d.nom}`),
       topDocs.map(()=>this.allPatients.length),
-      '#8b5cf6'
+      '#800080'
     );
   }
 
@@ -318,7 +318,7 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
       options:{responsive:true,plugins:{legend:{position:'bottom'}}}
     }));
   }
-  private makeBar(id:string, labels:string[], data:number[], color='#8b5cf6'): void {
+  private makeBar(id:string, labels:string[], data:number[], color='#800080'): void {
     const el=document.getElementById(id) as HTMLCanvasElement;
     if (!el) return;
     this.charts.push(new Chart(el,{

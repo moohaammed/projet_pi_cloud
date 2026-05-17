@@ -1,22 +1,298 @@
-/* ══════════════════════════════════════════════
-   MOBILE RESPONSIVE — hospital list
-   ══════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════════════
+   ALZCARE PREMIUM HOSPITAL LIST STYLES
+   ══════════════════════════════════════════════════════════════════════════ */
 
+:host {
+  display: block;
+  font-family: 'Quicksand', sans-serif;
+  --primary-purple: #800080;
+  --primary-purple-soft: rgba(128, 0, 128, 0.06);
+  --primary-purple-glow: rgba(128, 0, 128, 0.15);
+  --emerald-green: #10b981;
+  --emerald-green-soft: rgba(16, 185, 129, 0.1);
+  --text-dark: #2c3038;
+  --text-muted: #555a64;
+  --card-bg: #ffffff;
+  --page-bg: #f8f9fa;
+  --border-light: rgba(128, 0, 128, 0.08);
+}
+
+:host-context(body.dark) {
+  --text-dark: #e2e8f0;
+  --text-muted: #94a3b8;
+  --card-bg: #1a1d27;
+  --page-bg: #0f1117;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --primary-purple-soft: rgba(128, 0, 128, 0.2);
+}
+
+/* ── Container Layout ───────────────────────────────────────────────────── */
+.container.py-4 {
+  padding-top: 2.5rem !important;
+  padding-bottom: 3.5rem !important;
+}
+
+/* ── Header Area ───────────────────────────────────────────────────────── */
+h3.fw-bold {
+  color: var(--text-dark);
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+/* ── Info Banner (AI View) ──────────────────────────────────────────────── */
+.ai-banner {
+  background: linear-gradient(135deg, rgba(128, 0, 128, 0.06) 0%, rgba(59, 130, 246, 0.06) 100%) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(128, 0, 128, 0.03);
+}
+
+.ai-icon-circle {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary-purple), #a855f7);
+  box-shadow: 0 4px 12px rgba(128, 0, 128, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+/* ── Search Input Styles ────────────────────────────────────────────────── */
+.input-group {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  border: 1.5px solid var(--border-light);
+  transition: all 0.3s ease;
+  background: var(--card-bg);
+}
+
+.input-group:focus-within {
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3.5px var(--primary-purple-glow);
+}
+
+.input-group-text {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-muted);
+  padding-left: 16px;
+}
+
+.form-control {
+  border: none !important;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  background: transparent !important;
+  padding: 12px 16px;
+  height: auto;
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.form-control:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  background: var(--primary-purple) !important;
+  border: none !important;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 24px;
+  border-radius: 8px !important;
+  margin: 4px;
+  box-shadow: 0 4px 10px rgba(128, 0, 128, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(128, 0, 128, 0.3);
+}
+
+.btn-outline-secondary {
+  border: none !important;
+  background: var(--page-bg) !important;
+  color: var(--text-dark) !important;
+  font-weight: 700;
+  margin: 4px;
+  border-radius: 8px !important;
+}
+
+/* ── Premium Card Grid ──────────────────────────────────────────────────── */
+.card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(128, 0, 128, 0.09) !important;
+  border-color: var(--primary-purple) !important;
+}
+
+.card-header {
+  border: none !important;
+  padding: 20px !important;
+}
+
+.card-body {
+  padding: 20px !important;
+  background: transparent !important;
+}
+
+.card-footer {
+  border: none !important;
+  padding: 16px 20px 20px !important;
+  background: transparent !important;
+}
+
+/* ── Custom Badges ──────────────────────────────────────────────────────── */
+.badge {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: 50px;
+}
+
+.badge.bg-light.text-success {
+  background: var(--emerald-green-soft) !important;
+  color: var(--emerald-green) !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.badge.bg-light.text-primary {
+  background: var(--primary-purple-soft) !important;
+  color: var(--primary-purple) !important;
+  border: 1px solid rgba(128, 0, 128, 0.15);
+}
+
+.bg-primary-subtle {
+  background: var(--primary-purple-soft) !important;
+  color: var(--primary-purple) !important;
+}
+
+.bg-success-subtle {
+  background: var(--emerald-green-soft) !important;
+  color: var(--emerald-green) !important;
+}
+
+/* ── Inner Details ─────────────────────────────────────────────────────── */
+.small.text-muted i {
+  width: 18px;
+  text-align: center;
+}
+
+.small.text-muted {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px !important;
+  font-size: 0.85rem;
+}
+
+.card-header .fw-bold {
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+/* Star Ratings */
+.fa-star.text-warning {
+  color: #f59e0b !important;
+  text-shadow: 0 1px 4px rgba(245, 158, 11, 0.25);
+}
+
+/* Route/Itinerary button */
+.btn-success.btn-sm {
+  background: linear-gradient(135deg, var(--emerald-green), #059669) !important;
+  border: none !important;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.btn-success.btn-sm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3);
+}
+
+/* Details and Actions buttons */
+.btn-outline-primary {
+  border: 1.5px solid var(--primary-purple) !important;
+  color: var(--primary-purple) !important;
+  background: transparent !important;
+  font-weight: 700;
+  border-radius: 10px;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-purple) !important;
+  color: #ffffff !important;
+}
+
+.btn-warning.btn-sm {
+  background: #f59e0b !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-danger.btn-sm {
+  background: #ef4444 !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Mobile responsiveness overrides ───────────────────────────────────── */
 @media (max-width: 767.98px) {
-  /* Header: stack title and add button */
   .d-flex.justify-content-between {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 12px !important;
   }
 
-  /* Cards: full width on phones */
   .col-md-6.col-lg-4 {
     width: 100% !important;
     flex: 0 0 100% !important;
   }
 
-  /* Card footer buttons: stack */
   .card-footer.d-flex.gap-2 {
     flex-wrap: wrap;
   }
@@ -26,22 +302,7 @@
     min-width: 80px;
   }
 
-  /* AI info banner: tighten padding */
-  .p-3.p-md-4.rounded-4 {
-    padding: 12px !important;
-  }
-
-  /* AI icon: smaller */
-  .rounded-circle[style*="width:46px"] {
-    width: 36px !important;
-    height: 36px !important;
-  }
-}
-
-@media (max-width: 479.98px) {
-  /* Remove container side padding on very small screens */
-  .container.py-4 {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+  .ai-banner {
+    padding: 16px !important;
   }
 }

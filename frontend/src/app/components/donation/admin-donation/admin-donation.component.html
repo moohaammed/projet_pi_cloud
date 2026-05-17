@@ -3,9 +3,9 @@
   <div class="page-top">
     <h2 class="page-heading">
       <i class="fa-solid fa-hand-holding-heart me-2"></i>
-      Gestion des Donations
+      Donation Management
     </h2>
-    <p class="page-sub">Gérez les campagnes et suivez les dons reçus.</p>
+    <p class="page-sub">Manage campaigns and track donations received.</p>
   </div>
 
   <!-- STATS CARDS -->
@@ -14,28 +14,28 @@
       <div class="stat-icon purple"><i class="fa-solid fa-bullhorn"></i></div>
       <div class="stat-body">
         <span class="stat-value">{{ campaigns.length }}</span>
-        <span class="stat-label">Campagnes</span>
+        <span class="stat-label">Campaigns</span>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon green"><i class="fa-solid fa-coins"></i></div>
       <div class="stat-body">
         <span class="stat-value">{{ getTotalRaised() | number:'1.0-0' }} DT</span>
-        <span class="stat-label">Total Collecté</span>
+        <span class="stat-label">Total Collected</span>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon blue"><i class="fa-solid fa-heart"></i></div>
       <div class="stat-body">
         <span class="stat-value">{{ allDonations.length }}</span>
-        <span class="stat-label">Total Dons</span>
+        <span class="stat-label">Total Donations</span>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon orange"><i class="fa-solid fa-check-circle"></i></div>
       <div class="stat-body">
         <span class="stat-value">{{ getActiveCampaignCount() }}</span>
-        <span class="stat-label">Campagnes Actives</span>
+        <span class="stat-label">Active Campaigns</span>
       </div>
     </div>
   </div>
@@ -43,7 +43,7 @@
   <!-- CHART SECTION -->
   <div class="section-card mb-4">
     <div class="section-header">
-      <h4><i class="fa-solid fa-chart-column me-2"></i>Aperçu des montants collectés</h4>
+      <h4><i class="fa-solid fa-chart-column me-2"></i>Overview of collected amounts</h4>
     </div>
     <div class="section-body">
       <div style="position: relative; height:300px; width:100%;">
@@ -55,24 +55,24 @@
   <!-- CAMPAIGN FORM -->
   <div class="section-card">
     <div class="section-header">
-      <h4><i class="fa-solid fa-plus-circle me-2"></i>{{ isEditing ? 'Modifier la Campagne' : 'Nouvelle Campagne' }}</h4>
+      <h4><i class="fa-solid fa-plus-circle me-2"></i>{{ isEditing ? 'Modify Campaign' : 'New Campaign' }}</h4>
     </div>
     <div class="section-body">
       <div class="form-grid">
         <div class="form-group">
-          <label>Titre *</label>
-          <input class="form-control" [(ngModel)]="newCampaign.title" placeholder="Nom de la campagne">
+          <label>Title *</label>
+          <input class="form-control" [(ngModel)]="newCampaign.title" placeholder="Campaign name">
           <div class="text-danger small mt-1" *ngIf="errors['title']">{{ errors['title'] }}</div>
         </div>
         <div class="form-group">
-          <label>Objectif (DT) *</label>
+          <label>Goal (DT) *</label>
           <input class="form-control" type="number" [(ngModel)]="newCampaign.goalAmount" placeholder="5000">
           <div class="text-danger small mt-1" *ngIf="errors['goalAmount']">{{ errors['goalAmount'] }}</div>
         </div>
         <div class="form-group full-width">
           <label>Description</label>
           <textarea class="form-control" rows="3" [(ngModel)]="newCampaign.description"
-                    placeholder="Décrivez l'objectif de cette campagne..."></textarea>
+                    placeholder="Describe the goal of this campaign..."></textarea>
         </div>
         <div class="form-group">
           <label>Image</label>
@@ -81,16 +81,16 @@
         <div class="form-group d-flex align-items-end pb-2">
           <div class="form-check">
             <input class="form-check-input" type="checkbox" [(ngModel)]="newCampaign.active" id="campaignActive">
-            <label class="form-check-label" for="campaignActive">Campagne active</label>
+            <label class="form-check-label" for="campaignActive">Active campaign</label>
           </div>
         </div>
       </div>
       <div class="mt-3 d-flex gap-2">
         <button class="btn btn-primary" (click)="saveCampaign()">
-          <i class="fa-solid fa-save me-1"></i>{{ isEditing ? 'Sauvegarder' : 'Créer' }}
+          <i class="fa-solid fa-save me-1"></i>{{ isEditing ? 'Save' : 'Create' }}
         </button>
         <button class="btn btn-secondary" (click)="resetForm()" *ngIf="isEditing">
-          <i class="fa-solid fa-times me-1"></i>Annuler
+          <i class="fa-solid fa-times me-1"></i>Cancel
         </button>
       </div>
     </div>
@@ -99,7 +99,7 @@
   <!-- CAMPAIGNS TABLE -->
   <div class="section-card">
     <div class="section-header">
-      <h4><i class="fa-solid fa-list me-2"></i>Campagnes</h4>
+      <h4><i class="fa-solid fa-list me-2"></i>Campaigns</h4>
     </div>
     <div class="section-body p-0">
       <div class="table-responsive">
@@ -108,11 +108,11 @@
             <tr>
               <th>ID</th>
               <th>Image</th>
-              <th>Titre</th>
-              <th>Objectif</th>
-              <th>Collecté</th>
-              <th>Progrès</th>
-              <th>Statut</th>
+              <th>Title</th>
+              <th>Goal</th>
+              <th>Collected</th>
+              <th>Progress</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -140,15 +140,15 @@
               </td>
               <td>
                 <button class="btn btn-sm btn-outline-primary me-1" (click)="editCampaign(c)"
-                        title="Modifier"><i class="fa-solid fa-pen"></i></button>
+                        title="Edit"><i class="fa-solid fa-pen"></i></button>
                 <button class="btn btn-sm btn-outline-info me-1" (click)="viewDonations(c)"
-                        title="Voir les dons"><i class="fa-solid fa-eye"></i></button>
+                        title="View donations"><i class="fa-solid fa-eye"></i></button>
                 <button class="btn btn-sm btn-outline-danger" (click)="deleteCampaign(c.id!)"
-                        title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+                        title="Delete"><i class="fa-solid fa-trash"></i></button>
               </td>
             </tr>
             <tr *ngIf="campaigns.length === 0">
-              <td colspan="8" class="text-center text-muted py-4">Aucune campagne créée</td>
+              <td colspan="8" class="text-center text-muted py-4">No campaigns created</td>
             </tr>
           </tbody>
         </table>
@@ -161,11 +161,11 @@
     <div class="section-header">
       <h4>
         <i class="fa-solid fa-heart me-2"></i>
-        Dons pour « {{ selectedCampaign.title }} »
+        Donations for "{{ selectedCampaign.title }}"
         <span class="badge bg-primary ms-2">{{ campaignDonations.length }}</span>
       </h4>
       <button class="btn btn-sm btn-outline-secondary" (click)="selectedCampaign = null">
-        <i class="fa-solid fa-times me-1"></i>Fermer
+        <i class="fa-solid fa-times me-1"></i>Close
       </button>
     </div>
     <div class="section-body p-0">
@@ -174,12 +174,12 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Donateur</th>
+              <th>Donor</th>
               <th>Email</th>
-              <th>Montant</th>
-              <th>Méthode</th>
+              <th>Amount</th>
+              <th>Method</th>
               <th>Date</th>
-              <th>Anonyme</th>
+              <th>Anonymous</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -187,7 +187,7 @@
             <tr *ngFor="let d of campaignDonations">
               <td>{{ d.id }}</td>
               <td class="fw-semibold">
-                {{ d.anonymous ? 'Anonyme' : d.donorFirstName + ' ' + d.donorLastName }}
+                {{ d.anonymous ? 'Anonymous' : d.donorFirstName + ' ' + d.donorLastName }}
               </td>
               <td>{{ d.donorEmail }}</td>
               <td class="text-success fw-bold">{{ d.amount | number:'1.2-2' }} DT</td>
@@ -201,7 +201,7 @@
               <td>
                 <span class="badge" [class.bg-dark]="d.anonymous" [class.bg-light]="!d.anonymous"
                       [class.text-dark]="!d.anonymous">
-                  {{ d.anonymous ? 'Oui' : 'Non' }}
+                  {{ d.anonymous ? 'Yes' : 'No' }}
                 </span>
               </td>
               <td>
@@ -211,7 +211,7 @@
               </td>
             </tr>
             <tr *ngIf="campaignDonations.length === 0">
-              <td colspan="8" class="text-center text-muted py-4">Aucun don pour cette campagne</td>
+              <td colspan="8" class="text-center text-muted py-4">No donations for this campaign</td>
             </tr>
           </tbody>
         </table>

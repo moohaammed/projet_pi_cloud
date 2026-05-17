@@ -16,10 +16,10 @@
       </nav>
 
       <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-header bg-primary text-white p-4 rounded-top-4">
+        <div class="card-header text-white p-4 rounded-top-4">
           <h5 class="mb-0 fw-bold">
             <i class="fa-solid fa-bed-pulse me-2"></i>
-            {{ isEdit ? 'Edit patient' : 'Add a patient' }}
+            {{ isEdit ? 'Edit Patient Profile' : 'Add a Patient Profile' }}
           </h5>
         </div>
 
@@ -28,9 +28,9 @@
             <i class="fa-solid fa-circle-exclamation me-2"></i>{{ error }}
           </div>
 
-          <!-- Infos de base -->
+          <!-- Basic Info -->
           <h6 class="fw-bold text-muted text-uppercase small mb-3">
-            Informations de base
+            Basic Information
           </h6>
           <div class="row g-3 mb-4">
             <div class="col-md-6">
@@ -52,7 +52,7 @@
                 Email <span class="text-danger">*</span>
               </label>
               <input [(ngModel)]="patient.email" name="email"
-                     type="email" class="form-control">
+                     type="email" class="form-control" placeholder="example@email.com">
             </div>
             <div class="col-md-6">
               <label class="form-label fw-medium">Phone</label>
@@ -61,26 +61,26 @@
             </div>
             <div *ngIf="!isEdit" class="col-md-6">
               <label class="form-label fw-medium">
-                Mot de passe <span class="text-danger">*</span>
+                Password <span class="text-danger">*</span>
               </label>
               <input [(ngModel)]="patient.password" name="password"
-                     type="password" class="form-control">
+                     type="password" class="form-control" placeholder="••••••••">
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-medium">Date de naissance</label>
+              <label class="form-label fw-medium">Date of Birth</label>
               <input [(ngModel)]="patient.dateNaissance" name="dateNaissance"
                      type="date" class="form-control">
             </div>
             <div class="col-12">
-              <label class="form-label fw-medium">Adresse</label>
+              <label class="form-label fw-medium">Address</label>
               <input [(ngModel)]="patient.adresse" name="adresse"
-                     class="form-control" placeholder="Adresse du patient">
+                     class="form-control" placeholder="Patient's current address">
             </div>
           </div>
 
-          <!-- Stade Alzheimer -->
+          <!-- Alzheimer Stage -->
           <h6 class="fw-bold text-muted text-uppercase small mb-3">
-            Stade Alzheimer
+            Alzheimer Stage
           </h6>
           <div class="d-flex gap-3 mb-4">
             <div *ngFor="let s of stades"
@@ -98,42 +98,42 @@
             </div>
           </div>
 
-          <!-- Contact d'urgence -->
+          <!-- Emergency Contact -->
           <h6 class="fw-bold text-muted text-uppercase small mb-3">
-            Contact d'urgence
+            Emergency Contact
           </h6>
           <div class="row g-3 mb-4">
             <div class="col-md-4">
-              <label class="form-label fw-medium">Last Name du contact</label>
+              <label class="form-label fw-medium">Contact Last Name</label>
               <input [(ngModel)]="patient.contactUrgenceNom"
-                     name="contactUrgenceNom" class="form-control">
+                     name="contactUrgenceNom" class="form-control" placeholder="Contact Last Name">
             </div>
             <div class="col-md-4">
               <label class="form-label fw-medium">Phone</label>
               <input [(ngModel)]="patient.contactUrgenceTelephone"
-                     name="contactUrgenceTelephone" class="form-control">
+                     name="contactUrgenceTelephone" class="form-control" placeholder="+216 XX XXX XXX">
             </div>
             <div class="col-md-4">
               <label class="form-label fw-medium">Relation</label>
               <select [(ngModel)]="patient.contactUrgenceRelation"
                       name="contactUrgenceRelation" class="form-select">
-                <option value="">Choisir...</option>
-                <option>Fils</option>
-                <option>Fille</option>
-                <option>Époux/Épouse</option>
-                <option>Frère/Sœur</option>
-                <option>Other</option>
+                <option value="">Choose...</option>
+                <option value="son">Son</option>
+                <option value="daughter">Daughter</option>
+                <option value="spouse">Spouse</option>
+                <option value="sibling">Sibling</option>
+                <option value="other">Other</option>
               </select>
             </div>
           </div>
 
           <!-- Notes -->
           <h6 class="fw-bold text-muted text-uppercase small mb-3">
-            Notes médicales
+            Medical Notes
           </h6>
           <textarea [(ngModel)]="patient.notes" name="notes"
                     class="form-control mb-4" rows="3"
-                    placeholder="Observations, traitements en cours...">
+                    placeholder="Observations, ongoing treatments...">
           </textarea>
 
           <!-- Actions -->
@@ -143,7 +143,7 @@
               <span *ngIf="loading"
                     class="spinner-border spinner-border-sm me-2"></span>
               <i *ngIf="!loading" class="fa-solid fa-floppy-disk me-2"></i>
-              {{ isEdit ? 'Save modifications' : 'Create patient' }}
+              {{ isEdit ? 'Save Modifications' : 'Create Patient Profile' }}
             </button>
             <button class="btn btn-outline-secondary"
                     (click)="cancel()" [disabled]="loading">

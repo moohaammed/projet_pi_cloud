@@ -30,7 +30,7 @@
                   style="width: 38px; height: 38px; background: white; border-color: #dee2e6;">
             <i class="fa-solid fa-bell text-primary"></i>
             <span *ngIf="unreadCount > 0" 
-                  class="position-absolute top-0 start-100 tryears oldlate-middle badge rounded-pill bg-danger"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                   style="font-size: 0.65rem; border: 2px solid white;">
               {{ unreadCount > 9 ? '9+' : unreadCount }}
             </span>
@@ -581,7 +581,7 @@
           <div class="card-body" style="max-height: 250px; overflow-y: auto;">
             <div *ngIf="chatHistory.length === 0" class="text-muted text-center py-3 small">
               <i class="fa-solid fa-hand-sparkles fa-2x mb-2 text-info"></i><br>
-              Ask a question about your medical report to receive a quick and clear years oldwer.
+              Ask a question about your medical report to receive a quick and clear answer.
             </div>
             
             <div *ngFor="let msg of chatHistory" class="mb-3 d-flex" [ngClass]="{'justify-content-end': msg.sender === 'user'}">

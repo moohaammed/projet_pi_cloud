@@ -19,7 +19,8 @@ interface CreationResponse {
   selector: 'app-patient-create',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './patient-create.component.html'
+  templateUrl: './patient-create.component.html',
+  styleUrls: ['./patient-create.component.css']
 })
 export class PatientCreateComponent implements OnInit {
 
@@ -36,13 +37,13 @@ export class PatientCreateComponent implements OnInit {
   creerRelation = true;
   relation = {
     nom: '', prenom: '', email: '', telephone: '',
-    lienAvecPatient: 'fils'
+    lienAvecPatient: 'son'
   };
 
-  liens  = ['fils', 'fille', 'femme', 'mari', 'frere', 'soeur', 'pere', 'mere', 'autre'];
+  liens  = ['son', 'daughter', 'wife', 'husband', 'brother', 'sister', 'father', 'mother', 'other'];
   stades = [
-    { value: 'LEGER',  label: 'Leger'  },
-    { value: 'MODERE', label: 'Modere' },
+    { value: 'LEGER',  label: 'Mild'  },
+    { value: 'MODERE', label: 'Moderate' },
     { value: 'SEVERE', label: 'Severe' },
   ];
 
@@ -197,7 +198,7 @@ export class PatientCreateComponent implements OnInit {
       this.currentStep = 3;
       this.result = null;
       this.error = null;
-      this.relation = { nom: '', prenom: '', email: '', telephone: '', lienAvecPatient: 'fils' };
+      this.relation = { nom: '', prenom: '', email: '', telephone: '', lienAvecPatient: 'son' };
       return;
     }
 
@@ -212,7 +213,7 @@ export class PatientCreateComponent implements OnInit {
       notesMedicales: '', latitude: null, longitude: null,
       rayonVert: 300, rayonRouge: 800,
     };
-    this.relation = { nom: '', prenom: '', email: '', telephone: '', lienAvecPatient: 'fils' };
+    this.relation = { nom: '', prenom: '', email: '', telephone: '', lienAvecPatient: 'son' };
   }
 
   goToPatients(): void { this.router.navigate(['/patient-profiles']); }

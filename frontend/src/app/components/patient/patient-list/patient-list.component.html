@@ -5,24 +5,24 @@
     <div>
       <h3 class="fw-bold mb-1">
         <i class="fa-solid fa-bed-pulse text-primary me-2"></i>
-        Gestion des patients
+        Patient Profiles
       </h3>
       <p class="text-muted mb-0">{{ filtered.length }} patient(s)</p>
     </div>
 
-    <!-- ★ Bouton Add — wizard patient + relation ★ -->
+    <!-- Add Button -->
     <a *ngIf="isAdmin || isDoctor"
        routerLink="/patient-profiles/creer"
        class="btn fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2"
-       style="background:linear-gradient(135deg,#6f42c1,#3c3489);
+       style="background:linear-gradient(135deg,#800080,#5c005c);
               color:white; border:none;
-              box-shadow:0 4px 14px rgba(111,66,193,.35)">
+              box-shadow:0 4px 14px rgba(128,0,128,.35)">
       <i class="fa-solid fa-user-plus"></i>
-      Add a patient
+      Add a Patient
     </a>
   </div>
 
-  <!-- Recherche -->
+  <!-- Search -->
   <div class="mb-4">
     <div class="input-group">
       <span class="input-group-text bg-white">
@@ -56,10 +56,7 @@
             <tr *ngFor="let p of filtered">
               <td class="ps-4">
                 <div class="d-flex align-items-center gap-3">
-                  <div class="rounded-circle d-flex align-items-center
-                              justify-content-center fw-bold text-white"
-                       style="width:40px; height:40px; font-size:14px;
-                              background:#0d6efd; flex-shrink:0">
+                  <div class="patient-avatar">
                     {{ p.nom.charAt(0) }}{{ p.prenom.charAt(0) }}
                   </div>
                   <div>
@@ -73,7 +70,7 @@
                   <i class="fa-solid fa-phone me-1 text-success"></i>
                   {{ p.telephone }}
                 </div>
-                <div class="text-muted small" *ngIf="!p.telephone">No renseigné</div>
+                <div class="text-muted small" *ngIf="!p.telephone">Not provided</div>
               </td>
               <td>
                 <span class="badge rounded-pill"
@@ -86,7 +83,7 @@
                 <div class="d-flex gap-2 justify-content-end">
                   <a [routerLink]="['/patient-profiles', p.id]"
                      class="btn btn-sm btn-outline-primary">
-                    <i class="fa-solid fa-eye me-1"></i>Fiche
+                    <i class="fa-solid fa-eye me-1"></i>Details
                   </a>
                   <a *ngIf="isAdmin || isDoctor"
                      [routerLink]="['/patient-profiles/edit', p.id]"

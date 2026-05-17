@@ -4,7 +4,7 @@
   <!-- Header -->
   <div class="gp-header">
     <div>
-      <h2 class="gp-title"><i class="fa-solid fa-users me-2"></i>Gestion Patients</h2>
+      <h2 class="gp-title"><i class="fa-solid fa-users me-2"></i>Patient Management</h2>
       <p class="gp-subtitle">Complete administration of patient accounts and profiles</p>
     </div>
     <button class="btn-primary-purple" (click)="openCreate()">
@@ -26,7 +26,7 @@
       <i class="fa-solid fa-list me-2"></i>Patient List
     </button>
     <button [class.tab-active]="activeTab==='stats'" (click)="setTab('stats')">
-      <i class="fa-solid fa-chart-pie me-2"></i>Statistiques
+      <i class="fa-solid fa-chart-pie me-2"></i>Statistics
     </button>
   </div>
 
@@ -41,15 +41,15 @@
       </div>
       <div class="kpi-card kpi-blue">
         <div class="kpi-icon"><i class="fa-solid fa-user-plus"></i></div>
-        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Newx ce mois</div></div>
+        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">New this month</div></div>
       </div>
       <div class="kpi-card kpi-green">
         <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
-        <div><div class="kpi-val">{{ activeCount }}</div><div class="kpi-lbl">Comptes actifs</div></div>
+        <div><div class="kpi-val">{{ activeCount }}</div><div class="kpi-lbl">Active accounts</div></div>
       </div>
       <div class="kpi-card kpi-red">
         <div class="kpi-icon"><i class="fa-solid fa-ban"></i></div>
-        <div><div class="kpi-val">{{ inactiveCount }}</div><div class="kpi-lbl">Comptes suspendus</div></div>
+        <div><div class="kpi-val">{{ inactiveCount }}</div><div class="kpi-lbl">Suspended accounts</div></div>
       </div>
     </div>
 
@@ -57,7 +57,7 @@
     <div class="gp-filters">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Rechercher nom, prénom, email…"
+        <input type="text" placeholder="Search by last name, first name, email…"
                [(ngModel)]="searchQuery" (ngModelChange)="onFilter()">
       </div>
       <select [(ngModel)]="filterSex" (ngModelChange)="onFilter()" class="filter-select">
@@ -66,9 +66,9 @@
         <option value="Female">Female</option>
       </select>
       <select [(ngModel)]="filterActive" (ngModelChange)="onFilter()" class="filter-select">
-        <option value="">Tous statuts</option>
+        <option value="">All statuses</option>
         <option value="true">Active</option>
-        <option value="false">Suspendu</option>
+        <option value="false">Suspended</option>
       </select>
     </div>
 
@@ -95,7 +95,7 @@
                 </div>
                 <div>
                   <div class="patient-name">{{ p.prenom }} {{ p.nom }}</div>
-                  <div class="patient-sub">{{ p.telephone || 'Pas de tél.' }}</div>
+                  <div class="patient-sub">{{ p.telephone || 'No phone' }}</div>
                 </div>
               </div>
             </td>
@@ -110,19 +110,19 @@
             <td>
               <span class="status-badge" [class.status-active]="p.actif" [class.status-inactive]="!p.actif">
                 <i class="fa-solid fa-circle me-1" style="font-size:8px"></i>
-                {{ p.actif ? 'Active' : 'Suspendu' }}
+                {{ p.actif ? 'Active' : 'Suspended' }}
               </span>
             </td>
             <td class="text-muted-sm">{{ fmt(p.createdAt) }}</td>
             <td>
               <div class="action-btns">
-                <button class="act-btn act-view"   title="View détails"   (click)="openDetail(p)"><i class="fa-solid fa-eye"></i></button>
+                <button class="act-btn act-view" title="View details" (click)="openDetail(p)"><i class="fa-solid fa-eye"></i></button>
                 <button class="act-btn act-edit"   title="Edit"       (click)="openEdit(p)"><i class="fa-solid fa-pen"></i></button>
                 <button class="act-btn" [class.act-suspend]="p.actif" [class.act-activate]="!p.actif"
-                        [title]="p.actif?'Suspendre':'Activate'" (click)="toggleActif(p)">
+                        [title]="p.actif?'Suspend':'Activate'" (click)="toggleActif(p)">
                   <i class="fa-solid" [class.fa-lock]="p.actif" [class.fa-lock-open]="!p.actif"></i>
                 </button>
-                <button class="act-btn act-key"    title="Reset Mot de passe" (click)="resetPassword(p)"><i class="fa-solid fa-key"></i></button>
+                <button class="act-btn act-key" title="Reset Password" (click)="resetPassword(p)"><i class="fa-solid fa-key"></i></button>
                 <button class="act-btn act-delete" title="Delete"      (click)="openDelete(p)"><i class="fa-solid fa-trash"></i></button>
               </div>
             </td>
@@ -159,7 +159,7 @@
       </div>
       <div class="kpi-card kpi-blue">
         <div class="kpi-icon"><i class="fa-solid fa-user-plus"></i></div>
-        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Newx ce mois</div></div>
+        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">New this month</div></div>
       </div>
       <div class="kpi-card kpi-green">
         <div class="kpi-icon"><i class="fa-solid fa-microscope"></i></div>
@@ -169,26 +169,26 @@
         <div class="kpi-icon"><i class="fa-solid fa-brain"></i></div>
         <div>
           <div class="kpi-val">{{ activeCount>0 ? (activeCount/totalPat*100|number:'1.0-0') : 0 }}%</div>
-          <div class="kpi-lbl">Taux d'activité</div>
+          <div class="kpi-lbl">Activity rate</div>
         </div>
       </div>
     </div>
 
     <div class="chart-grid">
       <div class="chart-card">
-        <div class="chart-title"><i class="fa-solid fa-venus-mars me-2"></i>Distribution par Gender</div>
+        <div class="chart-title"><i class="fa-solid fa-venus-mars me-2"></i>Gender Distribution</div>
         <canvas id="chartSex" height="220"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title"><i class="fa-solid fa-chart-bar me-2"></i>Distribution par Age</div>
+        <div class="chart-title"><i class="fa-solid fa-chart-bar me-2"></i>Age Distribution</div>
         <canvas id="chartAge" height="220"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title"><i class="fa-solid fa-brain me-2"></i>Classification Alzheimer (IRM)</div>
+        <div class="chart-title"><i class="fa-solid fa-brain me-2"></i>Alzheimer Classification (MRI)</div>
         <canvas id="chartAlz" height="220"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title"><i class="fa-solid fa-chart-column me-2"></i>Analyses par Patient (Top 8)</div>
+        <div class="chart-title"><i class="fa-solid fa-chart-column me-2"></i>Analyses per Patient (Top 8)</div>
         <canvas id="chartAnPat" height="220"></canvas>
       </div>
     </div>
@@ -200,7 +200,7 @@
 <div class="modal-backdrop" *ngIf="showDetail" (click)="closeDetail()">
   <div class="modal-box modal-xl" (click)="$event.stopPropagation()">
     <div class="modal-head">
-      <span><i class="fa-solid fa-user me-2"></i>Details Patient</span>
+      <span><i class="fa-solid fa-user me-2"></i>Patient Details</span>
       <button class="modal-close" (click)="closeDetail()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body" *ngIf="selectedP">
@@ -211,30 +211,30 @@
           <h4 class="text-center fw-bold mt-2">{{ selectedP.prenom }} {{ selectedP.nom }}</h4>
           <span class="status-badge mx-auto d-block text-center mt-1" style="width:fit-content"
                 [class.status-active]="selectedP.actif" [class.status-inactive]="!selectedP.actif">
-            {{ selectedP.actif ? 'Active' : 'Suspendu' }}
+            {{ selectedP.actif ? 'Active' : 'Suspended' }}
           </span>
           <div class="detail-info-grid mt-3">
             <div><strong>Email:</strong> {{ selectedP.email || '—' }}</div>
-            <div><strong>Tél:</strong> {{ selectedP.telephone || '—' }}</div>
+            <div><strong>Phone:</strong> {{ selectedP.telephone || '—' }}</div>
             <div><strong>Age:</strong> {{ selectedP.age != null ? selectedP.age + ' years old' : '—' }}</div>
             <div><strong>Gender:</strong> {{ selectedP.sexe || '—' }}</div>
-            <div><strong>Poids:</strong> {{ selectedP.poids != null ? selectedP.poids + ' kg' : '—' }}</div>
+            <div><strong>Weight:</strong> {{ selectedP.poids != null ? selectedP.poids + ' kg' : '—' }}</div>
             <div><strong>Registered on:</strong> {{ fmt(selectedP.createdAt) }}</div>
           </div>
         </div>
 
         <!-- Analyses -->
         <div class="detail-section flex-grow-1">
-          <h5 class="fw-bold mb-3"><i class="fa-solid fa-microscope me-2 text-purple"></i>Analyses & Results IRM</h5>
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-microscope me-2 text-purple"></i>Analyses & MRI Results</h5>
           <div *ngIf="isLoadingAn" class="loading-state"><div class="spinner"></div></div>
-          <div *ngIf="!isLoadingAn && patientAnalyses.length===0" class="empty-row">Noe analyse enregistrée.</div>
+          <div *ngIf="!isLoadingAn && patientAnalyses.length===0" class="empty-row">No analysis recorded.</div>
           <div *ngFor="let an of patientAnalyses" class="analyse-card">
             <div class="analyse-header">
               <span class="badge-info">{{ fmt(an.date) }}</span>
               <span class="analyse-statut">{{ an.statut }}</span>
               <span *ngIf="an.interpretation" class="badge-alz">🧠 {{ an.interpretation }}</span>
               <span *ngIf="an.pourcentageRisque!=null" class="badge-risk">
-                Risque: {{ an.pourcentageRisque }}%
+                Risk: {{ an.pourcentageRisque }}%
               </span>
             </div>
             <div *ngIf="an.observationMedicale" class="analyse-obs">
@@ -258,7 +258,7 @@
       <button class="modal-close" (click)="closeForm()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
-      <h6 class="section-label">Profil Patient</h6>
+      <h6 class="section-label">Patient Profile</h6>
       <div class="form-grid">
         <div class="form-group">
           <label>Last Name <span class="req">*</span></label>
@@ -274,7 +274,7 @@
         </div>
         <div class="form-group">
           <label>Weight (kg)</label>
-          <input type="number" [(ngModel)]="pForm.poids" placeholder="Poids" class="gp-input" min="0">
+          <input type="number" [(ngModel)]="pForm.poids" placeholder="Weight" class="gp-input" min="0">
         </div>
         <div class="form-group">
           <label>Gender</label>
@@ -285,7 +285,7 @@
         </div>
       </div>
 
-      <h6 class="section-label mt-3">Compte Utilisateur</h6>
+      <h6 class="section-label mt-3">User Account</h6>
       <div class="form-grid">
         <div class="form-group">
           <label>Email <span class="req">*</span></label>
@@ -296,7 +296,7 @@
           <input type="tel" [(ngModel)]="uForm.telephone" placeholder="+216 XX XXX XXX" class="gp-input">
         </div>
         <div class="form-group" *ngIf="!isEditMode">
-          <label>Mot de passe initial</label>
+          <label>Initial password</label>
           <input type="password" [(ngModel)]="uForm.password" placeholder="AlzCare2026!" class="gp-input">
         </div>
       </div>

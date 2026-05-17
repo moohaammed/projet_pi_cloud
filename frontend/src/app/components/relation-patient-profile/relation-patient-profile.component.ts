@@ -15,8 +15,8 @@ import { PatientLocation, GeoAlert } from '../../models/map.model';
   templateUrl: './relation-patient-profile.component.html',
   styles: [`
     @keyframes fadeUp {
-      from { opacity:0; tryears oldform:tryears oldlateY(16px); }
-      to   { opacity:1; tryears oldform:tryears oldlateY(0); }
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
     }
     .fade-up { animation: fadeUp .4s ease both; }
     .fade-up-1 { animation-delay:.05s }
@@ -59,7 +59,7 @@ export class RelationPatientProfileComponent implements OnInit {
         this.loadExtras();
       },
       error: () => {
-        // fallback via patientId dyears old le profil
+        // fallback via patientId dans le profil
         const pid = (this.currentUser as any)?.patientId;
         if (pid) {
           this.alzUserService.getById(pid).subscribe({

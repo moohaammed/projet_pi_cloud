@@ -9,7 +9,8 @@ import { User, Role } from '../../../models/user.model';
   selector: 'app-patient-form',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './patient-form.component.html'
+  templateUrl: './patient-form.component.html',
+  styleUrls: ['./patient-form.component.css']
 })
 export class PatientFormComponent implements OnInit {
 
@@ -31,9 +32,9 @@ export class PatientFormComponent implements OnInit {
   error = '';
 
   stades = [
-    { value: 'LEGER',  label: 'Léger',   color: 'success' },
-    { value: 'MODERE', label: 'Modéré',  color: 'warning' },
-    { value: 'SEVERE', label: 'Sévère',  color: 'danger'  }
+    { value: 'LEGER',  label: 'Mild',     color: 'success' },
+    { value: 'MODERE', label: 'Moderate', color: 'warning' },
+    { value: 'SEVERE', label: 'Severe',   color: 'danger'  }
   ];
 
   constructor(

@@ -4,20 +4,20 @@
 
 /* ── Variables ──────────────────────────────────────────────────────────── */
 :host {
-  --violet-50:  #EEEDFE;
-  --violet-100: #CECBF6;
-  --violet-200: #AFA9EC;
-  --violet-300: #9590E5;
-  --violet-400: #7F77DD;
-  --violet-500: #6A61D0;
-  --violet-600: #534AB7;
-  --violet-700: #433A99;
-  --violet-800: #3C3489;
-  --violet-900: #26215C;
+  --violet-50:  #FBEBFF;
+  --violet-100: #F3C4FF;
+  --violet-200: #E688FF;
+  --violet-300: #D54CFF;
+  --violet-400: #B719FF;
+  --violet-500: #800080;
+  --violet-600: #700070;
+  --violet-700: #5C005C;
+  --violet-800: #4A004A;
+  --violet-900: #330033;
 
-  --mauve-50:  #F5F0FF;
-  --mauve-100: #EDE5FF;
-  --mauve-200: #D9CCFF;
+  --mauve-50:  #FAF5FF;
+  --mauve-100: #F3E8FF;
+  --mauve-200: #E9D5FF;
 
   --danger-bg:    #FFF0F3;
   --danger-color: #C0203E;
@@ -32,7 +32,7 @@
   --text-muted:     #9490B0;
 
   --card-bg:    #FFFFFF;
-  --page-bg:    #F4F1FC;
+  --page-bg:    var(--doc-bg, #f8f9fa);
   --border:     rgba(95, 85, 180, 0.15);
   --border-md:  rgba(95, 85, 180, 0.28);
 
@@ -44,6 +44,19 @@
   --shadow-sm: 0 2px 8px rgba(83, 74, 183, 0.10);
   --shadow-md: 0 6px 24px rgba(83, 74, 183, 0.14);
   --shadow-lg: 0 12px 40px rgba(83, 74, 183, 0.18);
+}
+
+:host-context(body.dark) {
+  --card-bg: #1a1d27;
+  --page-bg: #0f1117;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-md: rgba(255, 255, 255, 0.15);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 /* ── Page ───────────────────────────────────────────────────────────────── */

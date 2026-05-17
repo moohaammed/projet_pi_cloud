@@ -4,7 +4,7 @@
     <h2 class="fw-bold mb-1 fs-28">
       System <span class="text-primary">Overview</span>
     </h2>
-    <div class="fs-15 text-muted">Bienvenue Admin — donnees en temps reel.</div>
+    <div class="fs-15 text-muted">Welcome Admin — real-time data.</div>
   </div>
 </div>
 
@@ -32,7 +32,7 @@
           <i class="fa-solid fa-user-doctor" style="color:#0d6efd;font-size:20px"></i>
         </div>
         <div>
-          <div class="text-muted fw-semibold text-uppercase" style="font-size:10px;letter-spacing:.5px">Medecins</div>
+          <div class="text-muted fw-semibold text-uppercase" style="font-size:10px;letter-spacing:.5px">Doctors</div>
           <div class="fw-bold fs-4 text-dark">{{ totalDoctors }}</div>
         </div>
       </div>
@@ -46,7 +46,7 @@
           <i class="fa-solid fa-shield-halved" style="color:#198754;font-size:20px"></i>
         </div>
         <div>
-          <div class="text-muted fw-semibold text-uppercase" style="font-size:10px;letter-spacing:.5px">Sorties zone</div>
+          <div class="text-muted fw-semibold text-uppercase" style="font-size:10px;letter-spacing:.5px">Zone exits</div>
           <div class="fw-bold fs-4" style="color:#198754">{{ totalSortiesVerte }}</div>
         </div>
       </div>
@@ -60,7 +60,7 @@
           <i class="fa-solid fa-bell" style="color:#dc3545;font-size:20px"></i>
         </div>
         <div>
-          <div class="text-muted fw-semibold text-uppercase" style="font-size:10px;letter-spacing:.5px">Alertes actives</div>
+          <div class="text-muted fw-semibold text-uppercase" style="font-size:10px;letter-spacing:.5px">Active alerts</div>
           <div class="fw-bold fs-4 text-danger">{{ alertsActives }}</div>
         </div>
       </div>
@@ -70,13 +70,13 @@
 
 <!-- FILTRE -->
 <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
-  <span class="text-muted small fw-semibold">Periode :</span>
+  <span class="text-muted small fw-semibold">Period :</span>
   <button *ngFor="let n of [7, 14, 30]"
           class="btn btn-sm rounded-pill px-3 fw-semibold"
           [style.background]="periode === n ? '#6f42c1' : '#f5f0ff'"
           [style.color]="periode === n ? 'white' : '#4a2a8a'"
           [style.border]="'1.5px solid ' + (periode === n ? '#6f42c1' : '#d5b8ff')"
-          (click)="changePeriode(n)">{{ n }} jours</button>
+          (click)="changePeriode(n)">{{ n }} days</button>
   <button class="btn btn-sm rounded-pill px-3"
           style="background:#f5f0ff;color:#4a2a8a;border:1.5px solid #d5b8ff"
           (click)="loadStats()">
@@ -92,14 +92,14 @@
       <div class="card-body p-4">
         <h6 class="fw-bold mb-1" style="color:#1e1b3a">
           <i class="fa-solid fa-chart-line me-2" style="color:#6f42c1"></i>
-          Evolution incidents &amp; alertes
+          Evolution of incidents &amp; alerts
         </h6>
-        <div class="text-muted small mb-3">Cumul quotidien sur tous les patients</div>
+        <div class="text-muted small mb-3">Daily cumulative stats for all patients</div>
         <div *ngIf="statsLoading" class="d-flex align-items-center justify-content-center"
              style="height:240px">
           <div class="text-center">
             <div class="spinner-border mb-2" style="color:#6f42c1"></div>
-            <div class="text-muted small">Chargement...</div>
+            <div class="text-muted small">Loading...</div>
           </div>
         </div>
         <div [style.display]="statsLoading ? 'none' : 'block'" style="height:240px;position:relative">
@@ -115,9 +115,9 @@
       <div class="card-body p-4">
         <h6 class="fw-bold mb-1" style="color:#1e1b3a">
           <i class="fa-solid fa-chart-pie me-2" style="color:#e67e22"></i>
-          Sorties de zone par patient
+          Zone exits per patient
         </h6>
-        <div class="text-muted small mb-3">Top patients les plus alertes</div>
+        <div class="text-muted small mb-3">Top patients with most alerts</div>
         <div *ngIf="statsLoading" class="d-flex align-items-center justify-content-center"
              style="height:240px">
           <div class="spinner-border" style="color:#e67e22"></div>
@@ -139,7 +139,7 @@
       <div class="card-header bg-white border-0 p-4 pb-2">
         <h6 class="fw-bold mb-0" style="color:#1e1b3a">
           <i class="fa-solid fa-shield-halved me-2" style="color:#198754"></i>
-          Sorties de zone verte par patient
+          Green zone exits per patient
         </h6>
       </div>
       <div class="card-body p-4 pt-2">
@@ -162,12 +162,12 @@
             <div class="d-flex gap-1">
               <span class="badge rounded-pill fw-bold"
                     style="background:#f0fbf4;color:#198754;border:1px solid #8fd4a8;font-size:11px">
-                {{ p.sortiesZoneVerte }} sorties
+                {{ p.sortiesZoneVerte }} exits
               </span>
               <span *ngIf="p.sortiesZoneRouge > 0"
                     class="badge rounded-pill fw-bold bg-danger text-white"
                     style="font-size:11px">
-                {{ p.sortiesZoneRouge }} rouge
+                {{ p.sortiesZoneRouge }} red
               </span>
             </div>
           </div>
@@ -184,7 +184,7 @@
         <div *ngIf="!statsLoading && statsPatients.length === 0"
              class="text-center text-muted py-4">
           <i class="fa-solid fa-shield-check d-block fs-2 mb-2 opacity-30"></i>
-          Aucune sortie enregistree
+          No exits recorded
         </div>
       </div>
     </div>
@@ -196,7 +196,7 @@
       <div class="card-header bg-white border-0 p-4 pb-2">
         <h6 class="fw-bold mb-0" style="color:#1e1b3a">
           <i class="fa-solid fa-users me-2" style="color:#6f42c1"></i>
-          Detail incidents &amp; alertes par patient
+          Incident &amp; alert details per patient
         </h6>
       </div>
       <div class="card-body p-4 pt-2">
@@ -263,13 +263,13 @@
               <div class="col-4">
                 <div class="p-2 rounded-3 text-center" style="background:#fff8e1;border:1px solid #ffe082">
                   <div class="fw-bold" style="color:#e67e22">{{ p.totalAlerts }}</div>
-                  <div style="font-size:10px;color:#92400e">alertes</div>
+                  <div style="font-size:10px;color:#92400e">alerts</div>
                 </div>
               </div>
               <div class="col-4">
                 <div class="p-2 rounded-3 text-center" style="background:#f0fbf4;border:1px solid #8fd4a8">
                   <div class="fw-bold" style="color:#198754">{{ p.sortiesZoneVerte }}</div>
-                  <div style="font-size:10px;color:#0f5132">sorties zone</div>
+                  <div style="font-size:10px;color:#0f5132">zone exits</div>
                 </div>
               </div>
             </div>
@@ -278,7 +278,7 @@
                 <tr>
                   <th class="border-0 text-muted">Date</th>
                   <th class="border-0 text-center" style="color:#6f42c1">Incidents</th>
-                  <th class="border-0 text-center" style="color:#e67e22">Alertes</th>
+                  <th class="border-0 text-center" style="color:#e67e22">Alerts</th>
                   <th class="border-0 text-center text-muted">Total</th>
                 </tr>
               </thead>
@@ -306,8 +306,8 @@
 
         <div class="d-flex gap-3 mt-2" style="font-size:11px;color:#6c757d">
           <span><span style="display:inline-block;width:10px;height:10px;background:#6f42c1;border-radius:2px;margin-right:4px"></span>Incidents</span>
-          <span><span style="display:inline-block;width:10px;height:10px;background:#e67e22;border-radius:2px;margin-right:4px"></span>Alertes</span>
-          <span><span style="display:inline-block;width:10px;height:10px;background:#198754;border-radius:2px;margin-right:4px"></span>Sorties zone</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:#e67e22;border-radius:2px;margin-right:4px"></span>Alerts</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:#198754;border-radius:2px;margin-right:4px"></span>Zone exits</span>
         </div>
       </div>
     </div>

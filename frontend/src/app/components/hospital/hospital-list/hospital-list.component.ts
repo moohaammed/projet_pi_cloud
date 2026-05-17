@@ -118,7 +118,7 @@ export class HospitalListComponent implements OnInit {
     }
 
     if (term.length < 2) {
-      this.searchError = 'Tapez au moins 2 lettres pour chercher dans le dataset.';
+      this.searchError = 'Type at least 2 characters to search the dataset.';
       return;
     }
 
@@ -147,7 +147,7 @@ export class HospitalListComponent implements OnInit {
               h.specialite.toLowerCase().includes(term) ||
               h.adresse.toLowerCase().includes(term)
             );
-            this.searchError = 'Recherche dataset indisponible pour le moment.';
+            this.searchError = 'Dataset search is temporarily unavailable.';
             this.searchLoading = false;
           }
         });
@@ -171,7 +171,7 @@ export class HospitalListComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.patientLocationError = 'Impossible de charger les hopitaux depuis le dataset.';
+        this.patientLocationError = 'Failed to load hospitals from the dataset.';
       }
     });
   }
@@ -184,7 +184,7 @@ export class HospitalListComponent implements OnInit {
 
     if (!userId) {
       this.loading = false;
-      this.patientLocationError = 'Impossible de trouver votre compte patient.';
+      this.patientLocationError = 'Failed to find patient account.';
       return;
     }
 
@@ -209,7 +209,7 @@ export class HospitalListComponent implements OnInit {
 
     if (!relationId && !fallbackPatientId) {
       this.loading = false;
-      this.patientLocationError = 'Impossible de trouver le patient lie a ce compte relation.';
+      this.patientLocationError = 'Failed to find the patient linked to this relation.';
       return;
     }
 
@@ -224,14 +224,14 @@ export class HospitalListComponent implements OnInit {
         this.patientId = Number(patient?.id);
         if (!this.patientId) {
           this.loading = false;
-          this.patientLocationError = 'Aucun patient lie a ce compte relation.';
+          this.patientLocationError = 'No patient linked to this relation.';
           return;
         }
         this.loadRelationPatientLocation(this.patientId);
       },
       error: () => {
         this.loading = false;
-        this.patientLocationError = 'Impossible de charger le patient lie a ce compte relation.';
+        this.patientLocationError = 'Failed to load patient linked to this relation.';
       }
     });
   }
@@ -241,7 +241,7 @@ export class HospitalListComponent implements OnInit {
       next: (loc) => this.loadDatasetHospitals(patientId, loc.latitude, loc.longitude),
       error: () => {
         this.loading = false;
-        this.patientLocationError = 'Aucune position recente trouvee pour ce patient.';
+        this.patientLocationError = 'No recent location found for this patient.';
       }
     });
   }
@@ -256,7 +256,7 @@ export class HospitalListComponent implements OnInit {
   private useBrowserLocation(patientId: number): void {
     if (!navigator.geolocation) {
       this.loading = false;
-      this.patientLocationError = 'Position GPS indisponible. Activez la localisation pour voir les hopitaux les plus proches.';
+      this.patientLocationError = 'GPS location unavailable. Please enable location services to find nearest hospitals.';
       return;
     }
 
@@ -270,7 +270,7 @@ export class HospitalListComponent implements OnInit {
       },
       () => {
         this.loading = false;
-        this.patientLocationError = 'Impossible de recuperer votre position. Activez la localisation puis reessayez.';
+        this.patientLocationError = 'Failed to retrieve your position. Please enable location services and try again.';
       },
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
     );
@@ -294,7 +294,7 @@ export class HospitalListComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.patientLocationError = 'Impossible de charger les hopitaux les plus proches.';
+        this.patientLocationError = 'Failed to load nearest hospitals.';
       }
     });
   }
@@ -319,7 +319,7 @@ export class HospitalListComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.patientLocationError = 'Impossible de charger les hopitaux depuis le dataset.';
+        this.patientLocationError = 'Failed to load hospitals from the dataset.';
       }
     });
   }
@@ -348,7 +348,7 @@ export class HospitalListComponent implements OnInit {
   }
 
   delete(id: number): void {
-    if (confirm('Supprimer cet hopital ?')) {
+    if (confirm('Are you sure you want to delete this hospital?')) {
       this.hospitalService.delete(id).subscribe({
         next: () => this.load()
       });

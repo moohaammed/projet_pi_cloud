@@ -4,64 +4,57 @@
       <div class="col-sm-10 col-lg-10">
         <div class="align-items-center g-4 row text-start">
           <div class="col-lg-6 col-xl-5">
-            <!-- Start Header Text -->
             <div class="text-center mb-4">
               <h3 class="fw-semibold">
-                {{ isEdit ? 'Modifier' : 'Prendre' }}
-                <span class="underline position-relative text-primary">Rendez-vous</span>
+                {{ isEdit ? 'Edit' : 'Book' }}
+                <span class="underline position-relative text-primary">Appointment</span>
               </h3>
               <p class="text-muted text-center mb-0">
-                {{ isEdit ? 'Mettez à jour les informations de ce rendez-vous' : 'Planifiez votre consultation
-                médicale en quelques clics' }}
+                {{ isEdit ? 'Update the information for this appointment' : 'Schedule your medical consultation in a few clicks' }}
               </p>
             </div>
-            <!-- /.End Header Text -->
 
-            <!-- Success Alert -->
             <div class="alert alert-success" *ngIf="success">
               <i class="fa-solid fa-circle-check me-2"></i>
               {{ success }}
             </div>
 
-            <!-- Error Alert -->
             <div class="alert alert-danger" *ngIf="error">
               <i class="fa-solid fa-circle-exclamation me-2"></i>
               {{ error }}
             </div>
 
-            <!-- Loading -->
             <div class="text-center py-4" *ngIf="loading">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
-              <p class="mt-2">Chargement...</p>
+              <p class="mt-2">Loading...</p>
             </div>
 
-            <!-- Start Form -->
             <div class="tab-content" *ngIf="!loading">
               <form [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="row g-4">
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label class="required">ID Patient</label>
+                      <label class="required">Patient ID</label>
                       <input type="number" formControlName="patientId" class="form-control"
-                        [class.is-invalid]="isInvalid('patientId')" placeholder="Entrez votre ID patient">
+                        [class.is-invalid]="isInvalid('patientId')" placeholder="Enter your patient ID">
                       <div class="invalid-feedback" *ngIf="isInvalid('patientId')">{{ getError('patientId') }}</div>
                     </div>
                   </div>
 
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label class="required">Médecin (ID)</label>
+                      <label class="required">Doctor (ID)</label>
                       <input type="number" formControlName="medecinId" class="form-control"
-                        [class.is-invalid]="isInvalid('medecinId')" placeholder="Entrez l'ID du médecin">
+                        [class.is-invalid]="isInvalid('medecinId')" placeholder="Enter the doctor's ID">
                       <div class="invalid-feedback" *ngIf="isInvalid('medecinId')">{{ getError('medecinId') }}</div>
                     </div>
                   </div>
 
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label class="required">Date & Heure du Rendez-vous</label>
+                      <label class="required">Appointment Date & Time</label>
                       <input type="datetime-local" formControlName="dateHeure" class="form-control"
                         [class.is-invalid]="isInvalid('dateHeure')" [min]="isEdit ? '' : minDate">
                       <div class="invalid-feedback" *ngIf="isInvalid('dateHeure')">{{ getError('dateHeure') }}</div>
@@ -70,7 +63,7 @@
 
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label class="required">Statut</label>
+                      <label class="required">Status</label>
                       <select formControlName="statut" class="form-select" [class.is-invalid]="isInvalid('statut')">
                         <option *ngFor="let s of statutOptions" [value]="s">{{ statutLabels[s] }}</option>
                       </select>
@@ -80,46 +73,42 @@
 
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label class="required">Motif de consultation</label>
+                      <label class="required">Reason for visit</label>
                       <input type="text" formControlName="motif" class="form-control"
-                        [class.is-invalid]="isInvalid('motif')" placeholder="Ex: Consultation générale, Suivi...">
+                        [class.is-invalid]="isInvalid('motif')" placeholder="Ex: General consultation, Follow-up...">
                       <div class="invalid-feedback" *ngIf="isInvalid('motif')">{{ getError('motif') }}</div>
                     </div>
                   </div>
 
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label>Observations (Optionnel)</label>
+                      <label>Notes (Optional)</label>
                       <textarea formControlName="observations" class="form-control"
-                        placeholder="Notes complémentaires..." rows="3"></textarea>
-                      <div class="char-count text-end small text-muted">{{ form.get('observations')?.value?.length ?? 0
-                        }}/500</div>
+                        placeholder="Additional notes..." rows="3"></textarea>
+                      <div class="char-count text-end small text-muted">{{ form.get('observations')?.value?.length ?? 0 }}/500</div>
                     </div>
                   </div>
 
                   <div class="col-sm-12">
                     <button class="btn btn-primary btn-lg w-100" type="submit" [disabled]="submitting">
-                      <span *ngIf="!submitting">{{ isEdit ? 'Mettre à jour' : 'Prendre Rendez-vous' }}</span>
+                      <span *ngIf="!submitting">{{ isEdit ? 'Update' : 'Book Appointment' }}</span>
                       <span *ngIf="submitting">
                         <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Traitement...
+                        Processing...
                       </span>
                     </button>
                     <button class="btn btn-link w-100 mt-2 text-decoration-none text-muted" type="button"
                       (click)="onCancel()" *ngIf="!submitting">
-                      Annuler
+                      Cancel
                     </button>
                   </div>
                 </div>
               </form>
             </div>
-            <!-- /.End Form -->
           </div>
           <div class="col-lg-6 col-xl-7 order-lg-first pe-xl-5 d-none d-lg-block">
-            <!-- Start Illustration Image -->
             <img src="template/assets/img/illustration/schedule-meeting.svg" alt="" class="img-fluid"
               data-aos="fade-right">
-            <!-- /.End Illustration Image -->
           </div>
         </div>
       </div>

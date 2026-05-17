@@ -6,10 +6,10 @@
       <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
-            <a routerLink="/hospitals" class="text-decoration-none">Hôpitaux</a>
+            <a routerLink="/hospitals" class="text-decoration-none">Hospitals</a>
           </li>
           <li class="breadcrumb-item active">
-            {{ isEdit ? 'Modifier' : 'Ajouter' }}
+            {{ isEdit ? 'Edit' : 'Add' }}
           </li>
         </ol>
       </nav>
@@ -17,51 +17,51 @@
       <div class="card border-0 shadow-sm rounded-4">
 
         <!-- Header -->
-        <div class="card-header bg-primary text-white rounded-top-4 p-4">
+        <div class="card-header text-white rounded-top-4 p-4" style="background: linear-gradient(135deg, #800080, #5c005c)">
           <h5 class="mb-0 fw-bold">
             <i class="fa-solid fa-hospital me-2"></i>
-            {{ isEdit ? 'Modifier l\'hôpital' : 'Ajouter un hôpital' }}
+            {{ isEdit ? 'Edit Hospital' : 'Add Hospital' }}
           </h5>
           <small class="opacity-75">
-            Remplissez les informations de l'établissement
+            Fill in the facility details
           </small>
         </div>
 
         <div class="card-body p-4">
 
-          <div *ngIf="error" class="alert alert-danger">
+          <div *ngIf="error" class="alert alert-danger rounded-3">
             <i class="fa-solid fa-circle-exclamation me-2"></i>{{ error }}
           </div>
 
-          <!-- Informations générales -->
+          <!-- General Information -->
           <h6 class="fw-bold text-muted mb-3 text-uppercase small">
-            <i class="fa-solid fa-info-circle me-1"></i>Informations générales
+            <i class="fa-solid fa-info-circle me-1"></i>General Information
           </h6>
           <div class="row g-3 mb-4">
             <div class="col-md-6">
               <label class="form-label fw-medium">
-                Nom de l'hôpital <span class="text-danger">*</span>
+                Hospital Name <span class="text-danger">*</span>
               </label>
               <input [(ngModel)]="hospital.nom" name="nom"
-                     class="form-control" placeholder="Ex: Hôpital Charles Nicolle">
+                     class="form-control" placeholder="e.g., Charles Nicolle Hospital">
             </div>
             <div class="col-md-6">
               <label class="form-label fw-medium">
-                Ville <span class="text-danger">*</span>
+                City <span class="text-danger">*</span>
               </label>
               <input [(ngModel)]="hospital.ville" name="ville"
-                     class="form-control" placeholder="Ex: Tunis">
+                     class="form-control" placeholder="e.g., Tunis">
             </div>
             <div class="col-12">
-              <label class="form-label fw-medium">Adresse complète</label>
+              <label class="form-label fw-medium">Complete Address</label>
               <input [(ngModel)]="hospital.adresse" name="adresse"
-                     class="form-control" placeholder="Rue, quartier...">
+                     class="form-control" placeholder="Street, neighborhood...">
             </div>
             <div class="col-12">
               <label class="form-label fw-medium">Description</label>
               <textarea [(ngModel)]="hospital.description" name="description"
                         class="form-control" rows="3"
-                        placeholder="Présentation de l'établissement..."></textarea>
+                        placeholder="About the facility..."></textarea>
             </div>
           </div>
 
@@ -71,7 +71,7 @@
           </h6>
           <div class="row g-3 mb-4">
             <div class="col-md-6">
-              <label class="form-label fw-medium">Téléphone</label>
+              <label class="form-label fw-medium">Phone</label>
               <input [(ngModel)]="hospital.telephone" name="telephone"
                      class="form-control" placeholder="+216 XX XXX XXX">
             </div>
@@ -82,46 +82,46 @@
                      placeholder="contact@hopital.tn">
             </div>
             <div class="col-12">
-              <label class="form-label fw-medium">Site web</label>
+              <label class="form-label fw-medium">Website</label>
               <input [(ngModel)]="hospital.siteWeb" name="siteWeb"
                      class="form-control" placeholder="https://...">
             </div>
           </div>
 
-          <!-- Localisation GPS -->
+          <!-- GPS Location -->
           <h6 class="fw-bold text-muted mb-3 text-uppercase small">
             <i class="fa-solid fa-map-location-dot me-1"></i>
-            Localisation GPS
-            <small class="text-muted fw-normal ms-1">(pour affichage sur carte)</small>
+            GPS Location
+            <small class="text-muted fw-normal ms-1">(for mapping coordinates)</small>
           </h6>
           <div class="row g-3 mb-4">
             <div class="col-md-6">
               <label class="form-label fw-medium">Latitude</label>
               <input [(ngModel)]="hospital.latitude" name="latitude"
                      type="number" class="form-control"
-                     placeholder="Ex: 36.8065" step="0.0001">
+                     placeholder="e.g., 36.8065" step="0.0001">
             </div>
             <div class="col-md-6">
               <label class="form-label fw-medium">Longitude</label>
               <input [(ngModel)]="hospital.longitude" name="longitude"
                      type="number" class="form-control"
-                     placeholder="Ex: 10.1815" step="0.0001">
+                     placeholder="e.g., 10.1815" step="0.0001">
             </div>
           </div>
 
-          <!-- Note et avis -->
+          <!-- Evaluation -->
           <h6 class="fw-bold text-muted mb-3 text-uppercase small">
-            <i class="fa-solid fa-star me-1"></i>Évaluation
+            <i class="fa-solid fa-star me-1"></i>Evaluation
           </h6>
           <div class="row g-3 mb-4">
             <div class="col-md-6">
-              <label class="form-label fw-medium">Note (0-5)</label>
+              <label class="form-label fw-medium">Rating (0-5)</label>
               <input [(ngModel)]="hospital.rating" name="rating"
                      type="number" class="form-control"
                      min="0" max="5" step="0.1">
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-medium">Nombre d'avis</label>
+              <label class="form-label fw-medium">Number of Reviews</label>
               <input [(ngModel)]="hospital.nombreAvis" name="nombreAvis"
                      type="number" class="form-control" min="0">
             </div>
@@ -134,11 +134,11 @@
               <span *ngIf="loading"
                     class="spinner-border spinner-border-sm me-2"></span>
               <i *ngIf="!loading" class="fa-solid fa-floppy-disk me-2"></i>
-              {{ isEdit ? 'Enregistrer les modifications' : 'Créer l\'hôpital' }}
+              {{ isEdit ? 'Save Changes' : 'Create Hospital' }}
             </button>
             <button class="btn btn-outline-secondary"
                     (click)="cancel()" [disabled]="loading">
-              <i class="fa-solid fa-xmark me-1"></i>Annuler
+              <i class="fa-solid fa-xmark me-1"></i>Cancel
             </button>
           </div>
 

@@ -234,7 +234,7 @@
                     <div class="bg-white p-3 rounded-3 border h-100 shadow-sm">
                       <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="fw-bold text-subtle text-uppercase mb-0" style="font-size:0.75rem;">Quiz & Memory</h6>
-                        <button class="btn btn-sm btn-outline-glass text-danger px-2 border-0" (click)="resetPatientProgression('QUIZ')" [disabled]="isResetting" title="Réinitialiser">
+                        <button class="btn btn-sm btn-outline-glass text-danger px-2 border-0" (click)="resetPatientProgression('QUIZ')" [disabled]="isResetting" title="Reset">
                           <i class="fa-solid fa-rotate-left"></i>
                         </button>
                       </div>
@@ -256,7 +256,7 @@
                     <div class="bg-white p-3 rounded-3 border h-100 shadow-sm">
                       <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="fw-bold text-subtle text-uppercase mb-0" style="font-size:0.75rem;">Logical Games</h6>
-                        <button class="btn btn-sm btn-outline-glass text-danger px-2 border-0" (click)="resetPatientProgression('GAME')" [disabled]="isResetting" title="Réinitialiser">
+                        <button class="btn btn-sm btn-outline-glass text-danger px-2 border-0" (click)="resetPatientProgression('GAME')" [disabled]="isResetting" title="Reset">
                           <i class="fa-solid fa-rotate-left"></i>
                         </button>
                       </div>
@@ -461,7 +461,7 @@
 
               <!-- Alzheimer Predictor -->
               <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="selectedPatient">
-                <div class="card-header bg-tryears oldparent border-0 py-3 px-4">
+                <div class="card-header bg-transparent border-0 py-3 px-4">
                   <h6 class="fw-bold mb-0 text-dark">
                     <i class="fa-solid fa-robot me-2 text-primary"></i>
                     Alzheimer AI Prediction
@@ -534,7 +534,7 @@
 
               <!-- Risk Evaluation -->
               <div class="card border-0 shadow-sm mb-4 bg-light" *ngIf="selectedPatient">
-                <div class="card-header bg-tryears oldparent border-0 py-3 px-4">
+                <div class="card-header bg-transparent border-0 py-3 px-4">
                   <h6 class="fw-bold mb-0 text-dark">
                     <i class="fa-solid fa-stethoscope me-2 text-warning"></i>
                     AI Prediction - Clinical Stage Evaluation
@@ -685,11 +685,11 @@
                                   : 'status-pill--disconnected'">
                     <span class="status-pill__dot"
                           [class.live-pulse]="heartRateStatus === 'connected'"></span>
-                    {{ heartRateStatus === 'connected' ? 'Appareil connecté' : 'Déconnecté' }}
+                    {{ heartRateStatus === 'connected' ? 'Device connected' : 'Disconnected' }}
                   </div>
                   <button class="btn btn-outline-glass d-flex align-items-center gap-2"
                           (click)="refreshHeartRate()">
-                    <i class="fa-solid fa-rotate-right"></i> Actualiser
+                    <i class="fa-solid fa-rotate-right"></i> Refresh
                   </button>
                 </div>
               </div>
@@ -699,7 +699,7 @@
                 <div class="bpm-circle"
                      [class.bpm-circle--active]="heartRateStatus === 'connected'">
                   <ng-container *ngIf="heartRateStatus === 'disconnected'; else bpmValue">
-                    <span class="bpm-circle__label" style="font-size:0.6rem;text-align:center;padding:0 4px;">Déconnecté</span>
+                    <span class="bpm-circle__label" style="font-size:0.6rem;text-align:center;padding:0 4px;">Disconnected</span>
                   </ng-container>
                   <ng-template #bpmValue>
                     <span class="bpm-circle__value">{{ currentBpm ?? '--' }}</span>
@@ -735,7 +735,7 @@
                 <div class="ecg-header">
                   <span class="ecg-header__title">
                     <i class="fa-solid fa-wave-square me-2"></i>
-                    Tracé ECG en direct
+                    Live ECG Trace
                   </span>
                   <span *ngIf="heartRateStatus === 'connected'"
                         class="ecg-live-badge">
@@ -749,7 +749,7 @@
                   <div *ngIf="heartRateStatus === 'disconnected'"
                        class="ecg-overlay">
                     <i class="fa-solid fa-link-slash"></i>
-                    <span>En attente du signal…</span>
+                    <span>Waiting for signal…</span>
                   </div>
                 </div>
               </div>
@@ -762,7 +762,7 @@
                     <i class="fa-solid fa-chart-line"></i>
                   </div>
                   <div>
-                    <div class="stat-title">Moyenne</div>
+                    <div class="stat-title">Average</div>
                     <div class="stat-value">{{ getAverageBpm() || '--' }}
                       <small style="font-size:0.7rem;color:var(--text-subtle);">BPM</small>
                     </div>
@@ -800,7 +800,7 @@
                     <i class="fa-solid fa-database"></i>
                   </div>
                   <div>
-                    <div class="stat-title">Lectures</div>
+                    <div class="stat-title">Readings</div>
                     <div class="stat-value" style="color:#0ea5e9;">
                       {{ bpmHistory.length }}
                     </div>
@@ -813,8 +813,7 @@
                 <div class="ai-card__header">
                   <h6 class="fw-bold mb-0">
                     <i class="fa-solid fa-brain text-primary me-2"></i>
-                    Prédiction IA de Crise Cardiaque
-                  </h6>
+                    Cardiac Crisis AI Prediction</h6>
                   <span class="ai-status-pill"
                         [ngClass]="{
                           'bg-warning bg-opacity-10 text-warning': aiStatus === 'waiting',
@@ -823,11 +822,11 @@
                             aiStatus === 'disconnected' || aiStatus === 'idle',
                           'bg-danger bg-opacity-10 text-danger': aiStatus === 'error'
                         }">
-                    {{ aiStatus === 'waiting' ? 'Collecte en cours'
-                       : aiStatus === 'ready' ? 'Prédiction active'
-                       : aiStatus === 'disconnected' ? 'Déconnecté'
-                       : aiStatus === 'error' ? 'Erreur'
-                       : 'Initialisation' }}
+                    {{ aiStatus === 'waiting' ? 'Collecting data'
+                       : aiStatus === 'ready' ? 'Prediction active'
+                       : aiStatus === 'disconnected' ? 'Disconnected'
+                       : aiStatus === 'error' ? 'Error'
+                       : 'Initializing' }}
                   </span>
                 </div>
                 <div class="ai-card__body">
@@ -838,9 +837,9 @@
                     <div class="empty-state-icon">
                       <i class="fa-solid fa-link-slash"></i>
                     </div>
-                    <h6 class="fw-bold text-dark">Appareil déconnecté</h6>
+                    <h6 class="fw-bold text-dark">Device disconnected</h6>
                     <p class="text-subtle text-center mb-0">
-                      La prédiction IA reprendra dès la reconnexion de la smartwatch.
+                      AI prediction will resume once the smartwatch reconnects.
                     </p>
                   </div>
 
@@ -849,9 +848,9 @@
                     <div class="empty-state-icon">
                       <i class="fa-solid fa-hourglass-start"></i>
                     </div>
-                    <h6 class="fw-bold text-dark">Initialisation</h6>
+                    <h6 class="fw-bold text-dark">Initializing</h6>
                     <p class="text-subtle text-center mb-0">
-                      En attente des données de fréquence cardiaque…
+                      Waiting for heart rate data…
                     </p>
                   </div>
 
@@ -860,7 +859,7 @@
                     <div class="d-flex align-items-center gap-2 mb-3">
                       <i class="fa-solid fa-spinner fa-spin text-warning"></i>
                       <span class="fw-semibold text-subtle" style="font-size:0.85rem;">
-                        Collecte des mesures BPM…
+                        Collecting BPM readings…
                       </span>
                     </div>
                     <div class="d-flex align-items-center gap-3">
@@ -874,8 +873,8 @@
                       </span>
                     </div>
                     <p class="text-subtle mt-2 mb-0" style="font-size:0.8rem;">
-                      La prédiction démarrera après
-                      {{ aiResult.readingsRequired }} lectures.
+                      Prediction will start after
+                      {{ aiResult.readingsRequired }} readings.
                     </p>
                   </div>
 
@@ -885,9 +884,9 @@
                     <div class="empty-state-icon text-danger">
                       <i class="fa-solid fa-circle-exclamation"></i>
                     </div>
-                    <h6 class="fw-bold text-danger">Erreur de prédiction</h6>
+                    <h6 class="fw-bold text-danger">Prediction error</h6>
                     <p class="text-subtle text-center mb-0">
-                      {{ aiResult.errorMessage || 'Une erreur est survenue. Nouvelle tentative automatique.' }}
+                      {{ aiResult.errorMessage || 'An error occurred. Retrying automatically.' }}
                     </p>
                   </div>
 
@@ -907,14 +906,14 @@
                           {{ aiResult.riskLevel }}
                         </div>
                         <div class="text-subtle" style="font-size:0.7rem;">
-                          Niveau de risque
+                          Risk level
                         </div>
                       </div>
                     </div>
                     <div class="col-md-9 col-6 d-flex flex-column gap-2">
                       <div class="d-flex align-items-center justify-content-between mb-1">
                         <span class="fw-semibold text-subtle" style="font-size:0.8rem;">
-                          Probabilité de crise
+                          Crisis probability
                         </span>
                         <span class="fw-bold" [style.color]="getAiRiskColor()">
                           {{ getAiProbabilityPercent() }}%
@@ -931,13 +930,13 @@
                           <div class="p-2 rounded-3 bg-light border"
                                style="font-size:0.8rem;">
                             <div class="text-subtle" style="font-size:0.7rem;">
-                              Résultat
+                              Result
                             </div>
                             <div class="fw-bold"
                                  [ngClass]="aiResult.prediction === 'NORMAL'
                                             ? 'text-success' : 'text-danger'">
                               {{ aiResult.prediction === 'NORMAL'
-                                 ? '✅ Normal' : '⚠️ Pré-crise' }}
+                                 ? '✅ Normal' : '⚠️ Pre-crisis' }}
                             </div>
                           </div>
                         </div>
@@ -945,7 +944,7 @@
                           <div class="p-2 rounded-3 bg-light border"
                                style="font-size:0.8rem;">
                             <div class="text-subtle" style="font-size:0.7rem;">
-                              BPM moyen 60s
+                              Avg BPM 60s
                             </div>
                             <div class="fw-bold">{{ aiResult.bpmMean }}</div>
                           </div>
@@ -954,7 +953,7 @@
                           <div class="p-2 rounded-3 bg-light border"
                                style="font-size:0.8rem;">
                             <div class="text-subtle" style="font-size:0.7rem;">
-                              Action recommandée
+                              Recommended action
                             </div>
                             <div class="fw-semibold text-dark">{{ aiResult.action }}</div>
                           </div>
@@ -971,10 +970,10 @@
                 <div class="history-card__header">
                   <h6 class="fw-bold mb-0">
                     <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>
-                    Historique récent
+                    Recent History
                   </h6>
                   <span class="history-badge">
-                    {{ history.length }} enregistrements
+                    {{ history.length }} records
                   </span>
                 </div>
                 <div class="card-body p-0">
@@ -982,19 +981,19 @@
                     <div class="empty-state-icon">
                       <i class="fa-solid fa-heart-crack"></i>
                     </div>
-                    <h6 class="fw-bold text-dark">Aucune donnée</h6>
+                    <h6 class="fw-bold text-dark">No data</h6>
                     <p class="text-subtle mb-0">
-                      Connectez la smartwatch pour commencer.
+                      Connect the smartwatch to start.
                     </p>
                   </div>
                   <div class="table-responsive" *ngIf="history.length > 0">
                     <table class="modern-table">
                       <thead>
                         <tr>
-                          <th>Heure</th>
+                          <th>Time</th>
                           <th>BPM</th>
-                          <th>Appareil</th>
-                          <th>État</th>
+                          <th>Device</th>
+                          <th>Status</th>
                         </tr>
                       </thead>
                       <tbody>

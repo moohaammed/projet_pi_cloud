@@ -11,6 +11,15 @@
   --doc-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Enforce Quicksand font family globally like in the Appointments Dashboard, while preserving icons & monospace */
+*:not(i):not(.fa):not(.fas):not(.far):not(.fab):not(.fa-solid):not(.fa-regular):not(.fa-brands):not([class*="fa-"]):not([class*="flaticon-"]):not([class*="ti-"]):not(code):not(pre):not(.mono):not([class*="mono"]) {
+  font-family: 'Quicksand', sans-serif !important;
+}
+
+code, pre, .mono, [class*="mono"], .ai-risk-level, .ai-prob-value, .ai-detail-value, .bpm-value {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
 body {
   font-family: 'Quicksand', sans-serif !important;
   color: var(--doc-secondary);
@@ -459,3 +468,114 @@ body.high-contrast select {
 /* ── Scrollbar for horizontal nav on mobile ── */
 .admin-wrapper > aside .nav.flex-column::-webkit-scrollbar { height: 3px; }
 .admin-wrapper > aside .nav.flex-column::-webkit-scrollbar-thumb { background: rgba(128,0,128,0.3); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   EDUCATION & DONATION — Override inline component styles
+   Force global font and background to match the rest of the app
+   ═══════════════════════════════════════════════════════════════ */
+
+app-event-front,
+app-donation-list,
+app-donation-form,
+app-admin-donation,
+app-my-donations,
+app-donation-success,
+app-donation-cancel,
+app-activity-list,
+app-education {
+  font-family: 'Quicksand', sans-serif !important;
+}
+
+app-event-front .events-page,
+app-event-front :host,
+app-donation-list .donation-page,
+app-donation-list :host,
+app-donation-form .donation-form-page,
+app-donation-form :host {
+  background: #f8f9fa !important;
+  font-family: 'Quicksand', sans-serif !important;
+}
+
+/* Override the Fraunces serif font on titles */
+app-event-front .page-title,
+app-event-front .card-title,
+app-event-front .empty-title,
+app-event-front .stat-number,
+app-donation-list .page-title,
+app-donation-list .card-title,
+app-donation-list .empty-title,
+app-donation-list .stat-number,
+app-donation-form .page-title,
+app-donation-form .preview-title,
+app-donation-form .section-title,
+app-donation-form .summary-amount,
+app-donation-form .empty-title {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+/* Override Plus Jakarta Sans on inputs and buttons */
+app-event-front .search-input,
+app-event-front .btn-participate,
+app-event-front .page-btn,
+app-donation-list .search-input,
+app-donation-list .donate-btn,
+app-donation-list .page-btn,
+app-donation-form .form-input,
+app-donation-form .btn-donate,
+app-donation-form .btn-lookup,
+app-donation-form .preset-btn {
+  font-family: 'Quicksand', sans-serif !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PREMIUM ALZCARE GLOBAL FORM FIELDS OVERRIDES (admin/activities style)
+   ══════════════════════════════════════════════════════════════════════════ */
+.form-control,
+.form-select,
+.gp-input {
+  height: 52px !important;
+  background-color: #f8fafc !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #2c3038 !important;
+  padding: 10px 18px !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+  font-family: 'Quicksand', sans-serif !important;
+}
+
+textarea.form-control,
+textarea.gp-input {
+  height: auto !important;
+  min-height: 100px !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+.gp-input:focus {
+  background-color: #ffffff !important;
+  border-color: #800080 !important;
+  box-shadow: 0 0 0 4px rgba(128, 0, 128, 0.12) !important;
+  outline: none !important;
+}
+
+/* Dark Mode Overrides */
+body.dark .form-control,
+body.dark .form-select,
+body.dark .gp-input {
+  background-color: #22263a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark .form-control:focus,
+body.dark .form-select:focus,
+body.dark .gp-input:focus {
+  background-color: #1a1d27 !important;
+  border-color: #800080 !important;
+  box-shadow: 0 0 0 4px rgba(128, 0, 128, 0.2) !important;
+}
+

@@ -145,7 +145,7 @@
   <div class="card border-0 shadow-doc rounded-4 overflow-hidden bg-white mb-5 animate-fade-in" *ngIf="showForm">
     <div class="card-header bg-soft-primary border-0 p-4 d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
-        <button class="btn btn-sm btn-white rounded-circle shadow-sm me-3 text-primary bg-white px-2 py-1" (click)="reset()" title="Retour à la liste">
+        <button class="btn btn-sm btn-white rounded-circle shadow-sm me-3 text-primary bg-white px-2 py-1" (click)="reset()" title="Back to list">
           <i class="fa-solid fa-arrow-left"></i>
         </button>
         <span class="fw-black fs-20 text-primary ls-n1"><i class="fa-solid fa-calendar-plus me-2"></i> {{ isEditing ? 'Edit Event' : 'New Event' }}</span>
@@ -287,10 +287,10 @@
                 <button class="btn btn-sm btn-white border shadow-sm rounded-pill px-3 fw-black fs-11 text-uppercase hov-primary" (click)="viewSeats(e)" title="Reserve seats">
                     <i class="fa-solid fa-chair me-1 text-primary"></i> Seats
                 </button>
-                <button class="btn btn-sm btn-white border shadow-sm rounded-circle hov-primary" (click)="edit(e)" title="Modifier">
+                <button class="btn btn-sm btn-white border shadow-sm rounded-circle hov-primary" (click)="edit(e)" title="Edit">
                     <i class="fa-solid fa-pen-to-square text-primary"></i>
                 </button>
-                <button class="btn btn-sm btn-white border shadow-sm rounded-circle text-danger hov-danger" (click)="delete(e.id!)" title="Supprimer">
+                <button class="btn btn-sm btn-white border shadow-sm rounded-circle text-danger hov-danger" (click)="delete(e.id!)" title="Delete">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
               </div>

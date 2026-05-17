@@ -859,8 +859,8 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       max-width: 100% !important;
       margin: 0 !important;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #ffffff;
+      font-family: 'Quicksand', sans-serif;
+      background: #f8f9fa;
       min-height: 100vh;
     }
 
@@ -940,7 +940,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     .edu-hero-content { position: relative; z-index: 1; }
     .edu-hero-icon { font-size: 56px; margin-bottom: 15px; display: block; }
     .edu-hero-title { 
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 3.2rem; 
       font-weight: 800; 
       margin: 0; 
@@ -994,7 +994,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
 
     .stat-info { display: flex; flex-direction: column; text-align: left; }
     .stat-number {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.15rem;
       font-weight: 700;
       color: #3d0040;
@@ -1023,7 +1023,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     .btn-back-floating:hover { transform: translateX(-3px); border-color: #800080; background: #faf8ff; }
 
     .btn-reset {
-      background: #ffffff; color: #800080; border: 1px solid rgba(128,0,128,0.1);
+      background: #f8f9fa; color: #800080; border: 1px solid rgba(128,0,128,0.1);
       padding: 10px 22px; border-radius: 50px; font-weight: 700;
       cursor: pointer; transition: all 0.2s ease;
       margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
@@ -1254,10 +1254,10 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       margin-top: 24px;
     }
     .result-icon { font-size: 80px; margin-bottom: 15px; }
-    .result-title { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 800; margin-bottom: 10px; }
+    .result-title { font-family: 'Quicksand', sans-serif; font-size: 36px; font-weight: 800; margin-bottom: 10px; }
     .fail-title   { color: #800080; }
     .success-title { color: #059669; }
-    .score { font-family: 'Fraunces', serif; font-size: 72px; font-weight: 800; margin: 20px 0; }
+    .score { font-family: 'Quicksand', sans-serif; font-size: 72px; font-weight: 800; margin: 20px 0; }
     .score-success { 
       background: linear-gradient(to bottom, #800080, #5c0057);
       -webkit-background-clip: text;
@@ -1318,7 +1318,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       box-shadow: 0 2px 8px rgba(128,0,128,0.06);
     }
     .game-main-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.8rem;
       font-weight: 800;
       background: linear-gradient(to right, #3d0040, #800080);
@@ -1355,7 +1355,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     .game-stat-icon { font-size: 18px; }
     .game-stat-info { display: flex; flex-direction: column; text-align: left; }
     .game-stat-value {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.1rem;
       font-weight: 700;
       color: #3d0040;
@@ -1512,7 +1512,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     }
 
     .content-view-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 2.8rem;
       font-weight: 800;
       color: #3d0040;
@@ -1921,7 +1921,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       margin-bottom: 12px;
     }
     .exercice-main-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.9rem;
       font-weight: 800;
       background: linear-gradient(to right, #3d0040, #800080);
@@ -2033,7 +2033,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       z-index: 1;
     }
     .breath-count {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 2.6rem;
       font-weight: 800;
       color: #800080;
@@ -2142,7 +2142,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     }
 
     .result-score {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 4rem;
       font-weight: 900;
       background: linear-gradient(to bottom, #800080, #5c0057);
@@ -2336,7 +2336,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       to   { transform: translateY(-10px); }
     }
     .score-modal-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.7rem;
       font-weight: 800;
       background: linear-gradient(135deg, #800080, #3d0040);
@@ -2389,7 +2389,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     .score-ring-num {
       font-size: 1.5rem;
       font-weight: 900;
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
     }
     .correct-num   { color: #16a34a; }
     .partial-num   { color: #d97706; }
@@ -2473,7 +2473,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     }
     .asm-brain-icon { font-size: 2.2rem; }
     .asm-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.45rem;
       font-weight: 800;
       color: white;
@@ -2707,7 +2707,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     .asm-countdown-num {
       position: relative;
       z-index: 2;
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.5rem;
       font-weight: 900;
       color: #800080;
@@ -2726,7 +2726,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       100% { transform: scale(1);   opacity: 1; }
     }
     .asm-complete-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 2.4rem;
       font-weight: 900;
       background: linear-gradient(to right, #3d0040, #800080);
@@ -2877,7 +2877,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
       font-weight: 700;
     }
     .content-title-premium {
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 1.4rem;
       font-weight: 800;
       margin-top: 15px;
@@ -2958,7 +2958,7 @@ import { AlzheimerAccessibilityService } from '../../../services/alz-accessibili
     .content-title-giant {
       position: relative;
       z-index: 1;
-      font-family: 'Fraunces', serif;
+      font-family: 'Quicksand', sans-serif;
       font-size: 3.5rem;
       font-weight: 900;
       background: linear-gradient(135deg, #3d0040, #800080);
