@@ -60,7 +60,7 @@ spring:
         - id: donation-rest
           uri: lb://donation-service
           predicates:
-            - Path=/api/donations/**,/api/campaigns/**,/api/ai/**
+            - Path=/api/donations/**,/api/campaigns/**,/api/ai/analyze-campaign/**
 
         # ── Smartwatch service ──────────────────────────────────────────
         - id: smartwatch-service

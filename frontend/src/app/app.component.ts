@@ -105,8 +105,11 @@ export class AppComponent implements OnDestroy {
       this.videoCallInviteSub = this.videoCallService.signalMessages$.subscribe((msg) => {
         console.log('AppComponent: Signal REÇU', msg.type, 'de', msg.senderId, 'pour', msg.recipientId);
 
+        const webrtcTypes = ['offer', 'answer', 'ice-candidate', 'draw-event', 'join', 'join-reply', 'leave'];
         if (msg.type !== 'messenger-invite' && msg.type !== 'rendezvous-invite') {
-          console.log('AppComponent: Signal ignoré (type incorrect)');
+          if (!webrtcTypes.includes(msg.type)) {
+            console.log('AppComponent: Signal ignoré (type non géré)', msg.type);
+          }
           return;
         }
 

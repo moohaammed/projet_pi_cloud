@@ -227,11 +227,19 @@ Règles : questions concrètes adaptées Alzheimer, résumé centré patient, JS
         data = JSON.parse(textResponse);
       } catch (e) {
         console.error("BACKEND RAW =", textResponse);
-        this.errorMessage = "Réponse backend invalide";
+        this.errorMessage = "Réponse backend invalide (format incorrect)";
         this.isAnalyzing = false;
         this.cdr.detectChanges();
         return;
       }
+
+      if (data.error) {
+        this.errorMessage = "IA Erreur : " + data.error;
+        this.isAnalyzing = false;
+        this.cdr.detectChanges();
+        return;
+      }
+
       const raw = data.result || '';
 
       let parsed: LiveAnalysis;

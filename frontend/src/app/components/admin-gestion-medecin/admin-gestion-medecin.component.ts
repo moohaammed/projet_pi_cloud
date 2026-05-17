@@ -66,8 +66,12 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
     this.userSvc.getByRole('DOCTOR').subscribe({
       next: docs => {
         this.allDoctors = docs || [];
-        this.patSvc.getAllPatients().subscribe({
-          next: pts => { this.allPatients = pts||[]; this.isLoading = false; },
+        // Fetch all users with role PATIENT to ensure we see everyone even if no Patient entity exists yet
+        this.userSvc.getByRole('PATIENT').subscribe({
+          next: users => {
+            this.allPatients = users || [];
+            this.isLoading = false;
+          },
           error: () => { this.isLoading = false; }
         });
       },
@@ -190,9 +194,11 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
       next: (pts) => {
         console.log('[AdminGestionMedecin] Assigned patients from API:', pts);
         this.assignedPatients = pts || [];
-        // Map based on patient.user.id
-        const assignedIds = this.assignedPatients.map(p => p.user?.id);
-        this.unassignedPatientsList = this.allPatients.filter(p => !assignedIds.includes(p.user?.id || p.id));
+        
+        // Unassigned patients are those in allPatients whose ID (User ID) is not in assignedPatients (Patient entities)
+        const assignedUserIds = this.assignedPatients.map(p => p.user?.id).filter(id => !!id);
+        this.unassignedPatientsList = this.allPatients.filter(u => !assignedUserIds.includes(u.id));
+        
         this.isLoading = false;
       },
       error: () => { this.isLoading = false; }

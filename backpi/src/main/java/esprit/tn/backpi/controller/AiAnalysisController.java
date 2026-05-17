@@ -22,7 +22,7 @@ public class AiAnalysisController {
             String result = openRouterService.analyze(request);
             return ResponseEntity.ok(new AnalysisResponse(result));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body(java.util.Map.of("error", e.getMessage()));
         }
     }
 }

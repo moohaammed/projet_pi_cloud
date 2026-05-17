@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { RappelService } from '../services/rappel.service';
 import { PredictionService } from '../services/prediction.service';
+import { AssignmentService } from '../services/assignment.service';
 
 @Component({
   selector: 'app-medecin-dashboard',
@@ -109,7 +110,8 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private rappelService: RappelService,
     private predictionService: PredictionService,
-    private mapService: MapService
+    private mapService: MapService,
+    private assignmentService: AssignmentService
   ) { }
 
   ngOnInit(): void {
@@ -137,13 +139,18 @@ export class MedecinDashboardComponent implements OnInit, OnDestroy {
 
   loadPatients() {
     this.isLoadingPatients = true;
-    this.patientService.getAllPatients().subscribe({
-      next: (data) => {
-        this.patients = data || [];
-        this.isLoadingPatients = false;
-      },
-      error: () => this.isLoadingPatients = false
-    });
+    const user = this.authService.getCurrentUser();
+    if (user && user.id && user.role === 'DOCTOR') {
+      this.assignmentService.getPatientsByMedecin(user.id).subscribe({
+        next: (data) => {
+          this.patients = data || [];
+          this.isLoadingPatients = false;
+        },
+        error: () => this.isLoadingPatients = false
+      });
+    } else {
+      this.isLoadingPatients = false;
+    }
   }
 
   selectPatient(patient: any) {

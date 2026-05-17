@@ -108,7 +108,30 @@ public class PatientController {
 
     @PostMapping("/{patientId}/assign/{medecinId}")
     public ResponseEntity<Patient> assignPatient(@PathVariable Long patientId, @PathVariable Long medecinId) {
-        Patient p = patientRepository.findById(patientId).orElseThrow();
+        // Try to find by ID first
+        Optional<Patient> opt = patientRepository.findById(patientId);
+        
+        // If not found, try to find by User ID (since patientId passed from frontend might be User ID)
+        if (opt.isEmpty()) {
+            opt = patientRepository.findByUser_Id(patientId);
+        }
+
+        Patient p;
+        if (opt.isPresent()) {
+            p = opt.get();
+        } else {
+            // Create a new Patient entity if it doesn't exist
+            p = new Patient();
+            p.setMedecinId(medecinId);
+            // We assume the incoming patientId is the User ID
+            UserInfo ui = new UserInfo();
+            ui.setId(patientId);
+            p.setUser(ui);
+            // Assign a temporary ID if sequence is needed, or just let MongoDB handle it if it's not the PK
+            // But here the @Id is Long, so we should probably use the sequence or the User ID
+            p.setId(patientId); 
+        }
+        
         p.setMedecinId(medecinId);
         return ResponseEntity.ok(patientRepository.save(p));
     }
