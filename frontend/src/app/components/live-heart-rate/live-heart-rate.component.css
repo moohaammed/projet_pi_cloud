@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   LIVE HEART-RATE DASHBOARD — Premium Dark Medical Theme
+   LIVE HEART-RATE DASHBOARD — Dark Medical Theme
    ═══════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
@@ -128,12 +128,14 @@
   padding: 0.4rem 0.85rem;
   font-size: 0.8rem;
   font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .linked-patient-button.active {
-  border-color: rgba(34, 197, 94, 0.45);
-  background: rgba(34, 197, 94, 0.14);
-  color: #86efac;
+  border-color: rgba(168, 85, 247, 0.45);
+  background: rgba(128, 0, 128, 0.18);
+  color: #d8b4fe;
 }
 
 .connection-badge {
@@ -157,14 +159,13 @@
 }
 
 .connect-smartwatch-button {
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  background: rgba(34, 197, 94, 0.12);
-  color: #86efac;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: rgba(128, 0, 128, 0.12);
+  color: #d8b4fe;
   border-radius: 10px;
   padding: 0.6rem 1rem;
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -173,8 +174,8 @@
 }
 
 .connect-smartwatch-button:hover:not(:disabled) {
-  border-color: rgba(34, 197, 94, 0.5);
-  background: rgba(34, 197, 94, 0.18);
+  border-color: rgba(168, 85, 247, 0.5);
+  background: rgba(128, 0, 128, 0.2);
 }
 
 .connect-smartwatch-button:disabled {
@@ -184,7 +185,7 @@
 
 .smartwatch-config-message {
   max-width: 280px;
-  color: #86efac;
+  color: #d8b4fe;
   font-size: 0.75rem;
   text-align: right;
 }
@@ -276,8 +277,8 @@
 }
 
 .bpm-card.bpm-normal .card-glow { background: radial-gradient(circle, #22c55e 0%, transparent 70%); }
-.bpm-card.bpm-low .card-glow { background: radial-gradient(circle, #3b82f6 0%, transparent 70%); }
-.bpm-card.bpm-high .card-glow { background: radial-gradient(circle, #ef4444 0%, transparent 70%); }
+.bpm-card.bpm-low .card-glow    { background: radial-gradient(circle, #3b82f6 0%, transparent 70%); }
+.bpm-card.bpm-high .card-glow   { background: radial-gradient(circle, #ef4444 0%, transparent 70%); }
 
 .bpm-display {
   display: flex;
@@ -330,9 +331,7 @@
   background-clip: text;
 }
 
-.bpm-na {
-  opacity: 0.3;
-}
+.bpm-na { opacity: 0.3; }
 
 .bpm-unit {
   font-size: 1.1rem;
@@ -385,7 +384,7 @@
   border-radius: 12px;
   overflow: hidden;
   background: #0a0e1a;
-  border: 1px solid rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(128, 0, 128, 0.15);
 }
 
 .ecg-canvas {
@@ -398,7 +397,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  color: #00ff88;
+  color: #a855f7;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 1px;
@@ -408,7 +407,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #00ff88;
+  background: #a855f7;
   animation: pulse-dot 1.5s infinite;
 }
 
@@ -450,7 +449,7 @@
 }
 
 .stat-card:hover {
-  border-color: rgba(148, 163, 184, 0.2);
+  border-color: rgba(168, 85, 247, 0.2);
   transform: translateY(-2px);
 }
 
@@ -465,10 +464,10 @@
   flex-shrink: 0;
 }
 
-.stat-icon.avg { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
-.stat-icon.min { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-.stat-icon.max { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-.stat-icon.readings { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+.stat-icon.avg      { background: rgba(128, 0, 128, 0.15); color: #c084fc; }
+.stat-icon.min      { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.stat-icon.max      { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.stat-icon.readings { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; }
 
 .stat-info {
   display: flex;
@@ -497,9 +496,7 @@
 }
 
 /* ── HISTORY TABLE ── */
-.history-card {
-  grid-column: 1 / -1;
-}
+.history-card { grid-column: 1 / -1; }
 
 .history-count {
   color: #64748b;
@@ -541,7 +538,7 @@
 }
 
 .history-table tbody tr.latest {
-  background: rgba(34, 197, 94, 0.04);
+  background: rgba(128, 0, 128, 0.06);
 }
 
 .history-table td {
@@ -563,8 +560,8 @@
 }
 
 .bpm-badge.normal { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-.bpm-badge.low { background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
-.bpm-badge.high { background: rgba(239, 68, 68, 0.12); color: #f87171; }
+.bpm-badge.low    { background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
+.bpm-badge.high   { background: rgba(239, 68, 68, 0.12); color: #f87171; }
 
 .zone-tag {
   font-size: 0.7rem;
@@ -576,8 +573,8 @@
 }
 
 .zone-tag.normal { background: rgba(34, 197, 94, 0.1); color: #4ade80; }
-.zone-tag.low { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
-.zone-tag.high { background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
+.zone-tag.low    { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+.zone-tag.high   { background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
 
 /* ── EMPTY STATE ── */
 .empty-state {
@@ -610,13 +607,13 @@
 
 .ai-card {
   grid-column: 1 / -1;
-  border: 1px solid rgba(139, 92, 246, 0.15);
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(49, 46, 129, 0.2) 100%);
+  border: 1px solid rgba(128, 0, 128, 0.2);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(60, 0, 60, 0.2) 100%);
 }
 
 .ai-card:hover {
-  border-color: rgba(139, 92, 246, 0.3);
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.08);
+  border-color: rgba(128, 0, 128, 0.35);
+  box-shadow: 0 0 30px rgba(128, 0, 128, 0.08);
 }
 
 /* ── AI Status Badge ── */
@@ -640,83 +637,39 @@
   animation: pulse-dot 2s infinite;
 }
 
-.ai-status-badge.ai-waiting {
-  background: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.25);
-}
+.ai-status-badge.ai-waiting     { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.25); }
+.ai-status-badge.ai-ready       { background: rgba(34, 197, 94, 0.12);  color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.25); }
+.ai-status-badge.ai-disconnected{ background: rgba(239, 68, 68, 0.12);  color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); }
+.ai-status-badge.ai-error       { background: rgba(249, 115, 22, 0.12); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.25); }
+.ai-status-badge.ai-idle        { background: rgba(148, 163, 184, 0.12);color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.15); }
 
-.ai-status-badge.ai-ready {
-  background: rgba(34, 197, 94, 0.12);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.25);
-}
-
-.ai-status-badge.ai-disconnected {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.25);
-}
-
-.ai-status-badge.ai-error {
-  background: rgba(249, 115, 22, 0.12);
-  color: #f97316;
-  border: 1px solid rgba(249, 115, 22, 0.25);
-}
-
-.ai-status-badge.ai-idle {
-  background: rgba(148, 163, 184, 0.12);
-  color: #94a3b8;
-  border: 1px solid rgba(148, 163, 184, 0.15);
-}
-
-/* ── Disconnected State ── */
+/* ── State panels ── */
 .ai-disconnected-state,
-.ai-idle-state {
-  text-align: center;
-  padding: 2.5rem 1rem;
-}
+.ai-idle-state,
+.ai-error-state { text-align: center; padding: 2.5rem 1rem; }
 
 .ai-disconnected-icon,
 .ai-idle-icon,
-.ai-error-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
+.ai-error-icon { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .ai-disconnected-icon { color: #ef4444; }
-.ai-idle-icon { color: #64748b; }
-.ai-error-icon { color: #f97316; }
+.ai-idle-icon         { color: #64748b; }
+.ai-error-icon        { color: #f97316; }
 
 .ai-disconnected-text,
 .ai-idle-text,
-.ai-error-text {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-}
+.ai-error-text { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.5rem; }
 
 .ai-disconnected-text { color: #ef4444; }
-.ai-idle-text { color: #94a3b8; }
-.ai-error-text { color: #f97316; }
+.ai-idle-text         { color: #94a3b8; }
+.ai-error-text        { color: #f97316; }
 
 .ai-disconnected-hint,
 .ai-idle-hint,
-.ai-error-hint {
-  font-size: 0.8rem;
-  color: #64748b;
-}
-
-/* ── Error State ── */
-.ai-error-state {
-  text-align: center;
-  padding: 2.5rem 1rem;
-}
+.ai-error-hint { font-size: 0.8rem; color: #64748b; }
 
 /* ── Waiting State ── */
-.ai-waiting-state {
-  padding: 1.5rem 0;
-}
+.ai-waiting-state { padding: 1.5rem 0; }
 
 .ai-waiting-header {
   display: flex;
@@ -728,9 +681,7 @@
   margin-bottom: 1.25rem;
 }
 
-.ai-progress-container {
-  margin-bottom: 1rem;
-}
+.ai-progress-container { margin-bottom: 1rem; }
 
 .ai-progress-bar {
   width: 100%;
@@ -743,28 +694,23 @@
 
 .ai-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #c4b5fd 100%);
+  background: linear-gradient(90deg, #800080 0%, #a855f7 50%, #d8b4fe 100%);
   border-radius: 100px;
   transition: width 0.5s ease;
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 12px rgba(128, 0, 128, 0.4);
 }
 
 .ai-progress-text {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #a78bfa;
+  color: #c084fc;
 }
 
-.ai-waiting-hint {
-  font-size: 0.78rem;
-  color: #64748b;
-}
+.ai-waiting-hint { font-size: 0.78rem; color: #64748b; }
 
-/* ── Ready State — Live Prediction ── */
-.ai-ready-state {
-  padding: 0.5rem 0;
-}
+/* ── Ready State ── */
+.ai-ready-state { padding: 0.5rem 0; }
 
 .ai-prediction-grid {
   display: grid;
@@ -787,32 +733,11 @@
   transition: all 0.3s ease;
 }
 
-.ai-risk-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-}
+.ai-risk-icon  { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.ai-risk-level { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem; }
+.ai-risk-label { font-size: 0.7rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
 
-.ai-risk-level {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 0.25rem;
-}
-
-.ai-risk-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* ── Probability Section ── */
-.ai-probability-section {
-  margin-bottom: 1.25rem;
-}
+.ai-probability-section { margin-bottom: 1.25rem; }
 
 .ai-probability-header {
   display: flex;
@@ -821,19 +746,8 @@
   margin-bottom: 0.5rem;
 }
 
-.ai-prob-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.ai-prob-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.5rem;
-  font-weight: 800;
-}
+.ai-prob-label { font-size: 0.8rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+.ai-prob-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 800; }
 
 .ai-prob-bar {
   width: 100%;
@@ -847,10 +761,9 @@
   height: 100%;
   border-radius: 100px;
   transition: width 0.5s ease, background-color 0.5s ease;
-  box-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 16px rgba(128, 0, 128, 0.3);
 }
 
-/* ── Prediction Details ── */
 .ai-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -866,21 +779,8 @@
   border: 1px solid rgba(148, 163, 184, 0.06);
 }
 
-.ai-detail-label {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.25rem;
-}
-
-.ai-detail-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #e2e8f0;
-}
+.ai-detail-label { font-size: 0.68rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+.ai-detail-value { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 700; color: #e2e8f0; }
 
 .prediction-normal { color: #22c55e !important; }
 .prediction-crisis { color: #ef4444 !important; }
@@ -929,4 +829,3 @@
     grid-template-columns: 1fr;
   }
 }
-

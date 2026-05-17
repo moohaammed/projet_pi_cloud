@@ -1112,3 +1112,112 @@ a, button {
     align-items: flex-start;
   }
 }
+
+/* ══════════════════════════════════════════════════
+   MOBILE RESPONSIVE — medecin dashboard layout
+   ══════════════════════════════════════════════════ */
+
+@media (max-width: 991.98px) {
+
+  /* Dashboard container: reduce right padding */
+  .dashboard-container {
+    padding: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Dashboard header: stack on small screens */
+  .dashboard-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px;
+    padding: 16px !important;
+  }
+
+  /* Stats bar: 2 columns on tablet */
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Main grid: single column (stacks patient list above details) */
+  .dashboard-main {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Patient list: no fixed max-height on mobile — scroll naturally */
+  .patient-list {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  /* Patient detail: no sticky on mobile */
+  .patient-detail {
+    max-height: none !important;
+    overflow-y: visible !important;
+    position: static !important;
+  }
+
+  /* Segmented control: scrollable on mobile */
+  .segmented-control {
+    margin: 0 12px 16px 12px !important;
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+  }
+
+  .segment-btn {
+    flex-shrink: 0;
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Profile hero: stack avatar and info */
+  .profile-hero {
+    flex-direction: column !important;
+    padding: 20px !important;
+    gap: 16px !important;
+    text-align: center;
+  }
+
+  /* Profile stats: wrap pills */
+  .profile-stats-grid {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Patient grid: single column */
+  .patient-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+
+  /* Stats bar: single column on phones */
+  .stats-bar {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stat card: row layout to save vertical space */
+  .stat-card {
+    padding: 14px 16px !important;
+  }
+
+  /* Dashboard header h1 */
+  .dashboard-header h1 {
+    font-size: 1.2rem !important;
+  }
+
+  /* Section body padding */
+  .section-body {
+    padding: 10px !important;
+  }
+
+  /* Tables: horizontal scroll */
+  .panel-card .section-body {
+    overflow-x: auto;
+  }
+
+  .modern-table {
+    min-width: 480px;
+  }
+}
+

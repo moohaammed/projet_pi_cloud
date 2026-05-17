@@ -10,6 +10,32 @@
   color: #555a64;
 }
 
+/* Desktop: fixed full-screen shell */
+.admin-shell {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100vh;
+  z-index: 3;
+  overflow: hidden;
+}
+
+/* Mobile: override to scrollable layout */
+@media (max-width: 991.98px) {
+  .admin-shell {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100dvh;
+    overflow: visible !important;
+    bottom: auto !important;
+    right: auto !important;
+  }
+}
+
+
+
 .bg-grey {
   background-color: var(--docwala-grey) !important;
 }
@@ -444,3 +470,337 @@
   transform: scale(1.05) translateY(-3px);
   filter: drop-shadow(0 12px 20px rgba(128, 0, 128, 0.25));
 }
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — app.component
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Mobile sidebar drawer overlay ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  backdrop-filter: blur(2px);
+  animation: fadeOverlay 0.25s ease;
+}
+.sidebar-overlay.open { display: block; }
+@keyframes fadeOverlay {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+/* ── Admin wrapper on mobile ── */
+@media (max-width: 991.98px) {
+
+  /* Admin wrapper: stack vertically, not fixed */
+  .admin-wrapper {
+    flex-direction: column !important;
+    position: relative !important;
+    height: auto !important;
+    min-height: 100dvh;
+    overflow: visible !important;
+  }
+
+  /* Sidebar becomes a slide-in drawer from left */
+  .admin-wrapper > aside {
+    position: fixed !important;
+    top: 0 !important;
+    left: -280px !important;
+    width: 260px !important;
+    height: 100dvh !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    z-index: 300 !important;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    flex-shrink: 0;
+  }
+
+  /* When sidebar open on mobile */
+  .admin-wrapper > aside.mobile-open {
+    left: 0 !important;
+  }
+
+  /* Main content takes full width */
+  .admin-wrapper > .flex-grow-1 {
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    min-height: 100dvh;
+  }
+
+  /* Admin header bar */
+  .admin-wrapper header {
+    height: auto !important;
+    min-height: 64px;
+    padding: 8px 12px !important;
+    flex-wrap: wrap;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  /* Hide search bar on small screens to save space */
+  .admin-wrapper header .search-form {
+    display: none !important;
+  }
+
+  /* Action icons — tighten gap */
+  .admin-wrapper header .d-flex.gap-4 {
+    gap: 10px !important;
+  }
+
+  /* Main content padding reduced, add bottom space for safe area */
+  .admin-wrapper main {
+    padding: 12px !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow: auto !important;
+    height: auto !important;
+  }
+
+  /* Keep nav-links horizontal when sidebar is expanded on desktop */
+  .admin-wrapper > aside .nav.flex-column {
+    flex-direction: column !important;
+  }
+}
+
+/* ── Extra-small phones (≤ 479px) ── */
+@media (max-width: 479.98px) {
+
+  .admin-wrapper header {
+    padding: 6px 10px !important;
+  }
+
+  .admin-wrapper main {
+    padding: 10px !important;
+  }
+}
+
+/* ── Standard layout header ── */
+@media (max-width: 991.98px) {
+  /* Shrink desktop logo only (inside d-none d-lg-flex) */
+  .header .d-none.d-lg-flex .logo-img {
+    height: 72px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  /* Mobile header logo: already 44px via HTML attr, no override needed */
+  .header .d-flex.d-lg-none .logo-img {
+    height: 40px !important;
+  }
+}
+
+/* ── Collapsed navbar links — desktop only, no longer used on mobile ── */
+@media (max-width: 991.98px) {
+  /* Hide the old navbar toggler collapse since we now have bottom nav */
+  .navbar-collapse {
+    display: none !important;
+  }
+}
+
+/* ── Footer ── */
+@media (max-width: 767.98px) {
+  footer .row > [class*='col-'] {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    text-align: left !important;
+    margin-left: 0 !important;
+  }
+
+  footer .text-end {
+    text-align: left !important;
+  }
+
+  footer .logo-img {
+    height: 60px !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE HEADER BUTTONS
+   ════════════════════════════════════════════════════════════ */
+
+.mobile-header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.mobile-header-btn:hover,
+.mobile-header-btn:active {
+  background: rgba(128,0,128,0.1);
+  color: #800080;
+  transform: scale(1.08);
+}
+
+.mobile-header-btn--accent {
+  background: rgba(128,0,128,0.1);
+  color: #800080;
+}
+
+.mobile-header-btn--danger {
+  background: rgba(220,53,69,0.08);
+  color: #dc3545;
+}
+
+.mobile-header-btn--danger:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+/* User avatar in mobile header */
+.mobile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #800080, #a855f7);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(128,0,128,0.25);
+}
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE BOTTOM NAVIGATION BAR
+   ════════════════════════════════════════════════════════════ */
+
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #ffffff;
+  border-top: 1px solid #e9ecef;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  z-index: 1025;
+  align-items: stretch;
+  justify-content: space-around;
+  padding: 0 4px;
+  padding-bottom: env(safe-area-inset-bottom, 0px); /* iPhone notch */
+}
+
+.mobile-bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 3px;
+  padding: 8px 2px 6px;
+  color: #9ca3af;
+  text-decoration: none;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.18s ease;
+  min-width: 0;
+  position: relative;
+}
+
+.mobile-bottom-nav__item i {
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.mobile-bottom-nav__item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 56px;
+}
+
+.mobile-bottom-nav__item:hover,
+.mobile-bottom-nav__item:active {
+  color: #800080;
+}
+
+.mobile-bottom-nav__item:hover i {
+  transform: translateY(-2px);
+}
+
+/* Active state */
+.mobile-bottom-nav__item.active,
+.mobile-bottom-nav a.active {
+  color: #800080 !important;
+}
+
+.mobile-bottom-nav__item.active::before,
+.mobile-bottom-nav a.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background: linear-gradient(90deg, #800080, #a855f7);
+  border-radius: 0 0 4px 4px;
+}
+
+/* Page content: add bottom padding so it's not hidden by the nav */
+.pb-mobile {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE MORE MENU (offcanvas)
+   ════════════════════════════════════════════════════════════ */
+
+.mobile-more-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.15s ease;
+}
+
+.mobile-more-item:last-child {
+  border-bottom: none;
+}
+
+.mobile-more-item:hover,
+.mobile-more-item:active {
+  background: rgba(128,0,128,0.05);
+  color: #800080;
+}
+
+.mobile-more-item i {
+  width: 22px;
+  text-align: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.mobile-more-item.text-danger {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+

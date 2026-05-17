@@ -189,3 +189,68 @@
   margin-top: 12px;
   text-align: center;
 }
+
+/* ══════════════════════════════════════════════
+   MOBILE RESPONSIVE — patient dashboard
+   ══════════════════════════════════════════════ */
+
+@media (max-width: 991.98px) {
+  /* Header: wrap content */
+  .patient-header {
+    flex-wrap: wrap !important;
+  }
+
+  /* Notification panel: full-width on mobile */
+  .notification-panel {
+    min-width: unset !important;
+    width: 94vw !important;
+    right: 3vw !important;
+    left: 3vw !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* Reduce host padding */
+  :host {
+    padding: 0 !important;
+  }
+
+  /* Header stack */
+  .patient-header .d-flex {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Avatar shrink */
+  .patient-header__avatar {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* Action buttons: wrap */
+  .patient-header .gap-3,
+  .patient-header .gap-2 {
+    gap: 8px !important;
+    flex-wrap: wrap;
+  }
+
+  /* Rappel detail panel: full width */
+  .rappel-detail-panel {
+    padding: 12px;
+  }
+
+  /* MRI / image wrapper: cap height */
+  .mri-wrapper {
+    max-height: 280px !important;
+  }
+}
+
+@media (max-width: 479.98px) {
+  /* Stat row: single column */
+  .row.g-3 > [class*="col-sm-"],
+  .row.g-4 > [class*="col-sm-"] {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+}
+

@@ -4,6 +4,12 @@
   overflow: hidden;
 }
 
+.patient-screen {
+  height: 100vh;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
 .sos-btn {
   width: 220px;
   height: 220px;
@@ -68,14 +74,14 @@
 }
 
 .location-action-btn.primary {
-  background: #176b87;
+  background: #800080;
   color: #ffffff;
 }
 
 .location-action-btn.secondary {
   background: #ffffff;
-  color: #176b87;
-  border-color: #b9d4dc;
+  color: #800080;
+  border-color: rgba(128, 0, 128, 0.2);
 }
 
 .location-action-btn input {

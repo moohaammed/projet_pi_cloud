@@ -425,28 +425,127 @@ textarea.form-control {
   animation: fadeIn 0.4s ease-out;
 }
 
-// Responsive Design
-@media (max-width: 768px) {
+// ═══════════════════════════════════════════════
+// MOBILE RESPONSIVE — groups list
+// ═══════════════════════════════════════════════
+
+@media (max-width: 991.98px) {
   .discovery-hero-clean {
-    padding: 2rem 1.5rem;
-    
-    h2 {
-      font-size: 2rem;
-    }
+    padding: 2rem 1.5rem !important;
+
+    h2 { font-size: 2rem !important; }
   }
-  
+
   .groups-discovery-container {
-    padding: 1rem;
-  }
-  
-  .category-filters {
-    .btn {
-      font-size: 0.75rem;
-      padding: 0.5rem 1rem !important;
-    }
-  }
-  
-  .group-card-directory {
-    margin-bottom: 1rem;
+    padding: 1rem !important;
   }
 }
+
+@media (max-width: 767.98px) {
+  // Hero: further reduce
+  .discovery-hero-clean {
+    padding: 1.5rem 1rem !important;
+    border-radius: 1rem !important;
+    margin-bottom: 1rem !important;
+
+    h2 { font-size: 1.5rem !important; }
+    p { font-size: 0.9375rem !important; }
+  }
+
+  // Search box: stack input and button
+  .search-box-hero {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    border-radius: 1rem !important;
+    padding: 0.75rem !important;
+    gap: 8px;
+
+    .btn {
+      width: 100% !important;
+      border-radius: 0.75rem !important;
+    }
+
+    .form-control {
+      padding: 0.5rem 0 !important;
+    }
+  }
+
+  // Category filters: horizontally scrollable
+  .category-filters {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    gap: 0.5rem !important;
+
+    .btn {
+      flex-shrink: 0;
+      font-size: 0.75rem !important;
+      padding: 0.5rem 0.875rem !important;
+      white-space: nowrap;
+    }
+  }
+
+  // Group cards: full width
+  .group-card-directory {
+    margin-bottom: 1rem !important;
+  }
+
+  // Avatar: smaller on mobile
+  .avatar-directory {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.125rem !important;
+    border-radius: 0.875rem !important;
+  }
+
+  // Group name: smaller
+  .group-name {
+    font-size: 1rem !important;
+  }
+
+  // Modal: tighter padding
+  .modal-content {
+    border-radius: 1rem !important;
+
+    .modal-header {
+      padding: 1rem 1.25rem !important;
+      border-radius: 1rem 1rem 0 0 !important;
+
+      .modal-title {
+        font-size: 1.2rem !important;
+      }
+    }
+
+    .modal-body {
+      padding: 1.25rem !important;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.25rem !important;
+      border-radius: 0 0 1rem 1rem !important;
+    }
+  }
+}
+
+@media (max-width: 479.98px) {
+  .groups-discovery-container {
+    padding: 0.5rem !important;
+  }
+
+  .group-card-directory .card-body {
+    padding: 1rem !important;
+  }
+
+  .group-footer-action {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .empty-state {
+    padding: 2rem 1rem !important;
+
+    i { font-size: 3rem !important; }
+    h4 { font-size: 1.125rem !important; }
+  }
+}
+

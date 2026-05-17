@@ -1106,3 +1106,151 @@ textarea {
 .pulse-small {
   animation: pulse-small 1.5s ease-in-out infinite;
 }
+
+// ═══════════════════════════════════════════════
+// MOBILE RESPONSIVE — community feed
+// ═══════════════════════════════════════════════
+
+@media (max-width: 767.98px) {
+
+  // Feed layout: remove side padding
+  :host {
+    padding: 0 !important;
+  }
+
+  // Feed header: keep on one row, shrink buttons to icon-only
+  .feed-header {
+    padding: 0.875rem 1rem !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+
+    .feed-header-title h3 {
+      font-size: 1.1rem !important;
+    }
+
+    .feed-header-title p {
+      display: none; // hide subtitle to save space
+    }
+
+    .feed-header-btn {
+      padding: 0.4rem 0.6rem !important;
+
+      // Hide text labels, keep icons
+      .btn-label {
+        display: none !important;
+      }
+    }
+  }
+
+  // Create post box: reduce padding
+  .create-post-box {
+    padding: 1rem !important;
+    border-radius: 0.75rem !important;
+  }
+
+  // Post action buttons: overflow-x scroll
+  .post-actions, .social-actions {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    padding: 0.75rem 1rem !important;
+    -webkit-overflow-scrolling: touch;
+
+    button, .btn {
+      flex-shrink: 0;
+      padding: 0.5rem 0.875rem !important;
+      font-size: 0.8rem !important;
+      white-space: nowrap;
+    }
+  }
+
+  // Filter bar: scrollable on mobile
+  .filter-bar {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    padding: 0.75rem !important;
+    gap: 0.5rem !important;
+    -webkit-overflow-scrolling: touch;
+
+    button {
+      flex-shrink: 0;
+      padding: 0.5rem 1rem !important;
+      font-size: 0.8rem !important;
+    }
+  }
+
+  // Modal: full-screen on mobile
+  .modal-overlay .modal-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 90vh !important;
+
+    .modal-header {
+      padding: 1rem 1.25rem !important;
+    }
+
+    .modal-body {
+      padding: 1rem 1.25rem !important;
+    }
+  }
+
+  // Emoji picker: position inside viewport
+  .emoji-picker-comment {
+    left: 0 !important;
+    right: 0 !important;
+    min-width: unset !important;
+    width: 94vw !important;
+  }
+
+  // AI sentiment alert: stack vertically
+  .ai-sentiment-alert {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+
+    .alert-icon-wrapper {
+      width: 44px !important;
+      height: 44px !important;
+
+      i { font-size: 1.25rem !important; }
+    }
+  }
+
+  // Post author: reduce gap
+  .post-author {
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+
+    .avatar {
+      width: 40px !important;
+      height: 40px !important;
+    }
+  }
+
+  // Media gallery: reduce max-height
+  .media-gallery img,
+  .media-gallery video,
+  .post-media-container img,
+  .post-media-container video {
+    max-height: 260px !important;
+  }
+}
+
+@media (max-width: 479.98px) {
+  // Action button text hidden — icons only
+  .post-actions button span,
+  .social-actions button span {
+    display: none;
+  }
+
+  .post-actions button i,
+  .social-actions button i {
+    font-size: 1.1rem;
+    margin: 0 !important;
+  }
+}
+

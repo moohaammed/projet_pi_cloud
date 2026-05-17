@@ -288,3 +288,174 @@ body.high-contrast select {
   border: 1px solid #FFD700 !important;
 }
 
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE / MOBILE FIXES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Admin shell: sidebar hidden on mobile, slides in as overlay ── */
+@media (max-width: 991.98px) {
+
+  /* Override the inline position:fixed and height:100vh */
+  .admin-wrapper {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100dvh;
+    flex-direction: column !important;
+    overflow: visible !important;
+  }
+
+  /* Main content area: no overflow:hidden, no fixed height */
+  .admin-wrapper > .flex-grow-1 {
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    min-height: calc(100dvh - 64px);
+  }
+
+  /* Admin header inside main content */
+  .admin-wrapper header {
+    height: auto !important;
+    padding: 8px 12px !important;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Search bar in header shrinks */
+  .admin-wrapper header .input-group {
+    max-width: 100% !important;
+  }
+
+  /* Main content padding reduced */
+  .admin-wrapper main {
+    padding: 12px !important;
+    overflow: auto !important;
+    height: auto !important;
+  }
+}
+
+/* ── Standard layout (non-admin): navbar & topbar ── */
+@media (max-width: 991.98px) {
+
+  /* Topbar hidden on mobile (already d-none d-lg-block, but reinforce) */
+  .topbar { display: none !important; }
+
+  /* Header logo smaller */
+  .header .logo-img { height: 60px !important; }
+
+  /* Header min-height reduced */
+  .header { min-height: 70px !important; }
+}
+
+/* ── General content containers ── */
+@media (max-width: 767.98px) {
+
+  /* Prevent horizontal overflow */
+  body { overflow-x: hidden; }
+
+  /* Container padding */
+  .container, .container-fluid { padding-left: 12px !important; padding-right: 12px !important; }
+
+  /* Cards full width */
+  .card { margin-bottom: 16px; }
+
+  /* Tables scroll horizontally */
+  .table-responsive-force {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table { min-width: 500px; }
+
+  /* Grids collapse to single column */
+  .row > [class*="col-lg"],
+  .row > [class*="col-md"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  /* Donation / event grids (custom CSS grids) */
+  .campaigns-grid,
+  .events-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stats rows collapse */
+  .stats-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Buttons full width on small screens */
+  .btn-mobile-full {
+    width: 100% !important;
+    margin-bottom: 8px;
+  }
+
+  /* Modals: better on mobile, not full-screen but contained */
+  .modal-dialog {
+    margin: 1rem auto !important;
+    max-width: 94vw !important;
+  }
+  .modal-content {
+    border-radius: 1rem !important;
+  }
+  /* Large/XL modals: full width */
+  .modal-dialog.modal-lg,
+  .modal-dialog.modal-xl {
+    max-width: 98vw !important;
+  }
+
+  /* Feed / messenger panels */
+  .messenger-layout,
+  .feed-layout {
+    flex-direction: column !important;
+  }
+
+  /* Hide decorative sidebars on mobile */
+  .d-mobile-none { display: none !important; }
+
+  /* Font sizes */
+  h1, .h1 { font-size: 1.6rem !important; }
+  h2, .h2 { font-size: 1.35rem !important; }
+  h3, .h3 { font-size: 1.15rem !important; }
+
+  /* Page headers with large titles */
+  .page-title { font-size: 1.8rem !important; }
+
+  /* Stat bars wrap */
+  .stats-bar {
+    flex-wrap: wrap !important;
+    border-radius: 12px !important;
+  }
+
+  /* Form layouts */
+  .form-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Donation form sidebar stacks below */
+  .form-layout .sidebar { order: 2; }
+  .form-layout .main-form { order: 1; }
+}
+
+/* ── Extra small (phones < 480px) ── */
+@media (max-width: 479.98px) {
+
+  .stats-row { grid-template-columns: 1fr !important; }
+
+  .page-title { font-size: 1.4rem !important; }
+
+  /* Admin header icons only */
+  .admin-wrapper header .d-flex.gap-4 { gap: 12px !important; }
+
+  /* Table: horizontal scroll so they don't overflow */
+  .table-responsive-always {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Scrollbar for horizontal nav on mobile ── */
+.admin-wrapper > aside .nav.flex-column::-webkit-scrollbar { height: 3px; }
+.admin-wrapper > aside .nav.flex-column::-webkit-scrollbar-thumb { background: rgba(128,0,128,0.3); border-radius: 2px; }

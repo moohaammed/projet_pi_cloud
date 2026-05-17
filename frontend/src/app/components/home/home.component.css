@@ -235,3 +235,85 @@
   justify-content: center;
   font-size: 0.875rem;
 }
+
+/* ══════════════════════════════════════════════
+   MOBILE RESPONSIVE — home component
+   ══════════════════════════════════════════════ */
+
+@media (max-width: 991.98px) {
+  /* Hero: reduce padding */
+  .hero-header {
+    padding: 2rem 1.25rem !important;
+    border-radius: 1rem !important;
+  }
+
+  /* Hero buttons: stack vertically */
+  .hero-header .d-flex.gap-3 {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  .hero-header .d-flex.gap-3 .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Right column (toolkit + widget) moves below */
+  .col-lg-4 {
+    order: 2;
+  }
+  .col-lg-8 {
+    order: 1;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* Stat step boxes: shrink icons */
+  .step-icon {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .step-num {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Appointment card: stack columns */
+  .doctor-card .g-0.row > [class*="col-"] {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(0,0,0,0.06) !important;
+  }
+
+  /* Community posts: full width */
+  .row.g-3 > .col-md-6 {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  /* Toolkit grid: 2 items still fine on small */
+  .toolkit-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .toolkit-item {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .hero-header_title {
+    font-size: 1.5rem !important;
+  }
+
+  /* Work process steps: 2 columns */
+  .col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
