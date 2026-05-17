@@ -10,7 +10,7 @@
     <p class="text-muted mb-0 small mt-1">Vue médicale complète · Alzheimer 360°</p>
   </div>
   <button class="btn btn-outline-primary btn-sm" (click)="fetchPatients()" [disabled]="loading">
-    <i class="fa-solid fa-rotate-right me-1"></i> Actualiser
+    <i class="fa-solid fa-rotate-right me-1"></i> Refresh
   </button>
 </div>
 
@@ -88,9 +88,9 @@
     <div *ngIf="loading" class="card border-0 shadow-sm">
       <div class="card-body text-center py-5">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Chargement...</span>
+          <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="text-muted mt-3 mb-0">Chargement des dossiers patients...</p>
+        <p class="text-muted mt-3 mb-0">Loading patient files...</p>
       </div>
     </div>
 
@@ -99,7 +99,7 @@
       <div class="card-body text-center py-5">
         <i class="fa-solid fa-folder-open fa-3x text-muted mb-3"></i>
         <h5 class="text-muted fw-semibold">Aucun patient enregistré</h5>
-        <p class="text-muted small">Utilisez le formulaire à gauche pour ajouter un premier patient.</p>
+        <p class="text-muted small">Use the form on the left to add a first patient.</p>
       </div>
     </div>
 
@@ -108,7 +108,7 @@
       <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3 px-4">
         <h6 class="fw-bold mb-0">
           <i class="fa-solid fa-list-ul me-2 text-primary"></i>
-          Dossiers Patients
+          Files Patients
           <span class="badge bg-soft-primary text-primary ms-2">{{ totalPatients }}</span>
         </h6>
       </div>
@@ -118,16 +118,16 @@
           <thead class="table-light">
             <tr>
               <th class="ps-4 fw-semibold">Patient</th>
-              <th class="fw-semibold">Âge</th>
-              <th class="fw-semibold">Sexe</th>
+              <th class="fw-semibold">Age</th>
+              <th class="fw-semibold">Gender</th>
               <th class="fw-semibold">Poids</th>
-              <th class="fw-semibold">Statut</th>
+              <th class="fw-semibold">Status</th>
               <th class="fw-semibold text-center pe-4">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let p of patients">
-              <!-- Avatar + Nom -->
+              <!-- Avatar + Last Name -->
               <td class="ps-4">
                 <div class="d-flex align-items-center gap-3">
                   <div class="patient-avatar">{{ getInitials(p) }}</div>
@@ -137,24 +137,24 @@
                   </div>
                 </div>
               </td>
-              <!-- Âge -->
+              <!-- Age -->
               <td>
                 <span class="fw-medium">{{ p.age }}</span>
-                <small class="text-muted"> ans</small>
+                <small class="text-muted"> years old</small>
               </td>
-              <!-- Sexe -->
+              <!-- Gender -->
               <td>
-                <span [class]="p.sexe === 'Homme' || p.sexe === 'M'
+                <span [class]="p.sexe === 'Male' || p.sexe === 'M'
                   ? 'badge rounded-pill bg-primary bg-opacity-10 text-primary'
                   : 'badge rounded-pill bg-danger bg-opacity-10 text-danger'">
-                  <i [class]="p.sexe === 'Homme' || p.sexe === 'M'
+                  <i [class]="p.sexe === 'Male' || p.sexe === 'M'
                     ? 'fa-solid fa-mars me-1' : 'fa-solid fa-venus me-1'"></i>
                   {{ p.sexe }}
                 </span>
               </td>
               <!-- Poids -->
               <td>{{ p.poids }} <small class="text-muted">kg</small></td>
-              <!-- Statut -->
+              <!-- Status -->
               <td>
                 <span [class]="getStatusBadgeClass(getPatientStatus(p))">
                   {{ getPatientStatus(p) }}
@@ -166,13 +166,13 @@
                   <button id="btn-analyses-{{ p.id }}"
                           class="btn btn-sm btn-outline-primary"
                           (click)="viewAnalyses(p)"
-                          title="Voir les analyses">
+                          title="View analyses">
                     <i class="fa-solid fa-microscope me-1"></i>Analyses
                   </button>
                   <button id="btn-delete-{{ p.id }}"
                           class="btn btn-sm btn-outline-danger"
                           (click)="deletePatient(p.id)"
-                          title="Supprimer">
+                          title="Delete">
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 </div>
@@ -190,7 +190,7 @@
       <div class="card-header bg-white border-0 py-3 px-3 d-flex justify-content-between align-items-center">
         <h6 class="fw-bold mb-0">
           <i class="fa-solid fa-bell me-2 text-primary"></i>
-          Alertes
+          Alerts
         </h6>
         <span class="badge bg-danger rounded-pill" *ngIf="unreadNotifCount > 0">
           {{ unreadNotifCount }}
@@ -200,7 +200,7 @@
       <div class="card-body p-0">
         <div *ngIf="notifications.length === 0" class="text-center py-5 text-muted">
           <i class="fa-solid fa-circle-check fa-2x mb-2 text-success"></i>
-          <p class="small mb-0">Aucune alerte active</p>
+          <p class="small mb-0">Noe alerte active</p>
         </div>
 
         <div *ngFor="let notif of notifications"
@@ -235,7 +235,7 @@
           <i class="fa-solid fa-microscope me-2 text-primary"></i>
           Analyses — {{ selectedPatient?.nom }} {{ selectedPatient?.prenom }}
         </h5>
-        <small class="text-muted">Historique complet des analyses IRM</small>
+        <small class="text-muted">Complete history of MRI analyses</small>
       </div>
       <button id="btn-close-modal" class="btn-close" (click)="closeModal()"></button>
     </div>
@@ -245,13 +245,13 @@
       <!-- Loading -->
       <div *ngIf="loadingAnalyses" class="text-center py-5">
         <div class="spinner-border text-primary" role="status"></div>
-        <p class="text-muted mt-3">Chargement des analyses...</p>
+        <p class="text-muted mt-3">Loading analyses...</p>
       </div>
 
       <!-- Empty -->
       <div *ngIf="!loadingAnalyses && patientAnalyses.length === 0" class="text-center py-5 text-muted">
         <i class="fa-solid fa-flask fa-3x mb-3"></i>
-        <p class="fw-semibold">Aucune analyse disponible</p>
+        <p class="fw-semibold">Noe analyse disponible</p>
         <small>Ce patient n'a pas encore d'analyse enregistrée.</small>
       </div>
 
@@ -261,9 +261,9 @@
           <thead class="table-light">
             <tr>
               <th>Date</th>
-              <th>Statut</th>
-              <th>Risque IA</th>
-              <th>Interprétation</th>
+              <th>Status</th>
+              <th>AI Risk</th>
+              <th>Interpretation</th>
             </tr>
           </thead>
           <tbody>
@@ -281,7 +281,7 @@
                 </span>
                 <span *ngIf="a.pourcentageRisque == null" class="text-muted">—</span>
               </td>
-              <td class="text-muted fst-italic">{{ a.interpretation || 'Non évaluée' }}</td>
+              <td class="text-muted fst-italic">{{ a.interpretation || 'Not evaluatede' }}</td>
             </tr>
           </tbody>
         </table>
@@ -291,7 +291,7 @@
     <!-- Footer -->
     <div class="modal-panel__footer border-top">
       <button id="btn-close-modal-footer" class="btn btn-outline-secondary btn-sm" (click)="closeModal()">
-        <i class="fa-solid fa-times me-1"></i>Fermer
+        <i class="fa-solid fa-times me-1"></i>Close
       </button>
     </div>
 

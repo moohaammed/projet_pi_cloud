@@ -3,9 +3,9 @@ package esprit.tn.backpi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.boot.CommandLineRunner;
+
 import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableScheduling
@@ -16,14 +16,7 @@ public class BackpiApplication {
     }
 
     @Bean
-    public CommandLineRunner fixDatabaseSchema(JdbcTemplate jdbcTemplate) {
-        return args -> {
-            try {
-                jdbcTemplate.execute("ALTER TABLE analyse MODIFY observation_medicale LONGTEXT;");
-                System.out.println("✅ DATABASE FIX: observation_medicale column is now LONGTEXT");
-            } catch (Exception e) {
-                System.err.println("⚠️ DATABASE FIX SKIPPED: " + e.getMessage());
-            }
-        };
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

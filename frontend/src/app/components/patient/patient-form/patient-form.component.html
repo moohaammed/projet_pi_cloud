@@ -10,7 +10,7 @@
             </a>
           </li>
           <li class="breadcrumb-item active">
-            {{ isEdit ? 'Modifier' : 'Ajouter' }}
+            {{ isEdit ? 'Edit' : 'Add' }}
           </li>
         </ol>
       </nav>
@@ -19,7 +19,7 @@
         <div class="card-header bg-primary text-white p-4 rounded-top-4">
           <h5 class="mb-0 fw-bold">
             <i class="fa-solid fa-bed-pulse me-2"></i>
-            {{ isEdit ? 'Modifier le patient' : 'Ajouter un patient' }}
+            {{ isEdit ? 'Edit patient' : 'Add a patient' }}
           </h5>
         </div>
 
@@ -35,17 +35,17 @@
           <div class="row g-3 mb-4">
             <div class="col-md-6">
               <label class="form-label fw-medium">
-                Nom <span class="text-danger">*</span>
+                Last Name <span class="text-danger">*</span>
               </label>
               <input [(ngModel)]="patient.nom" name="nom"
-                     class="form-control" placeholder="Nom">
+                     class="form-control" placeholder="Last Name">
             </div>
             <div class="col-md-6">
               <label class="form-label fw-medium">
-                Prénom <span class="text-danger">*</span>
+                First Name <span class="text-danger">*</span>
               </label>
               <input [(ngModel)]="patient.prenom" name="prenom"
-                     class="form-control" placeholder="Prénom">
+                     class="form-control" placeholder="First Name">
             </div>
             <div class="col-md-6">
               <label class="form-label fw-medium">
@@ -55,7 +55,7 @@
                      type="email" class="form-control">
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-medium">Téléphone</label>
+              <label class="form-label fw-medium">Phone</label>
               <input [(ngModel)]="patient.telephone" name="telephone"
                      class="form-control" placeholder="+216 XX XXX XXX">
             </div>
@@ -104,12 +104,12 @@
           </h6>
           <div class="row g-3 mb-4">
             <div class="col-md-4">
-              <label class="form-label fw-medium">Nom du contact</label>
+              <label class="form-label fw-medium">Last Name du contact</label>
               <input [(ngModel)]="patient.contactUrgenceNom"
                      name="contactUrgenceNom" class="form-control">
             </div>
             <div class="col-md-4">
-              <label class="form-label fw-medium">Téléphone</label>
+              <label class="form-label fw-medium">Phone</label>
               <input [(ngModel)]="patient.contactUrgenceTelephone"
                      name="contactUrgenceTelephone" class="form-control">
             </div>
@@ -122,7 +122,7 @@
                 <option>Fille</option>
                 <option>Époux/Épouse</option>
                 <option>Frère/Sœur</option>
-                <option>Autre</option>
+                <option>Other</option>
               </select>
             </div>
           </div>
@@ -143,11 +143,11 @@
               <span *ngIf="loading"
                     class="spinner-border spinner-border-sm me-2"></span>
               <i *ngIf="!loading" class="fa-solid fa-floppy-disk me-2"></i>
-              {{ isEdit ? 'Enregistrer les modifications' : 'Créer le patient' }}
+              {{ isEdit ? 'Save modifications' : 'Create patient' }}
             </button>
             <button class="btn btn-outline-secondary"
                     (click)="cancel()" [disabled]="loading">
-              Annuler
+              Cancel
             </button>
           </div>
 

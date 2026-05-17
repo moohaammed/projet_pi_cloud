@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { PublicationDto } from './publication.service';
+import { environment } from '../../../environments/environment';
 
 /** A content item (post or group message) for admin content browser */
 export interface ContentItem {
@@ -124,7 +125,7 @@ export interface ClinicalPulse {
  */
 @Injectable({ providedIn: 'root' })
 export class AdminCollaborationService {
-  private readonly base = 'http://localhost:8080/api/admin/collaboration';
+  private readonly apiUrl = `${environment.apiUrl}/api/admin/collaboration`;
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
 
@@ -141,64 +142,64 @@ export class AdminCollaborationService {
 
   /** Returns unresolved safety alert count and pending moderation count */
   getKpis(): Observable<SystemHealthKpis> {
-    return this.http.get<SystemHealthKpis>(`${this.base}/health/kpis`, { headers: this.headers() });
+    return this.http.get<SystemHealthKpis>(`${this.apiUrl}/health/kpis`, { headers: this.headers() });
   }
 
   /** Returns the 200 most recent safety alert log entries */
   getSafetyLogs(): Observable<SafetyAlertLogRow[]> {
-    return this.http.get<SafetyAlertLogRow[]>(`${this.base}/safety-logs`, { headers: this.headers() });
+    return this.http.get<SafetyAlertLogRow[]>(`${this.apiUrl}/safety-logs`, { headers: this.headers() });
   }
 
   /** Returns all posts currently flagged for moderation review */
   getModerationQueue(): Observable<ModerationQueueItem[]> {
-    return this.http.get<ModerationQueueItem[]>(`${this.base}/moderation/queue`, { headers: this.headers() });
+    return this.http.get<ModerationQueueItem[]>(`${this.apiUrl}/moderation/queue`, { headers: this.headers() });
   }
 
   /** Clears the moderation flag on a post (post stays visible) */
   dismissFlag(publicationId: string): Observable<void> {
-    return this.http.post<void>(`${this.base}/moderation/${publicationId}/dismiss`, {}, { headers: this.headers() });
+    return this.http.post<void>(`${this.apiUrl}/moderation/${publicationId}/dismiss`, {}, { headers: this.headers() });
   }
 
   /** Permanently deletes a flagged post */
   deletePost(publicationId: string): Observable<void> {
-    return this.http.delete<void>(`${this.base}/moderation/${publicationId}`, { headers: this.headers() });
+    return this.http.delete<void>(`${this.apiUrl}/moderation/${publicationId}`, { headers: this.headers() });
   }
 
   /** Suspends a user account */
   suspendUser(userId: number): Observable<void> {
-    return this.http.post<void>(`${this.base}/users/${userId}/suspend`, {}, { headers: this.headers() });
+    return this.http.post<void>(`${this.apiUrl}/users/${userId}/suspend`, {}, { headers: this.headers() });
   }
 
   /** Returns daily activity + distress trend data for the last N days */
   getStressTrend(days = 7): Observable<PlatformStressTrend> {
-    return this.http.get<PlatformStressTrend>(`${this.base}/analytics/stress-trend`, {
+    return this.http.get<PlatformStressTrend>(`${this.apiUrl}/analytics/stress-trend`, {
       headers: this.headers(), params: { days: String(days) }
     });
   }
 
   /** Returns DM metadata (counts and timestamps, no message content) */
   getDirectMessageMetadata(): Observable<DirectMessageMetadata[]> {
-    return this.http.get<DirectMessageMetadata[]>(`${this.base}/privacy/direct-messages/metadata`, { headers: this.headers() });
+    return this.http.get<DirectMessageMetadata[]>(`${this.apiUrl}/privacy/direct-messages/metadata`, { headers: this.headers() });
   }
 
   /** Triggers a retroactive scan of the last 30 days of messages for missed safety alerts */
   retroactiveScan(): Observable<void> {
-    return this.http.post<void>(`${this.base}/analytics/retroactive-scan`, {}, { headers: this.headers() });
+    return this.http.post<void>(`${this.apiUrl}/analytics/retroactive-scan`, {}, { headers: this.headers() });
   }
 
   /** Returns all groups with member counts and owner names */
   getAllGroups(): Observable<ChatGroupAdmin[]> {
-    return this.http.get<ChatGroupAdmin[]>(`${this.base}/groups`, { headers: this.headers() });
+    return this.http.get<ChatGroupAdmin[]>(`${this.apiUrl}/groups`, { headers: this.headers() });
   }
 
   /** Permanently deletes a group */
   deleteGroup(groupId: string): Observable<void> {
-    return this.http.delete<void>(`${this.base}/groups/${groupId}`, { headers: this.headers() });
+    return this.http.delete<void>(`${this.apiUrl}/groups/${groupId}`, { headers: this.headers() });
   }
 
   /** Updates a group's name, description, and category */
   updateGroup(groupId: string, dto: ChatGroupAdmin): Observable<void> {
-    return this.http.put<void>(`${this.base}/groups/${groupId}`, dto, { headers: this.headers() });
+    return this.http.put<void>(`${this.apiUrl}/groups/${groupId}`, dto, { headers: this.headers() });
   }
 
   /**
@@ -206,52 +207,52 @@ export class AdminCollaborationService {
    * If scheduledAt is provided, the post won't appear in the feed until that time.
    */
   postAnnouncement(content: string, groupId?: string, scheduledAt?: string): Observable<void> {
-    return this.http.post<void>(`${this.base}/announcement`, { content, groupId, scheduledAt }, { headers: this.headers() });
+    return this.http.post<void>(`${this.apiUrl}/announcement`, { content, groupId, scheduledAt }, { headers: this.headers() });
   }
 
   /** Returns future-dated announcements that haven't been published yet */
   getScheduledAnnouncements(): Observable<PublicationDto[]> {
-    return this.http.get<PublicationDto[]>(`${this.base}/announcements/scheduled`, { headers: this.headers() });
+    return this.http.get<PublicationDto[]>(`${this.apiUrl}/announcements/scheduled`, { headers: this.headers() });
   }
 
   /** Returns all groups a specific user belongs to */
   getUserGroups(userId: number): Observable<ChatGroupAdmin[]> {
-    return this.http.get<ChatGroupAdmin[]>(`${this.base}/users/${userId}/groups`, { headers: this.headers() });
+    return this.http.get<ChatGroupAdmin[]>(`${this.apiUrl}/users/${userId}/groups`, { headers: this.headers() });
   }
 
   /** Alias for dismissFlag — clears the moderation flag without deleting */
   approvePost(publicationId: string): Observable<void> {
-    return this.http.post<void>(`${this.base}/moderation/${publicationId}/approve`, {}, { headers: this.headers() });
+    return this.http.post<void>(`${this.apiUrl}/moderation/${publicationId}/approve`, {}, { headers: this.headers() });
   }
 
   /** Alias for suspendUser */
   banUser(userId: number): Observable<void> {
-    return this.http.post<void>(`${this.base}/moderation/users/${userId}/ban`, {}, { headers: this.headers() });
+    return this.http.post<void>(`${this.apiUrl}/moderation/users/${userId}/ban`, {}, { headers: this.headers() });
   }
 
   /** Returns counts of posts, messages, comments, and shares */
   getEngagementMix(): Observable<EngagementMix> {
-    return this.http.get<EngagementMix>(`${this.base}/analytics/engagement-mix`, { headers: this.headers() });
+    return this.http.get<EngagementMix>(`${this.apiUrl}/analytics/engagement-mix`, { headers: this.headers() });
   }
 
   /** Returns positive/neutral/negative sentiment breakdown across all content */
   getSentimentDistribution(): Observable<SentimentDistribution> {
-    return this.http.get<SentimentDistribution>(`${this.base}/analytics/sentiment-distribution`, { headers: this.headers() });
+    return this.http.get<SentimentDistribution>(`${this.apiUrl}/analytics/sentiment-distribution`, { headers: this.headers() });
   }
 
   /** Returns AI usage statistics */
   getAiImpact(): Observable<AiImpact> {
-    return this.http.get<AiImpact>(`${this.base}/analytics/ai-impact`, { headers: this.headers() });
+    return this.http.get<AiImpact>(`${this.apiUrl}/analytics/ai-impact`, { headers: this.headers() });
   }
 
   /** Returns the AI-generated clinical pulse (thematic analysis of recent content) */
   getPulse(): Observable<ClinicalPulse> {
-    return this.http.get<ClinicalPulse>(`${this.base}/analytics/clinical-pulse`, { headers: this.headers() });
+    return this.http.get<ClinicalPulse>(`${this.apiUrl}/analytics/clinical-pulse`, { headers: this.headers() });
   }
 
   /** Returns the AI handover retrospective for a specific group and time window */
   getRetrospective(groupId: string, hours: number): Observable<any> {
-    return this.http.get<any>(`${this.base}/analytics/retrospective`, {
+    return this.http.get<any>(`${this.apiUrl}/analytics/retrospective`, {
       headers: this.headers(),
       params: { groupId, hours: String(hours) }
     });
@@ -262,39 +263,44 @@ export class AdminCollaborationService {
     name: string; description: string; category: string;
     isDefault: boolean; defaultForRole: string | null;
   }): Observable<void> {
-    return this.http.post<void>(`${this.base}/groups/create`, dto, { headers: this.headers() });
+    return this.http.post<void>(`${this.apiUrl}/groups/create`, dto, { headers: this.headers() });
   }
 
   /** Returns all default role-based groups */
   getDefaultGroups(): Observable<ChatGroupAdmin[]> {
-    return this.http.get<ChatGroupAdmin[]>(`${this.base}/groups/default`, { headers: this.headers() });
+    return this.http.get<ChatGroupAdmin[]>(`${this.apiUrl}/groups/default`, { headers: this.headers() });
   }
 
   /** Returns 50 most recent posts for content browser */
   getRecentPosts(): Observable<ContentItem[]> {
-    return this.http.get<ContentItem[]>(`${this.base}/content/posts`, { headers: this.headers() });
+    return this.http.get<ContentItem[]>(`${this.apiUrl}/content/posts`, { headers: this.headers() });
   }
 
   /** Returns 100 most recent group messages for content browser */
   getRecentGroupMessages(): Observable<ContentItem[]> {
-    return this.http.get<ContentItem[]>(`${this.base}/content/messages`, { headers: this.headers() });
+    return this.http.get<ContentItem[]>(`${this.apiUrl}/content/messages`, { headers: this.headers() });
   }
 
   /** Admin force-deletes any post */
   adminDeletePost(postId: string): Observable<void> {
-    return this.http.delete<void>(`${this.base}/content/posts/${postId}`, { headers: this.headers() });
+    return this.http.delete<void>(`${this.apiUrl}/content/posts/${postId}`, { headers: this.headers() });
   }
 
   /** Admin force-deletes a group message */
   adminDeleteMessage(messageId: string): Observable<void> {
-    return this.http.delete<void>(`${this.base}/content/messages/${messageId}`, { headers: this.headers() });
+    return this.http.delete<void>(`${this.apiUrl}/content/messages/${messageId}`, { headers: this.headers() });
   }
 
   /** Auto-joins a user into all default groups for their role */
   autoJoinDefaultGroups(userId: number, role: string): Observable<void> {
-    return this.http.post<void>(`${this.base}/users/${userId}/auto-join`, null, {
+    return this.http.post<void>(`${this.apiUrl}/users/${userId}/auto-join`, null, {
       headers: this.headers(),
       params: { role }
     });
+  }
+
+  /** Admin fetches the explicit text history of a private message thread */
+  getDirectMessageThread(userAId: number, userBId: number): Observable<ContentItem[]> {
+    return this.http.get<ContentItem[]>(`${this.apiUrl}/content/messages/direct/${userAId}/${userBId}`, { headers: this.headers() });
   }
 }

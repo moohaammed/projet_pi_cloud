@@ -1,4 +1,4 @@
-﻿.card {
+.card {
   background: #ffffff;
   border-radius: 1rem !important;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
@@ -998,4 +998,259 @@ textarea {
 
 
 
+
+// ── Trending Topics & Enhanced Search Styles ───────────────────────
+
+.topics-bar {
+  .topic-pill {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    color: #64748b;
+    font-size: 0.8125rem;
+    letter-spacing: -0.2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
+    &:hover {
+      background: #f8fafc;
+      color: #800080;
+      border-color: rgba(128, 0, 128, 0.2);
+      transform: translateY(-1px);
+    }
+
+    &.active {
+      background: #800080;
+      color: #ffffff;
+      border-color: #800080;
+      box-shadow: 0 4px 6px -1px rgba(128, 0, 128, 0.2), 0 2px 4px -1px rgba(128, 0, 128, 0.1);
+    }
+  }
+
+  .hide-scrollbar {
+    &::-webkit-scrollbar { display: none; }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.global-search-container {
+  .input-group {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+
+    &:focus-within {
+      border-color: #800080;
+      box-shadow: 0 0 0 4px rgba(128, 0, 128, 0.1);
+    }
+
+    .form-control {
+      font-weight: 500;
+      &::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+.empty-state-icon {
+  position: relative;
+  display: inline-block;
+  
+  i {
+    filter: drop-shadow(0 0 10px rgba(128, 0, 128, 0.1));
+  }
+}
+
+.max-w-400 { max-width: 400px; }
+
+.btn-reach-out {
+  background: #ffffff;
+  color: #10b981;
+  border: 2px solid #10b981;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 1.25rem;
+  border-radius: 50rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #10b981;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    transform: translateY(-2px);
+  }
+}
+
+// Memory Anchor Polish
+.memory-anchor-banner {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-left: 4px solid #0284c7;
+
+  .fa-brain {
+    animation: floating 3s ease-in-out infinite;
+  }
+}
+
+@keyframes floating {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes pulse-small {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.pulse-small {
+  animation: pulse-small 1.5s ease-in-out infinite;
+}
+
+// ═══════════════════════════════════════════════
+// MOBILE RESPONSIVE — community feed
+// ═══════════════════════════════════════════════
+
+@media (max-width: 767.98px) {
+
+  // Feed layout: remove side padding
+  :host {
+    padding: 0 !important;
+  }
+
+  // Feed header: keep on one row, shrink buttons to icon-only
+  .feed-header {
+    padding: 0.875rem 1rem !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+
+    .feed-header-title h3 {
+      font-size: 1.1rem !important;
+    }
+
+    .feed-header-title p {
+      display: none; // hide subtitle to save space
+    }
+
+    .feed-header-btn {
+      padding: 0.4rem 0.6rem !important;
+
+      // Hide text labels, keep icons
+      .btn-label {
+        display: none !important;
+      }
+    }
+  }
+
+  // Create post box: reduce padding
+  .create-post-box {
+    padding: 1rem !important;
+    border-radius: 0.75rem !important;
+  }
+
+  // Post action buttons: overflow-x scroll
+  .post-actions, .social-actions {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    padding: 0.75rem 1rem !important;
+    -webkit-overflow-scrolling: touch;
+
+    button, .btn {
+      flex-shrink: 0;
+      padding: 0.5rem 0.875rem !important;
+      font-size: 0.8rem !important;
+      white-space: nowrap;
+    }
+  }
+
+  // Filter bar: scrollable on mobile
+  .filter-bar {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    padding: 0.75rem !important;
+    gap: 0.5rem !important;
+    -webkit-overflow-scrolling: touch;
+
+    button {
+      flex-shrink: 0;
+      padding: 0.5rem 1rem !important;
+      font-size: 0.8rem !important;
+    }
+  }
+
+  // Modal: full-screen on mobile
+  .modal-overlay .modal-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 90vh !important;
+
+    .modal-header {
+      padding: 1rem 1.25rem !important;
+    }
+
+    .modal-body {
+      padding: 1rem 1.25rem !important;
+    }
+  }
+
+  // Emoji picker: position inside viewport
+  .emoji-picker-comment {
+    left: 0 !important;
+    right: 0 !important;
+    min-width: unset !important;
+    width: 94vw !important;
+  }
+
+  // AI sentiment alert: stack vertically
+  .ai-sentiment-alert {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+
+    .alert-icon-wrapper {
+      width: 44px !important;
+      height: 44px !important;
+
+      i { font-size: 1.25rem !important; }
+    }
+  }
+
+  // Post author: reduce gap
+  .post-author {
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+
+    .avatar {
+      width: 40px !important;
+      height: 40px !important;
+    }
+  }
+
+  // Media gallery: reduce max-height
+  .media-gallery img,
+  .media-gallery video,
+  .post-media-container img,
+  .post-media-container video {
+    max-height: 260px !important;
+  }
+}
+
+@media (max-width: 479.98px) {
+  // Action button text hidden — icons only
+  .post-actions button span,
+  .social-actions button span {
+    display: none;
+  }
+
+  .post-actions button i,
+  .social-actions button i {
+    font-size: 1.1rem;
+    margin: 0 !important;
+  }
+}
 

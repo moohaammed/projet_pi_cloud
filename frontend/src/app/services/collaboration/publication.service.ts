@@ -1,5 +1,6 @@
-﻿import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface CommentDto {
   id: string;
@@ -55,6 +56,7 @@ export interface PublicationDto {
   linkedEvent?: SharedEventPreviewDto | null;
   supportCount?: number;
   supportIds?: string;
+  tags?: string[];
 }
 
 export interface PublicationCreateRequest {
@@ -71,20 +73,20 @@ export interface PublicationCreateRequest {
 @Injectable({ providedIn: 'root' })
 export class PublicationService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:8080/api/publications';
+  private apiUrl = `${environment.apiUrl}/api/publications`;
 
   /** Currently loaded publications for the active feed view */
   public publications = signal<PublicationDto[]>([]);
   fetchPublications() {
-    this.http.get<PublicationDto[]>(this.baseUrl).subscribe(data => this.publications.set(data));
+    this.http.get<PublicationDto[]>(this.apiUrl).subscribe(data => this.publications.set(data));
   }
 
   fetchPersonalizedFeed(userId: number) {
-    this.http.get<PublicationDto[]>(`${this.baseUrl}/feed/${userId}`).subscribe(data => this.publications.set(data));
+    this.http.get<PublicationDto[]>(`${this.apiUrl}/feed/${userId}`).subscribe(data => this.publications.set(data));
   }
 
   fetchGroupFeed(groupId: string) {
-    this.http.get<PublicationDto[]>(`${this.baseUrl}/group/${groupId}`).subscribe(data => this.publications.set(data));
+    this.http.get<PublicationDto[]>(`${this.apiUrl}/group/${groupId}`).subscribe(data => this.publications.set(data));
   }
 
   createPublication(req: PublicationCreateRequest, files?: File[]) {
@@ -102,19 +104,19 @@ export class PublicationService {
       files.forEach(file => formData.append('files', file));
     }
     
-    return this.http.post<PublicationDto>(this.baseUrl, formData);
+    return this.http.post<PublicationDto>(this.apiUrl, formData);
   }
 
   createPublicationJson(req: PublicationCreateRequest) {
-    return this.http.post<PublicationDto>(`${this.baseUrl}/json`, req);
+    return this.http.post<PublicationDto>(`${this.apiUrl}/json`, req);
   }
 
   voteInPoll(pubId: string, optionIndex: number, userId: number) {
-    return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/poll/vote`, { optionIndex, userId });
+    return this.http.post<PublicationDto>(`${this.apiUrl}/${pubId}/poll/vote`, { optionIndex, userId });
   }
 
   toggleSupport(pubId: string, userId: number) {
-    return this.http.post<PublicationDto>(`${this.baseUrl}/${pubId}/support`, { userId });
+    return this.http.post<PublicationDto>(`${this.apiUrl}/${pubId}/support`, { userId });
   }
 
   updatePublication(id: string, req: PublicationCreateRequest, files?: File[]) {
@@ -128,11 +130,11 @@ export class PublicationService {
       files.forEach(file => formData.append('files', file));
     }
     
-    return this.http.put<PublicationDto>(`${this.baseUrl}/${id}`, formData);
+    return this.http.put<PublicationDto>(`${this.apiUrl}/${id}`, formData);
   }
 
   deletePublication(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }
 

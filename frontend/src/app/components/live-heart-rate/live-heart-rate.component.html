@@ -1,4 +1,18 @@
 <div class="heart-rate-dashboard">
+  <div class="relation-empty-state" *ngIf="relationUnlinked; else monitorContent">
+    <i class="fa-solid fa-link-slash"></i>
+    <h1>No linked patient</h1>
+    <p>Your relation account is not linked to a patient in patient_contact yet.</p>
+  </div>
+
+  <ng-template #monitorContent>
+  <div class="relation-empty-state" *ngIf="isResolvingPatient; else resolvedMonitor">
+    <div class="spinner-border text-light" role="status"></div>
+    <h1>Loading patient monitor</h1>
+    <p>Resolving your linked patient before opening the live stream.</p>
+  </div>
+
+  <ng-template #resolvedMonitor>
 
   <!-- ═══ HEADER ═══ -->
   <div class="dashboard-header">
@@ -9,11 +23,37 @@
       <div>
         <h1 class="dashboard-title">Heart Rate Monitor</h1>
         <p class="dashboard-subtitle">Real-time smartwatch BPM tracking</p>
+        <div class="monitored-patient-name" *ngIf="monitoredPatient">
+          <span>Patient</span>
+          <strong>{{ getMonitoredPatientName() || ('Patient #' + monitoredPatient.userId) }}</strong>
+        </div>
+        <div class="linked-patient-switcher" *ngIf="linkedPatients.length > 1">
+          <button type="button"
+                  *ngFor="let patient of linkedPatients"
+                  class="linked-patient-button"
+                  [class.active]="monitoredPatient?.userId === patient.userId"
+                  (click)="selectLinkedPatient(patient)">
+            {{ patient.prenom || 'Patient' }} {{ patient.nom || ('#' + patient.userId) }}
+          </button>
+        </div>
       </div>
     </div>
-    <div class="connection-badge" [class.connected]="status === 'connected'" [class.disconnected]="status === 'disconnected'">
-      <span class="status-dot"></span>
-      {{ status === 'connected' ? 'Device Connected' : 'Disconnected' }}
+    <div class="header-actions">
+      <button type="button"
+              class="connect-smartwatch-button"
+              *ngIf="currentUserRole === 'PATIENT'"
+              [disabled]="isPreparingSmartwatch"
+              (click)="connectSmartwatch()">
+        <i class="fa-solid" [ngClass]="isPreparingSmartwatch ? 'fa-spinner fa-spin' : 'fa-watch'"></i>
+        {{ isPreparingSmartwatch ? 'Preparing...' : 'Connect Smartwatch' }}
+      </button>
+      <div class="smartwatch-config-message" *ngIf="smartwatchTokenMessage || smartwatchTokenError" [class.error]="smartwatchTokenError">
+        {{ smartwatchTokenError || smartwatchTokenMessage }}
+      </div>
+      <div class="connection-badge" [class.connected]="status === 'connected'" [class.disconnected]="status === 'disconnected'">
+        <span class="status-dot"></span>
+        {{ status === 'connected' ? 'Device Connected' : 'Disconnected' }}
+      </div>
     </div>
   </div>
 
@@ -260,4 +300,6 @@
     </div>
 
   </div>
+  </ng-template>
+  </ng-template>
 </div>

@@ -2,6 +2,7 @@ package esprit.tn.backpi.helpnotification.service;
 
 import esprit.tn.backpi.helpnotification.dto.PatientContactDTO;
 import esprit.tn.backpi.entity.PatientContact;
+import esprit.tn.backpi.entity.RelationType;
 import esprit.tn.backpi.entity.Role;
 import esprit.tn.backpi.entity.User;
 import esprit.tn.backpi.repository.PatientContactRepository;
@@ -41,8 +42,9 @@ public class PatientContactService {
         contact.setRelationType(dto.getRelationType());
         contact.setNom(dto.getNom());
         contact.setPrenom(dto.getPrenom());
-        contact.setEmail(dto.getEmail());
+        contact.setEmail(normalizeEmail(dto.getEmail()));
         contact.setTelephone(dto.getTelephone());
+        contact.setContactUserId(dto.getContactUserId());
         contact.setCreatedAt(LocalDateTime.now());
 
         // Auto-link: check if email matches an existing user
@@ -64,8 +66,9 @@ public class PatientContactService {
         contact.setRelationType(dto.getRelationType());
         contact.setNom(dto.getNom());
         contact.setPrenom(dto.getPrenom());
-        contact.setEmail(dto.getEmail());
+        contact.setEmail(normalizeEmail(dto.getEmail()));
         contact.setTelephone(dto.getTelephone());
+        contact.setContactUserId(dto.getContactUserId());
 
         // Re-resolve the link
         resolveContactUserId(contact);
@@ -91,13 +94,37 @@ public class PatientContactService {
      */
     private void resolveContactUserId(PatientContact contact) {
         if (contact.getEmail() != null && !contact.getEmail().isBlank()) {
-            userRepository.findByEmail(contact.getEmail())
+            userRepository.findByEmailIgnoreCase(contact.getEmail())
                     .ifPresentOrElse(
-                            user -> contact.setContactUserId(user.getId()),
+                            user -> {
+                                validateContactRole(user, contact.getRelationType());
+                                contact.setContactUserId(user.getId());
+                            },
                             () -> contact.setContactUserId(null)
                     );
+        } else if (contact.getContactUserId() != null) {
+            validateContactRole(contact.getContactUserId(), contact.getRelationType());
         } else {
             contact.setContactUserId(null);
+        }
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim();
+    }
+
+    private void validateContactRole(Long contactUserId, RelationType relationType) {
+        User user = userRepository.findById(contactUserId)
+                .orElseThrow(() -> new RuntimeException("Linked user not found"));
+        validateContactRole(user, relationType);
+    }
+
+    private void validateContactRole(User user, RelationType relationType) {
+        if (relationType == RelationType.DOCTOR && user.getRole() != Role.DOCTOR) {
+            throw new RuntimeException("Doctor links must use a doctor account email");
+        }
+        if (relationType != RelationType.DOCTOR && user.getRole() != Role.RELATION) {
+            throw new RuntimeException("Relation links must use a relation account email");
         }
     }
 

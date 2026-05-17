@@ -3,9 +3,9 @@
   <!-- HEADER -->
   <div class="page-header">
     <div class="title-container">
-      <div class="header-badge">Agenda & Activités</div>
-      <h1 class="page-title">Découvrez Nos Événements</h1>
-      <p class="page-subtitle">Participez à nos activités éducatives et interactives conçues pour vous.</p>
+      <div class="header-badge">Agenda & Activities</div>
+      <h1 class="page-title">Discover Our Events</h1>
+      <p class="page-subtitle" style="white-space: nowrap !important; max-width: none !important; display: block;">Participate in our educational and interactive activities designed for you.</p>
       
       <!-- Notifications -->
       <div *ngIf="successMessage()" class="alert alert-success border-0 shadow-sm rounded-4 mt-3 animate-fade-in w-100" style="max-width: 600px;">
@@ -23,7 +23,7 @@
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-        <span style="font-size: 1.25rem; font-weight: 700; color: #3d0040;">Aujourd'hui, nous sommes le <span style="text-transform: capitalize; color: #800080;">{{ todayDateStr }}</span></span>
+        <span style="font-size: 1.25rem; font-weight: 700; color: #3d0040;">Today is <span style="text-transform: capitalize; color: #800080;">{{ todayDateStr }}</span></span>
       </div>
     </div>
   </div>
@@ -39,7 +39,7 @@
       <input
         class="search-input"
         type="text"
-        placeholder="Rechercher un événement…"
+        placeholder="Search for an event..."
         [(ngModel)]="searchQuery"
         (ngModelChange)="onSearchChange()"
       />
@@ -73,7 +73,7 @@
         </div>
         <div class="stat-info">
           <span class="stat-number">{{ getUpcomingCount() }}</span>
-          <span class="stat-label">À venir</span>
+          <span class="stat-label">Upcoming</span>
         </div>
       </div>
 
@@ -88,7 +88,7 @@
         </div>
         <div class="stat-info">
           <span class="stat-number">{{ events.length - getUpcomingCount() }}</span>
-          <span class="stat-label">Passés</span>
+          <span class="stat-label">Past</span>
         </div>
       </div>
     </div>
@@ -104,8 +104,8 @@
         <line x1="3" y1="10" x2="21" y2="10"/>
       </svg>
     </div>
-    <h3 class="empty-title">Aucun événement trouvé</h3>
-    <p class="empty-sub">Essayez d'affiner votre recherche</p>
+    <h3 class="empty-title">No events found</h3>
+    <p class="empty-sub">Try refining your search</p>
   </div>
 
   <!-- EVENTS GRID -->
@@ -126,7 +126,7 @@
           [class.upcoming]="isUpcoming(event.startDateTime)"
           [class.past]="!isUpcoming(event.startDateTime)">
           <span class="badge-dot"></span>
-          {{ isUpcoming(event.startDateTime) ? 'À venir' : 'Terminé' }}
+          {{ isUpcoming(event.startDateTime) ? 'Upcoming' : 'Completed' }}
         </span>
         <!-- Floating Date Chip -->
         <div class="card-date-chip">
@@ -137,7 +137,7 @@
         <button class="card-share-btn"
                 (click)="shareEvent(event); $event.stopPropagation()"
                 [disabled]="isSharing()"
-                title="Partager sur la communauté">
+                title="Share with the community">
           <i class="fa-solid" [class.fa-share-nodes]="!isSharing()" [class.fa-spinner]="isSharing()" [class.fa-spin]="isSharing()"></i>
         </button>
       </div>
@@ -169,7 +169,7 @@
         <!-- Capacity bar -->
         <div class="capacity-section" *ngIf="event.capacity">
           <div class="capacity-label">
-            <span>Places disponibles</span>
+            <span>Available seats</span>
             <span class="capacity-count">{{ event.availablePlaces }} / {{ event.capacity }}</span>
           </div>
           <div class="capacity-bar">
@@ -185,12 +185,12 @@
         <div class="card-actions-bottom">
           <span class="card-remind" *ngIf="event.remindEnabled">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            Rappel
+            Reminder
           </span>
           <button class="btn-participate" (click)="openBooking(event)"
             [disabled]="(event.availablePlaces || 0) === 0 || !isUpcoming(event.startDateTime)">
             <i class="fa-solid fa-ticket me-2"></i>
-            {{ !isUpcoming(event.startDateTime) ? 'Passé' : (event.availablePlaces || 0) === 0 ? 'Complet' : 'Réserver' }}
+            {{ !isUpcoming(event.startDateTime) ? 'Past' : (event.availablePlaces || 0) === 0 ? 'Full' : 'Book' }}
           </button>
         </div>
 
@@ -232,7 +232,7 @@
       <div class="evt-modal-header">
         <div class="d-flex align-items-center gap-2">
           <i class="fa-solid fa-share-nodes" style="color:#800080;"></i>
-          <span class="fw-bold" style="font-size:1rem;">Partager sur la communauté</span>
+          <span class="fw-bold" style="font-size:1rem;">Share with the community</span>
         </div>
         <button class="evt-modal-close" (click)="closeShareModal()">
           <i class="fa-solid fa-xmark"></i>
@@ -244,11 +244,11 @@
         <!-- Optional caption -->
         <textarea class="evt-caption-input" rows="2"
                   [(ngModel)]="shareCaption"
-                  placeholder="Dites quelque chose à propos de cet événement..."></textarea>
+                  placeholder="Say something about this event..."></textarea>
 
         <!-- Event preview card -->
         <div class="evt-share-preview">
-          <div class="evt-preview-badge"><i class="fa-solid fa-calendar-days me-1"></i> Événement</div>
+          <div class="evt-preview-badge"><i class="fa-solid fa-calendar-days me-1"></i> Event</div>
           <p class="evt-preview-title">{{ sharingEvent()?.title }}</p>
           <p class="evt-preview-meta" *ngIf="sharingEvent()?.startDateTime">
             <i class="fa-regular fa-clock me-1"></i>{{ sharingEvent()?.startDateTime | date:'d MMM y, HH:mm' }}
@@ -260,23 +260,23 @@
 
         <!-- Global feed option -->
         <div class="evt-destination-section">
-          <p class="evt-dest-label">Partager vers :</p>
+          <p class="evt-dest-label">Share to:</p>
 
           <div class="evt-group-item evt-global-item" (click)="shareEventGlobal()">
             <div class="evt-group-avatar evt-global-avatar">
               <i class="fa-solid fa-earth-americas"></i>
             </div>
             <div class="evt-group-info">
-              <span class="evt-group-name">Fil communautaire global</span>
-              <span class="evt-group-sub">Visible par tous les membres</span>
+              <span class="evt-group-name">Global community feed</span>
+              <span class="evt-group-sub">Visible to all members</span>
             </div>
             <button class="evt-share-btn" [disabled]="isSharing()">
               <i class="fa-solid" [class.fa-paper-plane]="!isSharing()" [class.fa-spinner]="isSharing()" [class.fa-spin]="isSharing()"></i>
-              Publier
+              Publish
             </button>
           </div>
 
-          <div class="evt-divider"><span>ou dans un groupe</span></div>
+          <div class="evt-divider"><span>or in a group</span></div>
 
           <!-- Search groups -->
           <div class="evt-search-wrap">
@@ -284,14 +284,14 @@
             <input type="text" class="evt-search-input"
                    [ngModel]="shareSearchQuery()"
                    (ngModelChange)="shareSearchQuery.set($event)"
-                   placeholder="Rechercher un groupe..." />
+                   placeholder="Search for a group..." />
           </div>
 
           <!-- Groups list -->
           <div class="evt-groups-list">
             <div *ngIf="filteredGroups().length === 0" class="evt-empty">
               <i class="fa-solid fa-folder-open d-block mb-2" style="font-size:1.5rem;opacity:.3;"></i>
-              Aucun groupe trouvé
+              No group found
             </div>
             <div *ngFor="let group of filteredGroups()"
                  class="evt-group-item"
@@ -299,11 +299,11 @@
               <div class="evt-group-avatar">{{ group.name.substring(0,2).toUpperCase() }}</div>
               <div class="evt-group-info">
                 <span class="evt-group-name">{{ group.name }}</span>
-                <span class="evt-group-sub">{{ group.members.length }} membres</span>
+                <span class="evt-group-sub">{{ group.members.length }} members</span>
               </div>
               <button class="evt-share-btn" [disabled]="isSharing()">
                 <i class="fa-solid" [class.fa-paper-plane]="!isSharing()" [class.fa-spinner]="isSharing()" [class.fa-spin]="isSharing()"></i>
-                Partager
+                Share
               </button>
             </div>
           </div>

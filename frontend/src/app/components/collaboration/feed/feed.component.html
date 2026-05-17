@@ -95,13 +95,13 @@
   <div class="global-search-container position-relative mb-4 z-3">
     <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border">
       <span class="input-group-text bg-white border-0 ps-4">
-        <i class="fa-solid fa-globe text-primary"></i>
+        <i class="fa-solid fa-magnifying-glass text-primary"></i>
       </span>
       <input type="text" class="form-control border-0 ps-2 bg-white text-dark"
-        placeholder="Search everything... Posts, Groups, Topics (e.g., Alzheimer)"
-        [ngModel]="globalSearchQuery()"
-        (ngModelChange)="globalSearchQuery.set($event); executeGlobalSearch()">
-      <button *ngIf="globalSearchQuery()" class="btn btn-white border-0 pe-4" (click)="globalSearchQuery.set(''); executeGlobalSearch()">
+        placeholder="Search posts, topics, or people..."
+        [ngModel]="feedSearchQuery()"
+        (ngModelChange)="feedSearchQuery.set($event); globalSearchQuery.set($event); executeGlobalSearch()">
+      <button *ngIf="feedSearchQuery()" class="btn btn-white border-0 pe-4" (click)="clearFilters()">
         <i class="fa-solid fa-xmark text-muted"></i>
       </button>
     </div>
@@ -145,6 +145,28 @@
             <span class="badge bg-soft-secondary text-dark rounded-pill fs-12 px-2" *ngFor="let t of result.tags">#{{ t }}</span>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Topic Highlights Bar ────────────────────────────────────────── -->
+  <div class="topics-bar mb-4 animate-fade-in">
+    <div class="d-flex align-items-center gap-2 overflow-auto hide-scrollbar py-2">
+      <div class="d-flex align-items-center gap-2 pe-3 border-end border-2">
+        <i class="fa-solid fa-fire-flame-curved text-warning fs-13"></i>
+        <span class="text-muted fs-11 fw-black text-uppercase letter-spacing-1">Trending</span>
+      </div>
+      <button *ngFor="let topic of TRENDING_TOPICS"
+              class="topic-pill btn btn-sm rounded-pill px-3 py-1 fw-bold transition-all border-0 shadow-sm"
+              [ngClass]="selectedTopic() === topic ? 'btn-primary active' : 'btn-white text-muted'"
+              (click)="toggleTopic(topic)">
+        #{{ topic }}
+      </button>
+      <div class="ms-auto ps-3" *ngIf="selectedTopic() || feedSearchQuery()">
+        <button class="btn btn-xs rounded-pill bg-soft-danger text-danger fw-bold border-0 px-3 py-1"
+                (click)="clearFilters()">
+          <i class="fa-solid fa-rotate-left me-1"></i> Reset Filters
+        </button>
       </div>
     </div>
   </div>
@@ -423,17 +445,22 @@
     </div>
   </div>
 
-  <!-- Publications List -->
-  <div *ngIf="filteredPublications().length === 0" class="text-center py-5">
-    <div class="empty-state-icon mb-3">
-      <i class="fa-solid fa-newspaper fs-48 text-muted opacity-25"></i>
+  <div *ngIf="filteredPublications().length === 0" class="text-center py-5 animate-fade-in">
+    <div class="empty-state-icon mb-4">
+      <i class="fa-solid fa-magnifying-glass-chart fs-64 text-primary opacity-10"></i>
     </div>
-    <h5 class="text-muted" *ngIf="feedSearchType() === 'ALL'">Silence is gold, but sharing helps.</h5>
-    <h5 class="text-muted" *ngIf="feedSearchType() !== 'ALL'">No posts match your filter.</h5>
-    <p class="text-muted small" *ngIf="feedSearchType() === 'ALL'">Try following more groups or being the first to post!</p>
-    <button *ngIf="feedSearchType() !== 'ALL'"
-      class="btn btn-soft-primary rounded-pill px-4 mt-2"
-      (click)="feedSearchType.set('ALL')">Clear filter</button>
+    <h4 class="fw-bold text-dark mb-2">
+      <span *ngIf="feedSearchQuery() || selectedTopic()">No results found for "{{ feedSearchQuery() || '#' + selectedTopic() }}"</span>
+      <span *ngIf="!feedSearchQuery() && !selectedTopic()">Silence is gold, but sharing helps.</span>
+    </h4>
+    <p class="text-muted fs-14 max-w-400 mx-auto mb-4">
+      <span *ngIf="feedSearchQuery() || selectedTopic()">Try adjusting your keywords or clearing the topic filter to see more community insights.</span>
+      <span *ngIf="!feedSearchQuery() && !selectedTopic()">Try following more groups or being the first to post! Your knowledge matters.</span>
+    </p>
+    <button class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-doc"
+      (click)="clearFilters()">
+      {{ (feedSearchQuery() || selectedTopic()) ? 'Clear all filters' : 'Sync Feed' }}
+    </button>
   </div>
 
   <article [id]="'pub-' + pub.id" class="card border-0 shadow-doc mb-5 rounded-4 overflow-hidden animate-fade-in"
@@ -501,7 +528,7 @@
       </div>
 
       <!-- Memory Anchor Highlight -->
-      <div *ngIf="pub.type === 'MEMORY_ANCHOR'"
+      <div *ngIf="pub.type === 'MEMORY_ANCHOR' && authService.getRole() !== 'DOCTOR'"
         class="memory-anchor-banner p-4 mb-3 rounded-4 d-flex align-items-center gap-4 bg-soft-info border-info border shadow-sm animate-pulse-slow">
         <div class="flex-shrink-0 bg-white rounded-circle p-3 shadow-sm border border-info">
           <i class="fa-solid fa-brain text-info fs-32"></i>
@@ -514,7 +541,7 @@
       </div>
 
       <!-- AI Sentiment Alert (Support Signal) -->
-      <div *ngIf="pub.distressed" class="ai-sentiment-alert p-4 mb-4 d-flex align-items-center gap-4 animate-fade-in">
+      <div *ngIf="pub.distressed && authService.getRole() !== 'DOCTOR'" class="ai-sentiment-alert p-4 mb-4 d-flex align-items-center gap-4 animate-fade-in">
         <div class="alert-icon-wrapper flex-shrink-0">
           <i class="fa-solid fa-heart-pulse"></i>
         </div>

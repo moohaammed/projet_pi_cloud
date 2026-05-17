@@ -5,10 +5,10 @@
   <div class="gp-header">
     <div>
       <h2 class="gp-title"><i class="fa-solid fa-users me-2"></i>Gestion Patients</h2>
-      <p class="gp-subtitle">Administration complète des comptes et profils patients</p>
+      <p class="gp-subtitle">Complete administration of patient accounts and profiles</p>
     </div>
     <button class="btn-primary-purple" (click)="openCreate()">
-      <i class="fa-solid fa-plus me-2"></i>Nouveau Patient
+      <i class="fa-solid fa-plus me-2"></i>New Patient
     </button>
   </div>
 
@@ -23,7 +23,7 @@
   <!-- Tabs -->
   <div class="gp-tabs">
     <button [class.tab-active]="activeTab==='list'"  (click)="setTab('list')">
-      <i class="fa-solid fa-list me-2"></i>Liste des Patients
+      <i class="fa-solid fa-list me-2"></i>Patient List
     </button>
     <button [class.tab-active]="activeTab==='stats'" (click)="setTab('stats')">
       <i class="fa-solid fa-chart-pie me-2"></i>Statistiques
@@ -41,7 +41,7 @@
       </div>
       <div class="kpi-card kpi-blue">
         <div class="kpi-icon"><i class="fa-solid fa-user-plus"></i></div>
-        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Nouveaux ce mois</div></div>
+        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Newx ce mois</div></div>
       </div>
       <div class="kpi-card kpi-green">
         <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
@@ -61,20 +61,20 @@
                [(ngModel)]="searchQuery" (ngModelChange)="onFilter()">
       </div>
       <select [(ngModel)]="filterSex" (ngModelChange)="onFilter()" class="filter-select">
-        <option value="">Tous les sexes</option>
-        <option value="Homme">Homme</option>
-        <option value="Femme">Femme</option>
+        <option value="">All genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
       </select>
-      <select [(ngModel)]="filterActif" (ngModelChange)="onFilter()" class="filter-select">
+      <select [(ngModel)]="filterActive" (ngModelChange)="onFilter()" class="filter-select">
         <option value="">Tous statuts</option>
-        <option value="true">Actif</option>
+        <option value="true">Active</option>
         <option value="false">Suspendu</option>
       </select>
     </div>
 
     <!-- Loading -->
     <div *ngIf="isLoading" class="loading-state">
-      <div class="spinner"></div><span>Chargement des patients…</span>
+      <div class="spinner"></div><span>Loading patients...</span>
     </div>
 
     <!-- Table -->
@@ -82,8 +82,8 @@
       <table class="gp-table">
         <thead>
           <tr>
-            <th>Patient</th><th>Email</th><th>Âge / Sexe</th>
-            <th>Analyses</th><th>Statut</th><th>Inscrit le</th><th>Actions</th>
+            <th>Patient</th><th>Email</th><th>Age / Gender</th>
+            <th>Analyses</th><th>Status</th><th>Registered on</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -101,7 +101,7 @@
             </td>
             <td class="text-muted-sm">{{ p.email || '—' }}</td>
             <td>
-              <span *ngIf="p.age" class="badge-info">{{ p.age }} ans</span>
+              <span *ngIf="p.age" class="badge-info">{{ p.age }} years old</span>
               <span *ngIf="p.sexe" class="badge-sex ms-1">{{ p.sexe }}</span>
             </td>
             <td>
@@ -110,26 +110,26 @@
             <td>
               <span class="status-badge" [class.status-active]="p.actif" [class.status-inactive]="!p.actif">
                 <i class="fa-solid fa-circle me-1" style="font-size:8px"></i>
-                {{ p.actif ? 'Actif' : 'Suspendu' }}
+                {{ p.actif ? 'Active' : 'Suspendu' }}
               </span>
             </td>
             <td class="text-muted-sm">{{ fmt(p.createdAt) }}</td>
             <td>
               <div class="action-btns">
-                <button class="act-btn act-view"   title="Voir détails"   (click)="openDetail(p)"><i class="fa-solid fa-eye"></i></button>
-                <button class="act-btn act-edit"   title="Modifier"       (click)="openEdit(p)"><i class="fa-solid fa-pen"></i></button>
+                <button class="act-btn act-view"   title="View détails"   (click)="openDetail(p)"><i class="fa-solid fa-eye"></i></button>
+                <button class="act-btn act-edit"   title="Edit"       (click)="openEdit(p)"><i class="fa-solid fa-pen"></i></button>
                 <button class="act-btn" [class.act-suspend]="p.actif" [class.act-activate]="!p.actif"
-                        [title]="p.actif?'Suspendre':'Activer'" (click)="toggleActif(p)">
+                        [title]="p.actif?'Suspendre':'Activate'" (click)="toggleActif(p)">
                   <i class="fa-solid" [class.fa-lock]="p.actif" [class.fa-lock-open]="!p.actif"></i>
                 </button>
                 <button class="act-btn act-key"    title="Reset Mot de passe" (click)="resetPassword(p)"><i class="fa-solid fa-key"></i></button>
-                <button class="act-btn act-delete" title="Supprimer"      (click)="openDelete(p)"><i class="fa-solid fa-trash"></i></button>
+                <button class="act-btn act-delete" title="Delete"      (click)="openDelete(p)"><i class="fa-solid fa-trash"></i></button>
               </div>
             </td>
           </tr>
           <tr *ngIf="paginated.length===0">
             <td colspan="7" class="empty-row">
-              <i class="fa-solid fa-inbox me-2"></i>Aucun patient trouvé.
+              <i class="fa-solid fa-inbox me-2"></i>No patient found.
             </td>
           </tr>
         </tbody>
@@ -159,7 +159,7 @@
       </div>
       <div class="kpi-card kpi-blue">
         <div class="kpi-icon"><i class="fa-solid fa-user-plus"></i></div>
-        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Nouveaux ce mois</div></div>
+        <div><div class="kpi-val">{{ newThisMonth }}</div><div class="kpi-lbl">Newx ce mois</div></div>
       </div>
       <div class="kpi-card kpi-green">
         <div class="kpi-icon"><i class="fa-solid fa-microscope"></i></div>
@@ -176,11 +176,11 @@
 
     <div class="chart-grid">
       <div class="chart-card">
-        <div class="chart-title"><i class="fa-solid fa-venus-mars me-2"></i>Distribution par Sexe</div>
+        <div class="chart-title"><i class="fa-solid fa-venus-mars me-2"></i>Distribution par Gender</div>
         <canvas id="chartSex" height="220"></canvas>
       </div>
       <div class="chart-card">
-        <div class="chart-title"><i class="fa-solid fa-chart-bar me-2"></i>Distribution par Âge</div>
+        <div class="chart-title"><i class="fa-solid fa-chart-bar me-2"></i>Distribution par Age</div>
         <canvas id="chartAge" height="220"></canvas>
       </div>
       <div class="chart-card">
@@ -200,7 +200,7 @@
 <div class="modal-backdrop" *ngIf="showDetail" (click)="closeDetail()">
   <div class="modal-box modal-xl" (click)="$event.stopPropagation()">
     <div class="modal-head">
-      <span><i class="fa-solid fa-user me-2"></i>Détails Patient</span>
+      <span><i class="fa-solid fa-user me-2"></i>Details Patient</span>
       <button class="modal-close" (click)="closeDetail()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body" *ngIf="selectedP">
@@ -211,23 +211,23 @@
           <h4 class="text-center fw-bold mt-2">{{ selectedP.prenom }} {{ selectedP.nom }}</h4>
           <span class="status-badge mx-auto d-block text-center mt-1" style="width:fit-content"
                 [class.status-active]="selectedP.actif" [class.status-inactive]="!selectedP.actif">
-            {{ selectedP.actif ? 'Actif' : 'Suspendu' }}
+            {{ selectedP.actif ? 'Active' : 'Suspendu' }}
           </span>
           <div class="detail-info-grid mt-3">
             <div><strong>Email:</strong> {{ selectedP.email || '—' }}</div>
             <div><strong>Tél:</strong> {{ selectedP.telephone || '—' }}</div>
-            <div><strong>Âge:</strong> {{ selectedP.age != null ? selectedP.age + ' ans' : '—' }}</div>
-            <div><strong>Sexe:</strong> {{ selectedP.sexe || '—' }}</div>
+            <div><strong>Age:</strong> {{ selectedP.age != null ? selectedP.age + ' years old' : '—' }}</div>
+            <div><strong>Gender:</strong> {{ selectedP.sexe || '—' }}</div>
             <div><strong>Poids:</strong> {{ selectedP.poids != null ? selectedP.poids + ' kg' : '—' }}</div>
-            <div><strong>Inscrit le:</strong> {{ fmt(selectedP.createdAt) }}</div>
+            <div><strong>Registered on:</strong> {{ fmt(selectedP.createdAt) }}</div>
           </div>
         </div>
 
         <!-- Analyses -->
         <div class="detail-section flex-grow-1">
-          <h5 class="fw-bold mb-3"><i class="fa-solid fa-microscope me-2 text-purple"></i>Analyses & Résultats IRM</h5>
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-microscope me-2 text-purple"></i>Analyses & Results IRM</h5>
           <div *ngIf="isLoadingAn" class="loading-state"><div class="spinner"></div></div>
-          <div *ngIf="!isLoadingAn && patientAnalyses.length===0" class="empty-row">Aucune analyse enregistrée.</div>
+          <div *ngIf="!isLoadingAn && patientAnalyses.length===0" class="empty-row">Noe analyse enregistrée.</div>
           <div *ngFor="let an of patientAnalyses" class="analyse-card">
             <div class="analyse-header">
               <span class="badge-info">{{ fmt(an.date) }}</span>
@@ -254,33 +254,33 @@
 <div class="modal-backdrop" *ngIf="showForm" (click)="closeForm()">
   <div class="modal-box" (click)="$event.stopPropagation()">
     <div class="modal-head">
-      <span><i class="fa-solid fa-pen me-2"></i>{{ isEditMode ? 'Modifier' : 'Nouveau' }} Patient</span>
+      <span><i class="fa-solid fa-pen me-2"></i>{{ isEditMode ? 'Edit' : 'New' }} Patient</span>
       <button class="modal-close" (click)="closeForm()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <h6 class="section-label">Profil Patient</h6>
       <div class="form-grid">
         <div class="form-group">
-          <label>Nom <span class="req">*</span></label>
-          <input type="text" [(ngModel)]="pForm.nom" placeholder="Nom" class="gp-input">
+          <label>Last Name <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="pForm.nom" placeholder="Last Name" class="gp-input">
         </div>
         <div class="form-group">
-          <label>Prénom <span class="req">*</span></label>
-          <input type="text" [(ngModel)]="pForm.prenom" placeholder="Prénom" class="gp-input">
+          <label>First Name <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="pForm.prenom" placeholder="First Name" class="gp-input">
         </div>
         <div class="form-group">
-          <label>Âge</label>
-          <input type="number" [(ngModel)]="pForm.age" placeholder="Âge" class="gp-input" min="0" max="120">
+          <label>Age</label>
+          <input type="number" [(ngModel)]="pForm.age" placeholder="Age" class="gp-input" min="0" max="120">
         </div>
         <div class="form-group">
-          <label>Poids (kg)</label>
+          <label>Weight (kg)</label>
           <input type="number" [(ngModel)]="pForm.poids" placeholder="Poids" class="gp-input" min="0">
         </div>
         <div class="form-group">
-          <label>Sexe</label>
+          <label>Gender</label>
           <select [(ngModel)]="pForm.sexe" class="gp-input">
-            <option value="Homme">Homme</option>
-            <option value="Femme">Femme</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
           </select>
         </div>
       </div>
@@ -292,7 +292,7 @@
           <input type="email" [(ngModel)]="uForm.email" placeholder="email@alzcare.tn" class="gp-input">
         </div>
         <div class="form-group">
-          <label>Téléphone</label>
+          <label>Phone</label>
           <input type="tel" [(ngModel)]="uForm.telephone" placeholder="+216 XX XXX XXX" class="gp-input">
         </div>
         <div class="form-group" *ngIf="!isEditMode">
@@ -302,10 +302,10 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeForm()" [disabled]="isSubmitting">Annuler</button>
+      <button class="btn-cancel" (click)="closeForm()" [disabled]="isSubmitting">Cancel</button>
       <button class="btn-primary-purple" (click)="save()" [disabled]="isSubmitting">
         <span *ngIf="isSubmitting"><i class="fa-solid fa-spinner fa-spin me-2"></i></span>
-        {{ isEditMode ? 'Mettre à jour' : 'Créer Patient' }}
+        {{ isEditMode ? 'Update' : 'Create Patient' }}
       </button>
     </div>
   </div>
@@ -315,17 +315,17 @@
 <div class="modal-backdrop" *ngIf="showDelConf" (click)="showDelConf=false">
   <div class="modal-box modal-sm" (click)="$event.stopPropagation()">
     <div class="modal-head danger-head">
-      <span><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmer la suppression</span>
+      <span><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirm deletion</span>
       <button class="modal-close" (click)="showDelConf=false"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body text-center py-4" *ngIf="deletingP">
       <div class="delete-icon"><i class="fa-solid fa-trash-can"></i></div>
-      <p class="mt-3">Supprimer le patient <strong>{{ deletingP.prenom }} {{ deletingP.nom }}</strong> ?</p>
-      <p class="text-muted small">Cette action est irréversible. Toutes les analyses associées seront également supprimées.</p>
+      <p class="mt-3">Delete patient <strong>{{ deletingP.prenom }} {{ deletingP.nom }}</strong> ?</p>
+      <p class="text-muted small">This action is irreversible. All associated analyses will also be deleted.</p>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="showDelConf=false">Annuler</button>
-      <button class="btn-danger" (click)="doDelete()"><i class="fa-solid fa-trash me-2"></i>Supprimer</button>
+      <button class="btn-cancel" (click)="showDelConf=false">Cancel</button>
+      <button class="btn-danger" (click)="doDelete()"><i class="fa-solid fa-trash me-2"></i>Delete</button>
     </div>
   </div>
 </div>

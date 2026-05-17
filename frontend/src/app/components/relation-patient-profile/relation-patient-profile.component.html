@@ -3,7 +3,7 @@
      style="height:60vh">
   <div class="text-center">
     <div class="spinner-border mb-3" style="color:#6f42c1; width:48px;height:48px"></div>
-    <div class="text-muted fw-semibold">Chargement du profil patient…</div>
+    <div class="text-muted fw-semibold">Loading du profil patient…</div>
   </div>
 </div>
 
@@ -13,7 +13,7 @@
   <div class="text-center p-4">
     <i class="fa-solid fa-user-slash d-block fs-1 mb-3" style="color:#d5b8ff"></i>
     <h5 class="fw-bold" style="color:#3c3489">Aucun patient lié</h5>
-    <p class="text-muted">Votre compte n'est pas encore associé à un patient.<br>
+    <p class="text-muted">Your account is not yet associated with a patient.<br>
        Contactez l'administrateur.</p>
   </div>
 </div>
@@ -27,7 +27,7 @@
 
     <!-- Bannière -->
     <div class="p-4 pb-0 position-relative">
-      <!-- Statut en ligne -->
+      <!-- Status en ligne -->
       <div class="position-absolute top-0 end-0 m-3">
         <span class="badge rounded-pill px-3 py-2 d-flex align-items-center gap-2"
               style="font-size:12px; font-weight:700"
@@ -52,7 +52,7 @@
           <h2 class="fw-bold mb-0">{{ patient.prenom }} {{ patient.nom }}</h2>
           <div class="opacity-75 mt-1 d-flex align-items-center gap-3 flex-wrap"
                style="font-size:14px">
-            <span *ngIf="age"><i class="fa-solid fa-cake-candles me-1"></i>{{ age }} ans</span>
+            <span *ngIf="age"><i class="fa-solid fa-cake-candles me-1"></i>{{ age }} years old</span>
             <span><i class="fa-solid fa-envelope me-1"></i>{{ patient.email }}</span>
             <span *ngIf="$any(patient).telephone">
               <i class="fa-solid fa-phone me-1"></i>{{ $any(patient).telephone }}
@@ -68,7 +68,7 @@
       <div class="flex-fill text-center py-3 border-end"
            style="border-color:rgba(255,255,255,0.15)!important">
         <div class="fw-bold text-white fs-4">{{ alerts.length }}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.7)">Alertes total</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">Alerts total</div>
       </div>
       <div class="flex-fill text-center py-3 border-end"
            style="border-color:rgba(255,255,255,0.15)!important">
@@ -76,7 +76,7 @@
              [style.color]="unresolvedAlerts.length > 0 ? '#ff8080' : 'white'">
           {{ unresolvedAlerts.length }}
         </div>
-        <div style="font-size:11px;color:rgba(255,255,255,.7)">Non résolues</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">No résolues</div>
       </div>
       <div class="flex-fill text-center py-3 border-end"
            style="border-color:rgba(255,255,255,0.15)!important">
@@ -100,7 +100,7 @@
        style="background:linear-gradient(135deg,#6f42c1,#3c3489);
               color:white;border:none;box-shadow:0 4px 14px rgba(111,66,193,.35)">
       <i class="fa-solid fa-map-location-dot"></i>
-      Voir sur la carte
+      View on map
     </a>
     <a routerLink="/analyzer"
        class="btn fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2"
@@ -116,11 +116,11 @@
     <button *ngFor="let s of [
       {key:'info',    label:'Informations',  icon:'fa-user'},
       {key:'sante',   label:'Santé',         icon:'fa-heart-pulse'},
-      {key:'urgences',label:'Alertes',       icon:'fa-bell'},
+      {key:'urgences',label:'Alerts',       icon:'fa-bell'},
       {key:'activite',label:'Incidents IA',  icon:'fa-triangle-exclamation'}
     ]"
             class="btn btn-sm rounded-pill px-4 py-2 fw-semibold"
-            style="font-size:13px; transition:all .2s"
+            style="font-size:13px; tryears oldition:all .2s"
             [style.background]="activeSection === s.key ? '#6f42c1' : '#f5f0ff'"
             [style.color]="activeSection === s.key ? 'white' : '#4a2a8a'"
             [style.border]="'1.5px solid ' + (activeSection === s.key ? '#6f42c1' : '#d5b8ff')"
@@ -157,11 +157,11 @@
             </h6>
             <div class="d-flex flex-column gap-2">
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                <span class="text-muted small">Prénom</span>
+                <span class="text-muted small">First Name</span>
                 <span class="fw-semibold">{{ patient.prenom }}</span>
               </div>
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                <span class="text-muted small">Nom</span>
+                <span class="text-muted small">Last Name</span>
                 <span class="fw-semibold">{{ patient.nom }}</span>
               </div>
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
@@ -169,12 +169,12 @@
                 <span class="fw-semibold small">{{ patient.email }}</span>
               </div>
               <div *ngIf="age" class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                <span class="text-muted small">Âge</span>
-                <span class="fw-semibold">{{ age }} ans</span>
+                <span class="text-muted small">Age</span>
+                <span class="fw-semibold">{{ age }} years old</span>
               </div>
               <div *ngIf="$any(patient).telephone"
                    class="d-flex justify-content-between align-items-center py-2">
-                <span class="text-muted small">Téléphone</span>
+                <span class="text-muted small">Phone</span>
                 <span class="fw-semibold">{{ $any(patient).telephone }}</span>
               </div>
             </div>
@@ -224,7 +224,7 @@
                  target="_blank"
                  class="btn btn-sm btn-outline-primary rounded-pill mt-1"
                  style="font-size:12px">
-                <i class="fa-solid fa-map-location-dot me-1"></i>Ouvrir dans Maps
+                <i class="fa-solid fa-map-location-dot me-1"></i>Ouvrir dyears old Maps
               </a>
             </div>
 
@@ -266,7 +266,7 @@
           </div>
           <div class="col-sm-6" *ngIf="$any(patient).medecin">
             <div class="p-3 rounded-3" style="background:#e8f4ff;border:1px solid #b5d4f4">
-              <div class="text-muted small mb-1">Médecin référent</div>
+              <div class="text-muted small mb-1">Doctor référent</div>
               <div class="fw-bold" style="color:#0a58ca">{{ $any(patient).medecin }}</div>
             </div>
           </div>
@@ -290,7 +290,7 @@
         <div *ngIf="!$any(patient).stade && !$any(patient).medecin && !$any(patient).notes"
              class="text-center text-muted py-4">
           <i class="fa-solid fa-file-medical d-block fs-2 mb-2 opacity-40"></i>
-          <div class="small">Aucune information médicale complémentaire disponible</div>
+          <div class="small">Noe information médicale complémentaire disponible</div>
         </div>
       </div>
     </div>
@@ -306,7 +306,7 @@
                  style="width:32px;height:32px;background:#fff5f5">
               <i class="fa-solid fa-bell" style="color:#dc3545;font-size:14px"></i>
             </div>
-            Historique des alertes
+            Alerts history
           </h6>
           <span class="badge rounded-pill px-3"
                 style="background:#dc3545;font-size:12px">
@@ -337,17 +337,17 @@
                  target="_blank"
                  class="btn btn-sm btn-outline-primary rounded-pill py-0 px-2"
                  style="font-size:10px">
-                <i class="fa-solid fa-map-location-dot me-1"></i>Voir position
+                <i class="fa-solid fa-map-location-dot me-1"></i>View position
               </a>
             </div>
           </div>
           <span *ngIf="a.resolue" class="badge bg-success rounded-pill">✓ Résolu</span>
-          <span *ngIf="!a.resolue" class="badge bg-danger rounded-pill">⚡ Actif</span>
+          <span *ngIf="!a.resolue" class="badge bg-danger rounded-pill">⚡ Active</span>
         </div>
 
         <div *ngIf="alerts.length === 0" class="text-center text-muted py-4">
           <i class="fa-solid fa-check-circle text-success d-block fs-1 mb-2"></i>
-          Aucune alerte enregistrée
+          Noe alerte enregistrée
         </div>
       </div>
     </div>

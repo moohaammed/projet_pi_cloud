@@ -4,9 +4,9 @@
   <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
     <h5 class="fw-bold mb-0">
       <i class="fa-solid fa-user-plus me-2 text-primary"></i>
-      Nouveau Patient
+      New Patient
     </h5>
-    <p class="text-muted small mt-1 mb-3">Renseignez les informations du dossier médical</p>
+    <p class="text-muted small mt-1 mb-3">Fill in the medical file information</p>
     <hr class="mt-0">
   </div>
 
@@ -14,7 +14,7 @@
   <div class="card-body px-4 pb-4 pt-2">
     <form [formGroup]="patientForm" (ngSubmit)="onSubmit()">
 
-      <!-- Nom -->
+      <!-- Last Name -->
       <div class="form-group mt-4">
         <input id="pf-nom"
                type="text"
@@ -22,11 +22,11 @@
                formControlName="nom"
                placeholder="Ex : Dupont"
                [ngClass]="{'is-invalid': patientForm.get('nom')?.invalid && patientForm.get('nom')?.touched}">
-        <label for="pf-nom" class="required">Nom de famille</label>
-        <div class="invalid-feedback">Le nom est requis.</div>
+        <label for="pf-nom" class="required">Last Name de famille</label>
+        <div class="invalid-feedback">The last name is required.</div>
       </div>
 
-      <!-- Prénom -->
+      <!-- First Name -->
       <div class="form-group mt-4">
         <input id="pf-prenom"
                type="text"
@@ -34,11 +34,11 @@
                formControlName="prenom"
                placeholder="Ex : Jean"
                [ngClass]="{'is-invalid': patientForm.get('prenom')?.invalid && patientForm.get('prenom')?.touched}">
-        <label for="pf-prenom" class="required">Prénom</label>
-        <div class="invalid-feedback">Le prénom est requis.</div>
+        <label for="pf-prenom" class="required">First Name</label>
+        <div class="invalid-feedback">The first name is required.</div>
       </div>
 
-      <!-- Âge + Poids -->
+      <!-- Age + Poids -->
       <div class="row g-3 mt-0">
         <div class="col-6">
           <div class="form-group mt-4">
@@ -48,8 +48,8 @@
                    formControlName="age"
                    placeholder="45"
                    [ngClass]="{'is-invalid': patientForm.get('age')?.invalid && patientForm.get('age')?.touched}">
-            <label for="pf-age" class="required">Âge</label>
-            <div class="invalid-feedback">Âge invalide.</div>
+            <label for="pf-age" class="required">Age</label>
+            <div class="invalid-feedback">Age invalide.</div>
           </div>
         </div>
         <div class="col-6">
@@ -60,26 +60,26 @@
                    formControlName="poids"
                    placeholder="75"
                    [ngClass]="{'is-invalid': patientForm.get('poids')?.invalid && patientForm.get('poids')?.touched}">
-            <label for="pf-poids" class="required">Poids (kg)</label>
+            <label for="pf-poids" class="required">Weight (kg)</label>
             <div class="invalid-feedback">Poids invalide.</div>
           </div>
         </div>
       </div>
 
-      <!-- Sexe -->
+      <!-- Gender -->
       <div class="form-group mt-4">
         <select id="pf-sexe" class="form-select" formControlName="sexe">
-          <option value="Homme">Homme</option>
-          <option value="Femme">Femme</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
         </select>
-        <label for="pf-sexe">Sexe</label>
+        <label for="pf-sexe">Gender</label>
       </div>
 
       <!-- IRM Upload Zone -->
       <div class="mt-4">
         <p class="small fw-bold text-uppercase text-muted mb-2" style="letter-spacing:.05em">
           <i class="fa-solid fa-brain me-1 text-primary"></i>
-          Scanner IRM (optionnel)
+          Scanner IRM (optional)
         </p>
 
         <div class="drop-zone"
@@ -126,7 +126,7 @@
                 class="btn btn-primary"
                 [disabled]="patientForm.invalid || isSubmitting">
           <span *ngIf="!isSubmitting">
-            <i class="fa-solid fa-save me-2"></i>Enregistrer le patient
+            <i class="fa-solid fa-save me-2"></i>Save patient
           </span>
           <span *ngIf="isSubmitting">
             <span class="spinner-border spinner-border-sm me-2" role="status"></span>

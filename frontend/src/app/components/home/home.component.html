@@ -186,7 +186,7 @@
         <br><br>
 
         <!-- CareBot Widget Preview -->
-        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-soft-info overflow-hidden position-relative">
+        <div *ngIf="currentUser()?.role !== 'DOCTOR'" class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-soft-info overflow-hidden position-relative">
           <div class="position-absolute top-0 end-0 mt-n3 me-n3 opacity-10">
             <i class="fa-solid fa-robot" style="font-size: 120px;"></i>
           </div>

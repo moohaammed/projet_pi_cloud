@@ -71,7 +71,7 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
       error: (err) => {
-        const msg = err.error?.message || err.message || 'Erreur lors du chargement des événements';
+        const msg = err.error?.message || err.message || 'Error while loading events';
         alert(msg);
       }
     });
@@ -93,17 +93,17 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.errors['image'] = '';
 
     if (file) {
-      // ✅ Vérifier le type de fichier
+      // ✅ Check file type
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        this.errors['image'] = 'Format invalide. Seuls JPG, PNG et WEBP sont acceptés.';
+        this.errors['image'] = 'Invalid format. Only JPG, PNG and WEBP are accepted.';
         this.selectedFile = null;
         return;
       }
-      // ✅ Vérifier la taille (max 5MB)
+      // ✅ Check size (max 5MB)
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
-        this.errors['image'] = 'L\'image ne doit pas dépasser 5 MB.';
+        this.errors['image'] = 'The image must not exceed 5 MB.';
         this.selectedFile = null;
         return;
       }
@@ -115,68 +115,68 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
   validate(): boolean {
     this.errors = {};
 
-    // --- Titre ---
+    // --- Title ---
     const title = this.newEvent.title?.trim();
     if (!title) {
-      this.errors['title'] = 'Le titre est obligatoire.';
+      this.errors['title'] = 'Title is required.';
     } else if (title.length < 3) {
-      this.errors['title'] = 'Le titre doit contenir au moins 3 caractères.';
+      this.errors['title'] = 'Title must contain at least 3 characters.';
     } else if (title.length > 100) {
-      this.errors['title'] = 'Le titre ne doit pas dépasser 100 caractères.';
+      this.errors['title'] = 'Title must not exceed 100 characters.';
     }
 
-    // --- Date et heure ---
+    // --- Date and time ---
     const dateValue = this.newEvent.startDateTime?.trim();
     if (!dateValue) {
-      this.errors['startDateTime'] = 'La date et l\'heure sont obligatoires.';
+      this.errors['startDateTime'] = 'Date and time are required.';
     } else {
       const selected = new Date(dateValue);
       const now = new Date();
       
-      // On définit une limite raisonnable (ex: 2 ans maximum dans le futur)
+      // Reasonable limit (e.g., 2 years maximum in the future)
       const maxFutureDate = new Date();
       maxFutureDate.setFullYear(now.getFullYear() + 2);
 
       if (isNaN(selected.getTime())) {
-        this.errors['startDateTime'] = 'La date est invalide.';
+        this.errors['startDateTime'] = 'Invalid date.';
       } else if (selected < now) {
-        this.errors['startDateTime'] = 'La date ne peut pas être dans le passé.';
+        this.errors['startDateTime'] = 'Date cannot be in the past.';
       } else if (selected > maxFutureDate) {
-        this.errors['startDateTime'] = 'La date est trop lointaine (max 2 ans dans le futur).';
+        this.errors['startDateTime'] = 'Date is too far (max 2 years in the future).';
       }
     }
 
-    // --- Lieu ---
+    // --- Location ---
     const location = this.newEvent.location?.trim();
     if (!location) {
-      this.errors['location'] = 'Le lieu est obligatoire.';
+      this.errors['location'] = 'Location is required.';
     } else if (location.length < 2) {
-      this.errors['location'] = 'Le lieu doit contenir au moins 2 caractères.';
+      this.errors['location'] = 'Location must contain at least 2 characters.';
     }
 
     // --- Description ---
     const desc = this.newEvent.description?.trim();
     if (!desc) {
-      this.errors['description'] = 'La description est obligatoire.';
+      this.errors['description'] = 'Description is required.';
     } else if (desc.length < 10) {
-      this.errors['description'] = 'La description doit contenir au moins 10 caractères.';
+      this.errors['description'] = 'Description must contain at least 10 characters.';
     } else if (desc.length > 500) {
-      this.errors['description'] = 'La description ne doit pas dépasser 500 caractères.';
+      this.errors['description'] = 'Description must not exceed 500 characters.';
     }
 
     // --- Image (required) ---
     if (!this.selectedFile && !this.isEditing) {
-      this.errors['image'] = 'L\'image est obligatoire.';
+      this.errors['image'] = 'Image is required.';
     }
 
-    // --- Capacité ---
+    // --- Capacity ---
     const capacity = this.newEvent.capacity;
     if (capacity === null || capacity === undefined) {
-      this.errors['capacity'] = 'La capacité est obligatoire.';
+      this.errors['capacity'] = 'Capacity is required.';
     } else if (capacity <= 0) {
-      this.errors['capacity'] = 'La capacité doit être supérieure à 0.';
+      this.errors['capacity'] = 'Capacity must be greater than 0.';
     } else if (capacity > 500) {
-      this.errors['capacity'] = 'La capacité maximale est de 500 places.';
+      this.errors['capacity'] = 'Maximum capacity is 500 seats.';
     }
 
     return Object.keys(this.errors).length === 0;
@@ -207,7 +207,7 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
             this.reset();
           },
           error: (err) => {
-            const msg = err.error?.message || err.message || 'Erreur lors de la modification';
+            const msg = err.error?.message || err.message || 'Error during modification';
             alert(msg);
           }
         });
@@ -227,7 +227,7 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
             this.reset();
           },
           error: (err) => {
-            const msg = err.error?.message || err.message || 'Erreur lors de la création';
+            const msg = err.error?.message || err.message || 'Error during creation';
             alert(msg);
           }
         });
@@ -243,11 +243,11 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   delete(id: string) {
-    if (confirm('Voulez-vous vraiment supprimer cet événement ?')) {
+    if (confirm('Do you really want to delete this event?')) {
       this.eventService.delete(id).subscribe({
         next: () => this.load(),
         error: (err) => {
-          const msg = err.error?.message || err.message || 'Erreur lors de la suppression';
+          const msg = err.error?.message || err.message || 'Error during deletion';
           alert(msg);
         }
       });
@@ -279,7 +279,7 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isLoadingAttendees = false;
       },
       error: (err) => {
-        alert('Erreur lors du chargement des participants');
+        alert('Error while loading attendees');
         this.isLoadingAttendees = false;
         this.closeAttendeesModal();
       }
@@ -366,7 +366,7 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.charts.push(new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-          labels: ['Places Réservées', 'Places Disponibles'],
+          labels: ['Booked Seats', 'Available Seats'],
           datasets: [{
             data: [this.bookedTotal, freeSeats],
             backgroundColor: ['#800080', '#e9d5ff'],
@@ -395,7 +395,7 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
         data: {
           labels: sortedMonths,
           datasets: [{
-            label: 'Nbr d\'événements',
+            label: 'Number of events',
             data: monthData,
             borderColor: '#8b5cf6',
             backgroundColor: 'rgba(139, 92, 246, 0.2)',
@@ -418,7 +418,7 @@ export class EventListComponent implements OnInit, AfterViewInit, OnDestroy {
         data: {
           labels: topEvents.map(e => e.title?.substring(0, 15) + '...'),
           datasets: [{
-            label: 'Capacité Máx',
+            label: 'Max Capacity',
             data: topEvents.map(e => e.capacity || 0),
             backgroundColor: '#0ea5e9',
             borderRadius: 6

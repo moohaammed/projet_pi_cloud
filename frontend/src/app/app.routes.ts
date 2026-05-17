@@ -106,15 +106,88 @@ export const routes: Routes = [
           import('./components/dashboard-geo/dashboard-geo.component')
             .then(m => m.AdminDashboardGeoComponent)
       },
+      {
+        path: 'collaboration',
+        loadComponent: () =>
+          import('./components/collaboration/admin-collaboration-dashboard/admin-collaboration-dashboard.component')
+            .then(m => m.AdminCollaborationDashboardComponent)
+      },
+      {
+        path: 'rendezvous',
+        loadComponent: () =>
+          import('./components/dashboard/admin-dashboard/admin-dashboard.component')
+            .then(m => m.AdminDashboardComponent)
+
+      },
+
+      // ✅ MERGE FIXÉ ICI
+      {
+        path: 'education',
+        loadComponent: () =>
+          import('./components/education/admin-education-dashboard/admin-education-dashboard.component')
+            .then(m => m.AdminEducationDashboardComponent)
+      },
+      {
+        path: 'donations',
+        loadComponent: () =>
+          import('./components/donation/admin-donation/admin-donation.component')
+            .then(m => m.AdminDonationComponent)
+      },
+      {
+        path: 'patients',
+        loadComponent: () =>
+          import('./components/admin-gestion-patient/admin-gestion-patient.component')
+            .then(m => m.AdminGestionPatientComponent)
+      },
+      {
+        path: 'heart-rate',
+        loadComponent: () =>
+          import('./components/heart-rate-monitoring/admin-heart-rate-monitor/admin-heart-rate-monitor.component')
+            .then(m => m.AdminHeartRateMonitorComponent)
+      },
+      {
+        path: 'medecins',
+        loadComponent: () =>
+          import('./components/admin-gestion-medecin/admin-gestion-medecin.component')
+            .then(m => m.AdminGestionMedecinComponent)
+      }
     ]
   },
 
   // DASHBOARDS
-  { path: 'patient-dashboard',   component: PatientDashboardComponent,   canActivate: [authGuard] },
-  { path: 'medecin-dashboard',   component: MedecinDashboardComponent,   canActivate: [authGuard] },
-  { path: 'gestion-patient-role',component: GestionPatientRoleComponent, canActivate: [authGuard] },
-  { path: 'contact-doctor',      component: ContactDoctorComponent },
-  { path: 'doctor-detail/:id',   component: DoctorDetailComponent },
+// DASHBOARDS
+{
+  path: 'patient-dashboard',
+  component: PatientDashboardComponent,
+  canActivate: [authGuard]
+},
+{
+  path: 'medecin-dashboard',
+  component: MedecinDashboardComponent,
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['DOCTOR'] }
+},
+{
+  path: 'doctor/heart-rate',
+  loadComponent: () =>
+    import('./components/heart-rate-monitoring/doctor-heart-rate-monitor/doctor-heart-rate-monitor.component')
+      .then(m => m.DoctorHeartRateMonitorComponent),
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['DOCTOR'] }
+},
+{
+  path: 'gestion-patient-role',
+  component: GestionPatientRoleComponent,
+  canActivate: [authGuard]
+},
+{
+  path: 'contact-doctor',
+  component: ContactDoctorComponent
+},
+{
+  path: 'doctor-detail/:id',
+  component: DoctorDetailComponent
+},
 
   // RENDEZ-VOUS
   { path: 'rendezvous',          component: RendezVousListComponent, canActivate: [authGuard] },
@@ -152,7 +225,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/live-heart-rate/live-heart-rate.component')
         .then(m => m.LiveHeartRateComponent),
-    canActivate: [authGuard]
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['PATIENT', 'RELATION'] }
   },
 
   { path: '**', redirectTo: 'auth/login' }

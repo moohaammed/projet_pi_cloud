@@ -238,6 +238,14 @@ export class GroupsListComponent implements OnInit {
     this.selectedCategory.set('ALL');
   }
 
+  getUserName(userId: number): string {
+    const user = this.userService.users().find(u => u.id === userId);
+    if (user) {
+      return `${user.prenom || ''} ${user.nom || ''}`.trim() || `User ${userId}`;
+    }
+    return `User ${userId}`;
+  }
+
   toggleUserSelection(id: number, event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
     if (checked) {

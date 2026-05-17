@@ -441,4 +441,68 @@ public class AdminCollaborationService {
         dto.setContentPreview(content.length() > 200 ? content.substring(0, 197) + "..." : content);
         return dto;
     }
+
+    public String seedDatabase() {
+        StringBuilder report = new StringBuilder();
+        
+        // 1. Cleanup Groups
+        chatGroupRepository.findAll().forEach(g -> {
+            if ("DOCTOR".equals(g.getDefaultForRole())) {
+                List<esprit.tn.collab.entities.collaboration.Message> msgs = messageRepository.findByChatGroupId(g.getId());
+                for (esprit.tn.collab.entities.collaboration.Message m : msgs) {
+                    Map<String, Object> u = userClient.getUserById(m.getSenderId());
+                    if (!userClient.isRole(u, "DOCTOR")) {
+                        messageRepository.delete(m);
+                        report.append("Deleted non-doctor msg from DOCTOR group: ").append(m.getId()).append("\n");
+                    }
+                }
+            } else if ("PATIENT".equals(g.getDefaultForRole())) {
+                List<esprit.tn.collab.entities.collaboration.Message> msgs = messageRepository.findByChatGroupId(g.getId());
+                for (esprit.tn.collab.entities.collaboration.Message m : msgs) {
+                    Map<String, Object> u = userClient.getUserById(m.getSenderId());
+                    if (!userClient.isRole(u, "PATIENT")) {
+                        messageRepository.delete(m);
+                        report.append("Deleted non-patient msg from PATIENT group: ").append(m.getId()).append("\n");
+                    }
+                }
+            }
+        });
+
+        // 2. DM Convo 9 and 10
+        List<esprit.tn.collab.entities.collaboration.Message> existing = messageRepository.findDirectMessages(9L, 10L);
+        if (existing.isEmpty()) {
+            java.time.Instant now = java.time.Instant.now();
+            esprit.tn.collab.entities.collaboration.Message m1 = new esprit.tn.collab.entities.collaboration.Message(); m1.setSenderId(9L); m1.setReceiverId(10L); m1.setContent("Hello, this is Dr. Leila. I wanted to follow up on your recent memory exercises. How are you feeling today?"); m1.setSentAt(now.minusSeconds(48 * 3600)); m1.setType(esprit.tn.collab.entities.collaboration.MessageType.TEXT); messageRepository.save(m1);
+            esprit.tn.collab.entities.collaboration.Message m2 = new esprit.tn.collab.entities.collaboration.Message(); m2.setSenderId(10L); m2.setReceiverId(9L); m2.setContent("Good morning doctor! I feel a bit better but sometimes I forget my medication timings."); m2.setSentAt(now.minusSeconds(46 * 3600)); m2.setType(esprit.tn.collab.entities.collaboration.MessageType.TEXT); messageRepository.save(m2);
+            esprit.tn.collab.entities.collaboration.Message m3 = new esprit.tn.collab.entities.collaboration.Message(); m3.setSenderId(9L); m3.setReceiverId(10L); m3.setContent("Don't worry, the CareBot should remind you. I will adjust the settings to send an alert to your family member as a backup."); m3.setSentAt(now.minusSeconds(45 * 3600)); m3.setType(esprit.tn.collab.entities.collaboration.MessageType.TEXT); messageRepository.save(m3);
+            esprit.tn.collab.entities.collaboration.Message m4 = new esprit.tn.collab.entities.collaboration.Message(); m4.setSenderId(10L); m4.setReceiverId(9L); m4.setContent("Thank you so much."); m4.setSentAt(now.minusSeconds(44 * 3600)); m4.setType(esprit.tn.collab.entities.collaboration.MessageType.TEXT); messageRepository.save(m4);
+            report.append("Seeded private convo between Dr. Leila (9) and Patient (10).\n");
+        } else {
+            report.append("Private convo between 9 and 10 already exists.\n");
+        }
+
+        return report.toString().isEmpty() ? "Database groups are already clean and DM already seeded." : report.toString();
+    }
+
+    public List<esprit.tn.collab.dto.collaboration.admin.ContentItemDto> getDirectMessageThread(Long adminUserId, Long userAId, Long userBId) {
+        requireAdmin(adminUserId);
+        List<esprit.tn.collab.entities.collaboration.Message> messages = messageRepository.findDirectMessages(userAId, userBId);
+        
+        return messages.stream().map(m -> {
+            esprit.tn.collab.dto.collaboration.admin.ContentItemDto dto = new esprit.tn.collab.dto.collaboration.admin.ContentItemDto();
+            dto.setId(m.getId());
+            dto.setType("DIRECT_MESSAGE");
+            dto.setContent(m.getContent() != null ? m.getContent() : "[Media Payload]");
+            dto.setAuthorId(m.getSenderId());
+            if (m.getSenderId() != null) {
+                Map<String, Object> author = userClient.getUserById(m.getSenderId());
+                dto.setAuthorName(userClient.getFullName(author));
+            } else {
+                dto.setAuthorName("System");
+            }
+            dto.setCreatedAt(m.getSentAt());
+            dto.setDistressed(m.isDistressed());
+            return dto;
+        }).collect(java.util.stream.Collectors.toList());
+    }
 }

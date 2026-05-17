@@ -1,17 +1,17 @@
 /* ══ Page Layout ══════════════════════════════════════════════ */
 .doctor-page-container {
-  background: #f0f4ff;
+  background: #f8fafc;
   min-height: 100vh;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
 }
 
 /* ══ Header ═══════════════════════════════════════════════════ */
 .header-section {
-  background: linear-gradient(135deg, #14b8a6 0%, #8b5cf6 100%);
-  border-bottom-left-radius: 28px;
-  border-bottom-right-radius: 28px;
+  background: linear-gradient(135deg, #800080 0%, #5c0057 100%);
+  border-bottom-left-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
   padding-bottom: 2.2rem !important;
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 8px 32px rgba(128, 0, 128, 0.25);
   position: relative;
   overflow: hidden;
 }
@@ -24,7 +24,7 @@
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
   pointer-events: none;
 }
 
@@ -36,7 +36,7 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
   pointer-events: none;
 }
 
@@ -47,13 +47,13 @@
 
 /* ══ Search Bar ════════════════════════════════════════════════ */
 .search-bar-group {
-  border-radius: 14px;
+  border-radius: 1rem;
   overflow: hidden;
   max-width: 480px;
 }
 
 .search-bar-group .input-group-text {
-  border-radius: 14px 0 0 14px !important;
+  border-radius: 1rem 0 0 1rem !important;
   padding: 0.7rem 0.9rem;
 }
 
@@ -76,13 +76,10 @@
   border-radius: 50px;
   padding: 6px 16px;
   font-size: 0.83rem;
-  color: #475569;
+  color: #555a64;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-  font-weight: 500;
+  font-weight: 600;
 }
-
-.text-purple { color: #8b5cf6 !important; }
-.text-teal   { color: #14b8a6 !important; }
 
 /* ══ Doctor Cards ══════════════════════════════════════════════ */
 .fade-in-card {
@@ -95,20 +92,22 @@
 }
 
 .doctor-card {
-  border-radius: 20px !important;
+  border-radius: 1.25rem !important;
   background: #ffffff;
+  border: 1px solid rgba(128, 0, 128, 0.06) !important;
+  box-shadow: 0 4px 16px rgba(128, 0, 128, 0.06) !important;
   transition: transform 0.28s ease, box-shadow 0.28s ease;
   overflow: hidden;
 }
 
 .doctor-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 40px rgba(139, 92, 246, 0.14) !important;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(128, 0, 128, 0.12) !important;
 }
 
 /* ══ Favorite Button ══════════════════════════════════════════ */
 .heart-btn {
-  background: #f8f0ff;
+  background: rgba(128, 0, 128, 0.06);
   border: none;
   width: 36px;
   height: 36px;
@@ -117,7 +116,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #cbd5e1;
+  color: #ccc;
   transition: background 0.2s, color 0.2s, transform 0.2s;
   z-index: 2;
 }
@@ -144,8 +143,8 @@
   height: 90px;
   border-radius: 50%;
   padding: 3px;
-  background: linear-gradient(135deg, #14b8a6, #8b5cf6);
-  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.25);
+  background: linear-gradient(135deg, #800080, #a855f7);
+  box-shadow: 0 4px 14px rgba(128, 0, 128, 0.25);
 }
 
 .doctor-avatar {
@@ -171,17 +170,18 @@
 
 /* ══ Doctor Name & Specialty ══════════════════════════════════ */
 .doc-name {
-  color: #1e293b;
+  color: #2c3038;
   font-size: 1.05rem;
+  font-weight: 800;
 }
 
 .specialty-badge {
   display: inline-flex;
   align-items: center;
-  background: linear-gradient(135deg, rgba(20,184,166,0.1), rgba(139,92,246,0.1));
-  color: #8b5cf6;
+  background: rgba(128, 0, 128, 0.08);
+  color: #800080;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 3px 12px;
   border-radius: 50px;
   letter-spacing: 0.02em;
@@ -204,29 +204,30 @@
 }
 
 /* ══ Price & Appointment ══════════════════════════════════════ */
-.theme-text { color: #8b5cf6; }
+.theme-text { color: #800080; }
 
 .btn-appoint {
-  background: linear-gradient(135deg, #8b5cf6, #14b8a6);
+  background: linear-gradient(135deg, #800080, #a855f7);
   color: white;
   border: none;
   border-radius: 50px;
   padding: 8px 18px;
   font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .btn-appoint:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6px 16px rgba(128, 0, 128, 0.35);
   color: white;
 }
 
 /* ══ Empty State ══════════════════════════════════════════════ */
 .empty-state {
   background: white;
-  border-radius: 20px;
+  border-radius: 1.25rem;
   padding: 3rem !important;
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
@@ -244,36 +245,36 @@
   height: 40px;
 }
 
-/* ══ Utilities ════════════════════════════════════════════════ */
-.bg-soft-teal { background-color: rgba(20, 184, 166, 0.1); }
-.text-teal { color: #14b8a6 !important; }
-.fs-7 { font-size: 0.8rem; }
-.btn-teal {
-  background-color: #14b8a6;
-  color: white;
-}
-.btn-teal:hover {
-  background-color: #0d9488;
-  color: white;
-}
+.text-purple { color: #800080 !important; }
 
-/* ══ Leaflet Map ══════════════════════════════════════════════ */
+/* ══ Map ══════════════════════════════════════════════════════ */
 .map-container {
   height: 350px;
   width: 100%;
-  border-radius: 20px;
+  border-radius: 1.25rem;
   overflow: hidden;
   border: 4px solid white;
-  z-index: 1; /* prevent popups overlapping navbar sometimes if configured */
 }
 
 .highlight-card {
   animation: glowCard 1.5s ease-out;
-  border: 2px solid #14b8a6 !important;
+  border: 2px solid #800080 !important;
 }
 
 @keyframes glowCard {
   0% { box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-  30% { box-shadow: 0 0 25px rgba(20, 184, 166, 0.8) !important; transform: translateY(-5px); }
+  30% { box-shadow: 0 0 25px rgba(128, 0, 128, 0.5) !important; transform: translateY(-5px); }
   100% { box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateY(0); }
+}
+
+/* ══ Responsive ═══════════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+  .header-section {
+    border-radius: 0 0 1rem 1rem;
+    padding: 1.25rem !important;
+  }
+
+  .title-text {
+    font-size: 1.2rem !important;
+  }
 }

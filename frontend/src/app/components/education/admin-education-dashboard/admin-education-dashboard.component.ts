@@ -14,7 +14,7 @@ import { RouterModule } from '@angular/router';
           <h2 class="fw-bold mb-1 section-header__title text-capitalize fs-28">
             Education <span class="underline position-relative text-primary">Dashboard</span>
           </h2>
-          <div class="sub-title fs-14 text-muted">Gérez le contenu thérapeutique et l'agenda événementiel.</div>
+          <div class="sub-title fs-14 text-muted">Manage therapeutic content and the event calendar.</div>
         </div>
       </div>
       <!-- Actions -->
@@ -27,18 +27,18 @@ import { RouterModule } from '@angular/router';
 
     <!-- KPIs -->
     <section class="mb-5 mt-4">
-      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Vue Générale</h2>
+      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Overview</h2>
       <div class="row g-4">
         <!-- Activités KPI -->
         <div class="col-md-4">
           <div class="card shadow border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-primary">
             <div class="card-body p-4">
-              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Activités Créées</div>
+              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Activities Created</div>
               <div class="fs-1 fw-bold text-dark mb-1 d-flex align-items-end">
                 12
                 <span class="fs-14 text-primary ms-2 mb-2 px-2 py-1 bg-soft-primary rounded-pill fw-bold">Active</span>
               </div>
-              <p class="small mb-0 text-muted">Quiz, Exercices, Jeux en DB.</p>
+              <p class="small mb-0 text-muted">Quiz, Exercises, Games in DB.</p>
             </div>
           </div>
         </div>
@@ -46,12 +46,12 @@ import { RouterModule } from '@angular/router';
         <div class="col-md-4">
           <div class="card shadow border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-success">
             <div class="card-body p-4">
-              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Événements à venir</div>
+              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Upcoming Events</div>
               <div class="fs-1 fw-bold text-dark mb-1 d-flex align-items-end">
                 4
-                <span class="fs-14 text-success ms-2 mb-2 px-2 py-1 bg-soft-success rounded-pill fw-bold">Planifié</span>
+                <span class="fs-14 text-success ms-2 mb-2 px-2 py-1 bg-soft-success rounded-pill fw-bold">Planned</span>
               </div>
-              <p class="small mb-0 text-muted">Sessions et conférences programmées.</p>
+              <p class="small mb-0 text-muted">Scheduled sessions and conferences.</p>
             </div>
           </div>
         </div>
@@ -59,11 +59,11 @@ import { RouterModule } from '@angular/router';
         <div class="col-md-4">
           <div class="card shadow border-0 h-100 rounded-4 transition-hover bg-white border-start border-4 border-warning">
             <div class="card-body p-4">
-              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Taux de Complétion</div>
+              <div class="text-muted small fw-bold text-uppercase mb-2" style="opacity: 0.7;">Completion Rate</div>
               <div class="fs-1 fw-bold text-dark mb-1 d-flex align-items-end">
                 78%
               </div>
-              <p class="small mb-0 text-muted">Moyenne d'achèvement des patients.</p>
+              <p class="small mb-0 text-muted">Average patient completion.</p>
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@ import { RouterModule } from '@angular/router';
 
     <!-- Gestion Modules -->
     <section class="mb-5">
-      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Administration Modules</h2>
+      <h2 class="h6 mb-4 fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Module Administration</h2>
       <div class="row g-4">
         <!-- Gestion des Activités -->
         <div class="col-lg-6">
@@ -82,16 +82,16 @@ import { RouterModule } from '@angular/router';
                 <i class="fa-solid fa-gamepad fs-4"></i>
               </div>
               <div>
-                <h4 class="mb-0 fw-bold text-dark">Espace Thérapeutique</h4>
-                <p class="text-muted small mb-0">Constructeur d'activités & Contenus</p>
+                <h4 class="mb-0 fw-bold text-dark">Therapeutic Space</h4>
+                <p class="text-muted small mb-0">Activity Builder & Content</p>
               </div>
             </div>
             <p class="text-muted mb-4 fs-15">
-              Gérez le socle thérapeutique de l'application. Vous pouvez configurer des Quiz de mémoire, ajouter des jeux interactifs et de la documentation.
+              Manage the therapeutic foundation of the application. You can configure memory quizzes, add interactive games and documentation.
             </p>
             <div class="text-end mt-auto">
               <button routerLink="/activities" class="btn btn-primary btn-lg fw-bold rounded-pill px-5 shadow transition-hover">
-                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Gérer Activités
+                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Manage Activities
               </button>
             </div>
           </div>
@@ -105,23 +105,23 @@ import { RouterModule } from '@angular/router';
                 <i class="fa-solid fa-calendar-star fs-4"></i>
               </div>
               <div>
-                <h4 class="mb-0 fw-bold text-primary">Agenda & Événements</h4>
-                <p class="text-dark opacity-75 small mb-0">Planification des séances de groupe</p>
+                <h4 class="mb-0 fw-bold text-primary">Agenda & Events</h4>
+                <p class="text-dark opacity-75 small mb-0">Group session planning</p>
               </div>
             </div>
             <ul class="list-unstyled small text-dark opacity-75 d-flex flex-column gap-3 mb-4">
               <li class="d-flex align-items-start">
                 <i class="fa-solid fa-check text-primary me-2 mt-1"></i>
-                Organiser et publier de nouveaux événements.
+                Organize and publish new events.
               </li>
               <li class="d-flex align-items-start">
                 <i class="fa-solid fa-check text-primary me-2 mt-1"></i>
-                Rappels automatiques (email/sms) pour les participants.
+                Automatic reminders (email/sms) for participants.
               </li>
             </ul>
             <div class="text-end mt-auto">
               <button routerLink="/events" class="btn bg-white text-primary btn-lg fw-bold rounded-pill px-5 shadow transition-hover border-0">
-                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Gérer Événements
+                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Manage Events
               </button>
             </div>
           </div>

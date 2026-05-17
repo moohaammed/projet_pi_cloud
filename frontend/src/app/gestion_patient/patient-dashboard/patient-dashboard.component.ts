@@ -98,7 +98,7 @@ export class PatientDashboardComponent implements OnInit {
 
   deletePatient(id?: number): void {
     if (!id) return;
-    if (confirm('Voulez-vous vraiment supprimer ce patient ?')) {
+    if (confirm('Voulez-vous vraiment supprimer this patient ?')) {
       this.patientService.deletePatient(id).subscribe({
         next: () => this.fetchPatients(),
         error: (err) => console.error(err)
@@ -116,13 +116,13 @@ export class PatientDashboardComponent implements OnInit {
   initNotifications(): void {
     this.notifications = [
       {
-        message: 'Rappel : Bilan sanguin semestriel à planifier pour les patients ≥ 65 ans.',
+        message: 'Reminder: Semi-annual blood test to plan for patients ≥ 65 years old.',
         type: 'info',
         date: new Date().toLocaleDateString('fr-FR'),
         read: false
       },
       {
-        message: 'Résultats IRM en attente de validation médicale.',
+        message: 'Results IRM en attente de validation médicale.',
         type: 'warning',
         date: new Date().toLocaleDateString('fr-FR'),
         read: false
@@ -140,7 +140,7 @@ export class PatientDashboardComponent implements OnInit {
     const count = this.urgentCount;
     if (count > 0) {
       this.notifications.unshift({
-        message: `${count} patient(s) en état critique nécessitent une attention immédiate.`,
+        message: `${count} patient(s) in critical condition require immediate attention.`,
         type: 'danger',
         date: new Date().toLocaleDateString('fr-FR'),
         read: false

@@ -33,6 +33,8 @@ public class Patient {
     @Field("medecin_id")
     private Long medecinId;
 
+    // Embedded user info - matches the existing MongoDB document structure
+    // Spring Data resolves findByUser_Id() as user.id nested field query
     private UserInfo user;
 
     public Long getId() { return id; }

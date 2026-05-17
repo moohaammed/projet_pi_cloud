@@ -4,7 +4,7 @@
   <div class="mb-4">
     <h3 class="fw-bold" style="color:#3c3489">
       <i class="fa-solid fa-user-plus me-2" style="color:#6f42c1"></i>
-      {{ existingPatientMode ? 'Ajouter un contact relation' : 'Creer un nouveau patient' }}
+      {{ existingPatientMode ? 'Add un contact relation' : 'Creer un nouveau patient' }}
     </h3>
     <p class="text-muted">Wizard guide — patient + position maison + zones de securite + compte relation.</p>
   </div>
@@ -19,7 +19,7 @@
     ]; let last = last">
       <div class="d-flex align-items-center gap-2">
         <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
-             style="width:36px;height:36px;font-size:14px;transition:all .2s"
+             style="width:36px;height:36px;font-size:14px;tryears oldition:all .2s"
              [style.background]="currentStep >= s.n ? '#6f42c1' : '#f0ebff'"
              [style.color]="currentStep >= s.n ? 'white' : '#9490b0'"
              [style.border]="'2px solid ' + (currentStep >= s.n ? '#6f42c1' : '#d5b8ff')">
@@ -30,7 +30,7 @@
               [style.color]="currentStep >= s.n ? '#3c3489' : '#9490b0'" >{{ s.label }}</span>
       </div>
       <div *ngIf="!last" class="flex-grow-1 mx-2"
-           style="height:2px;border-radius:2px;transition:all .3s"
+           style="height:2px;border-radius:2px;tryears oldition:all .3s"
            [style.background]="currentStep > s.n ? '#6f42c1' : '#e8d5ff'">
       </div>
     </ng-container>
@@ -42,7 +42,7 @@
       <i class="fa-solid fa-people-arrows" style="font-size:12px"></i>
     </div>
     <span class="fw-semibold small ms-2" style="color:#3c3489">
-      Contact relation pour {{ patient.prenom || 'ce patient' }} {{ patient.nom }}
+      Relation contact for {{ patient.prenom || 'this patient' }} {{ patient.nom }}
     </span>
   </div>
 
@@ -54,7 +54,7 @@
       </h5>
       <div class="row g-3">
         <div class="col-sm-6">
-          <label class="form-label fw-semibold small">Nom <span class="text-danger">*</span></label>
+          <label class="form-label fw-semibold small">Last Name <span class="text-danger">*</span></label>
           <input class="form-control rounded-3" [(ngModel)]="patient.nom"
                  style="border-color:rgba(111,66,193,.3)" placeholder="Ben Ali">
         </div>
@@ -113,7 +113,7 @@
       <h5 class="fw-bold mb-1" style="color:#6f42c1">
         <i class="fa-solid fa-house-location me-2"></i>Position maison et zones de securite
       </h5>
-      <p class="text-muted small mb-4">Optionnel — peut etre defini plus tard depuis la carte.</p>
+      <p class="text-muted small mb-4">Optional — can be defined later from the map.</p>
 
       <!-- GPS -->
       <div class="p-3 rounded-3 mb-4" style="background:#f5f0ff;border:1px solid #d5b8ff">
@@ -215,7 +215,7 @@
 
       <div class="d-flex justify-content-between mt-4">
         <button class="btn btn-outline-secondary rounded-pill px-4" (click)="prevStep()">
-          <i class="fa-solid fa-arrow-left me-2"></i> Retour
+          <i class="fa-solid fa-arrow-left me-2"></i> Back
         </button>
         <button class="btn rounded-pill px-4 fw-bold"
                 style="background:linear-gradient(135deg,#6f42c1,#3c3489);color:white;border:none"
@@ -233,10 +233,10 @@
         <i class="fa-solid fa-people-arrows me-2"></i>Contact urgence / Relation
       </h5>
       <p class="text-muted small mb-4" *ngIf="!existingPatientMode">
-        Ce contact recevra un compte RELATION pour suivre {{ patient.prenom || "le patient" }}.
+        This contact will receive a RELATION account to follow {{ patient.prenom || "the patient" }}.
       </p>
       <p class="text-muted small mb-4" *ngIf="existingPatientMode">
-        Le patient existe deja. Renseignez seulement les informations du contact relation.
+        The patient already exists. Only fill in the relation contact information.
       </p>
       <div class="form-check form-switch mb-4" *ngIf="!existingPatientMode">
         <input class="form-check-input" type="checkbox" [(ngModel)]="creerRelation"
@@ -247,7 +247,7 @@
       </div>
       <div *ngIf="creerRelation" class="row g-3">
         <div class="col-sm-6">
-          <label class="form-label fw-semibold small">Nom <span class="text-danger">*</span></label>
+          <label class="form-label fw-semibold small">Last Name <span class="text-danger">*</span></label>
           <input class="form-control rounded-3" [(ngModel)]="relation.nom"
                  style="border-color:rgba(13,110,253,.3)" placeholder="Ben Ali">
         </div>
@@ -267,7 +267,7 @@
                  style="border-color:rgba(13,110,253,.3)" placeholder="+216 XX XXX XXX">
         </div>
         <div class="col-sm-6">
-          <label class="form-label fw-semibold small">Lien avec le patient</label>
+          <label class="form-label fw-semibold small">Relationship with the patient</label>
           <select class="form-select rounded-3" [(ngModel)]="relation.lienAvecPatient"
                   style="border-color:rgba(13,110,253,.3)">
             <option *ngFor="let l of liens" [value]="l">{{ l }}</option>
@@ -281,7 +281,7 @@
       </div>
       <div class="d-flex justify-content-between mt-4">
         <button class="btn btn-outline-secondary rounded-pill px-4" (click)="prevStep()">
-          <i class="fa-solid fa-arrow-left me-2"></i> Retour
+          <i class="fa-solid fa-arrow-left me-2"></i> Back
         </button>
         <button class="btn rounded-pill px-4 fw-bold"
                 style="background:linear-gradient(135deg,#6f42c1,#3c3489);color:white;border:none"
@@ -308,7 +308,7 @@
           </span>
         </div>
         <div class="row g-1" style="font-size:13px">
-          <div class="col-5 text-muted">Nom</div>
+          <div class="col-5 text-muted">Last Name</div>
           <div class="col-7 fw-semibold">{{ patient.prenom }} {{ patient.nom }}</div>
           <div class="col-5 text-muted">Email</div>
           <div class="col-7 fw-semibold">{{ patient.email }}</div>
@@ -329,7 +329,7 @@
           <div class="col-5 text-muted">Domicile</div>
           <div class="col-7 fw-semibold">
             <span *ngIf="patient.latitude && patient.longitude">{{ patient.latitude }}, {{ patient.longitude }}</span>
-            <span *ngIf="!patient.latitude || !patient.longitude" class="text-muted fst-italic">Non renseigne</span>
+            <span *ngIf="!patient.latitude || !patient.longitude" class="text-muted fst-italic">No renseigne</span>
           </div>
           <div class="col-5 text-muted">Zone verte</div>
           <div class="col-7 fw-semibold text-success">{{ patient.rayonVert }} m</div>
@@ -350,7 +350,7 @@
           </span>
         </div>
         <div class="row g-1" style="font-size:13px">
-          <div class="col-5 text-muted">Nom</div>
+          <div class="col-5 text-muted">Last Name</div>
           <div class="col-7 fw-semibold">{{ relation.prenom }} {{ relation.nom }}</div>
           <div class="col-5 text-muted">Email</div>
           <div class="col-7 fw-semibold">{{ relation.email }}</div>
@@ -362,14 +362,14 @@
       <div class="d-flex justify-content-between">
         <button class="btn btn-outline-secondary rounded-pill px-4"
                 [disabled]="loading" (click)="prevStep()">
-          <i class="fa-solid fa-arrow-left me-2"></i> Retour
+          <i class="fa-solid fa-arrow-left me-2"></i> Back
         </button>
         <button class="btn rounded-pill px-4 fw-bold"
                 style="background:linear-gradient(135deg,#198754,#0f5132);color:white;border:none"
                 [disabled]="loading" (click)="submit()">
           <span *ngIf="!loading">
             <i class="fa-solid fa-check me-2"></i>
-            {{ existingPatientMode ? 'Creer le contact relation' : 'Creer les comptes' }}
+            {{ existingPatientMode ? 'Create relation contact' : 'Create accounts' }}
           </span>
           <span *ngIf="loading"><span class="spinner-border spinner-border-sm me-2"></span>Creation...</span>
         </button>
@@ -385,9 +385,9 @@
         <i class="fa-solid fa-check text-white" style="font-size:36px"></i>
       </div>
       <h4 class="fw-bold" style="color:#0f5132">
-        {{ existingPatientMode ? 'Contact relation cree avec succes !' : 'Comptes crees avec succes !' }}
+        {{ existingPatientMode ? 'Relation contact created successfully!' : 'Accounts created successfully!' }}
       </h4>
-      <p class="text-muted">Les identifiants ont ete envoyes par email.</p>
+      <p class="text-muted">Credentials have been sent by email.</p>
     </div>
     <!-- Patient -->
     <div class="card border-0 shadow-sm rounded-4 mb-3 text-start">
@@ -447,12 +447,12 @@
     </div>
     <div class="d-flex gap-3 justify-content-center mt-4">
       <button class="btn btn-outline-secondary rounded-pill px-4" (click)="resetForm()">
-        <i class="fa-solid fa-plus me-2"></i>{{ existingPatientMode ? 'Ajouter un autre contact' : 'Nouveau patient' }}
+        <i class="fa-solid fa-plus me-2"></i>{{ existingPatientMode ? 'Add un autre contact' : 'New patient' }}
       </button>
       <button class="btn rounded-pill px-4 fw-bold"
               style="background:linear-gradient(135deg,#6f42c1,#3c3489);color:white;border:none"
               (click)="goToPatients()">
-        <i class="fa-solid fa-list me-2"></i>Voir les patients
+        <i class="fa-solid fa-list me-2"></i>View patients
       </button>
     </div>
   </div>

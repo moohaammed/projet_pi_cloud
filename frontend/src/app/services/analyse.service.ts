@@ -71,7 +71,7 @@ export class AnalyseService {
                 try {
                     return JSON.parse(rawResponse);
                 } catch {
-                    console.warn('[AnalyseService] Non-JSON response, treating as success:', rawResponse);
+                    console.warn('[AnalyseService] No-JSON response, treating as success:', rawResponse);
                     return { message: rawResponse };
                 }
             }),

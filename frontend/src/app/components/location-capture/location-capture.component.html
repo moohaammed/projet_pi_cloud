@@ -8,18 +8,18 @@
 
     <div class="status-card" *ngIf="result" [class.unknown]="isUnknown" [class.known]="!isUnknown">
       <ng-container *ngIf="!isUnknown; else unknownLocation">
-        <strong>Vous etes a : {{ result.lieu }} ({{ result.confiance }})</strong>
+        <strong>You are at: {{ result.lieu }} ({{ result.confiance }})</strong>
       </ng-container>
       <ng-template #unknownLocation>
-        <strong *ngIf="result.incidentId">Lieu inconnu - alerte envoyee a votre famille</strong>
-        <strong *ngIf="!result.incidentId">Lieu inconnu - aucune alerte rouge detectee</strong>
+        <strong *ngIf="result.incidentId">Unknown location - alert sent to your family</strong>
+        <strong *ngIf="!result.incidentId">Unknown location - no red-zone alert detected</strong>
       </ng-template>
-      <span *ngIf="lastCaptureAt">Derniere analyse : {{ lastCaptureAt | date:'HH:mm:ss' }}</span>
+      <span *ngIf="lastCaptureAt">Last analysis: {{ lastCaptureAt | date:'HH:mm:ss' }}</span>
     </div>
 
     <div class="waiting-card" *ngIf="!result && !errorMessage">
-      <strong>Activation de la surveillance AlzCare</strong>
-      <span>La camera analyse l'environnement toutes les 30 secondes.</span>
+      <strong>AlzCare monitoring enabled</strong>
+      <span>The camera analyzes the environment every 30 seconds.</span>
     </div>
 
     <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>

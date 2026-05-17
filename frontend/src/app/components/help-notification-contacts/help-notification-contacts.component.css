@@ -1,136 +1,371 @@
-:host {
-  display: block;
-  background: #f5f5f5;
+/* ══ Page wrapper ═════════════════════════════════════════════ */
+.help-notification-page {
+  background: #f8fafc;
   min-height: 100vh;
+  font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
 }
 
-/* ── Page Header ─────────────────────────────────── */
+/* ══ Page Header ══════════════════════════════════════════════ */
 .page-header {
-  background: linear-gradient(135deg, rgba(128, 0, 128, 0.06) 0%, rgba(255,255,255,0) 60%);
-  border-bottom: 1px solid rgba(128, 0, 128, 0.1);
+  background: linear-gradient(135deg, #800080 0%, #5c0057 100%);
+  border-bottom-left-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(128, 0, 128, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+.page-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.page-header p {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 0.88rem;
 }
 
 .header-icon {
   width: 52px;
   height: 52px;
-  background: rgba(128, 0, 128, 0.1);
-  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #800080;
+  color: #ffffff;
+  font-size: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* ── Override primary colors ─────────────────────── */
-.text-primary {
-  color: #800080 !important;
-}
+/* ══ Primary color overrides ══════════════════════════════════ */
+.text-primary { color: #800080 !important; }
 
 .btn-primary {
-  background-color: #800080 !important;
-  border-color: #800080 !important;
+  background: linear-gradient(135deg, #800080, #a855f7) !important;
+  border: none !important;
+  font-weight: 700;
+  border-radius: 50px !important;
+  box-shadow: 0 4px 14px rgba(128, 0, 128, 0.25);
+  transition: all 0.25s ease;
 }
 
 .btn-primary:hover {
-  background-color: #660066 !important;
-  border-color: #660066 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(128, 0, 128, 0.35) !important;
 }
 
 .btn-outline-primary {
   color: #800080 !important;
-  border-color: #800080 !important;
+  border: 1.5px solid rgba(128, 0, 128, 0.3) !important;
+  border-radius: 50px !important;
+  font-weight: 700;
+  background: transparent !important;
+  transition: all 0.2s ease;
 }
 
 .btn-outline-primary:hover {
-  background-color: #800080 !important;
-  color: #ffffff !important;
-}
-
-.badge.bg-primary {
-  background-color: #800080 !important;
-}
-
-.border-primary {
+  background: rgba(128, 0, 128, 0.08) !important;
   border-color: #800080 !important;
 }
 
-/* ── Help Notification Button ────────────────────── */
-.btn-help-notification {
-  background: linear-gradient(135deg, #800080, #b300b3);
-  color: #fff;
-  border: none;
+.btn-outline-danger {
+  border: 1.5px solid rgba(220, 53, 69, 0.3) !important;
+  color: #dc3545 !important;
+  border-radius: 50px !important;
+  font-weight: 700;
+  background: transparent !important;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+  background: rgba(220, 53, 69, 0.08) !important;
+}
+
+.btn-outline-secondary {
+  border: 1.5px solid #e2e8f0 !important;
+  color: #555a64 !important;
+  border-radius: 50px !important;
   font-weight: 600;
-  padding: 0.5rem 1.2rem;
-  border-radius: 50px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(128, 0, 128, 0.3);
+  background: white !important;
+  transition: all 0.2s ease;
 }
 
-.btn-help-notification:hover:not(:disabled) {
-  background: linear-gradient(135deg, #660066, #990099);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(128, 0, 128, 0.4);
-  transform: translateY(-1px);
+.btn-outline-secondary:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
 }
 
-.btn-help-notification:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  color: #fff;
+/* ══ Cards ════════════════════════════════════════════════════ */
+.card {
+  border-radius: 1.25rem !important;
+  border: 1px solid rgba(128, 0, 128, 0.06) !important;
+  box-shadow: 0 4px 16px rgba(128, 0, 128, 0.06) !important;
+  background: #ffffff;
+  transition: box-shadow 0.25s ease;
 }
 
-/* ── Relation Type Badges ────────────────────────── */
+.card-header {
+  background: #ffffff !important;
+  border-bottom: none !important;
+}
+
+.card-header h5 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #2c3038;
+}
+
+/* ══ Form inputs ══════════════════════════════════════════════ */
+.form-control,
+.form-select {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  color: #2c3038;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #800080;
+  box-shadow: 0 0 0 3px rgba(128, 0, 128, 0.1);
+  background: #ffffff;
+  outline: none;
+}
+
+.form-label {
+  color: #555a64 !important;
+  font-weight: 700 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px !important;
+}
+
+/* ══ Table ════════════════════════════════════════════════════ */
+.table thead th {
+  background: #f8fafc !important;
+  color: #555a64;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 12px 16px;
+  border-bottom: 1.5px solid rgba(128, 0, 128, 0.08) !important;
+  border-top: none !important;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  color: #2c3038;
+  border-bottom: 1px solid rgba(128, 0, 128, 0.04) !important;
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+.table-hover tbody tr:hover td {
+  background: rgba(128, 0, 128, 0.03) !important;
+}
+
+/* ══ Section rows ═════════════════════════════════════════════ */
+.section-row td {
+  background: rgba(128, 0, 128, 0.04) !important;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(128, 0, 128, 0.08) !important;
+}
+
+.section-row strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #800080;
+  font-size: 0.9rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.section-row strong::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(135deg, #800080, #a855f7);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.section-row span {
+  color: #555a64;
+  font-size: 0.82rem;
+}
+
+/* ══ Relation badges ══════════════════════════════════════════ */
 .badge-doctor {
-  background-color: rgba(0, 123, 255, 0.12) !important;
-  color: #0d6efd !important;
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #2563eb !important;
+  font-weight: 700;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 50px;
 }
 
 .badge-parent {
-  background-color: rgba(255, 165, 0, 0.12) !important;
-  color: #e68a00 !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: #d97706 !important;
+  font-weight: 700;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: 50px;
 }
 
 .badge-caregiver {
-  background-color: rgba(40, 167, 69, 0.12) !important;
-  color: #28a745 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #059669 !important;
+  font-weight: 700;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 50px;
 }
 
 .badge-relation {
-  background-color: rgba(128, 0, 128, 0.12) !important;
+  background: rgba(128, 0, 128, 0.08) !important;
   color: #800080 !important;
+  font-weight: 700;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(128, 0, 128, 0.15);
+  border-radius: 50px;
 }
 
-/* ── Linked Status Badges ────────────────────────── */
+/* ══ Linked status badges ═════════════════════════════════════ */
 .bg-success-subtle {
-  background-color: rgba(40, 167, 69, 0.1) !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 50px;
 }
 
 .bg-secondary-subtle {
-  background-color: rgba(108, 117, 125, 0.1) !important;
+  background: rgba(107, 114, 128, 0.08) !important;
+  border: 1px solid rgba(107, 114, 128, 0.15);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 50px;
 }
 
-/* ── Animations ──────────────────────────────────── */
+/* ══ Info panel ═══════════════════════════════════════════════ */
+.card.border-start.border-4 {
+  border-left: 4px solid #800080 !important;
+  border-radius: 1.25rem !important;
+}
+
+.card.border-start.border-4 ul li {
+  line-height: 1.8;
+  color: #555a64;
+}
+
+/* ══ Alerts ═══════════════════════════════════════════════════ */
+.alert {
+  border-radius: 1rem !important;
+  font-size: 0.9rem;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #065f46 !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.08) !important;
+  color: #991b1b !important;
+  border: 1px solid rgba(220, 53, 69, 0.2) !important;
+}
+
+/* ══ Section title (mobile) ═══════════════════════════════════ */
+.link-section-title {
+  color: #2c3038;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(128, 0, 128, 0.08);
+  margin-bottom: 16px;
+}
+
+/* ══ Spinner ══════════════════════════════════════════════════ */
+.spinner-border {
+  border-color: #800080;
+  border-right-color: transparent;
+}
+
+/* ══ Action buttons in table ══════════════════════════════════ */
+.table tbody td .btn-sm {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.table tbody td .btn-sm:hover {
+  transform: scale(1.1);
+}
+
+/* ══ Fade-in animation ════════════════════════════════════════ */
 .fade-in {
-  animation: fadeIn 0.3s ease-in;
+  animation: fadeIn 0.4s ease;
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Custom scrollbar ────────────────────────────── */
-.table-responsive::-webkit-scrollbar {
-  height: 6px;
-}
+/* ══ Responsive ═══════════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+  .page-header {
+    border-radius: 0 0 1rem 1rem;
+    padding: 1.25rem !important;
+  }
 
-.table-responsive::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
+  .page-header h2 {
+    font-size: 1.2rem !important;
+  }
 
-.table-responsive::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
+  .container-fluid {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .card-body {
+    padding: 1rem !important;
+  }
 }

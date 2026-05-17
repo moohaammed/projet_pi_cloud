@@ -25,7 +25,7 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
   errorMsg   = '';
 
   searchQuery = '';
-  filterActif = '';
+  filterActive = '';
   currentPage = 1;
   readonly PAGE = 10;
 
@@ -85,7 +85,7 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
       const q = this.searchQuery.toLowerCase();
       l = l.filter(d => `${d.nom} ${d.prenom} ${d.email}`.toLowerCase().includes(q));
     }
-    if (this.filterActif !== '') l = l.filter(d => d.actif === (this.filterActif==='true'));
+    if (this.filterActive !== '') l = l.filter(d => d.actif === (this.filterActive==='true'));
     return l;
   }
   get paginated(): any[] { const s=(this.currentPage-1)*this.PAGE; return this.filtered.slice(s,s+this.PAGE); }
@@ -129,13 +129,13 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
     const payload = { ...this.dForm, role:'DOCTOR' };
     if (this.isEditMode) {
       this.userSvc.update(this.dForm.id, payload).subscribe({
-        next: () => this.afterSave('Médecin mis à jour.'),
+        next: () => this.afterSave('Doctor mis à jour.'),
         error: () => { this.isSubmitting=false; this.showError('Erreur mise à jour.'); }
       });
     } else {
       if (!payload.password) payload.password = 'AlzCare2026!';
       this.userSvc.create(payload).subscribe({
-        next: () => this.afterSave('Médecin créé avec succès.'),
+        next: () => this.afterSave('Doctor created successfully.'),
         error: err => { this.isSubmitting=false; this.showError(err.error?.message||'Erreur création.'); }
       });
     }
@@ -146,7 +146,7 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
   doDelete(): void {
     if (!this.deletingDoc) return;
     this.userSvc.delete(this.deletingDoc.id).subscribe({
-      next: () => { this.showSuccess('Médecin supprimé.'); this.showDelConf=false; this.deletingDoc=null; this.loadAll(); },
+      next: () => { this.showSuccess('Doctor supprimé.'); this.showDelConf=false; this.deletingDoc=null; this.loadAll(); },
       error: () => this.showError('Erreur suppression.')
     });
   }
@@ -164,9 +164,9 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
 
   resetPassword(d: any): void {
     if (!d.email) { this.showError('Email introuvable.'); return; }
-    if (!confirm(`Envoyer un nouveau mot de passe à ${d.email}?`)) return;
+    if (!confirm(`Send un nouveau mot de passe à ${d.email}?`)) return;
     this.userSvc.resetPasswordByEmail(d.email).subscribe({
-      next: ()  => this.showSuccess('Nouveau mot de passe envoyé par email.'),
+      next: ()  => this.showSuccess('New mot de passe envoyé par email.'),
       error: () => this.showError('Erreur réinitialisation.')
     });
   }
@@ -212,7 +212,7 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     this.assignmentSvc.assign(this.selectedAssignMedecin, this.selectedAssignPatient).subscribe({
       next: () => {
-        this.showSuccess('Patient assigné avec succès.');
+        this.showSuccess('Patient assigned successfully.');
         this.selectedAssignPatient = null;
         this.isSubmitting = false;
         this.refreshAssignments();
@@ -226,10 +226,10 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
 
   unassignPatient(patientId: number): void {
     if (!this.selectedAssignMedecin) return;
-    if (!confirm('Voulez-vous vraiment retirer ce patient ?')) return;
+    if (!confirm('Voulez-vous vraiment retirer this patient ?')) return;
     this.assignmentSvc.unassign(this.selectedAssignMedecin, patientId).subscribe({
       next: () => {
-        this.showSuccess('Patient retiré avec succès.');
+        this.showSuccess('Patient removed successfully.');
         this.refreshAssignments();
       },
       error: () => this.showError('Erreur d\'annulation.')
@@ -255,20 +255,20 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.newDoctorId === this.selectedAssignMedecin) {
-      this.showError('Le patient est déjà assigné à ce médecin.');
+      this.showError('Patient is already assigned to this doctor.');
       return;
     }
 
     this.isSubmitting = true;
     this.assignmentSvc.reassign(this.selectedAssignMedecin, this.movingPatient.id, this.newDoctorId).subscribe({
       next: () => {
-        this.showSuccess('Patient réassigné avec succès.');
+        this.showSuccess('Patient reassigned successfully.');
         this.closeReassignModal();
         this.isSubmitting = false;
         this.refreshAssignments();
       },
       error: (err) => {
-        this.showError(err.error?.message || 'Erreur lors de la réassignation.');
+        this.showError(err.error?.message || 'Error during reassignment.');
         this.isSubmitting = false;
       }
     });
@@ -278,8 +278,8 @@ export class AdminGestionMedecinComponent implements OnInit, OnDestroy {
   initCharts(): void {
     this.destroyCharts();
     // Active vs inactive donut
-    this.makeDonut('chartDocActif',
-      ['Actifs','Suspendus'],
+    this.makeDonut('chartDocActive',
+      ['Actives','Suspendus'],
       [this.activeCount, this.inactiveCount],
       ['#10b981','#ef4444']
     );

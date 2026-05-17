@@ -25,6 +25,13 @@ public class UserController {
     @Autowired
     private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private org.springframework.web.client.RestTemplate restTemplate;
+
+    @org.springframework.beans.factory.annotation.Value("${collab.service.url:http://localhost:8081}")
+    private String collabServiceUrl;
+    
+
     // GET ALL
     @GetMapping
     public ResponseEntity<List<User>> getAll() {
@@ -78,7 +85,15 @@ public class UserController {
         payload.put("userId", id);
         payload.put("userName", user.getNom() + " " + user.getPrenom());
         payload.put("status", status);
-        messagingTemplate.convertAndSend("/topic/live-status", payload);
+
+        try {
+            String url = collabServiceUrl + "/api/admin/collaboration/internal/live-status";
+            restTemplate.postForObject(url, payload, Void.class);
+            System.out.println("✅ Live status relayed to collab-service for user " + id);
+        } catch (Exception e) {
+            System.err.println("❌ Failed to relay live status to collab-service: " + e.getMessage());
+        }
+
         return ResponseEntity.ok(user);
     }
 

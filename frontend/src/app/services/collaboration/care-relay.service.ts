@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 /**
  * The AI-generated handover summary for a group.
@@ -41,7 +42,7 @@ export interface HandoverDTO {
 @Injectable({ providedIn: 'root' })
 export class CareRelayService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/care-relay';
+  private apiUrl = `${environment.apiUrl}/api/care-relay`;
 
   /** The currently loaded handover summary — null when not loaded or cleared */
   handover = signal<HandoverDTO | null>(null);

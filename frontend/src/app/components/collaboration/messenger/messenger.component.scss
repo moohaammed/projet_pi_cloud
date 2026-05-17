@@ -502,21 +502,115 @@
   }
 }
 
-// Responsive Design
-@media (max-width: 768px) {
+// ═══════════════════════════════════════════════
+// MOBILE RESPONSIVE — messenger
+// ═══════════════════════════════════════════════
+
+@media (max-width: 991.98px) {
+
+  // Messenger container: use dynamic viewport height
+  .messenger-container {
+    height: calc(100dvh - 80px) !important;
+    border-radius: 0.75rem !important;
+  }
+
+  // Chat sidebar: narrower on tablet
+  .chat-list-sidebar {
+    width: 240px !important;
+    min-width: 240px !important;
+  }
+
+  // Bubble max-width: wider on tablet
+  .bubble {
+    max-width: 80% !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+
+  // Full-height messenger using dvh
+  .messenger-container {
+    height: calc(100dvh - 60px) !important;
+    border-radius: 0 !important;
+    flex-direction: column !important;
+  }
+
+  // Sidebar: full width (shown when no chat selected)
   .chat-list-sidebar {
     width: 100% !important;
     min-width: 100% !important;
+    max-height: 45vh;
+    overflow-y: auto;
+    border-right: none !important;
+    border-bottom: 1px solid #e9ecef;
   }
-  
-  .messenger-container {
-    height: calc(100vh - 100px) !important;
-  }
-  
+
+  // Message bubbles: wider on mobile
   .bubble {
-    max-width: 85%;
+    max-width: 88% !important;
+    font-size: 0.875rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .msg-wrapper {
+    max-width: 88% !important;
+  }
+
+  // Bubble actions: always visible on touch
+  .bubble-actions {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  // Details sidebar: hidden on mobile by default
+  .details-sidebar {
+    display: none !important;
+  }
+
+  // Search wrapper: smaller padding
+  .search-wrapper {
+    padding: 0.5rem 1rem !important;
+  }
+
+  // Shared pub card: full width
+  .shared-pub-card {
+    max-width: 100% !important;
+  }
+
+  // Nav pills: scrollable
+  .nav-pills {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+
+    .nav-link {
+      flex-shrink: 0;
+      padding: 0.5rem 1rem !important;
+      font-size: 0.75rem !important;
+      white-space: nowrap;
+    }
   }
 }
+
+@media (max-width: 479.98px) {
+
+  .messenger-container {
+    height: calc(100dvh - 56px) !important;
+  }
+
+  .bubble {
+    font-size: 0.8125rem !important;
+    padding: 0.625rem 0.875rem !important;
+  }
+
+  // Chat list items: compact
+  .chat-list-item {
+    padding: 0.625rem 0.75rem !important;
+    margin: 0.125rem 0.5rem !important;
+  }
+}
+
 
 // Typing indicator dots
 .typing-dots {

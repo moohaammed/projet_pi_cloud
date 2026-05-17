@@ -36,9 +36,8 @@ public class PatientController {
 
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<Patient> getPatientByUserId(@PathVariable("userId") Long userId) {
-        return patientRepository.findByUser_Id(userId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+        Patient p = patientService.retrievePatientByUserId(userId);
+        return p != null ? ResponseEntity.ok(p) : ResponseEntity.noContent().build();
     }
 
     @PostMapping
@@ -99,11 +98,11 @@ public class PatientController {
 
     @GetMapping("/assigned-doctor/{userPatientId}")
     public ResponseEntity<?> getAssignedDoctor(@PathVariable Long userPatientId) {
-        Optional<Patient> opt = patientRepository.findByUser_Id(userPatientId);
-        if (opt.isEmpty() || opt.get().getMedecinId() == null) {
+        Patient p = patientService.retrievePatientByUserId(userPatientId);
+        if (p == null || p.getMedecinId() == null) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(Map.of("medecinId", opt.get().getMedecinId()));
+        return ResponseEntity.ok(Map.of("medecinId", p.getMedecinId()));
     }
 
     @PostMapping("/{patientId}/assign/{medecinId}")

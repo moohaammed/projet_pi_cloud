@@ -1,0 +1,132 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< esprit.tn:donation-service >---------------------
+[INFO] Building donation-service 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.0:run (default-cli) > test-compile @ donation-service >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ donation-service ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ donation-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ donation-service ---
+[INFO] skip non existing resourceDirectory D:\projet_pi_\projet_pi_cloud\donation-service\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ donation-service ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.3.0:run (default-cli) < test-compile @ donation-service <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.0:run (default-cli) @ donation-service ---
+[INFO] Attaching agents: []
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.0)
+
+2026-05-09T11:50:10.113+02:00  INFO 21580 --- [donation-service] [           main] esprit.tn.donation.DonationApplication   : Starting DonationApplication using Java 17.0.8 with PID 21580 (D:\projet_pi_\projet_pi_cloud\donation-service\target\classes started by DELL in D:\projet_pi_\projet_pi_cloud\donation-service)
+2026-05-09T11:50:10.119+02:00  INFO 21580 --- [donation-service] [           main] esprit.tn.donation.DonationApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-05-09T11:50:14.124+02:00  INFO 21580 --- [donation-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2026-05-09T11:50:14.627+02:00  INFO 21580 --- [donation-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 494 ms. Found 2 MongoDB repository interfaces.
+2026-05-09T11:50:15.540+02:00  INFO 21580 --- [donation-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=0ff34861-4ac8-3af8-9a95-a85f3b1379ec
+2026-05-09T11:50:15.786+02:00  WARN 21580 --- [donation-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-05-09T11:50:15.796+02:00  WARN 21580 --- [donation-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'deferringLoadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.DeferringLoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-09T11:50:16.846+02:00  INFO 21580 --- [donation-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8087 (http)
+2026-05-09T11:50:16.881+02:00  INFO 21580 --- [donation-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-09T11:50:16.882+02:00  INFO 21580 --- [donation-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
+2026-05-09T11:50:17.169+02:00  INFO 21580 --- [donation-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-09T11:50:17.175+02:00  INFO 21580 --- [donation-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 6888 ms
+2026-05-09T11:50:19.140+02:00  INFO 21580 --- [donation-service] [localhost:27017] org.mongodb.driver.cluster               : Exception in monitor thread while connecting to server localhost:27017
+
+com.mongodb.MongoSocketOpenException: Exception opening socket
+	at com.mongodb.internal.connection.SocketStream.lambda$open$0(SocketStream.java:86) ~[mongodb-driver-core-5.0.1.jar:na]
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403) ~[na:na]
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:86) ~[mongodb-driver-core-5.0.1.jar:na]
+	at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:201) ~[mongodb-driver-core-5.0.1.jar:na]
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitorRunnable.lookupServerDescription(DefaultServerMonitor.java:193) ~[mongodb-driver-core-5.0.1.jar:na]
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitorRunnable.run(DefaultServerMonitor.java:153) ~[mongodb-driver-core-5.0.1.jar:na]
+	at java.base/java.lang.Thread.run(Thread.java:833) ~[na:na]
+Caused by: java.net.ConnectException: Connection refused: no further information
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:597) ~[na:na]
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327) ~[na:na]
+	at java.base/java.net.Socket.connect(Socket.java:633) ~[na:na]
+	at com.mongodb.internal.connection.SocketStreamHelper.initialize(SocketStreamHelper.java:76) ~[mongodb-driver-core-5.0.1.jar:na]
+	at com.mongodb.internal.connection.SocketStream.initializeSocket(SocketStream.java:105) ~[mongodb-driver-core-5.0.1.jar:na]
+	at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:80) ~[mongodb-driver-core-5.0.1.jar:na]
+	... 4 common frames omitted
+
+2026-05-09T11:50:19.153+02:00  INFO 21580 --- [donation-service] [           main] org.mongodb.driver.client                : MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "5.0.1"}, "os": {"type": "Windows", "name": "Windows 10", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/17.0.8+9-LTS-211"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=null, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@4c531172, com.mongodb.Jep395RecordCodecProvider@489bc8fd, com.mongodb.KotlinCodecProvider@5ac53c06]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null}
+2026-05-09T11:50:23.181+02:00  INFO 21580 --- [donation-service] [           main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2026-05-09T11:50:27.318+02:00  INFO 21580 --- [donation-service] [           main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2026-05-09T11:50:27.394+02:00  INFO 21580 --- [donation-service] [           main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2026-05-09T11:50:27.485+02:00  WARN 21580 --- [donation-service] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-05-09T11:50:27.536+02:00  INFO 21580 --- [donation-service] [           main] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2026-05-09T11:50:27.702+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2026-05-09T11:50:27.714+02:00  INFO 21580 --- [donation-service] [           main] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-05-09T11:50:27.760+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
+2026-05-09T11:50:27.760+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
+2026-05-09T11:50:27.760+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
+2026-05-09T11:50:27.760+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Application is null : false
+2026-05-09T11:50:27.760+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
+2026-05-09T11:50:27.760+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
+2026-05-09T11:50:27.760+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
+2026-05-09T11:50:28.619+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : The response status is 200
+2026-05-09T11:50:28.626+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
+2026-05-09T11:50:28.630+02:00  INFO 21580 --- [donation-service] [           main] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-05-09T11:50:28.642+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1778320228641 with initial instances count: 4
+2026-05-09T11:50:28.645+02:00  INFO 21580 --- [donation-service] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application DONATION-SERVICE with eureka with status UP
+2026-05-09T11:50:28.646+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1778320228646, current=UP, previous=STARTING]
+2026-05-09T11:50:28.648+02:00  INFO 21580 --- [donation-service] [nfoReplicator-0] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_DONATION-SERVICE/localhost:donation-service:8087: registering service...
+2026-05-09T11:50:28.661+02:00  INFO 21580 --- [donation-service] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application DONATION-SERVICE with eureka with status DOWN
+2026-05-09T11:50:28.661+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1778320228661, current=DOWN, previous=UP]
+2026-05-09T11:50:28.661+02:00  WARN 21580 --- [donation-service] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-05-09T11:50:28.675+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Shutting down DiscoveryClient ...
+2026-05-09T11:50:28.742+02:00  INFO 21580 --- [donation-service] [nfoReplicator-0] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_DONATION-SERVICE/localhost:donation-service:8087 - registration status: 204
+2026-05-09T11:50:28.742+02:00  INFO 21580 --- [donation-service] [nfoReplicator-0] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_DONATION-SERVICE/localhost:donation-service:8087: registering service...
+2026-05-09T11:50:28.748+02:00  INFO 21580 --- [donation-service] [nfoReplicator-0] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_DONATION-SERVICE/localhost:donation-service:8087 - registration status: 204
+2026-05-09T11:50:28.750+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Unregistering ...
+2026-05-09T11:50:28.807+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_DONATION-SERVICE/localhost:donation-service:8087 - deregister  status: 200
+2026-05-09T11:50:28.815+02:00  INFO 21580 --- [donation-service] [           main] com.netflix.discovery.DiscoveryClient    : Completed shut down of DiscoveryClient
+2026-05-09T11:50:28.845+02:00  INFO 21580 --- [donation-service] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-05-09T11:50:28.930+02:00 ERROR 21580 --- [donation-service] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8087 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8087 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  40.537 s
+[INFO] Finished at: 2026-05-09T11:50:29+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.0:run (default-cli) on project donation-service: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

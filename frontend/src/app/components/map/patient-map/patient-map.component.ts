@@ -84,7 +84,7 @@ export class PatientMapComponent implements OnInit, OnDestroy {
   // ===== GPS =====
   startGPS(): void {
     if (!navigator.geolocation) {
-      this.erreurMessage = 'GPS non disponible';
+      this.erreurMessage = 'GPS unavailable';
       this.status = 'error';
       return;
     }
@@ -223,7 +223,7 @@ export class PatientMapComponent implements OnInit, OnDestroy {
   private analyzeLocationPhoto(image: string): void {
     const patientId = Number(this.currentUser.userId || this.currentUser.id);
     if (!patientId) {
-      this.locationAnalysisError = 'Identifiant patient introuvable.';
+      this.locationAnalysisError = 'Patient identifier not found.';
       return;
     }
 
@@ -241,7 +241,7 @@ export class PatientMapComponent implements OnInit, OnDestroy {
         this.locationAnalysisLoading = false;
       },
       error: (err) => {
-        this.locationAnalysisError = err?.error?.detail || err?.error?.message || 'Analyse de lieu impossible.';
+        this.locationAnalysisError = err?.error?.detail || err?.error?.message || 'Location analysis unavailable.';
         this.locationAnalysisLoading = false;
       }
     });
@@ -286,10 +286,10 @@ export class PatientMapComponent implements OnInit, OnDestroy {
 
   get statusMessage(): string {
     switch (this.status) {
-      case 'starting':  return 'Démarrage du GPS...';
-      case 'tracking':  return 'GPS actif — vous êtes suivi';
-      case 'sos':       return 'Alerte envoyée !';
-      case 'offline':   return 'GPS hors ligne';
+      case 'starting':  return 'Starting GPS...';
+      case 'tracking':  return 'GPS active - you are being monitored';
+      case 'sos':       return 'Alert sent!';
+      case 'offline':   return 'GPS offline';
       case 'error':     return this.erreurMessage;
       default:          return '';
     }

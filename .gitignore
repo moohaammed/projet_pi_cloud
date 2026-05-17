@@ -24,5 +24,8 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
-
-
+# Secrets and local config
+secret.properties
+.env
+local.properties
+application-local.properties

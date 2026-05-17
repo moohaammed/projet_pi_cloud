@@ -27,7 +27,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
   // filter/pagination
   searchQuery = '';
   filterSex   = '';
-  filterActif = '';
+  filterActive = '';
   currentPage = 1;
   readonly PAGE = 10;
 
@@ -90,7 +90,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
       l = l.filter(p => `${p.nom} ${p.prenom} ${p.email}`.toLowerCase().includes(q));
     }
     if (this.filterSex)   l = l.filter(p => p.sexe === this.filterSex);
-    if (this.filterActif !== '') l = l.filter(p => p.actif === (this.filterActif === 'true'));
+    if (this.filterActive !== '') l = l.filter(p => p.actif === (this.filterActive === 'true'));
     return l;
   }
 
@@ -132,7 +132,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
   closeDetail(): void { this.showDetail = false; this.selectedP = null; this.patientAnalyses = []; }
 
   openCreate(): void {
-    this.isEditMode = false; this.pForm = {sexe:'Homme'}; this.uForm={role:'PATIENT',actif:true}; this.showForm = true;
+    this.isEditMode = false; this.pForm = {sexe:'Male'}; this.uForm={role:'PATIENT',actif:true}; this.showForm = true;
   }
   openEdit(p: any): void {
     this.isEditMode = true; this.selectedP = p;
@@ -149,7 +149,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
         next: () => {
           if (this.uForm.id) {
             this.userSvc.update(this.uForm.id, this.uForm).subscribe({
-              next: ()  => this.afterSave('Patient mis à jour avec succès.'),
+              next: ()  => this.afterSave('Patient updated successfully.'),
               error: () => this.afterSave('Profil mis à jour.')
             });
           } else { this.afterSave('Patient mis à jour.'); }
@@ -168,7 +168,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
             age:this.pForm.age, poids:this.pForm.poids,
             sexe:this.pForm.sexe, user_id:created.id
           }).subscribe({
-            next: ()  => this.afterSave('Patient créé avec succès.'),
+            next: ()  => this.afterSave('Patient created successfully.'),
             error: () => { this.isSubmitting=false; this.showError('Compte créé, erreur profil patient.'); }
           });
         },
@@ -203,9 +203,9 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
 
   resetPassword(p: any): void {
     if (!p.email) { this.showError('Email introuvable.'); return; }
-    if (!confirm(`Envoyer un nouveau mot de passe à ${p.email}?`)) return;
+    if (!confirm(`Send un nouveau mot de passe à ${p.email}?`)) return;
     this.userSvc.resetPasswordByEmail(p.email).subscribe({
-      next: ()  => this.showSuccess('Nouveau mot de passe envoyé par email.'),
+      next: ()  => this.showSuccess('New mot de passe envoyé par email.'),
       error: () => this.showError('Erreur réinitialisation mot de passe.')
     });
   }
@@ -221,7 +221,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
     this.destroyCharts();
     // Sex donut
     const sexMap: Record<string,number> = {};
-    this.allPatients.forEach(p => { const k=p.sexe||'Inconnu'; sexMap[k]=(sexMap[k]||0)+1; });
+    this.allPatients.forEach(p => { const k=p.sexe||'Unknown'; sexMap[k]=(sexMap[k]||0)+1; });
     this.makeDonut('chartSex', Object.keys(sexMap), Object.values(sexMap), ['#8b5cf6','#f472b6','#a78bfa','#c4b5fd']);
 
     // Age groups bar
@@ -236,7 +236,7 @@ export class AdminGestionPatientComponent implements OnInit, OnDestroy {
     // Alzheimer classification
     const alzMap: Record<string,number> = {};
     this.allAnalyses.forEach(a => { if (a.interpretation) { const k=a.interpretation; alzMap[k]=(alzMap[k]||0)+1; } });
-    if (!Object.keys(alzMap).length) alzMap['Aucune donnée']=1;
+    if (!Object.keys(alzMap).length) alzMap['Noe donnée']=1;
     this.makeDonut('chartAlz', Object.keys(alzMap), Object.values(alzMap), ['#10b981','#f59e0b','#ef4444','#3b82f6','#8b5cf6','#ec4899']);
 
     // Analyses per patient (top 8)

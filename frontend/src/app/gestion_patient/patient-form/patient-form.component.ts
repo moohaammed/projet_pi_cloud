@@ -23,7 +23,7 @@ export class PatientFormComponent {
             prenom: ['', Validators.required],
             age: ['', [Validators.required, Validators.min(0)]],
             poids: ['', [Validators.required, Validators.min(0)]],
-            sexe: ['Homme', Validators.required]
+            sexe: ['Male', Validators.required]
         });
     }
 
@@ -47,8 +47,8 @@ export class PatientFormComponent {
     onDrop(event: DragEvent): void {
         event.preventDefault();
         this.dragOver = false;
-        if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
-            this.selectedFile = event.dataTransfer.files[0];
+        if (event.dataTryears oldfer?.files && event.dataTryears oldfer.files.length > 0) {
+            this.selectedFile = event.dataTryears oldfer.files[0];
         }
     }
 
@@ -68,7 +68,7 @@ export class PatientFormComponent {
         this.patientService.createPatient(newPatient).subscribe({
             next: (res) => {
                 this.isSubmitting = false;
-                this.patientForm.reset({ sexe: 'Homme' });
+                this.patientForm.reset({ sexe: 'Male' });
                 this.selectedFile = null;
                 this.patientAdded.emit();
             },

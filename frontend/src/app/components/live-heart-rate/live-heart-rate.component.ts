@@ -13,6 +13,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HeartRateService, HeartRateRecord } from '../../services/heart-rate.service';
 import { HeartRateAiService, HeartRateAiResult } from '../../services/heart-rate-ai.service';
 import { AuthService } from '../../services/auth.service';
+import { HeartRateAccessService, MonitoredPatient } from '../../services/heart-rate-access.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -30,6 +31,14 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
   status: 'connected' | 'disconnected' = 'disconnected';
   history: HeartRateRecord[] = [];
   bpmHistory: number[] = [];
+  isResolvingPatient = false;
+  relationUnlinked = false;
+  monitoredPatient: MonitoredPatient | null = null;
+  linkedPatients: MonitoredPatient[] = [];
+  currentUserRole = '';
+  isPreparingSmartwatch = false;
+  smartwatchTokenMessage = '';
+  smartwatchTokenError = '';
 
   // ECG waveform data
   ecgPoints: string = '';
@@ -62,6 +71,7 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     private heartRateService: HeartRateService,
     private heartRateAiService: HeartRateAiService,
     private authService: AuthService,
+    private heartRateAccessService: HeartRateAccessService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: any
@@ -74,12 +84,77 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
 
     // Try to get logged-in user ID
     const user = this.authService.getCurrentUser();
+    this.currentUserRole = user?.role || '';
     if (user && user.id) {
       this.userId = user.id;
     }
 
     // Initialize ECG data with zeros
     this.ecgData = new Array(this.ECG_MAX_POINTS).fill(0);
+
+    if (user?.role === 'RELATION') {
+      this.resolveRelationPatient(user.id);
+      return;
+    }
+
+    this.initializeMonitoring();
+  }
+
+  connectSmartwatch(): void {
+    if (!this.isBrowser || this.isPreparingSmartwatch) {
+      return;
+    }
+
+    this.smartwatchTokenMessage = '';
+    this.smartwatchTokenError = '';
+
+    const user = this.authService.getCurrentUser();
+    const patientUserId = Number(user?.id || this.userId);
+    if (!patientUserId) {
+      this.smartwatchTokenError = 'Could not resolve the logged-in patient.';
+      return;
+    }
+
+    this.isPreparingSmartwatch = true;
+    this.heartRateService.generateSmartwatchToken(patientUserId).subscribe({
+      next: (response) => {
+        const config = {
+          ingestUrl: this.heartRateService.getIngestUrl(),
+          token: response.token,
+          expiresAt: response.expiresAt,
+          deviceName: 'ST2',
+          watchNameKeyword: 'ST2',
+          characteristicUuid: '000033f2-0000-1000-8000-00805f9b34fb',
+          source: 'BLE_CLIENT_TOKEN'
+        };
+
+        this.downloadSmartwatchConfig(config);
+        this.smartwatchTokenMessage = `Config downloaded. Token expires at ${this.formatTimestamp(response.expiresAt)}.`;
+        this.isPreparingSmartwatch = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.smartwatchTokenError = 'Could not prepare smartwatch connection.';
+        this.isPreparingSmartwatch = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private downloadSmartwatchConfig(config: Record<string, unknown>): void {
+    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'medisync-smartwatch-config.json';
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  private initializeMonitoring(): void {
+    this.isResolvingPatient = false;
+    this.relationUnlinked = false;
+    this.stopLiveSubscriptions();
 
     // Connect to the live SSE stream
     this.connectToLiveStream();
@@ -97,24 +172,88 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
     this.startInactivityChecker();
   }
 
+  private resolveRelationPatient(relationUserId: number): void {
+    this.isResolvingPatient = true;
+    this.heartRateAccessService.getRelationPatients(relationUserId).subscribe({
+      next: (patients) => {
+        this.linkedPatients = (patients || []).filter(patient => typeof patient.userId === 'number');
+        if (this.linkedPatients.length === 0) {
+          this.showRelationUnlinkedState();
+          return;
+        }
+
+        this.selectLinkedPatient(this.linkedPatients[0]);
+      },
+      error: () => this.showRelationUnlinkedState()
+    });
+  }
+
+  selectLinkedPatient(patient: MonitoredPatient): void {
+    if (typeof patient.userId !== 'number') {
+      return;
+    }
+
+    this.monitoredPatient = patient;
+    this.userId = patient.userId;
+    this.resetLiveDisplayState();
+    this.initializeMonitoring();
+  }
+
+  private showRelationUnlinkedState(): void {
+    this.isResolvingPatient = false;
+    this.relationUnlinked = true;
+    this.status = 'disconnected';
+    this.currentBpm = null;
+    this.deviceName = 'Disconnected';
+    this.aiStatus = 'disconnected';
+    this.aiResult = null;
+    this.cdr.detectChanges();
+  }
+
   ngOnDestroy(): void {
-    if (this.sseSubscription) {
-      this.sseSubscription.unsubscribe();
-    }
-    if (this.aiSseSubscription) {
-      this.aiSseSubscription.unsubscribe();
-    }
-    if (this.reconnectTimeout) {
-      clearTimeout(this.reconnectTimeout);
-    }
-    if (this.aiReconnectTimeout) {
-      clearTimeout(this.aiReconnectTimeout);
-    }
+    this.stopLiveSubscriptions();
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
+  }
+
+  private stopLiveSubscriptions(): void {
+    if (this.sseSubscription) {
+      this.sseSubscription.unsubscribe();
+      this.sseSubscription = null;
+    }
+    if (this.aiSseSubscription) {
+      this.aiSseSubscription.unsubscribe();
+      this.aiSseSubscription = null;
+    }
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    if (this.aiReconnectTimeout) {
+      clearTimeout(this.aiReconnectTimeout);
+      this.aiReconnectTimeout = null;
+    }
     if (this.inactivityIntervalId) {
       clearInterval(this.inactivityIntervalId);
+      this.inactivityIntervalId = null;
+    }
+  }
+
+  private resetLiveDisplayState(): void {
+    this.currentBpm = null;
+    this.deviceName = 'Disconnected';
+    this.lastRecordedAt = '';
+    this.status = 'disconnected';
+    this.history = [];
+    this.bpmHistory = [];
+    this.aiResult = null;
+    this.aiStatus = 'idle';
+    this.lastEventTimestamp = 0;
+    this.ecgData = new Array(this.ECG_MAX_POINTS).fill(0);
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = 0;
     }
   }
 
@@ -125,6 +264,9 @@ export class LiveHeartRateComponent implements OnInit, OnDestroy {
    * (handled in connectToLiveStream), the status flips back to 'connected'.
    */
 private startInactivityChecker(): void {
+  if (this.inactivityIntervalId) {
+    clearInterval(this.inactivityIntervalId);
+  }
   this.inactivityIntervalId = setInterval(() => {
     if (
       this.lastEventTimestamp > 0 &&
@@ -453,6 +595,11 @@ private connectToAiStream(): void {
   getMaxBpm(): number {
     if (this.bpmHistory.length === 0) return 0;
     return Math.max(...this.bpmHistory);
+  }
+
+  getMonitoredPatientName(): string {
+    if (!this.monitoredPatient) return '';
+    return `${this.monitoredPatient.prenom || ''} ${this.monitoredPatient.nom || ''}`.trim();
   }
 
   formatTimestamp(ts: string): string {

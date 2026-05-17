@@ -8,19 +8,19 @@
           <i class="fa-solid fa-user-injured fa-lg text-primary"></i>
         </div>
         <div>
-          <h2 class="fw-bold mb-0">Espace Patient</h2>
-          <p class="text-muted mb-0 small">Gérez votre profil et suivez vos analyses IRM</p>
+          <h2 class="fw-bold mb-0">Patient Space</h2>
+          <p class="text-muted mb-0 small">Manage your profile and track your MRI analyses</p>
         </div>
       </div>
       <div class="d-flex gap-2 align-items-center">
         <span *ngIf="assignedDoctor" class="badge bg-success py-2 px-3 me-2 shadow-sm" style="font-size: 0.9em;">
-           <i class="fa-solid fa-user-doctor me-2"></i>Mon Médecin: Dr. {{assignedDoctor.prenom}} {{assignedDoctor.nom}}
+           <i class="fa-solid fa-user-doctor me-2"></i>My Doctor: Dr. {{assignedDoctor.prenom}} {{assignedDoctor.nom}}
         </span>
         <a routerLink="/patients" class="btn btn-outline-secondary btn-sm">
-          <i class="fa-solid fa-arrow-left me-1"></i>Retour
+          <i class="fa-solid fa-arrow-left me-1"></i>Back
         </a>
         <button class="btn btn-primary btn-sm" (click)="goToContactDoctor()">
-          <i class="fa-solid fa-stethoscope me-2"></i>Contacter Médecins
+          <i class="fa-solid fa-stethoscope me-2"></i>Contact Doctors
         </button>
 
         <!-- Notification Bell -->
@@ -30,7 +30,7 @@
                   style="width: 38px; height: 38px; background: white; border-color: #dee2e6;">
             <i class="fa-solid fa-bell text-primary"></i>
             <span *ngIf="unreadCount > 0" 
-                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  class="position-absolute top-0 start-100 tryears oldlate-middle badge rounded-pill bg-danger"
                   style="font-size: 0.65rem; border: 2px solid white;">
               {{ unreadCount > 9 ? '9+' : unreadCount }}
             </span>
@@ -42,7 +42,7 @@
                style="position: absolute; right: 0; top: 45px; width: 320px; z-index: 1060; background: white; overflow: hidden;">
             <div class="p-3 bg-light d-flex justify-content-between align-items-center border-bottom">
               <h6 class="fw-bold mb-0">Notifications</h6>
-              <span class="badge bg-soft-primary text-primary">{{ unreadCount }} nouvelles</span>
+              <span class="badge bg-soft-primary text-primary">{{ unreadCount }} new</span>
             </div>
             
             <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
@@ -52,7 +52,7 @@
               
               <div *ngIf="!isLoadingNotifications && notifications.length === 0" class="text-center py-5 text-muted px-3">
                 <i class="fa-solid fa-bell-slash fa-2x mb-2 opacity-25"></i>
-                <p class="small mb-0">Vous n'avez pas encore de notifications.</p>
+                <p class="small mb-0">You don't have any notifications yet.</p>
               </div>
 
               <div *ngFor="let n of notifications" 
@@ -83,7 +83,7 @@
 
             <div class="p-2 bg-white border-top text-center" *ngIf="notifications.length > 0">
               <button class="btn btn-link text-primary btn-sm fw-bold text-decoration-none w-100" (click)="markAllAsRead()">
-                Tout marquer comme lu
+                Mark all as read
               </button>
             </div>
           </div>
@@ -97,11 +97,11 @@
     <!-- ══ Alerts ══════════════════════════════════════ -->
     <div *ngIf="successMessage" class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
       <i class="fa-solid fa-circle-check fa-lg"></i>
-      <div><strong>Succès !</strong> {{ successMessage }}</div>
+      <div><strong>Success!</strong> {{ successMessage }}</div>
     </div>
     <div *ngIf="errorMessage" class="alert alert-danger border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
       <i class="fa-solid fa-circle-exclamation fa-lg"></i>
-      <div><strong>Erreur !</strong> {{ errorMessage }}</div>
+      <div><strong>Error!</strong> {{ errorMessage }}</div>
     </div>
 
     <!-- ══ Profile Creation Prompt ════════════════════════════ -->
@@ -109,10 +109,10 @@
       <div class="card-body p-4">
         <h6 class="fw-bold mb-2">
           <i class="fa-solid fa-address-card me-2 text-primary"></i>
-          Dossier Patient Incomplet
+          Incomplete Patient File
         </h6>
         <p class="text-muted mb-0">
-          Il semble que votre dossier médical ne soit pas encore complet. Veuillez compléter vos informations personnelles dans le formulaire ci-dessous pour débloquer l'analyse IRM.
+          It seems your medical file is not complete yet. Please complete your personal information in the form below to unlock MRI analysis.
         </p>
       </div>
     </div>
@@ -121,7 +121,7 @@
     <div class="alert alert-info border-0 shadow-sm d-flex justify-content-between align-items-center mb-4" *ngIf="patientId">
       <span>
         <i class="fa-solid fa-id-card me-2"></i>
-        Patient actif : <strong>{{ patient.nom }} {{ patient.prenom }}</strong>
+        Active patient : <strong>{{ patient.nom }} {{ patient.prenom }}</strong>
         <span class="badge bg-primary ms-2">#{{ patientId }}</span>
       </span>
     </div>
@@ -131,18 +131,18 @@
         <div>
           <h5 class="fw-bold mb-1">
             <i class="fa-solid fa-location-crosshairs me-2 text-primary"></i>
-            Reconnaissance de lieu
+            Location Recognition
           </h5>
           <p class="text-muted small mb-0">
-            Ouvrez la camera pour detecter automatiquement si vous etes dans un lieu connu.
+            Open the camera to automatically detect if you are in a known location.
           </p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
           <a routerLink="/location-capture" class="btn btn-primary">
-            <i class="fa-solid fa-video me-2"></i>Ouvrir la camera
+            <i class="fa-solid fa-video me-2"></i>Open camera
           </a>
           <a routerLink="/patient-map" class="btn btn-outline-danger">
-            <i class="fa-solid fa-bell me-2"></i>Interface SOS
+            <i class="fa-solid fa-bell me-2"></i>SOS Interface
           </a>
         </div>
       </div>
@@ -153,28 +153,28 @@
            <div class="card border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #800080, #5c005c); border-radius: 16px;">
                <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                    <div>
-                       <h4 class="fw-bold mb-1"><i class="fa-solid fa-brain me-2"></i>Ma Progression Cognitive</h4>
-                       <p class="mb-0 opacity-75">Statut de votre suivi et de vos activités éducatives.</p>
+                       <h4 class="fw-bold mb-1"><i class="fa-solid fa-brain me-2"></i>My Cognitive Progression</h4>
+                       <p class="mb-0 opacity-75">Status of your tracking and educational activities.</p>
                    </div>
                    <div class="d-flex gap-4 text-center">
                        <div>
-                           <div class="text-uppercase small opacity-75 fw-bold mb-1">Stade Quiz</div>
+                           <div class="text-uppercase small opacity-75 fw-bold mb-1">Quiz Stage</div>
                            <span class="badge bg-white px-3 py-2 fs-6 rounded-pill shadow-sm" style="color: #800080;">{{ patientStadeQuiz }}</span>
                            <div class="mt-2 small opacity-75">{{ patientScoreQuiz }} pts</div>
                        </div>
                        <div class="border-start border-light border-opacity-25 px-4 text-start">
-                           <div class="text-uppercase small opacity-75 fw-bold mb-1 text-center">Stade Jeu</div>
+                           <div class="text-uppercase small opacity-75 fw-bold mb-1 text-center">Game Stage</div>
                            <div class="text-center">
                                <span class="badge bg-white px-3 py-2 fs-6 rounded-pill shadow-sm" style="color: #800080;">{{ patientStadeGame }}</span>
                            </div>
                            <div class="mt-2 small opacity-75 text-center">{{ patientScoreGame }} pts</div>
                        </div>
                        <div class="border-start border-light border-opacity-25 px-4 text-start">
-                           <div class="text-uppercase small opacity-75 fw-bold mb-1">Score Global</div>
+                           <div class="text-uppercase small opacity-75 fw-bold mb-1">Global Score</div>
                            <h3 class="fw-bold mb-0 text-white">{{ patientScoreFinal }} pts</h3>
                        </div>
                        <div>
-                           <a routerLink="/education" class="btn btn-light fw-bold px-4 py-2 shadow-sm rounded-pill mt-2" style="color: #800080;">Jouer</a>
+                           <a routerLink="/education" class="btn btn-light fw-bold px-4 py-2 shadow-sm rounded-pill mt-2" style="color: #800080;">Play</a>
                        </div>
                    </div>
                </div>
@@ -182,16 +182,16 @@
        </div>
     </div>
 
-    <!-- NEW: Mes Rappels Quotidiens -->
+    <!-- NEW: My Daily Reminders -->
     <div class="row mb-4" *ngIf="patientId && reminders.length > 0">
       <div class="col-12">
         <div class="card border-0 shadow-sm rounded-4">
           <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
             <h5 class="fw-bold mb-0">
               <i class="fa-solid fa-clock me-2 text-primary"></i>
-              Mes Rappels Quotidiens
+              My Daily Reminders
             </h5>
-            <p class="text-muted small mt-1 mb-0">Cliquez sur un rappel pour voir les détails et écouter le message vocal.</p>
+            <p class="text-muted small mt-1 mb-0">Click on a reminder to see details and listen to the voice message.</p>
           </div>
           <div class="card-body p-4">
             <div class="row g-3">
@@ -220,18 +220,18 @@
                     <!-- Full Details -->
                     <div class="detail-section">
                       <p *ngIf="r.description"><strong>📋 Description :</strong> {{ r.description }}</p>
-                      <p *ngIf="r.heureRappel"><strong>⏰ Heure :</strong> {{ r.heureRappel }}</p>
-                      <p *ngIf="r.jours"><strong>📅 Jours :</strong> {{ r.jours }}</p>
+                      <p *ngIf="r.heureRappel"><strong>⏰ Time :</strong> {{ r.heureRappel }}</p>
+                      <p *ngIf="r.jours"><strong>📅 Days :</strong> {{ r.jours }}</p>
                       <p *ngIf="r.type"><strong>🏷️ Type :</strong> {{ r.type }}</p>
                     </div>
 
                     <!-- Voice message section -->
                     <div class="voice-section" *ngIf="r.voiceMessagePath">
-                      <p class="mb-2">🎤 <strong>Votre médecin a laissé un message vocal</strong></p>
+                      <p class="mb-2">🎤 <strong>Your doctor left a voice message</strong></p>
 
                       <!-- Audio player -->
                       <audio controls [src]="getVoiceUrl(r.id)" class="audio-player">
-                        Votre navigateur ne supporte pas la lecture audio.
+                        Your browser does not support audio playback.
                       </audio>
 
                       <!-- Summarize button -->
@@ -241,17 +241,17 @@
                         [disabled]="isSummarizing[r.id]">
                         <span *ngIf="!isSummarizing[r.id]">
                           <i class="fa-solid fa-wand-magic-sparkles me-1"></i>
-                          {{ summaries[r.id] ? 'Réactualiser le résumé' : '📝 Résumer avec IA' }}
+                          {{ summaries[r.id] ? 'Refresh summary' : '📝 Summarize with AI' }}
                         </span>
                         <span *ngIf="isSummarizing[r.id]">
                           <i class="fa-solid fa-spinner fa-spin me-1"></i>
-                          ⏳ L'IA analyse le message...
+                          ⏳ AI is analyzing the message...
                         </span>
                       </button>
 
                       <!-- Summary result -->
                       <div *ngIf="summaries[r.id]" class="summary-box animate__fadeIn">
-                        <p><strong>🤖 Résumé IA</strong></p>
+                        <p><strong>🤖 AI Summary</strong></p>
                         <p>{{ summaries[r.id] }}</p>
                       </div>
                     </div>
@@ -259,7 +259,7 @@
                     <!-- No voice message -->
                     <div *ngIf="!r.voiceMessagePath" class="no-voice">
                       <p style="color: #aaa; font-size: 13px;">
-                        🔇 Aucun message vocal pour ce rappel.
+                        🔇 No voice message for this reminder.
                       </p>
                     </div>
 
@@ -282,56 +282,56 @@
           <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
             <h5 class="fw-bold mb-0">
               <i class="fa-solid fa-address-card me-2 text-primary"></i>
-              Mon Profil
+              My Profile
             </h5>
-            <p class="text-muted small mt-1 mb-0">Informations personnelles et médicales</p>
+            <p class="text-muted small mt-1 mb-0">Personal and medical information</p>
             <hr>
           </div>
           <div class="card-body px-4 pb-4">
 
             <div *ngIf="isLoadingPatient" class="text-center py-4">
               <div class="spinner-border text-primary" role="status"></div>
-              <p class="text-muted mt-2">Chargement du profil...</p>
+              <p class="text-muted mt-2">Loading profile...</p>
             </div>
 
             <form *ngIf="!isLoadingPatient" (ngSubmit)="updateProfile()" #profileForm="ngForm">
               <div class="row g-4">
-                <!-- Nom -->
+                <!-- Last Name -->
                 <div class="col-md-6">
                   <div class="form-group mt-3">
                     <input type="text" class="form-control" [(ngModel)]="patient.nom" name="nom" required placeholder="Dupont">
-                    <label class="required">Nom</label>
+                    <label class="required">Last Name</label>
                   </div>
                 </div>
-                <!-- Prénom -->
+                <!-- First Name -->
                 <div class="col-md-6">
                   <div class="form-group mt-3">
                     <input type="text" class="form-control" [(ngModel)]="patient.prenom" name="prenom" required placeholder="Jean">
-                    <label class="required">Prénom</label>
+                    <label class="required">First Name</label>
                   </div>
                 </div>
-                <!-- Âge -->
+                <!-- Age -->
                 <div class="col-md-4">
                   <div class="form-group mt-3">
                     <input type="number" class="form-control" [(ngModel)]="patient.age" name="age" required min="0" max="150" placeholder="65">
-                    <label class="required">Âge</label>
+                    <label class="required">Age</label>
                   </div>
                 </div>
                 <!-- Poids -->
                 <div class="col-md-4">
                   <div class="form-group mt-3">
                     <input type="number" class="form-control" [(ngModel)]="patient.poids" name="poids" required placeholder="72">
-                    <label class="required">Poids (kg)</label>
+                    <label class="required">Weight (kg)</label>
                   </div>
                 </div>
-                <!-- Sexe -->
+                <!-- Gender -->
                 <div class="col-md-4">
                   <div class="form-group mt-3">
                     <select class="form-select" [(ngModel)]="patient.sexe" name="sexe">
-                      <option value="Homme">Homme</option>
-                      <option value="Femme">Femme</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
                     </select>
-                    <label>Sexe</label>
+                    <label>Gender</label>
                   </div>
                 </div>
               </div>
@@ -341,11 +341,11 @@
                         (click)="addPatient()"
                         [disabled]="isSubmitting || profileForm.invalid">
                   <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-                  <i class="fa-solid fa-user-plus me-1"></i>Créer
+                  <i class="fa-solid fa-user-plus me-1"></i>Create
                 </button>
                 <button type="submit" class="btn btn-primary flex-grow-1"
                         [disabled]="isSubmitting || profileForm.invalid">
-                  <i class="fa-solid fa-save me-1"></i>Mettre à jour
+                  <i class="fa-solid fa-save me-1"></i>Update
                 </button>
                 <button type="button" class="btn btn-outline-danger"
                         (click)="deletePatient()">
@@ -363,9 +363,9 @@
           <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
             <h5 class="fw-bold mb-0">
               <i class="fa-solid fa-microscope me-2 text-primary"></i>
-              Nouvelle Analyse IRM
+              New MRI Analysis
             </h5>
-            <p class="text-muted small mt-1 mb-0">Soumettez une image IRM pour diagnostic IA</p>
+            <p class="text-muted small mt-1 mb-0">Submit an MRI image for AI diagnosis</p>
             <hr>
           </div>
           <div class="card-body px-4 pb-4">
@@ -374,8 +374,8 @@
               <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
                 <i class="fa-solid fa-lock fa-2x text-secondary"></i>
               </div>
-              <h6 class="fw-bold text-dark">Espace verrouillé</h6>
-              <p class="small mb-0">Vous devez d'abord compléter et créer votre profil médical (à gauche) pour pouvoir soumettre des analyses IRM.</p>
+              <h6 class="fw-bold text-dark">Locked space</h6>
+              <p class="small mb-0">You must first complete and create your medical profile (on the left) to be able to submit MRI analyses.</p>
             </div>
 
             <form *ngIf="patientId" (ngSubmit)="submitAnalyse()" #analyseForm="ngForm">
@@ -383,27 +383,27 @@
               <!-- Rapport -->
               <div class="mb-4">
                 <label class="small fw-bold text-muted text-uppercase mb-2 d-block" style="letter-spacing:.05em">
-                  <i class="fa-solid fa-file-medical me-1 text-primary"></i>Rapport Médical
+                  <i class="fa-solid fa-file-medical me-1 text-primary"></i>Medical Report
                 </label>
                 <input type="file" class="form-control"
                        (change)="onFileSelected($event, 'rapport_medical')">
-                <small class="text-muted">PDF ou image du rapport médical</small>
+                <small class="text-muted">PDF or image of the medical report</small>
               </div>
 
               <!-- IRM -->
               <div class="mb-4">
                 <label class="small fw-bold text-muted text-uppercase mb-2 d-block" style="letter-spacing:.05em">
-                  <i class="fa-solid fa-brain me-1 text-primary"></i>Image IRM
+                  <i class="fa-solid fa-brain me-1 text-primary"></i>MRI Image
                 </label>
                 <input type="file" class="form-control" accept="image/*"
                        (change)="onFileSelected($event, 'image_irm')">
-                <small class="text-muted d-block">Formats acceptés : JPG, PNG, DCM</small>
+                <small class="text-muted d-block">Accepted formats: JPG, PNG, DCM</small>
                 
                 <div *ngIf="newAnalyse.interpretation" class="alert alert-success mt-3 mb-0 border-0 p-3 shadow-sm d-flex align-items-center gap-3">
                   <i class="fa-solid fa-robot fa-2x"></i>
                   <div>
-                    <h6 class="fw-bold mb-1">Résultat IA Immédiat : {{ newAnalyse.interpretation }}</h6>
-                    <span class="small opacity-75">Confiance : {{ newAnalyse.pourcentage_risque }}%</span>
+                    <h6 class="fw-bold mb-1">Immediate AI Result : {{ newAnalyse.interpretation }}</h6>
+                    <span class="small opacity-75">Confidence : {{ newAnalyse.pourcentage_risque }}%</span>
                   </div>
                 </div>
               </div>
@@ -413,14 +413,14 @@
                 <input type="number" class="form-control"
                        [(ngModel)]="newAnalyse.score_jeu" name="score_jeu"
                        placeholder="Ex : 78">
-                <label>Score Jeu Cognitif <span class="text-muted fw-normal">(optionnel)</span></label>
+                <label>Cognitive Game Score <span class="text-muted fw-normal">(optional)</span></label>
               </div>
 
               <button id="btn-submit-analyse" type="submit"
                       class="btn btn-success w-100 py-2"
                       [disabled]="isSubmitting || !newAnalyse.rapport_medical || !newAnalyse.image_irm">
                 <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-                <i class="fa-solid fa-flask me-2"></i>Lancer l'Analyse IA
+                <i class="fa-solid fa-flask me-2"></i>Run AI Analysis
               </button>
             </form>
           </div>
@@ -434,12 +434,12 @@
         <div>
           <h5 class="fw-bold mb-0">
             <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>
-            Historique de mes Analyses
+            My Analyses History
           </h5>
-          <p class="text-muted small mt-1 mb-0">Résultats complets de vos diagnostics IA</p>
+          <p class="text-muted small mt-1 mb-0">Complete results of your AI diagnostics</p>
         </div>
         <button class="btn btn-sm btn-outline-primary" (click)="loadAnalyses()">
-          <i class="fa-solid fa-rotate-right me-1"></i>Actualiser
+          <i class="fa-solid fa-rotate-right me-1"></i>Refresh
         </button>
       </div>
       <hr class="mx-4 mt-3 mb-0">
@@ -454,10 +454,10 @@
             <thead class="table-light">
               <tr>
                 <th>Date</th>
-                <th>Statut</th>
-                <th>Risque IA</th>
-                <th>Interprétation</th>
-                <th class="text-center">Détails</th>
+                <th>Status</th>
+                <th>AI Risk</th>
+                <th>Interpretation</th>
+                <th class="text-center">Details</th>
               </tr>
             </thead>
             <tbody>
@@ -476,16 +476,16 @@
                   </span>
                   <span *ngIf="a.pourcentageRisque == null" class="text-muted">—</span>
                 </td>
-                <td class="text-muted fst-italic">{{ a.interpretation || 'Aucune' }}</td>
+                <td class="text-muted fst-italic">{{ a.interpretation || 'Noe' }}</td>
                 <td class="text-center">
                   <button class="btn btn-sm btn-outline-primary" (click)="viewDetails(a)">
-                    <i class="fa-solid fa-eye me-1"></i>Voir
+                    <i class="fa-solid fa-eye me-1"></i>View
                   </button>
                 </td>
               </tr>
               <tr *ngIf="analyses.length === 0">
                 <td colspan="5" class="text-center text-muted py-4">
-                  <i class="fa-solid fa-folder-open me-2"></i>Aucune analyse dans l'historique.
+                  <i class="fa-solid fa-folder-open me-2"></i>No analysis in history.
                 </td>
               </tr>
             </tbody>
@@ -500,7 +500,7 @@
       <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 px-4">
         <h6 class="fw-bold mb-0 text-primary">
           <i class="fa-solid fa-microscope me-2"></i>
-          Détails de l'analyse — {{ selectedAnalyse.date }}
+          Analysis Details — {{ selectedAnalyse.date }}
         </h6>
         <button type="button" class="btn-close" (click)="selectedAnalyse = null"></button>
       </div>
@@ -508,45 +508,45 @@
         <div class="row g-4">
           <div class="col-md-8">
             <p class="mb-2">
-              <strong>Rapport Médical :</strong>
-              <span class="text-muted ms-1">{{ selectedAnalyse.rapportMedical || 'Non fourni' }}</span>
+              <strong>Medical Report :</strong>
+              <span class="text-muted ms-1">{{ selectedAnalyse.rapportMedical || 'Not provided' }}</span>
             </p>
             <p class="mb-2">
-              <strong>Résultat IA :</strong>
+              <strong>AI Result :</strong>
               <span class="badge bg-primary ms-1">{{ selectedAnalyse.pourcentageRisque ?? 'N/A' }} %</span>
             </p>
             <p class="mb-2">
-              <strong>Interprétation IA :</strong>
-              <span class="text-muted ms-1 fst-italic">{{ selectedAnalyse.interpretation || 'Non évalué' }}</span>
+              <strong>AI Interpretation :</strong>
+              <span class="text-muted ms-1 fst-italic">{{ selectedAnalyse.interpretation || 'Not evaluated' }}</span>
             </p>
             <p class="mb-2">
-              <strong>Score Cognitif :</strong>
+              <strong>Cognitive Score :</strong>
               <span class="badge bg-secondary ms-1">{{ selectedAnalyse.scoreJeu || 'N/A' }}</span>
             </p>
             <div *ngIf="selectedAnalyse.geminiData" class="mt-4">
               <h6 class="fw-bold text-success border-bottom pb-2">
-                <i class="fa-solid fa-robot me-2"></i>Analyse détaillée du Rapport (IA Gemini)
+                <i class="fa-solid fa-robot me-2"></i>Detailed Report Analysis (Gemini AI)
               </h6>
               <div class="mb-3">
-                <strong>Résumé :</strong>
+                <strong>Summary :</strong>
                 <p class="text-muted small mb-0">{{ selectedAnalyse.geminiData.summary }}</p>
               </div>
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <strong>Points Clés :</strong>
+                  <strong>Key Points :</strong>
                   <ul class="text-muted small mb-0 ps-3">
                     <li *ngFor="let f of selectedAnalyse.geminiData.key_findings">{{ f }}</li>
                   </ul>
                 </div>
                 <div class="col-md-6 mb-3">
-                  <strong>Recommandations :</strong>
+                  <strong>Recommendations :</strong>
                   <ul class="text-muted small mb-0 ps-3">
                     <li *ngFor="let r of selectedAnalyse.geminiData.recommendations">{{ r }}</li>
                   </ul>
                 </div>
               </div>
               <div *ngIf="selectedAnalyse.geminiData.alerts && selectedAnalyse.geminiData.alerts.length > 0" class="alert alert-danger px-3 py-2 small border-0">
-                <strong class="d-block mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i>Alertes :</strong>
+                <strong class="d-block mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i>Alerts :</strong>
                 <ul class="mb-0 ps-3">
                   <li *ngFor="let al of selectedAnalyse.geminiData.alerts">{{ al }}</li>
                 </ul>
@@ -555,7 +555,7 @@
 
             <div *ngIf="selectedAnalyse.observationMedicale" class="alert alert-warning border-0 mt-3">
               <h6 class="fw-bold">
-                <i class="fa-solid fa-user-doctor me-1"></i>Observation du Médecin
+                <i class="fa-solid fa-user-doctor me-1"></i>Doctor's Observation
               </h6>
               <p class="mb-0">{{ selectedAnalyse.observationMedicale }}</p>
             </div>
@@ -564,10 +564,10 @@
             <img *ngIf="selectedAnalyse.imageIRM"
                  [src]="selectedAnalyse.imageIRM"
                  class="img-fluid rounded shadow-sm border"
-                 alt="Image IRM">
+                 alt="MRI Image">
             <div *ngIf="!selectedAnalyse.imageIRM" class="text-muted mt-4">
               <i class="fa-solid fa-image fa-3x mb-2"></i>
-              <p class="small">Aucune image fournie</p>
+              <p class="small">No image provided</p>
             </div>
           </div>
         </div>
@@ -575,13 +575,13 @@
         <!-- Chat Area -->
         <hr class="mt-4">
         <h6 class="fw-bold text-primary mb-3">
-          <i class="fa-solid fa-comment-medical me-2"></i>Assistant Médical IA (Questions sur ce rapport)
+          <i class="fa-solid fa-comment-medical me-2"></i>AI Medical Assistant (Questions about this report)
         </h6>
         <div class="card bg-light border-0">
           <div class="card-body" style="max-height: 250px; overflow-y: auto;">
             <div *ngIf="chatHistory.length === 0" class="text-muted text-center py-3 small">
               <i class="fa-solid fa-hand-sparkles fa-2x mb-2 text-info"></i><br>
-              Posez une question sur votre rapport médical pour recevoir une réponse rapide et claire.
+              Ask a question about your medical report to receive a quick and clear years oldwer.
             </div>
             
             <div *ngFor="let msg of chatHistory" class="mb-3 d-flex" [ngClass]="{'justify-content-end': msg.sender === 'user'}">
@@ -593,13 +593,13 @@
             
             <div *ngIf="isChatting" class="text-muted small mt-2 d-flex align-items-center">
               <div class="spinner-grow spinner-grow-sm text-success me-2" role="status"></div>
-              L'IA analyse le document...
+              AI is analyzing the document...
             </div>
           </div>
           <div class="card-footer bg-white border-0 mt-1 pb-3 px-3">
             <div class="input-group">
               <input type="text" class="form-control form-control-sm border-secondary shadow-none" [(ngModel)]="chatQuestion" (keyup.enter)="sendMessage()" placeholder="Ex: Que signifie hypertrophie ?" [disabled]="isChatting">
-              <button class="btn btn-primary btn-sm px-3" (click)="sendMessage()" [disabled]="isChatting || !chatQuestion.trim()">Envoyer</button>
+              <button class="btn btn-primary btn-sm px-3" (click)="sendMessage()" [disabled]="isChatting || !chatQuestion.trim()">Send</button>
             </div>
           </div>
         </div>
@@ -612,9 +612,9 @@
       <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
         <h5 class="fw-bold mb-0">
           <i class="fa-solid fa-gamepad me-2 text-primary"></i>
-          Historique des Activités
+          Activity History
         </h5>
-        <p class="text-muted small mt-1 mb-0">Vos sessions de Quiz et Jeux cognitifs.</p>
+        <p class="text-muted small mt-1 mb-0">Your Quiz and Cognitive Games sessions.</p>
       </div>
       <hr class="mx-4 mt-3 mb-0">
       <div class="card-body px-4 pb-4">
@@ -623,9 +623,9 @@
             <thead class="table-light">
               <tr>
                 <th>Date</th>
-                <th>Activité</th>
-                <th>Résultat</th>
-                <th>Stade Final</th>
+                <th>Activity</th>
+                <th>Result</th>
+                <th>Final Stage</th>
                 <th>Score</th>
               </tr>
             </thead>
@@ -635,14 +635,14 @@
                 <td>{{ h.activity?.title }} <span class="badge bg-light text-dark shadow-sm ms-2">{{ h.activity?.type }}</span></td>
                 <td>
                   <span class="badge" [ngClass]="h.reussi ? 'bg-success' : 'bg-danger'">
-                    {{ h.reussi ? 'Réussi' : 'Échoué' }}
+                    {{ h.reussi ? 'Passed' : 'Failed' }}
                   </span>
                 </td>
                 <td class="fw-bold text-muted">{{ h.currentStade }}</td>
                 <td class="text-success fw-bold">+{{ h.scoreSession }}</td>
               </tr>
               <tr *ngIf="progressionHistory.length === 0">
-                <td colspan="5" class="text-center text-muted py-4">Aucune activité jouée pour le moment. Allez jouer depuis l'Espace Education !</td>
+                <td colspan="5" class="text-center text-muted py-4">No activity played yet. Go play from the Education Space!</td>
               </tr>
             </tbody>
           </table>

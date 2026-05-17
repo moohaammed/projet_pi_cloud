@@ -1,1 +1,69 @@
-/* rendezvous-list.component.css - Handled by global styles */
+/* ══════════════════════════════════════════════
+   MOBILE RESPONSIVE — rendezvous list
+   ══════════════════════════════════════════════ */
+
+/* Page hero header: reduce height on mobile */
+@media (max-width: 767.98px) {
+  .page-header {
+    padding: 2rem 0 !important;
+  }
+
+  /* Negative margin trick for filter card — remove on mobile */
+  .mt-n5 {
+    margin-top: 1rem !important;
+  }
+
+  /* Filter bar: all cols go full width */
+  .row.align-items-end > [class*="col-"] {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  /* Appointment cards: full width */
+  .col-lg-6 {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  /* Status sidebar: goes on top, full width */
+  .d-sm-flex > div[style*="width: 100px"] {
+    width: 100% !important;
+    min-width: unset !important;
+    flex-direction: row !important;
+    padding: 12px 16px !important;
+    gap: 12px;
+  }
+
+  /* Imminent alert: wrap buttons below */
+  .alert.d-flex.justify-content-between {
+    flex-direction: column !important;
+    gap: 10px;
+  }
+
+  .alert.d-flex .btn {
+    margin-left: 0 !important;
+    align-self: flex-start;
+  }
+
+  /* Card action buttons: wrap */
+  .d-flex.gap-2 {
+    flex-wrap: wrap;
+  }
+
+  /* Patient profile modal: full width */
+  .modal-dialog.modal-lg {
+    max-width: 96vw !important;
+    margin: 2vh auto !important;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .page-header h1 {
+    font-size: 1.4rem !important;
+  }
+
+  /* Filter reset + add buttons side by side */
+  .col-lg-3.col-md-6.d-flex.gap-2 {
+    flex-direction: row;
+  }
+}

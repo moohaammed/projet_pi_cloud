@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 export interface HeartRateRecord {
   id?: string;
@@ -12,6 +12,26 @@ export interface HeartRateRecord {
   capturedAt?: string;
   receivedAt?: string;
   recordedAt: string; // Legacy field — kept for backward compatibility
+}
+
+export interface HeartRateLiveState {
+  eventId?: string;
+  userId: number;
+  deviceName?: string;
+  bpm?: number | null;
+  source?: string;
+  capturedAt?: string;
+  receivedAt?: string;
+  lastReceivedAt?: string;
+  lastSeenAtMs?: number;
+  connected: boolean;
+  zone?: string;
+}
+
+export interface SmartwatchTokenResponse {
+  token: string;
+  userId: number;
+  expiresAt: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -36,6 +56,29 @@ export class HeartRateService {
   }
 
   /**
+   * GET current live/offline state for several users in one request.
+   */
+  getStates(userIds: number[]): Observable<HeartRateLiveState[]> {
+    if (userIds.length === 0) {
+      return of([]);
+    }
+    return this.http.get<HeartRateLiveState[]>(`${this.apiUrl}/states`, {
+      params: { userIds: userIds.join(',') }
+    });
+  }
+
+  /**
+   * Generate a short-lived token for the patient smartwatch collector.
+   */
+  generateSmartwatchToken(userId: number): Observable<SmartwatchTokenResponse> {
+    return this.http.post<SmartwatchTokenResponse>(`${this.apiUrl}/smartwatch-token`, { userId });
+  }
+
+  getIngestUrl(): string {
+    return `${this.apiUrl}/ingest`;
+  }
+
+  /**
    * GET a specific heart-rate record by MongoDB ID.
    */
   getById(id: string): Observable<HeartRateRecord> {
@@ -54,19 +97,25 @@ export class HeartRateService {
    * Returns an Observable that emits HeartRateRecord objects
    * as they arrive from the Kafka-backed streaming pipeline.
    *
-   * @param userId optional — if provided, only events for this user are streamed.
+   * @param userFilter optional. A number streams one user; an array streams several users.
    */
-  connectLiveStream(userId?: number): Observable<HeartRateRecord> {
+  connectLiveStream(userFilter?: number | number[]): Observable<HeartRateRecord> {
     return new Observable(observer => {
-      const url = userId != null
-        ? `${this.apiUrl}/stream?userId=${userId}`
-        : `${this.apiUrl}/stream`;
+      let url = `${this.apiUrl}/stream`;
+      if (Array.isArray(userFilter) && userFilter.length > 0) {
+        url = `${url}?userIds=${encodeURIComponent(userFilter.join(','))}`;
+      } else if (typeof userFilter === 'number') {
+        url = `${url}?userId=${userFilter}`;
+      }
       const eventSource = new EventSource(url);
 
       eventSource.addEventListener('heartrate', (event: any) => {
         try {
           const data = JSON.parse(event.data);
-          observer.next(data);
+          observer.next({
+            ...data,
+            recordedAt: data.recordedAt || data.receivedAt || data.capturedAt || new Date().toISOString()
+          });
         } catch (e) {
           console.error('[SSE] Failed to parse event:', e);
         }
