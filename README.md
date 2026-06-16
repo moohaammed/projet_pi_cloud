@@ -708,7 +708,7 @@ projet_pi_cloud-main/
 ## 👥 Team
 
 > Project developed at **ESPRIT** — École Supérieure Privée d'Ingénierie et de Technologies  
-> Group: **2A15** | Academic Year: 2025–2026
+> Group: **arctic** | Academic Year: 2025–2026
 
 ---
 
